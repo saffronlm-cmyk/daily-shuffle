@@ -1,0 +1,5 @@
+.DS_Store
+*.rtf
+*.txt
+archive_old_files/
+claude_conversations/
