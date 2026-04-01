@@ -37,7 +37,7 @@
 
   /* Layout */
   .app { display: flex; flex-direction: column; min-height: 100vh; }
-  header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 20px; display: flex; align-items: center; gap: 24px; height: 56px; position: sticky; top: 0; z-index: 100; }
+  header { background: var(--surface); border-bottom: 1px solid var(--border); padding: env(safe-area-inset-top) 20px 0; display: flex; align-items: center; gap: 24px; height: calc(56px + env(safe-area-inset-top)); position: sticky; top: 0; z-index: 100; }
   .logo { font-size: 18px; font-weight: 700; color: var(--accent); letter-spacing: -0.5px; white-space: nowrap; }
   .logo span { color: var(--text2); font-weight: 400; }
   nav { display: flex; gap: 4px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; flex-shrink: 1; min-width: 0; }
@@ -46,7 +46,7 @@
   nav button:hover { color: var(--text); background: var(--surface2); }
   nav button.active { color: var(--accent); background: rgba(200,132,154,.12); }
   .header-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
-  main { flex: 1; }
+  main { flex: 1; padding-bottom: env(safe-area-inset-bottom); }
   .tab-content { display: none; }
   .tab-content.active { display: block; }
 
@@ -298,7 +298,7 @@
   .settings-btn.key-active { border-color: var(--green); color: var(--green); }
   .settings-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity .2s; }
   .settings-overlay.open { opacity: 1; pointer-events: all; }
-  .settings-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 28px; max-width: 440px; width: 100%; position: relative; }
+  .settings-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 28px; max-width: 440px; width: 100%; position: relative; max-height: 85vh; overflow-y: auto; -webkit-overflow-scrolling: touch; }
   .settings-panel h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
   .settings-panel p { font-size: 13px; color: var(--text2); margin-bottom: 20px; line-height: 1.5; }
   .settings-panel .form-group label { margin-bottom: 6px; }
