@@ -2,7 +2,7 @@
   "name": "Daily Shuffle",
   "short_name": "Daily Shuffle",
   "description": "Personal meal planner — shuffle, plan, shop.",
-  "start_url": "./daily-shuffle.html",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",

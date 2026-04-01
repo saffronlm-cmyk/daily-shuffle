@@ -3,7 +3,7 @@
 
 const CACHE = 'daily-shuffle-v9';
 const ASSETS = [
-  './daily-shuffle.html',
+  './index.html',
   './manifest.json',
   './icon-192.png',
   './icon-512.png'
