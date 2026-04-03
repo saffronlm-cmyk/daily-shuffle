@@ -3345,7 +3345,9 @@ function exportLibrary() {
     nutrition,
     hiddenRecipes: [...hiddenRecipes],
     fullData: Object.fromEntries(
-      Object.entries(RECIPE_FULL_DATA).filter(([,v]) => v.nutrition || v.costPerPortion)
+      Object.entries(RECIPE_FULL_DATA).filter(([id, v]) =>
+        v.nutrition || v.costPerPortion || v.ingredients?.length || v.method?.length || v.tips || v.storage
+      )
     )
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
@@ -3366,7 +3368,20 @@ function importLibrary(evt) {
     try {
       const data = JSON.parse(e.target.result);
       if (!data.version) throw new Error('Unrecognised file format.');
-      if (data.overrides) localStorage.setItem('ds_overrides', JSON.stringify(data.overrides));
+      // Merge fullData into overrides so ingredients/method survive reload
+      let overrides = data.overrides || {};
+      if (data.fullData) {
+        for (const [id, fd] of Object.entries(data.fullData)) {
+          if (!overrides[id]) overrides[id] = {};
+          if (fd.ingredients?.length) overrides[id].ingredients = fd.ingredients;
+          if (fd.method?.length) overrides[id].method = fd.method;
+          if (fd.tips) overrides[id].tips = fd.tips;
+          if (fd.storage) overrides[id].storage = fd.storage;
+          if (fd.nutrition) overrides[id].nutrition = fd.nutrition;
+          if (fd.costPerPortion) overrides[id].costPerPortion = fd.costPerPortion;
+        }
+      }
+      localStorage.setItem('ds_overrides', JSON.stringify(overrides));
       if (data.nutrition) localStorage.setItem('ds_nutrition', JSON.stringify(data.nutrition));
       if (data.customRecipes) localStorage.setItem('ds_custom_recipes', JSON.stringify(data.customRecipes));
       if (data.hiddenRecipes) localStorage.setItem('ds_hidden_recipes', JSON.stringify(data.hiddenRecipes));
@@ -5388,6 +5403,7 @@ function addRecipe() {
 
   window._parsedAiRecipe = null;
   saveCustom();
+  saveOverrides(); // persist full data (ingredients/method) immediately
   clearForm();
   // Clear AI inputs
   aiImages = [];
@@ -5545,6 +5561,8 @@ function autoSync() {
 }
 
 function getLibraryPayload() {
+  // Ensure overrides are saved before building payload
+  saveOverrides();
   return {
     customRecipes: recipes.filter(r => !RECIPE_BOOK.find(b => b.id === r.id)),
     overrides: JSON.parse(localStorage.getItem('ds_overrides') || '{}'),
