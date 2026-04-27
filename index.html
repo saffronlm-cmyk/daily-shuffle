@@ -1144,2073 +1144,109 @@
 // All recipes: GF / DF / banana-free by default
 // groceryItems: key things to buy for each recipe, grouped by category
 
-const RECIPE_FULL_DATA = {
-  1: {
-    ingredients: [
-  {group: 'Base (1 serving)', item: '30 g rolled oats'},
-  {group: 'Base (1 serving)', item: '250 ml water'},
-  {group: 'Base (1 serving)', item: 'Pinch of salt'},
-  {group: 'Base (1 serving)', item: '150 g liquid egg whites'},
-  {group: 'Base (1 serving)', item: '20 g Medjool date, puréed (about 1 small date)'},
-  {group: 'Base (1 serving)', item: '1 tsp vanilla extract'},
-  {group: 'Base (1 serving)', item: 'Dash of almond extract'},
-  {group: 'Base (1 serving)', item: '1½ tbsp (10 g) milled flaxseeds'},
-  {group: 'Batch Base (4 servings)', item: '45 g rolled oats + 45 g quinoa flakes'},
-  {group: 'Batch Base (4 servings)', item: '750–900 ml water'},
-  {group: 'Batch Base (4 servings)', item: '5 g salt'},
-  {group: 'Batch Base (4 servings)', item: '450 g liquid egg whites'},
-  {group: 'Batch Base (4 servings)', item: '4 Medjool dates (approx. 80 g), puréed'},
-  {group: 'Batch Base (4 servings)', item: '1 tsp vanilla extract'},
-  {group: 'Batch Base (4 servings)', item: 'Dash of almond extract'},
-  {group: 'Batch Base (4 servings)', item: '3 tbsp milled flaxseeds'}
-],
-    method: [
-  `Add the oats, water, and salt to a small saucepan. Cook over medium heat, stirring regularly, until the oats have absorbed most of the water and the mixture is thick — around 5–7 minutes.`,
-  `Reduce the heat to low. Pour in the egg whites and whisk constantly until fully incorporated and the mixture thickens to a creamy, custardy consistency, about 2–3 minutes. Do not stop whisking or the eggs will scramble.`,
-  `Remove from the heat and stir through the puréed date, vanilla, almond extract, and flaxseeds. Serve immediately, or allow to cool and divide into jars for batch prep.`
-],
-    tips: `Whisking is non-negotiable — constant movement from the moment the egg whites hit the pan prevents scrambling and creates that silky texture. Purée your dates ahead of time. Soak in warm water for 10 minutes and mash with a fork, or use a small blender. Variations: stir in grated carrot + cinnamon + ginger (Carrot Cake); pumpkin purée + pumpkin spice (Pumpkin Pie); cocoa + espresso + chocolate protein powder + butternut squash purée (Double Chocolate Cake Batter); PBfit + protein powder (Peanut Butter); grated apple + cinnamon (Apple Cinnamon); or lemon zest + chia seeds (Lemon Chia).`,
-    storage: `Fridge: up to 4 days in a sealed container. Reheat in a saucepan over
-low heat with 2–3 tbsp water or milk, stirring well. Or microwave for 90
-seconds, stirring halfway.`,
-    nutrition: null,
-    costPerPortion: { aldi: 0.67, asda: 0.72, sainsburys: 0.80, note: "Egg whites and Medjool dates are the main cost drivers. Dates from Aldi vary in availability — Asda/Sainsbury's are more consistent." },
-  },
-  2: {
-    ingredients: [
-  {item: '90 g (1 cup) quinoa flakes'},
-  {item: '3 tbsp cocoa powder'},
-  {item: '2 tbsp chia seeds'},
-  {item: '2 tbsp coconut sugar'},
-  {item: '1 heaped tbsp silken tofu'},
-  {item: '15 g vegan chocolate protein powder'},
-  {item: '125 ml (½ cup) Alpro high-protein soya milk'},
-  {item: '1 tsp instant coffee'},
-  {item: '20 g dark chocolate (70%), chopped or grated (topping)'}
-],
-    method: [
-  `Combine all ingredients except the chocolate topping in a large bowl or jar. Stir well until fully combined — ensure the silken tofu is thoroughly incorporated.`,
-  `Divide evenly between 4 airtight jars or containers.`,
-  `Refrigerate overnight, or for a minimum of 6 hours, until the chia seeds have swelled and the mixture has thickened to a dense, fudgy consistency.`,
-  `Top with chopped dark chocolate before serving. Serve cold.`
-],
-    tips: `The consistency thickens significantly overnight. If you prefer a looser texture, stir in a splash of soya milk before eating.`,
-    storage: `Keeps in the fridge for up to 4 days, making it ideal for meal prep.`,
-    nutrition: null,
-    costPerPortion: { aldi: 0.42, asda: 0.48, sainsburys: 0.51, note: "Protein powder is ~40% of cost per serving. Quinoa flakes are the second largest spend." },
-  },
-  3: {
-    ingredients: [
-  {item: '30 g rolled oats'},
-  {item: '30 g quinoa flakes'},
-  {item: '3 tbsp chia seeds'},
-  {item: '2 tbsp cocoa powder'},
-  {item: '4 Medjool dates, pitted'},
-  {item: '½ tsp baking soda'},
-  {item: '½ tsp baking powder'},
-  {item: 'Pinch of salt'},
-  {item: '60 g chocolate protein powder'},
-  {item: '250 ml (1 cup) Alpro high-protein soya milk'},
-  {item: '125 ml (½ cup) water'},
-  {item: '75 g (½ cup) fresh or frozen raspberries'},
-  {item: '30 g (¼ cup) dark chocolate (85%), roughly chopped'}
-],
-    method: [
-  `Preheat the oven to 180°C / 160°C fan / 350°F / Gas Mark 4.`,
-  `Add all ingredients except the raspberries and chocolate to a blender. Blitz until smooth, around 30 seconds.`,
-  `Pour the batter into a lined muffin tin or oven-safe dish. Fold in the raspberries and chopped chocolate.`,
-  `Bake for 15–20 minutes, until the edges are set and the centres are just firm.`,
-  `Leave to cool before serving.`
-],
-    tips: `Slightly underbaking keeps them fudgy rather than dry — check at 15 minutes. A silicone muffin tin means no lining needed and easy removal once cooled.`,
-    storage: `Store in an airtight container in the fridge for up to 4 days. Reheat in
-the microwave for 30–45 seconds, or eat cold.`,
-    nutrition: null,
-    costPerPortion: { aldi: 0.79, asda: 0.84, sainsburys: 0.89, note: "Protein powder and Medjool dates account for ~73% of the batch cost." },
-  },
-  4: {
-    ingredients: [
-  {group: 'Dry', item: '50 g gluten-free self-raising, plain, or oat flour'},
-  {group: 'Dry', item: '25 g egg white powder'},
-  {group: 'Dry', item: '20 g vegan protein powder'},
-  {group: 'Dry', item: '½ tsp (2 g) baking powder'},
-  {group: 'Dry', item: '2 g baking soda'},
-  {group: 'Dry', item: '1 g ground cinnamon (optional)'},
-  {group: 'Dry', item: 'Pinch of salt'},
-  {group: 'Dry', item: '1 tbsp coconut sugar'},
-  {group: 'Wet', item: '160 ml water'},
-  {group: 'Wet', item: '60 g unsweetened applesauce'},
-  {group: 'Wet', item: '3 tbsp plain soya yoghurt'},
-  {group: 'Fold-ins', item: '50 g fresh or frozen blueberries'},
-  {group: 'Fold-ins', item: '60 g dark chocolate chunks'}
-],
-    method: [
-  `Sieve the egg white powder into a small bowl. Add half the water (80 ml) and stir until the powder begins to dissolve. Add the remaining water and beat until the mixture reaches a meringue-like consistency.`,
-  `In a large bowl, combine the flour, protein powder, baking powder, baking soda, cinnamon, salt, and coconut sugar.`,
-  `In a separate bowl, mix the applesauce and yoghurt. Add this to the dry ingredients and stir until combined. Gently fold in the egg whites until just incorporated, then fold in the blueberries and chocolate chunks.`,
-  `Heat a non-stick skillet over medium heat and lightly grease. Spoon the batter into small rounds (about 1 tbsp each) and cook for 2–3 minutes per side until golden and cooked through.`
-],
-    tips: null,
-    storage: null,
-    nutrition: null,
-    costPerPortion: { aldi: 0.80, asda: 0.86, sainsburys: 0.91, note: "Egg white powder and dark chocolate chunks are the main costs. Swap to frozen blueberries to save ~10p/serving." },
-  },
-  5: {
-    ingredients: [
-  {group: 'Dry', item: '60 g (½ cup) gluten-free flour'},
-  {group: 'Dry', item: '60 g (½ cup) oat flour'},
-  {group: 'Dry', item: '30 g protein powder'},
-  {group: 'Dry', item: '1 tbsp baking powder'},
-  {group: 'Dry', item: '2 tsp pumpkin pie spice or ground cinnamon'},
-  {group: 'Dry', item: '¼ tsp salt'},
-  {group: 'Wet', item: '190 g (¾ cup) pumpkin purée'},
-  {group: 'Wet', item: '2 large eggs'},
-  {group: 'Wet', item: '125 g (½ cup) liquid egg whites'},
-  {group: 'Wet', item: '250 ml (1 cup) unsweetened soya milk'},
-  {group: 'Wet', item: '125 g (½ cup) plain soya yoghurt'},
-  {group: 'Wet', item: '2 tbsp coconut oil, melted'},
-  {group: 'Wet', item: 'Maple syrup, to taste'},
-  {group: 'Wet', item: 'Vanilla extract, to taste'},
-  {group: 'Optional', item: 'Dark or white chocolate chips'}
-],
-    method: [
-  `In a small bowl, whisk together all dry ingredients.`,
-  `In a large bowl, whisk together the pumpkin purée, eggs, egg whites, soya milk, yoghurt, coconut oil, maple syrup, and vanilla until smooth.`,
-  `Add the dry ingredients to the wet and fold until just combined — do not overmix.`,
-  `Heat a non-stick skillet or griddle over medium heat and lightly grease. Spoon the batter in ¼ cup portions. If using chocolate chips, press a few into each pancake before the first flip.`,
-  `Cook for 2–3 minutes until bubbles appear on the surface, then flip and cook for a further 1–2 minutes. Repeat with remaining batter.`
-],
-    tips: null,
-    storage: null,
-    nutrition: null,
-    costPerPortion: { aldi: 0.96, asda: 1.03, sainsburys: 1.11, note: "Protein powder, pumpkin purée, and eggs drive the cost. Aldi stocks tinned pumpkin seasonally — check availability." },
-  },
-  6: {
-    ingredients: [
-  {group: 'Chocolate Variation — Dry', item: '70 g oat flour'},
-  {group: 'Chocolate Variation — Dry', item: '3 tbsp cocoa powder'},
-  {group: 'Chocolate Variation — Dry', item: '1 tbsp instant coffee powder, dissolved in 30 ml hot water'},
-  {group: 'Chocolate Variation — Dry', item: '50 g chocolate protein powder'},
-  {group: 'Chocolate Variation — Dry', item: 'Pinch of salt'},
-  {group: 'Chocolate Variation — Wet', item: '140 ml soya milk'},
-  {group: 'Chocolate Variation — Wet', item: '100 g plain soya yoghurt'},
-  {group: 'Chocolate Variation — Wet', item: '20 g date purée'},
-  {group: 'Chocolate Variation — Wet', item: '60 g (¼ cup) applesauce'},
-  {group: 'Chocolate Variation — Wet', item: '2 large eggs'},
-  {group: 'Chocolate Variation — Wet', item: '130 g liquid egg whites'},
-  {group: 'Chocolate Fold-ins', item: '4 squares dark chocolate (70%), roughly chopped'},
-  {group: 'Chocolate Fold-ins', item: 'Fresh or frozen raspberries (optional)'},
-  {group: 'Lemon Variation — Dry', item: '100 g oat flour'},
-  {group: 'Lemon Variation — Dry', item: '50 g salted caramel protein powder'},
-  {group: 'Lemon Variation — Dry', item: '1 tsp baking powder'},
-  {group: 'Lemon Variation — Dry', item: 'Pinch of salt'},
-  {group: 'Lemon Variation — Wet', item: '100 ml soya milk'},
-  {group: 'Lemon Variation — Wet', item: '120 g plain soya yoghurt'},
-  {group: 'Lemon Variation — Wet', item: '20 g date purée'},
-  {group: 'Lemon Variation — Wet', item: '65 g applesauce'},
-  {group: 'Lemon Variation — Wet', item: '2 large eggs'},
-  {group: 'Lemon Variation — Wet', item: '150 g liquid egg whites'},
-  {group: 'Lemon Variation — Wet', item: '1 tbsp lemon juice'},
-  {group: 'Lemon Variation — Wet', item: 'Zest of 1 lemon'}
-],
-    method: [
-  `Preheat the oven to 180°C / 160°C fan / 350°F / Gas Mark 4.`,
-  `Whisk together all dry ingredients in a large bowl.`,
-  `In a separate bowl, combine all wet ingredients except the egg whites. Pour into the dry ingredients and stir until just combined.`,
-  `In a clean bowl, beat the egg whites to stiff peaks — do not overbeat.`,
-  `Gently fold the egg whites into the batter in two additions, keeping as much air as possible.`,
-  `Pour into a greased oven-safe dish. Add any fold-in ingredients and distribute evenly.`,
-  `Bake for the time specified in the variation — 20 minutes for Chocolate, 25 minutes for Lemon. The edges should be set and the centre just firm.`
-],
-    tips: `Being gentle when folding in the egg whites is key to the soufflé-like texture — resist the urge to stir.`,
-    storage: null,
-    nutrition: `Chocolate variation: 297 kcal | Protein: 26.5 g | Carbs: 21.3`,
-    costPerPortion: { aldi: 1.44, asda: 1.53, sainsburys: 1.61, note: "Protein powder accounts for ~50% of total cost. Chocolate variation shown — lemon is similar." },
-  },
-  7: {
-    ingredients: [
-  {item: '20 g oat or quinoa flour'},
-  {item: '2 tbsp (20 g) cocoa powder'},
-  {item: '½ tsp baking soda'},
-  {item: '½ tsp baking powder'},
-  {item: '½ tsp salt'},
-  {item: '30 g chocolate protein powder'},
-  {item: '125 ml (½ cup) soya milk'},
-  {item: '1 shot espresso'},
-  {item: '1 tbsp dark chocolate (85%), roughly chopped'},
-  {item: '40 g fresh or frozen raspberries (topping)'}
-],
-    method: [
-  `Whisk together all dry ingredients in a microwave-safe bowl until well combined.`,
-  `Mix the espresso and soya milk together, then pour into the dry ingredients and stir until smooth.`,
-  `Fold in the chopped chocolate.`,
-  `Microwave on high for 2–3 minutes. The centre should remain slightly underdone — it will continue to set as it cools.`,
-  `Top with raspberries and serve immediately.`
-],
-    tips: null,
-    storage: null,
-    nutrition: null,
-    costPerPortion: { aldi: 1.91, asda: 2.02, sainsburys: 2.10, note: "Single-serve. Protein powder is ~66% of cost. Batch the dry mix to reduce per-portion effort." },
-  },
-  9: {
-    ingredients: [
-  {group: 'Dry', item: '120 g (1 cup) oat flour'},
-  {group: 'Dry', item: '60 g (½ cup) protein powder'},
-  {group: 'Dry', item: '1 tsp baking powder'},
-  {group: 'Dry', item: '½ tsp baking soda'},
-  {group: 'Dry', item: '½ tsp salt'},
-  {group: 'Dry', item: '1–2 tsp ground cinnamon and/or pumpkin spice'},
-  {group: 'Wet', item: '240 g (1 cup) pumpkin purée'},
-  {group: 'Wet', item: '1 large egg'},
-  {group: 'Wet', item: '1 egg white'},
-  {group: 'Wet', item: '40 g date purée'},
-  {group: 'Wet', item: '2 tbsp neutral oil'},
-  {group: 'Wet', item: '60 ml (¼ cup) unsweetened soya milk'},
-  {group: 'Wet', item: '1 tsp vanilla extract'},
-  {group: 'Wet', item: '1–2 tsp lemon juice or apple cider vinegar'}
-],
-    method: [
-  `Preheat the oven to 180°C / 160°C fan / 350°F / Gas Mark 4. Line a 9-hole muffin tin with cases or lightly grease.`,
-  `In a large bowl, whisk together all dry ingredients.`,
-  `In a separate bowl, whisk together the pumpkin purée, egg, egg white, date purée, oil, soya milk, vanilla, and lemon juice until smooth.`,
-  `Pour the wet ingredients into the dry and fold until just combined — a few lumps are fine. Do not overmix.`,
-  `Divide the batter evenly between the 9 muffin cases, filling each about three-quarters full.`,
-  `Bake for 20–22 minutes, until a skewer inserted into the centre comes out clean.`,
-  `Leave to cool in the tin for 5 minutes before transferring to a wire rack.`
-],
-    tips: `The lemon juice or apple cider vinegar reacts with the baking soda for a better rise — do not skip it. These freeze well. Cool completely, wrap individually, and freeze for up to 3 months.`,
-    storage: `Room temperature for up to 2 days, or fridge for up to 5 days.`,
-    nutrition: null,
-    costPerPortion: { aldi: 0.53, asda: 0.56, sainsburys: 0.59, note: "Best cost-per-serving in the breakfast range. Protein powder and dates are the main costs across the 9 muffins." },
-  },
-  10: {
-    ingredients: [
-  {group: 'Pudding', item: '375 ml (1½ cups) water'},
-  {group: 'Pudding', item: '185 ml (¾ cup) Alpro high-protein soya milk'},
-  {group: 'Pudding', item: '60 g (½ cup) chocolate protein powder'},
-  {group: 'Pudding', item: '2 tbsp cocoa powder'},
-  {group: 'Pudding', item: '1½ tbsp coconut sugar'},
-  {group: 'Pudding', item: '60 g (¼ cup) chia seeds'},
-  {group: 'Suggested toppings (per serving)', item: '1 tbsp Nush protein yoghurt'},
-  {group: 'Suggested toppings (per serving)', item: '½ rice cake'},
-  {group: 'Suggested toppings (per serving)', item: '1 tsp desiccated coconut'},
-  {group: 'Suggested toppings (per serving)', item: '11 g dark chocolate (70%), chopped'},
-  {group: 'Suggested toppings (per serving)', item: '12 g hazelnut butter'},
-  {group: 'Suggested toppings (per serving)', item: '40 g (¼ cup) frozen raspberries'}
-],
-    method: [
-  `Add the protein powder, cocoa, coconut sugar, water, and soya milk to a blender. Blitz until smooth and fully combined.`,
-  `Pour into a large bowl and stir in the chia seeds until evenly distributed.`,
-  `Refrigerate for a minimum of 4 hours, or overnight, until the chia seeds have swelled and the mixture has set.`,
-  `Divide into 6 portions and serve with toppings of your choice.`
-],
-    tips: `Stir the mixture once after 30 minutes in the fridge to prevent the chia seeds clumping at the bottom. The pudding base keeps for up to 4 days — add toppings fresh when serving.`,
-    storage: null,
-    nutrition: `Pudding base only: 96 kcal | Protein: 9.5 g | Carbs: 7.8 g |`,
-    costPerPortion: { aldi: 0.58, asda: 0.61, sainsburys: 0.63, note: "Base only — suggested toppings add ~£0.70–0.75/serving if all used. Protein powder is the main cost driver." },
-  },
-  11: {
-    ingredients: [
-  {group: 'Base', item: '10 g cocoa powder (see variations for additional)'},
-  {group: 'Base', item: 'Pinch of sea salt'},
-  {group: 'Base', item: '50 g liquid egg whites'},
-  {group: 'Base', item: '20 g pure maple syrup'},
-  {group: 'Base', item: '2 tbsp applesauce or soya milk'},
-  {group: 'Base', item: '20 g dark chocolate (74%), roughly chopped'},
-  {group: 'Sweet Potato Variation (add to base)', item: '135 g sweet potato, cooked and mashed'},
-  {group: 'Sweet Potato Variation (add to base)', item: '30 g chocolate protein powder'},
-  {group: 'Sweet Potato Variation (add to base)', item: '10 g additional cocoa powder'},
-  {group: 'Pumpkin Variation (add to base)', item: '240 g (1 cup) pumpkin purée'},
-  {group: 'Pumpkin Variation (add to base)', item: '75 g chocolate protein powder'},
-  {group: 'Pumpkin Variation (add to base)', item: '2 tbsp additional cocoa powder'},
-  {group: 'Pumpkin Variation (add to base)', item: '20 g oat flour'},
-  {group: 'Pumpkin Variation (add to base)', item: '1 tbsp PBfit powder'}
-],
-    method: [
-  `Preheat the oven to 180°C / 160°C fan / 350°F / Gas Mark 4.`,
-  `Add all ingredients except the chocolate to a blender and blitz until completely smooth.`,
-  `Pour into a lined 5×3 inch baking tin. Press the chopped chocolate into the top.`,
-  `Bake for 30 minutes, or until just set. Adjust time depending on how fudgy you like the centre.`,
-  `Leave to cool fully before slicing — these brownies firm up significantly as they cool.`
-],
-    tips: `Resist cutting them straight from the oven — they need the cooling time to set properly.`,
-    storage: null,
-    nutrition: `Sweet Potato variation: 173 kcal | Protein: 13.9 g | Carbs:`,
-    costPerPortion: { aldi: 1.71, asda: 1.79, sainsburys: 1.88, note: "Pumpkin variation. 75g protein powder accounts for ~64% of batch cost. Sweet potato variation is significantly cheaper." },
-  },
-  12: {
-    ingredients: [
-  {group: 'Base', item: '10 g cocoa powder (see variations for additional)'},
-  {group: 'Base', item: 'Pinch of sea salt'},
-  {group: 'Base', item: '50 g liquid egg whites'},
-  {group: 'Base', item: '20 g pure maple syrup'},
-  {group: 'Base', item: '2 tbsp applesauce or soya milk'},
-  {group: 'Base', item: '20 g dark chocolate (74%), roughly chopped'},
-  {group: 'Sweet Potato Variation (add to base)', item: '135 g sweet potato, cooked and mashed'},
-  {group: 'Sweet Potato Variation (add to base)', item: '30 g chocolate protein powder'},
-  {group: 'Sweet Potato Variation (add to base)', item: '10 g additional cocoa powder'},
-  {group: 'Pumpkin Variation (add to base)', item: '240 g (1 cup) pumpkin purée'},
-  {group: 'Pumpkin Variation (add to base)', item: '75 g chocolate protein powder'},
-  {group: 'Pumpkin Variation (add to base)', item: '2 tbsp additional cocoa powder'},
-  {group: 'Pumpkin Variation (add to base)', item: '20 g oat flour'},
-  {group: 'Pumpkin Variation (add to base)', item: '1 tbsp PBfit powder'}
-],
-    method: [
-  `Preheat the oven to 180°C / 160°C fan / 350°F / Gas Mark 4.`,
-  `Add all ingredients except the chocolate to a blender and blitz until completely smooth.`,
-  `Pour into a lined 5×3 inch baking tin. Press the chopped chocolate into the top.`,
-  `Bake for 30 minutes, or until just set. Adjust time depending on how fudgy you like the centre.`,
-  `Leave to cool fully before slicing — these brownies firm up significantly as they cool.`
-],
-    tips: `Resist cutting them straight from the oven — they need the cooling time to set properly.`,
-    storage: null,
-    nutrition: `Sweet Potato variation: 173 kcal | Protein: 13.9 g | Carbs:`,
-    costPerPortion: { aldi: 0.78, asda: 0.82, sainsburys: 0.88, note: "Sweet potato variation. Much cheaper than the pumpkin version (30g vs 75g protein powder). Sweet potato is very affordable." },
-  },
-  13: {
-    ingredients: [
-  {item: '1 cup (approx. 200 g) steamed butternut squash, puréed'},
-  {item: '30 g chocolate protein powder (Free Soul or similar)'},
-  {item: '1½ tbsp cocoa powder'},
-  {item: '1 tbsp chocolate PBfit powder'},
-  {item: '½ tsp instant decaf coffee'},
-  {item: '15 g dark chocolate (85%), roughly chopped or grated'}
-],
-    method: [
-  `Steam the butternut squash until completely tender, then mash or blend to a smooth purée. Allow to cool slightly.`,
-  `Add the protein powder, cocoa powder, PBfit powder, and instant coffee to the warm purée and stir vigorously until fully combined and smooth. The mixture should be thick and fudgy — add a splash of water or soya milk to loosen if needed.`,
-  `Transfer to a bowl and top with the chopped dark chocolate. Serve warm, or refrigerate for at least 30 minutes for a cold, denser pudding.`
-],
-    tips: `The pudding thickens considerably as it cools — if eating warm, it will be more mousse-like; cold, it firms up to a fudgy brownie-batter texture. A small shot of espresso works just as well as the instant decaf — it deepens the chocolate flavour significantly. Stir in a spoonful of soya yoghurt for extra creaminess.`,
-    storage: `Store in an airtight container in the fridge for up to 3 days. Stir
-before serving.`,
-    nutrition: `391 kcal | Protein: 30.1 g | Carbs: 37.6 g | Fat: 11.2 g |`,
-    costPerPortion: { aldi: 1.90, asda: 1.98, sainsburys: 2.05, note: "Single-serve. Protein powder and PBfit are ~82% of cost. Butternut squash itself is very cheap." },
-  },
-  14: {
-    ingredients: [
-  {item: '1 cup (approx. 125 g) butternut squash, steamed and puréed'},
-  {item: '75 g chocolate protein powder (Free Soul or similar)'},
-  {item: '20 g oat flour'},
-  {item: '2 tbsp cocoa powder'},
-  {item: '2 tbsp PBfit powder'},
-  {item: '3 tbsp (approx. 50 ml) liquid egg whites'},
-  {item: '30 g dark chocolate (74%), roughly chopped'},
-  {item: 'Pinch of salt'}
-],
-    method: [
-  `Preheat the oven to 180°C / 160°C fan / 350°F / Gas Mark 4. Line a small baking tin (approx. 18 × 12 cm) with parchment paper.`,
-  `Steam the butternut squash until completely tender, then mash or blend to a smooth purée. Allow to cool slightly.`,
-  `In a large bowl, combine the butternut purée, protein powder, oat flour, cocoa powder, PBfit powder, egg whites, and salt. Stir until a thick, smooth batter forms. The mixture should be dense — if it feels too stiff, add a splash of soya milk to loosen slightly.`,
-  `Pour into the prepared tin and spread evenly. Press the chopped chocolate pieces into the top.`,
-  `Bake for 20–25 minutes, until the edges are set and a skewer inserted into the centre comes out with just a few moist crumbs. Do not overbake — these are meant to be fudgy.`,
-  `Leave to cool completely in the tin before slicing into 4 portions. They firm up significantly as they cool.`
-],
-    tips: `Resist cutting them warm — they need to cool fully to reach their proper fudgy texture. For an even richer result, refrigerate for a couple of hours before eating. These freeze well individually wrapped for up to 2 months.`,
-    storage: `Store in an airtight container in the fridge for up to 4 days.`,
-    nutrition: `186 kcal | Protein: 17.6 g | Carbs: 18.2 g | Fat: 4.9 g |`,
-    costPerPortion: { aldi: 1.08, asda: 1.11, sainsburys: 1.15, note: "75g protein powder drives ~76% of batch cost. Squash is very cheap — store prices are similar across all three." },
-  },
-  15: {
-    ingredients: [
-  {item: '½ cup (approx. 125 g) butternut squash, steamed and puréed'},
-  {item: '15 g salted caramel protein powder (Free Soul or similar)'},
-  {item: '2 tbsp PBfit powder'},
-  {item: '4 tbsp (approx. 60 ml) unsweetened soya milk'},
-  {item: '10 g dark chocolate (74%), roughly chopped'},
-  {item: 'Pinch of salt'}
-],
-    method: [
-  `Steam the butternut squash until completely tender, then mash or blend to a smooth purée.`,
-  `In a mug or microwave-safe bowl, combine the butternut purée, protein powder, PBfit powder, soya milk, and salt. Stir until a smooth, thick batter forms.`,
-  `Press the chopped chocolate pieces into the centre of the batter.`,
-  `Microwave on high for 90 seconds to 2 minutes, until the edges are set and the centre is just firm. It should still look slightly underdone in the middle — it will continue to set as it cools.`,
-  `Leave to rest for 1 minute before eating. Serve straight from the mug.`
-],
-    tips: `Slightly undercooking is the key to a moist, cakey texture — err on the side of less time and check. The batter also works baked in a small ramekin at 180°C for about 12–15 minutes for a more structured result. Top with a spoonful of soya yoghurt or a drizzle of nut butter to serve.`,
-    storage: null,
-    nutrition: `286 kcal | Protein: 19.9 g | Carbs: 28.8 g | Fat: 8.4 g |`,
-    costPerPortion: { aldi: 1.41, asda: 1.49, sainsburys: 1.58, note: "Single-serve. PBfit and protein powder are ~82% of cost. Butternut squash can be prepped and frozen in batches." },
-  },
-  20: {
-    ingredients: [
-  {group: 'For the Brine', item: '2 litres cold water'},
-  {group: 'For the Brine', item: '100 g rock salt or fine sea salt'},
-  {group: 'For the Brine', item: '2 tbsp caster sugar'},
-  {group: 'For the Brine', item: '1 tsp garlic granules'},
-  {group: 'For the Brine', item: '1 sprig fresh thyme (optional)'},
-  {group: 'For Cooking', item: '4 boneless chicken breasts'},
-  {group: 'For Cooking', item: 'Light drizzle of olive oil'},
-  {group: 'For Cooking', item: '½ tsp white pepper'},
-  {group: 'For Cooking', item: '½ tsp onion powder'},
-  {group: 'For Cooking', item: '½ tsp garlic powder'},
-  {group: 'For Cooking', item: 'Pinch of dried mixed herbs'}
-],
-    method: [
-  `Dissolve the salt and sugar in the water. If using garlic granules and thyme, add them now. Tip: heat a small portion of the water to help dissolve, then top up with cold water and allow the brine to cool completely before adding the chicken.`,
-  `Submerge the chicken breasts fully in the brine in a bowl, zip-lock bag, or airtight container. Refrigerate for 8–12 hours (overnight is ideal).`,
-  `Remove the chicken from the brine and rinse lightly under cold running water. Pat dry thoroughly with kitchen paper.`,
-  `Lightly oil each breast and season with white pepper, onion powder, garlic powder, and a pinch of dried herbs.`,
-  `Place in a baking dish, cover with foil, and bake at 180°C (350°F) for 20–25 minutes, or until the internal temperature reaches 74°C (165°F).`
-],
-    tips: `Covered chicken cooks faster than you might expect — set a timer for 20 minutes and check with a meat thermometer.`,
-    storage: `Refrigerate in an airtight container for up to 4 days. Slice or shred
-before storing for easy meal prep.`,
-    nutrition: null,
-    costPerPortion: null,
-  },
-  21: {
-    ingredients: [
-  {item: '1.1 kg (2.5 lb) boneless chicken thighs, trimmed'},
-  {item: 'Salt and pepper, to taste'},
-  {item: '1 tbsp paprika'},
-  {item: '1 tbsp Aleppo pepper (or chilli flakes)'},
-  {item: '1 tbsp garlic powder'},
-  {item: '½ tbsp chipotle powder'},
-  {item: '½ tsp ground coriander'},
-  {item: '¼ tsp cayenne pepper'},
-  {item: '2 tbsp fresh coriander (cilantro), chopped'},
-  {item: '1 tbsp olive oil'},
-  {item: '2 tbsp plain yoghurt'},
-  {item: 'Juice of 1 large lime'},
-  {item: '½ large red onion, thinly sliced'}
-],
-    method: [
-  `Place the trimmed chicken thighs in a large bowl. Season generously with salt, pepper, and all the spices.`,
-  `Add the fresh coriander, olive oil, yoghurt, and lime juice. Mix thoroughly until every piece is well coated.`,
-  `Toss in the sliced red onion and mix again. Cover and marinate in the fridge for 2–4 hours, or cook immediately if short on time.`,
-  `Remove the chicken from the fridge 30 minutes before cooking. Preheat the oven to 210°C (410°F).`,
-  `Pack the marinated chicken tightly into a loaf tin (approx. 22 × 11 × 6 cm). Bake for 50–55 minutes.`,
-  `Remove from the oven and tilt the tin over a bowl to collect the cooking juices. Pour the juices back over the chicken before serving.`
-],
-    tips: `The collected cooking juices are liquid gold — save any excess for rice, soups, or drizzling over grain bowls.`,
-    storage: null,
-    nutrition: null,
-    costPerPortion: null,
-  },
-  22: {
-    ingredients: [
-  {item: '1.1 kg (2.5 lb) boneless chicken thighs, trimmed'},
-  {item: '1 medium yellow onion, processed in a food processor'},
-  {item: 'Juice of 1 large lemon'},
-  {item: '3 tbsp tomato paste'},
-  {item: '2 tbsp plain or Greek yoghurt'},
-  {item: 'Salt and pepper, to taste'},
-  {item: '1½ tbsp dried thyme'},
-  {item: '1½ tbsp garlic powder'},
-  {item: '1 tbsp urfa pepper (or Aleppo pepper / chilli flakes)'}
-],
-    method: [
-  `Place the chicken thighs in a large bowl. Add the processed onion, lemon juice, tomato paste, and yoghurt.`,
-  `Season with thyme, garlic powder, urfa pepper, salt, and pepper. Mix thoroughly.`,
-  `Cover and marinate in the fridge for 2–6 hours, or ideally overnight.`,
-  `Remove the chicken from the fridge 30 minutes before cooking. Preheat the oven to 210°C (410°F).`,
-  `Pack the marinated chicken tightly into a loaf tin. Bake for 50 minutes.`,
-  `Remove from the oven and gently tilt the tin over a jar to collect excess juices. Pour the juices back over the chicken, then tilt again and reserve any remaining liquid for soups.`,
-  `Turn the loaf tin upside down onto a cutting board. Slice the chicken into thin strips and serve.`
-],
-    tips: null,
-    storage: null,
-    nutrition: null,
-    costPerPortion: null,
-  },
-  23: {
-    ingredients: [
-  {group: 'For the Chicken', item: '4 skin-on, bone-in chicken thighs'},
-  {group: 'For the Chicken', item: '3 tbsp olive oil'},
-  {group: 'For the Chicken', item: '2 tbsp tomato paste'},
-  {group: 'For the Chicken', item: '4–5 garlic cloves, minced'},
-  {group: 'For the Chicken', item: 'Zest and juice of 1 large lemon'},
-  {group: 'For the Chicken', item: 'Salt and pepper, to taste'},
-  {group: 'For the Chicken', item: '1 tbsp smoked paprika'},
-  {group: 'For the Chicken', item: '1 tbsp dried oregano'},
-  {group: 'For the Chicken', item: '¼–½ tsp cayenne pepper'},
-  {group: 'For the Mint Yoghurt Sauce', item: '3 tbsp thick Greek yoghurt (or labneh)'},
-  {group: 'For the Mint Yoghurt Sauce', item: '3 tbsp fresh mint, finely chopped'},
-  {group: 'For the Mint Yoghurt Sauce', item: '2 spring onions, sliced'},
-  {group: 'For the Mint Yoghurt Sauce', item: '½ large jalapeño, deseeded if preferred'},
-  {group: 'For the Mint Yoghurt Sauce', item: '1 tbsp olive oil'},
-  {group: 'For the Mint Yoghurt Sauce', item: 'Juice of ½ lemon'},
-  {group: 'For the Mint Yoghurt Sauce', item: 'Salt and pepper, to taste'}
-],
-    method: [
-  `Pat the chicken thighs dry with kitchen paper and place in a bowl.`,
-  `Whisk together the olive oil, tomato paste, garlic, lemon zest and juice, salt, pepper, smoked paprika, oregano, and cayenne.`,
-  `Pour the marinade over the chicken and massage it in thoroughly. Cover and marinate for 2–6 hours, or ideally overnight.`,
-  `Remove from the fridge 30 minutes before cooking. Preheat the oven to 220°C (425°F).`,
-  `Place the chicken on a wire rack set over a baking tray. Roast for 37–40 minutes, until the skin is crispy and the juices run clear.`,
-  `While the chicken roasts, blend the yoghurt, mint, spring onions, jalapeño, olive oil, lemon juice, salt, and pepper until smooth. Taste and adjust seasoning.`,
-  `Serve the chicken with the mint yoghurt sauce alongside rice, quinoa, or a simple cucumber salad.`
-],
-    tips: null,
-    storage: null,
-    nutrition: null,
-    costPerPortion: null,
-  },
-  24: {
-    ingredients: [
-  {group: 'For the Chicken', item: '5 skin-on, bone-in chicken thighs'},
-  {group: 'For the Chicken', item: '3 tbsp olive oil (plus 1 tbsp for the pan)'},
-  {group: 'For the Chicken', item: 'Salt and freshly cracked pepper, to taste'},
-  {group: 'For the Chicken', item: '½ tbsp chipotle powder'},
-  {group: 'For the Chicken', item: '1 tbsp sweet paprika'},
-  {group: 'For the Chicken', item: '1 tbsp garlic powder'},
-  {group: 'For the Chicken', item: '1 tbsp dried oregano or thyme'},
-  {group: 'For the Salad', item: '½ red onion, finely diced'},
-  {group: 'For the Salad', item: '2–3 Persian cucumbers, diced'},
-  {group: 'For the Salad', item: '2–3 tbsp fresh coriander (cilantro), chopped'},
-  {group: 'For the Salad', item: 'Pinch of salt'},
-  {group: 'For the Sauce', item: '3 tbsp Greek yoghurt'},
-  {group: 'For the Sauce', item: '3 tbsp mayonnaise'},
-  {group: 'For the Sauce', item: '1 tbsp garlic, minced'},
-  {group: 'For the Sauce', item: '½ jalapeño, deseeded if preferred'},
-  {group: 'For the Sauce', item: 'Large handful of fresh coriander (cilantro)'},
-  {group: 'For the Sauce', item: 'Juice of 1 large lime'},
-  {group: 'For the Sauce', item: 'Salt and pepper, to taste'},
-  {group: 'To Serve', item: 'Cooked rice of your choice'},
-  {group: 'To Serve', item: 'Sliced jalapeños, avocado, and cotija cheese (optional)'}
-],
-    method: [
-  `Place the chicken thighs in a bowl. Drizzle with 3 tbsp olive oil and season with all spices. Mix well and marinate for 1–6 hours in the fridge, or skip ahead if short on time.`,
-  `Preheat the oven to 205°C (400°F). Allow the chicken to come to room temperature for 30 minutes.`,
-  `Heat 1 tbsp olive oil in an oven-safe skillet over low–medium heat. Place the chicken thighs skin-side down and sear for 8 minutes. Flip and cook for a further 5 minutes, then transfer the skillet to the oven for 17–20 minutes.`,
-  `Meanwhile, toss together the red onion, cucumbers, coriander, and a pinch of salt. Cook your rice according to packet instructions.`,
-  `Blend the yoghurt, mayonnaise, garlic, jalapeño, coriander, lime juice, salt, and pepper until smooth.`,
-  `Remove the skillet from the oven. Serve the chicken over rice, topped with the salad, jalapeños, avocado, cotija, and a generous drizzle of sauce.`
-],
-    tips: null,
-    storage: null,
-    nutrition: null,
-    costPerPortion: null,
-  },
-  25: {
-    ingredients: [
-  {group: 'For the Chicken', item: '900 g boneless, skinless chicken thighs'},
-  {group: 'For the Chicken', item: '1½ tbsp olive oil'},
-  {group: 'For the Chicken', item: '1 tbsp smoked paprika'},
-  {group: 'For the Chicken', item: '1 tbsp garlic powder'},
-  {group: 'For the Chicken', item: '1 tbsp dried thyme'},
-  {group: 'For the Chicken', item: '½ tbsp red pepper flakes'},
-  {group: 'For the Chicken', item: '½ tsp ground cumin'},
-  {group: 'For the Chicken', item: '¼ tsp ground cinnamon'},
-  {group: 'For the Chicken', item: '2 tbsp plain yoghurt'},
-  {group: 'For the Chicken', item: '5 tbsp lemon juice'},
-  {group: 'For the Chicken', item: 'Salt and pepper, to taste'},
-  {group: 'For the Salad', item: '1 red onion, thinly sliced'},
-  {group: 'For the Salad', item: '10 cherry tomatoes, quartered'},
-  {group: 'For the Salad', item: '2 tbsp fresh parsley, chopped'},
-  {group: 'For the Salad', item: '2 tbsp sumac'},
-  {group: 'For the Salad', item: '5 tbsp lemon juice'},
-  {group: 'For the Salad', item: 'Salt and pepper, to taste'},
-  {group: 'For the Sauce', item: '60 ml (¼ cup) plain yoghurt'},
-  {group: 'For the Sauce', item: '3 tbsp mayonnaise'},
-  {group: 'For the Sauce', item: '3–4 tbsp pickle juice'},
-  {group: 'For the Sauce', item: '2 tbsp fresh dill, chopped'},
-  {group: 'For the Sauce', item: 'Salt and pepper, to taste'}
-],
-    method: [
-  `Place the chicken thighs in a large bowl. Add the olive oil, all spices, yoghurt, lemon juice, salt, and pepper. Mix thoroughly and marinate for 4–6 hours if possible, or proceed immediately.`,
-  `If the chicken has been in the fridge, remove it 30 minutes before cooking.`,
-  `Prepare the salad by tossing the sliced red onion, tomatoes, parsley, sumac, lemon juice, salt, and pepper.`,
-  `For the sauce, mix the yoghurt, mayonnaise, pickle juice, dill, salt, and pepper until smooth.`,
-  `Heat 1 tbsp olive oil in a cast-iron skillet over medium–high heat. Sear the chicken for 4 minutes per side, plus 1–2 minutes more, until golden and cooked through.`,
-  `Serve over rice, topped with the salad, sliced cucumbers, a generous drizzle of sauce. Finish with extra sumac and crumbled feta if desired.`
-],
-    tips: null,
-    storage: null,
-    nutrition: null,
-    costPerPortion: null,
-  },
-  26: {
-    ingredients: [
-  {group: 'For the Chicken', item: '1.4 kg (3 lb) boneless chicken thighs, trimmed'},
-  {group: 'For the Chicken', item: 'Salt and pepper, to taste'},
-  {group: 'For the Chicken', item: '2 packets taco seasoning'},
-  {group: 'For the Chicken', item: '1 tbsp olive oil'},
-  {group: 'For the Chicken', item: '2 tbsp adobo sauce (from a tin of chipotle peppers)'},
-  {group: 'For the Chicken', item: 'Juice of 2 small limes'},
-  {group: 'For the Chicken', item: '1 medium red onion, thinly sliced'},
-  {group: 'For the Corn Salsa', item: '2 cups (approx. 300 g) sweetcorn'},
-  {group: 'For the Corn Salsa', item: '½ medium red onion, finely diced'},
-  {group: 'For the Corn Salsa', item: '1 jalapeño, finely diced'},
-  {group: 'For the Corn Salsa', item: 'Large handful of fresh coriander (cilantro), chopped'},
-  {group: 'For the Corn Salsa', item: 'Juice of 1 lime'},
-  {group: 'For the Corn Salsa', item: 'Salt, to taste'},
-  {group: 'For the Sauce', item: '4 tbsp plain yoghurt'},
-  {group: 'For the Sauce', item: '2 tbsp mayonnaise'},
-  {group: 'For the Sauce', item: 'Juice of 1 large lime'},
-  {group: 'For the Sauce', item: '½ tbsp onion powder'},
-  {group: 'For the Sauce', item: '1 tsp chipotle powder'},
-  {group: 'For the Sauce', item: 'Salt, to taste'}
-],
-    method: [
-  `Season the chicken with salt, pepper, taco seasoning, olive oil, adobo sauce, and lime juice. Add the sliced red onion and toss to combine. Cover and marinate for 2–4 hours in the fridge, or proceed immediately.`,
-  `Remove the chicken from the fridge 30 minutes before cooking. Preheat the oven to 220°C (425°F).`,
-  `Pack the chicken tightly into a loaf tin. Bake for approximately 55 minutes.`,
-  `Remove from the oven and tilt the tin to collect the cooking juices. Pour the juices back over the chicken or reserve for soups. Turn the tin onto a cutting board and slice the chicken into strips or cubes.`,
-  `For the salsa, toss together the sweetcorn, red onion, jalapeño, coriander, lime juice, and salt.`,
-  `For the sauce, whisk together the yoghurt, mayonnaise, lime juice, onion powder, chipotle powder, and salt.`,
-  `Serve the chicken with the corn salsa and sauce.`
-],
-    tips: null,
-    storage: null,
-    nutrition: null,
-    costPerPortion: null,
-  },
-  27: {
-    ingredients: [
-  {group: 'For the Chicken', item: '680–900 g (1.5–2 lb) boneless, skinless chicken thighs, cubed'},
-  {group: 'For the Chicken', item: '½ tbsp olive oil (plus extra for drizzling)'},
-  {group: 'For the Chicken', item: '2½ tbsp plain Greek yoghurt'},
-  {group: 'For the Chicken', item: '2 tbsp tomato paste'},
-  {group: 'For the Chicken', item: 'Juice of 1 large lemon'},
-  {group: 'For the Chicken', item: '6 garlic cloves, minced'},
-  {group: 'For the Chicken', item: '1 tbsp dried oregano'},
-  {group: 'For the Chicken', item: '1 tbsp sweet paprika'},
-  {group: 'For the Chicken', item: '⅓ tsp ground cinnamon'},
-  {group: 'For the Chicken', item: '1 tsp ground cumin'},
-  {group: 'For the Chicken', item: 'Salt and pepper, to taste'},
-  {group: 'For the Chicken', item: '2 red onions, cut into small wedges'},
-  {group: 'For the Chicken', item: '1 tbsp sumac (plus extra for finishing)'},
-  {group: 'For the Cucumber Sauce', item: '180 ml (¾ cup) plain Greek yoghurt'},
-  {group: 'For the Cucumber Sauce', item: '1 Persian cucumber, finely diced'},
-  {group: 'For the Cucumber Sauce', item: '3 tbsp fresh dill, finely chopped'},
-  {group: 'For the Cucumber Sauce', item: '1 small shallot, finely processed or grated'},
-  {group: 'For the Cucumber Sauce', item: 'Juice of ½ lemon'},
-  {group: 'For the Cucumber Sauce', item: 'Salt and pepper, to taste'}
-],
-    method: [
-  `Place the cubed chicken in a large bowl. Add the olive oil, yoghurt, tomato paste, lemon juice, garlic, oregano, paprika, cinnamon, cumin, salt, and pepper. Mix well and marinate for 2–6 hours, or ideally overnight.`,
-  `Remove the chicken from the fridge 30 minutes before cooking. Preheat the oven to 200°C (400°F).`,
-  `Line a baking tray with parchment paper. Spread the chicken in a single layer without overcrowding. Scatter the red onion wedges around the chicken, drizzle with olive oil, and sprinkle with sumac.`,
-  `Roast for 37–40 minutes, until the chicken is golden and cooked through.`,
-  `While the chicken roasts, mix together all cucumber sauce ingredients.`,
-  `Serve topped with dollops of cucumber sauce, fresh herbs, an extra dusting of sumac, and a squeeze of fresh lemon. CHICKEN — ASIAN-INSPIRED RICE & NOODLE BOWLS`
-],
-    tips: null,
-    storage: null,
-    nutrition: null,
-    costPerPortion: null,
-  },
-  30: {
-    ingredients: [
-  {group: 'Char Siu Chicken', item: '340 g (12 oz) boneless, skinless chicken thighs'},
-  {group: 'Char Siu Chicken', item: '3 tbsp soy sauce'},
-  {group: 'Char Siu Chicken', item: '3 tbsp hoisin sauce'},
-  {group: 'Char Siu Chicken', item: '1½ tbsp honey'},
-  {group: 'Char Siu Chicken', item: '2 tsp minced garlic'},
-  {group: 'Char Siu Chicken', item: '1 tbsp clear rice wine (Shaoxing or mirin)'},
-  {group: 'Char Siu Chicken', item: '1 tsp toasted sesame oil'},
-  {group: 'Char Siu Chicken', item: '½ tsp five-spice powder'},
-  {group: 'Char Siu Chicken', item: '3 tbsp water'},
-  {group: 'Char Siu Chicken', item: 'Salt and pepper, to taste'},
-  {group: 'Sesame Cucumber Salad', item: '2½ cups Persian cucumber, diced'},
-  {group: 'Sesame Cucumber Salad', item: '¼ tsp salt'},
-  {group: 'Sesame Cucumber Salad', item: '¼ tsp ground ginger'},
-  {group: 'Sesame Cucumber Salad', item: '¼ tsp minced garlic'},
-  {group: 'Sesame Cucumber Salad', item: '2 tbsp rice vinegar'},
-  {group: 'Sesame Cucumber Salad', item: '½ tbsp soy sauce'},
-  {group: 'Sesame Cucumber Salad', item: '½ tbsp toasted sesame oil'},
-  {group: 'Sesame Cucumber Salad', item: '½ tbsp honey'},
-  {group: 'Sesame Cucumber Salad', item: '2 tsp chilli oil'},
-  {group: 'Sesame Cucumber Salad', item: '1 tbsp sesame seeds'},
-  {group: 'To Serve', item: '1½ cups cooked rice'}
-],
-    method: [
-  `Whisk together the soy sauce, hoisin, honey, garlic, rice wine, sesame oil, five-spice, water, and a pinch of salt and pepper.`,
-  `Add the chicken thighs and use a fork to poke holes all over — this helps the marinade penetrate deeper. Coat well, cover, and refrigerate for at least 30 minutes, or overnight.`,
-  `Dice the cucumbers and pat dry with kitchen paper. Toss with all the salad ingredients and set aside to lightly pickle while the chicken cooks.`,
-  `Place the marinated chicken on parchment paper in your air fryer basket. Spoon any remaining marinade over the top. Air fry at 195°C (380°F) for 18–20 minutes, flipping halfway, until caramelised and cooked through.`,
-  `Rest the chicken for a few minutes, then slice.`,
-  `Divide the rice between two bowls. Top with sliced chicken and cucumber salad.`
-],
-    tips: `Poking holes in the chicken before marinating makes a noticeable difference — don't skip it. The leftover marinade spooned on top before cooking creates an even stickier glaze.`,
-    storage: `For meal prep, store the cucumber salad and chicken separately from the
-rice. Microwave the rice with a damp paper towel, then add the chicken.
-Add the cucumber salad cold on top to preserve the crunch.`,
-    nutrition: `689 kcal | Protein: 42 g | Carbs: 79 g | Fat: 22 g (per`,
-    costPerPortion: null,
-  },
-  31: {
-    ingredients: [
-  {group: 'Meatballs', item: '500 g lean ground chicken'},
-  {group: 'Meatballs', item: '1 small courgette (zucchini), grated and squeezed dry'},
-  {group: 'Meatballs', item: '½ red chilli, finely diced'},
-  {group: 'Meatballs', item: '1 heaped tsp garlic and ginger paste'},
-  {group: 'Meatballs', item: '2 tbsp fresh coriander, finely chopped'},
-  {group: 'Meatballs', item: '2 spring onions, finely sliced'},
-  {group: 'Meatballs', item: '1 medium egg'},
-  {group: 'Meatballs', item: '2 tbsp light soy sauce'},
-  {group: 'Meatballs', item: 'Zest of 1 lime'},
-  {group: 'Meatballs', item: 'Salt and pepper, to taste'},
-  {group: 'Sauce', item: '2 tbsp Thai red curry paste'},
-  {group: 'Sauce', item: '1 x 400 ml tin coconut milk (light or full-fat)'},
-  {group: 'Sauce', item: '1 spring onion, diced'},
-  {group: 'Sauce', item: '1 tsp garlic and ginger paste'},
-  {group: 'Sauce', item: '1 red pepper, thinly sliced'},
-  {group: 'Sauce', item: '½ chicken stock cube'},
-  {group: 'Sauce', item: '1 tbsp soy sauce'},
-  {group: 'Sauce', item: '1 tsp honey'},
-  {group: 'Sauce', item: 'Juice of ½ lime'},
-  {group: 'Sauce', item: 'Fresh coriander, to finish'},
-  {group: 'To Serve', item: 'Steamed rice'},
-  {group: 'To Serve', item: 'Steamed or blanched broccoli'}
-],
-    method: [
-  `Grate the courgette and squeeze out any excess moisture using a clean tea towel — this prevents the mixture from becoming too wet. Add to a large bowl with all remaining meatball ingredients and mix gently. The mixture will be soft; this is normal.`,
-  `Heat a drizzle of oil in a large frying pan over medium heat. Using two spoons, shape the mixture into small, golf ball-sized meatballs. Cook in batches, turning carefully, until browned all over. They don't need to be cooked through at this stage. Set aside.`,
-  `Wipe the pan clean to remove any burnt residue. Return to medium heat and add the Thai red curry paste and diced spring onion. Cook for 1 minute, stirring, until fragrant.`,
-  `Pour in the coconut milk and stir to combine. Add the garlic and ginger paste, soy sauce, honey, stock cube, and sliced red pepper. Bring to a gentle simmer and cook for 5 minutes.`,
-  `Add the meatballs back into the sauce. Simmer for a further 10 minutes until cooked through. Taste and adjust seasoning.`,
-  `Finish with a squeeze of lime juice and a scattering of fresh coriander. Serve over fluffy rice with steamed broccoli.`
-],
-    tips: `Squeezing moisture from the grated courgette is key to meatballs that hold their shape. Browning in batches ensures a good crust — overcrowding the pan causes steaming rather than colouring.`,
-    storage: `Store in an airtight container in the fridge for up to 3 days. Reheat
-gently in a pan with a splash of water, or microwave covered until
-piping hot.`,
-    nutrition: `271 kcal | Protein: 28 g (per serving, excluding rice)`,
-    costPerPortion: null,
-  },
-  32: {
-    ingredients: [
-  {group: 'Chicken & Marinade', item: '450 g (1 lb) boneless, skinless chicken thighs'},
-  {group: 'Chicken & Marinade', item: '1 tbsp lemongrass paste'},
-  {group: 'Chicken & Marinade', item: '2 garlic cloves, minced'},
-  {group: 'Chicken & Marinade', item: '1 tbsp shallot, finely diced'},
-  {group: 'Chicken & Marinade', item: '1 tbsp soy sauce'},
-  {group: 'Chicken & Marinade', item: '1½ tbsp oyster sauce'},
-  {group: 'Chicken & Marinade', item: '½ tbsp fish sauce'},
-  {group: 'Chicken & Marinade', item: '½ tbsp brown sugar'},
-  {group: 'Chicken & Marinade', item: '1 tbsp honey'},
-  {group: 'Chicken & Marinade', item: 'Salt and pepper, to taste'},
-  {group: 'Chicken & Marinade', item: 'Cooking oil spray'},
-  {group: 'Vietnamese Dipping Sauce', item: '½ tbsp fresh lime juice'},
-  {group: 'Vietnamese Dipping Sauce', item: '2 tbsp sugar'},
-  {group: 'Vietnamese Dipping Sauce', item: '1 tbsp fish sauce'},
-  {group: 'Vietnamese Dipping Sauce', item: '2 garlic cloves, minced'},
-  {group: 'Vietnamese Dipping Sauce', item: '2 tbsp water'},
-  {group: 'Vietnamese Dipping Sauce', item: '1 small Thai red chilli, finely diced'},
-  {group: 'To Serve', item: '1½ cups cooked rice'},
-  {group: 'To Serve', item: '1 medium carrot, sliced into thin rounds'},
-  {group: 'To Serve', item: '1 Persian cucumber, sliced into long strips'},
-  {group: 'To Serve', item: '1 cup cabbage, finely shredded'}
-],
-    method: [
-  `Combine all marinade ingredients with the chicken thighs. Mix well, cover, and refrigerate for at least 30 minutes and up to 2 hours.`,
-  `While the chicken marinates, prepare the vegetables — slice the cucumber into strips, cut the carrot into thin rounds, and finely shred the cabbage.`,
-  `Make the dipping sauce by combining lime juice, sugar, fish sauce, garlic, water, and chilli in a small bowl. Stir until the sugar dissolves. It should be a balance of sweet, sour, salty, and spicy.`,
-  `Heat a pan over medium heat and coat with cooking spray. Cook the chicken for 5–7 minutes per side until cooked through and lightly caramelised. Season with salt and pepper.`,
-  `Rest the chicken briefly, then slice or chop as preferred.`,
-  `Divide the rice between two bowls. Top with the vegetables and sliced chicken. Serve with the dipping sauce on the side.`
-],
-    tips: `For deeper flavour, marinate overnight in the fridge. A griddle pan or cast iron skillet will give the chicken a beautiful char.`,
-    storage: `Store components separately for up to 4 days. Keep the sauce in a small
-jar and add just before eating to keep the vegetables crisp.`,
-    nutrition: `620 kcal | Protein: 51 g | Carbs: 79 g | Fat: 10 g (per`,
-    costPerPortion: null,
-  },
-  33: {
-    ingredients: [
-  {group: 'Basil Chicken', item: '340 g (¾ lb) ground chicken'},
-  {group: 'Basil Chicken', item: '2 shallots, finely diced'},
-  {group: 'Basil Chicken', item: '2 tbsp minced garlic'},
-  {group: 'Basil Chicken', item: '3 Thai bird\'s eye chillies, finely diced (reduce for less heat)'},
-  {group: 'Basil Chicken', item: '1 cup Thai basil leaves'},
-  {group: 'Basil Chicken', item: 'Cooking oil spray'},
-  {group: 'Sauce', item: '1 tbsp fish sauce'},
-  {group: 'Sauce', item: '1 tbsp soy sauce'},
-  {group: 'Sauce', item: '1 tbsp oyster sauce'},
-  {group: 'Sauce', item: '2 tsp sugar'},
-  {group: 'Sauce', item: '4 tbsp chicken bone broth'},
-  {group: 'To Serve', item: '1½ cups cooked rice'},
-  {group: 'To Serve', item: '2 eggs, fried sunny-side up'},
-  {group: 'To Serve', item: '1 Persian cucumber, thinly sliced'}
-],
-    method: [
-  `Heat a pan or wok over medium-high heat with cooking spray. Add the shallots, chillies, and garlic. Stir-fry for 30 seconds until fragrant.`,
-  `Add the ground chicken, breaking it apart as it cooks. Once mostly cooked through, pour in the fish sauce, soy sauce, oyster sauce, sugar, and bone broth. Toss everything together and cook for a further 2–3 minutes until the sauce has reduced. Stir through the Thai basil leaves and remove from the heat — they will wilt from the residual heat.`,
-  `In the same pan (wiped clean if needed), cook the eggs sunny-side up.`,
-  `Divide the rice between two bowls. Top with the basil chicken, a fried egg each, and the sliced cucumber on the side.`
-],
-    tips: `Thai basil has a distinct anise-like flavour — avoid substituting regular basil if possible. It's widely available in Asian supermarkets. A very hot pan is traditional and gives the chicken a slightly charred, smoky edge.`,
-    storage: `Store the chicken and rice separately in the fridge for up to 3 days.
-Cook the eggs fresh when serving.`,
-    nutrition: `597 kcal | Protein: 44 g | Carbs: 63 g | Fat: 19 g (per`,
-    costPerPortion: null,
-  },
-  34: {
-    ingredients: [
-  {group: 'Chicken', item: '900 g (2 lb) chicken thighs, cut into bite-sized cubes'},
-  {group: 'Chicken', item: '2 tsp smoked paprika'},
-  {group: 'Chicken', item: '1 tsp garlic powder'},
-  {group: 'Chicken', item: '1 tsp onion powder'},
-  {group: 'Chicken', item: '1 tsp salt'},
-  {group: 'Chicken', item: '½ tsp black pepper'},
-  {group: 'Chicken', item: '1 tbsp olive oil'},
-  {group: 'Chicken', item: 'Drizzle of avocado oil, for frying'},
-  {group: 'Bang Bang Sauce', item: '80 ml (⅓ cup) mayonnaise'},
-  {group: 'Bang Bang Sauce', item: '2–3 tbsp sriracha (adjust to heat preference)'},
-  {group: 'Bang Bang Sauce', item: '60 ml (¼ cup) Thai sweet chilli sauce'},
-  {group: 'Bang Bang Sauce', item: '1 tsp rice vinegar'},
-  {group: 'Bang Bang Sauce', item: '½ tsp garlic powder'},
-  {group: 'To Serve', item: '2 cups cooked rice or cauliflower rice'},
-  {group: 'To Serve', item: 'Cabbage slaw'},
-  {group: 'To Serve', item: '2 spring onions, thinly sliced'}
-],
-    method: [
-  `Place the cubed chicken in a large bowl. Add all the spices, salt, pepper, and olive oil. Toss well until every piece is evenly coated.`,
-  `Heat a large pan over medium-high heat with a drizzle of avocado oil. Once hot, add the chicken in a single layer — cook in batches if needed. Stir occasionally for 5–7 minutes until fully cooked and golden at the edges.`,
-  `While the chicken cooks, whisk together the mayo, sriracha, sweet chilli sauce, rice vinegar, and garlic powder. Taste and adjust to balance heat and sweetness.`,
-  `Reserve a few tablespoons of sauce for drizzling, then pour the rest over the cooked chicken. Stir to coat and simmer for 1–2 minutes until the sauce thickens and begins to caramelise.`,
-  `To assemble: start with rice or cauliflower rice, add a handful of slaw, spoon the bang bang chicken on top, drizzle with reserved sauce, and finish with sliced spring onions.`
-],
-    tips: `Reserving sauce to drizzle at the end gives this bowl its restaurant-style finish — don't skip it. For extra crunch, add the slaw at the very end rather than underneath the chicken.`,
-    storage: null,
-    nutrition: null,
-    costPerPortion: null,
-  },
-  35: {
-    ingredients: [
-  {group: 'Chicken', item: '300 g chicken breast, cut into bite-sized chunks'},
-  {group: 'Chicken', item: '1 tbsp cornflour (cornstarch)'},
-  {group: 'Chicken', item: '1 tsp garlic granules'},
-  {group: 'Chicken', item: 'Salt and pepper, to taste'},
-  {group: 'Chicken', item: '2 spring onions, diced'},
-  {group: 'Chicken', item: 'Small handful of cashews'},
-  {group: 'Orange Sauce', item: 'Juice of 1 large orange, plus 1 tsp zest'},
-  {group: 'Orange Sauce', item: '4 tbsp light soy sauce'},
-  {group: 'Orange Sauce', item: '2 tbsp rice vinegar'},
-  {group: 'Orange Sauce', item: '2 tbsp tomato purée'},
-  {group: 'Orange Sauce', item: '1 tsp garlic granules'},
-  {group: 'Orange Sauce', item: '1 tsp ginger purée'},
-  {group: 'Orange Sauce', item: '1 tsp toasted sesame oil'},
-  {group: 'To Serve', item: '250 g pre-cooked rice (brown rice recommended)'},
-  {group: 'To Serve', item: '½ medium avocado, sliced'},
-  {group: 'To Serve', item: '1 medium carrot and ½ cucumber, peeled into ribbons'},
-  {group: 'To Serve', item: '1 tsp rice vinegar (for the ribbons)'}
-],
-    method: [
-  `Toss the chicken chunks in the cornflour, garlic granules, and a pinch of salt and pepper until evenly coated.`,
-  `Whisk together all sauce ingredients in a small bowl. Peel the cucumber and carrot into ribbons and toss lightly with 1 tsp rice vinegar.`,
-  `Heat a large frying pan or wok over medium-high heat with a drizzle of oil. Add the chicken and stir-fry for 2 minutes until lightly golden.`,
-  `Add the spring onions and cashews, tossing for a further 2 minutes until the cashews are lightly toasted and fragrant.`,
-  `Pour in the sauce and stir to coat. Simmer for 1–2 minutes until the sauce thickens and the chicken is cooked through.`,
-  `Serve over rice with sliced avocado and the vegetable ribbons.`
-],
-    tips: `Fresh orange juice makes a real difference here — bottled juice won't give the same brightness. For extra protein, double the chicken or add edamame.`,
-    storage: null,
-    nutrition: null,
-    costPerPortion: null,
-  },
-  36: {
-    ingredients: [
-  {group: 'Tofu & Sauce', item: '1 pack (385 g / 13.5 oz) soft or silken tofu'},
-  {group: 'Tofu & Sauce', item: '6 tbsp soy sauce'},
-  {group: 'Tofu & Sauce', item: '1½ tbsp sesame oil'},
-  {group: 'Tofu & Sauce', item: '3 tsp brown sugar'},
-  {group: 'Tofu & Sauce', item: '3 tsp gochugaru (Korean red pepper flakes)'},
-  {group: 'Tofu & Sauce', item: '1½ tsp sesame seeds'},
-  {group: 'Tofu & Sauce', item: '1 tsp garlic powder'},
-  {group: 'Tofu & Sauce', item: '1 tbsp jalapeño, finely diced'},
-  {group: 'Tofu & Sauce', item: '2 spring onions — half finely diced, half sliced long for garnish'},
-  {group: 'To Serve', item: '100–150 g cooked rice'},
-  {group: 'To Serve', item: 'A handful of lettuce, roughly chopped'}
-],
-    method: [
-  `In a small bowl, mix together the soy sauce, sesame oil, brown sugar, gochugaru, sesame seeds, garlic powder, diced jalapeño, and diced spring onion. Set aside.`,
-  `Drain the tofu and gently pat dry with kitchen paper. Slice into even pieces.`,
-  `Microwave the tofu on high for 3 minutes to warm through and firm up slightly.`,
-  `Steam or microwave the rice until piping hot. Arrange the chopped lettuce and sliced spring onion on top of the rice, then lay the warm tofu slices over the vegetables.`,
-  `Spoon the sauce generously over the tofu just before eating. Serve immediately.`
-],
-    tips: `Patting the tofu dry before microwaving prevents excess water from diluting the sauce. Gochugaru is available in most Asian supermarkets — it has a mild, smoky heat quite different from regular chilli flakes.`,
-    storage: null,
-    nutrition: null,
-    costPerPortion: null,
-  },
-  37: {
-    ingredients: [
-  {group: 'For the Bowl', item: '370 g (13 oz) boneless, skinless chicken thighs'},
-  {group: 'For the Bowl', item: 'Salt and pepper, to taste'},
-  {group: 'For the Bowl', item: '100 g rice vermicelli noodles (uncooked)'},
-  {group: 'For the Bowl', item: '½–1 bunch green leaf lettuce, chopped'},
-  {group: 'For the Bowl', item: '1½ cups bean sprouts'},
-  {group: 'For the Bowl', item: '2 Persian cucumbers, thinly sliced'},
-  {group: 'For the Bowl', item: '1 large carrot, diced or julienned'},
-  {group: 'For the Bowl', item: 'Cooking spray'},
-  {group: 'For the Peanut Sauce', item: '½ tbsp olive oil'},
-  {group: 'For the Peanut Sauce', item: '2 garlic cloves, minced'},
-  {group: 'For the Peanut Sauce', item: '2½ tbsp hoisin sauce'},
-  {group: 'For the Peanut Sauce', item: '1½ tbsp smooth peanut butter'},
-  {group: 'For the Peanut Sauce', item: '60 ml (¼ cup) water (adjust for thickness)'},
-  {group: 'For the Peanut Sauce', item: '1 tsp sambal chilli paste'}
-],
-    method: [
-  `Prepare the vegetables: thinly slice the cucumbers, chop the lettuce, and dice or julienne the carrots.`,
-  `Cook the vermicelli noodles in boiling water according to packet instructions. Once cooked, immediately plunge into cold water to stop cooking. Drain well and set aside.`,
-  `Season the chicken thighs with salt and pepper. Cook in a pan over medium heat with cooking spray until golden and cooked through. Slice or shred.`,
-  `For the sauce, stir together the olive oil, garlic, hoisin sauce, peanut butter, water, and chilli paste until smooth.`,
-  `Divide the noodles between two bowls. Top with lettuce, bean sprouts, cucumbers, carrots, and chicken. Drizzle generously with the peanut sauce.`
-],
-    tips: null,
-    storage: null,
-    nutrition: `623 kcal | Protein: 47 g | Carbs: 69 g | Fat: 18 g (per`,
-    costPerPortion: null,
-  },
-  38: {
-    ingredients: [
-  {group: 'For the Chicken', item: '600 g skinless chicken thighs, sliced'},
-  {group: 'For the Chicken', item: '1–2 tbsp dark soy sauce'},
-  {group: 'For the Chicken', item: '1 garlic clove, finely chopped'},
-  {group: 'For the Chicken', item: '1 tsp honey'},
-  {group: 'For the Chicken', item: '1 tsp cornflour'},
-  {group: 'For the Bowls', item: '270 g vermicelli, somen, or soba noodles'},
-  {group: 'For the Bowls', item: '2 Lebanese cucumbers, sliced into rounds'},
-  {group: 'For the Bowls', item: '2 carrots, grated or julienned'},
-  {group: 'For the Bowls', item: '4 spring onions, thinly sliced'},
-  {group: 'For the Bowls', item: '1 cup red cabbage, very thinly shredded'},
-  {group: 'For the Bowls', item: '1 cup fresh coriander (cilantro), chopped'},
-  {group: 'For the Bowls', item: '1 cup fresh mint, chopped'},
-  {group: 'For the Bowls', item: '½ cup cashews, lightly crushed'},
-  {group: 'For the Nuớc Mắm Dressing', item: '2 tbsp fish sauce'},
-  {group: 'For the Nuớc Mắm Dressing', item: '2 tbsp lime juice'},
-  {group: 'For the Nuớc Mắm Dressing', item: '1 tbsp rice vinegar'},
-  {group: 'For the Nuớc Mắm Dressing', item: '1 tbsp brown sugar or coconut sugar'},
-  {group: 'For the Nuớc Mắm Dressing', item: '1 garlic clove, finely minced'},
-  {group: 'For the Nuớc Mắm Dressing', item: '1 small red chilli, finely chopped (optional)'},
-  {group: 'For the Nuớc Mắm Dressing', item: '2 tbsp water (adjust to taste)'}
-],
-    method: [
-  `Combine the sliced chicken with soy sauce, garlic, honey, and cornflour. Toss to coat evenly and set aside for 20–30 minutes.`,
-  `Cook the noodles according to packet instructions. Drain, rinse under cold water, and set aside.`,
-  `Whisk together all dressing ingredients until the sugar dissolves. Adjust the balance of lime, sugar, and water to your taste.`,
-  `Preheat the air fryer to 180°C (360°F). Line the basket lightly with foil, then add the chicken in a single layer. Air-fry for 10–12 minutes, flipping halfway and spooning the juices over the chicken when you turn it, until golden and cooked through.`,
-  `Divide the noodles among four bowls. Top with cucumber, carrot, spring onion, cabbage, coriander, and mint. Add the cooked chicken, sprinkle with crushed cashews, and drizzle generously with the dressing.`
-],
-    tips: null,
-    storage: null,
-    nutrition: null,
-    costPerPortion: null,
-  },
-  39: {
-    ingredients: [
-  {group: 'For the Noodles', item: '400 g (14 oz) rice noodles (stir-fry or pad thai style)'},
-  {group: 'For the Noodles', item: '1 tbsp olive oil'},
-  {group: 'For the Noodles', item: '450 g (1 lb) boneless, skinless chicken thighs, cut into bite-sized'},
-  {group: 'pieces', item: '2 tbsp low-sodium soy sauce'},
-  {group: 'pieces', item: '1 cup bean sprouts'},
-  {group: 'pieces', item: '1 red bell pepper, deseeded and thinly sliced'},
-  {group: 'pieces', item: '1 cup shredded carrots'},
-  {group: 'pieces', item: '3 garlic cloves, minced'},
-  {group: 'pieces', item: '2 eggs'},
-  {group: 'pieces', item: '1 cup spring onions, thinly sliced (approx. 1 bunch)'},
-  {group: 'pieces', item: '½ cup fresh coriander (cilantro)'},
-  {group: 'pieces', item: 'Juice of 1 lime'},
-  {group: 'pieces', item: '½ tsp red pepper flakes'},
-  {group: 'For the Sauce', item: '120 ml (½ cup) low-sodium soy sauce or tamari'},
-  {group: 'For the Sauce', item: '2 tbsp toasted sesame oil'},
-  {group: 'For the Sauce', item: '3 tbsp fish sauce'},
-  {group: 'For the Sauce', item: '80 ml (⅓ cup) coconut sugar'},
-  {group: 'For the Sauce', item: '3 tbsp rice vinegar'},
-  {group: 'For the Sauce', item: '60 ml (¼ cup) creamy natural peanut butter'},
-  {group: 'For the Sauce', item: '1 tsp ground ginger'},
-  {group: 'To Garnish', item: '80 ml (⅓ cup) chopped peanuts'},
-  {group: 'To Garnish', item: 'Juice of 1 lime'}
-],
-    method: [
-  `Cook the noodles according to packet instructions. Drain and set aside.`,
-  `Heat the olive oil in a large pan or wok over medium heat. Add the chicken pieces and 2 tbsp soy sauce. Cook for 7–8 minutes until browned and nearly cooked through. Transfer to a plate, leaving the oil and juices in the pan.`,
-  `Add the bean sprouts, bell pepper, carrots, and garlic to the pan. Cook for about 4 minutes until the vegetables have softened.`,
-  `Blend all sauce ingredients until smooth.`,
-  `Push the vegetables to one side of the pan. Crack the eggs in and scramble, then combine with the vegetables.`,
-  `Return the chicken to the pan along with the noodles, spring onions, coriander, lime juice, pepper flakes, and the sauce. Toss everything together until well coated.`,
-  `Serve topped with chopped peanuts and an extra squeeze of lime.`
-],
-    tips: null,
-    storage: null,
-    nutrition: null,
-    costPerPortion: null,
-  },
-  40: {
-    ingredients: [
-  {group: 'For the Chicken', item: '800 g chicken breast, cut into small cubes'},
-  {group: 'For the Chicken', item: '20 g (about 1½ tbsp) soy sauce'},
-  {group: 'For the Chicken', item: '2 tsp black pepper'},
-  {group: 'For the Chicken', item: '2 tsp garlic powder'},
-  {group: 'For the Chicken', item: '1 tsp chilli flakes'},
-  {group: 'For the Chicken', item: '2 tsp olive oil'},
-  {group: 'For the Pad Thai Sauce', item: '30 g (about 2 tbsp) soy sauce (plus light soy to taste)'},
-  {group: 'For the Pad Thai Sauce', item: '40 g (about 2½ tbsp) tamarind paste'},
-  {group: 'For the Pad Thai Sauce', item: '30 g (about 2 tbsp) honey'},
-  {group: 'For the Pad Thai Sauce', item: '5 g (about 1 tsp) fish sauce'},
-  {group: 'For the Pad Thai Sauce', item: '15–20 g (about 1–1½ tbsp) sriracha'},
-  {group: 'For the Pad Thai Sauce', item: 'Juice of 1–2 limes'},
-  {group: 'For Cooking & Assembly', item: '4 garlic cloves, finely chopped'},
-  {group: 'For Cooking & Assembly', item: '1 medium onion, chopped'},
-  {group: 'For Cooking & Assembly', item: 'Spring onions, chopped (plus extra for garnish)'},
-  {group: 'For Cooking & Assembly', item: '3 whole eggs'},
-  {group: 'For Cooking & Assembly', item: '400 g cooked rice noodles'},
-  {group: 'For Cooking & Assembly', item: 'Bean sprouts, to serve'},
-  {group: 'For Cooking & Assembly', item: '30 g crushed peanuts'},
-  {group: 'For Cooking & Assembly', item: 'Chilli flakes, for finishing'},
-  {group: 'For Cooking & Assembly', item: 'Extra lime juice, for finishing'}
-],
-    method: [
-  `Toss the cubed chicken breast with the soy sauce, black pepper, garlic powder, and chilli flakes. Set aside briefly while you prepare the other ingredients.`,
-  `Whisk together all the pad thai sauce ingredients in a small bowl until smooth. Taste and adjust the balance of sweet, salty, and sour.`,
-  `Heat the olive oil in a large wok or frying pan over medium-high heat. Add the chicken and stir-fry for 5–6 minutes until golden and cooked through. Remove and set aside.`,
-  `In the same pan, add a splash more oil if needed. Fry the onion for 2–3 minutes until softened, then add the garlic and spring onion whites. Cook for a further minute.`,
-  `Push the vegetables to one side. Crack the eggs into the pan and scramble, then combine with the vegetables.`,
-  `Return the chicken to the pan. Add the cooked rice noodles and pour over the pad thai sauce. Toss everything together over the heat until well coated and heated through.`,
-  `Serve topped with bean sprouts, crushed peanuts, sliced spring onion, chilli flakes, and a generous squeeze of lime.`
-],
-    tips: `For even higher protein, use a full kilo of chicken breast or add extra eggs. Cook the noodles just until al dente — they'll soften further in the pan with the sauce.`,
-    storage: null,
-    nutrition: null,
-    costPerPortion: null,
-  },
-  41: {
-    ingredients: [
-  {group: 'For the Curry Broth', item: '1 tbsp vegetable oil'},
-  {group: 'For the Curry Broth', item: '2.5 cm (1 in) fresh ginger, finely chopped'},
-  {group: 'For the Curry Broth', item: '3 garlic cloves, minced'},
-  {group: 'For the Curry Broth', item: '1 tsp ground cumin'},
-  {group: 'For the Curry Broth', item: '1 tsp ground turmeric'},
-  {group: 'For the Curry Broth', item: '1 tsp mild chilli powder'},
-  {group: 'For the Curry Broth', item: '1 tbsp tomato paste'},
-  {group: 'For the Curry Broth', item: '400 ml coconut milk'},
-  {group: 'For the Curry Broth', item: '200 ml chicken stock (add more if needed)'},
-  {group: 'For the Curry Broth', item: 'Salt, pepper, and a pinch of sugar, to taste'},
-  {group: 'For the Noodles', item: '150–200 g ramen noodles (approx. 2 packets)'},
-  {group: 'For the Crispy Beef', item: '200 g beef mince (20% fat)'},
-  {group: 'For the Crispy Beef', item: '1 tsp cumin seeds'},
-  {group: 'For the Crispy Beef', item: 'Salt and pepper, to taste'},
-  {group: 'To Garnish', item: '2 pak choi, halved and microwaved for 2 minutes in water, then'},
-  {group: 'drained', item: '2 spring onions, finely sliced'},
-  {group: 'drained', item: '1 tbsp chilli oil (optional)'},
-  {group: 'drained', item: '1 tsp sesame seeds (optional)'}
-],
-    method: [
-  `Heat the vegetable oil in a large pot over medium heat. Add the ginger, garlic, cumin, turmeric, and chilli powder. Fry for 30 seconds, stirring constantly, until fragrant.`,
-  `Stir in the tomato paste and cook for a further 30 seconds.`,
-  `Pour in the coconut milk and chicken stock. Stir to combine, bring to the boil, then reduce the heat and simmer for 10 minutes.`,
-  `Meanwhile, heat a frying pan over medium-high heat. Add the beef mince and break apart with a spoon. Add the cumin seeds and leave to fry, stirring occasionally, until golden brown and crispy, about 10–15 minutes. Season with salt and pepper.`,
-  `Taste the broth and season with salt, pepper, or a pinch of sugar. Add the ramen noodles directly to the pot, cover, and cook according to packet instructions (usually 3–4 minutes), stirring occasionally. Add a splash more stock if the noodles begin to stick.`,
-  `Divide the noodles and broth between three bowls. Top with the crispy beef, pak choi, sliced spring onion, a drizzle of chilli oil, and a sprinkle of sesame seeds.`
-],
-    tips: `The noodles will absorb liquid as they sit — add extra stock when reheating leftovers. ASIAN SOUPS & BROTHS`,
-    storage: null,
-    nutrition: null,
-    costPerPortion: null,
-  },
-  50: {
-    ingredients: [
-  {group: 'For the Broth', item: '1 red onion, finely sliced'},
-  {group: 'For the Broth', item: '2 garlic cloves, finely diced'},
-  {group: 'For the Broth', item: '20 g fresh ginger, finely diced'},
-  {group: 'For the Broth', item: '2 tbsp gochujang paste'},
-  {group: 'For the Broth', item: '1½ tbsp honey'},
-  {group: 'For the Broth', item: '500 ml chicken or vegetable stock'},
-  {group: 'For the Broth', item: '1 tin (400 ml) coconut milk'},
-  {group: 'For the Broth', item: '2 tsp fish sauce'},
-  {group: 'For the Broth', item: 'A little oil, for frying'},
-  {group: 'For the Chicken', item: '2 chicken breasts'},
-  {group: 'For the Chicken', item: '2 tbsp soy sauce'},
-  {group: 'For the Chicken', item: '2 tbsp honey'},
-  {group: 'For the Chicken', item: '1 tsp chilli crunch oil'},
-  {group: 'To Garnish & Serve', item: 'Bok choy, halved lengthways'},
-  {group: 'To Garnish & Serve', item: 'Spring onion, finely sliced'},
-  {group: 'To Garnish & Serve', item: 'Crispy fried onions'},
-  {group: 'To Garnish & Serve', item: 'Chilli oil'},
-  {group: 'To Garnish & Serve', item: 'Lime wedges'},
-  {group: 'To Garnish & Serve', item: 'Sesame seeds'},
-  {group: 'To Garnish & Serve', item: 'Cooked sticky rice'}
-],
-    method: [
-  `Combine the soy sauce, honey, and chilli crunch oil in a bowl. Add the chicken breasts, toss to coat, and set aside to marinate while you prepare the broth.`,
-  `Heat a little oil in a saucepan over medium-high heat. Add the sliced red onion and cook for about 5 minutes until soft. Add the ginger and garlic and cook for a further 2 minutes.`,
-  `Reduce the heat slightly. Stir in the honey and gochujang paste and cook for 1 minute, stirring constantly. Pour in the stock and coconut milk, mix well, and reduce to a gentle simmer. Add the fish sauce.`,
-  `Heat a frying pan with a little oil. Cook the chicken breasts for about 5 minutes per side until cooked through. Pour in the remaining marinade and let it bubble and reduce until sticky. Flip the chicken to coat evenly. Remove and slice.`,
-  `In the same pan, add the halved bok choy cut-side down and sear for 1 minute to char lightly.`,
-  `Press cooked sticky rice into a small bowl, then tip it upside down into the centre of each serving bowl to create a dome.`,
-  `Ladle the broth around the rice. Top with sliced chicken, charred bok choy, spring onion, crispy onions, a drizzle of chilli oil, sesame seeds, and a lime wedge.`
-],
-    tips: null,
-    storage: null,
-    nutrition: `646 kcal | Protein: 41.2 g (per serving)`,
-    costPerPortion: null,
-  },
-  51: {
-    ingredients: [
-  {group: 'For the Crispy Tofu', item: '1 block extra-firm tofu, pressed and grated on a box grater'},
-  {group: '(medium/large holes)', item: '1 tbsp olive oil'},
-  {group: '(medium/large holes)', item: '60 ml (¼ cup) teriyaki sauce'},
-  {group: '(medium/large holes)', item: '1 garlic clove, grated'},
-  {group: 'For the Miso Peanut Broth', item: '1 tbsp red curry paste (or roasted red chilli paste)'},
-  {group: 'For the Miso Peanut Broth', item: '1 tbsp white miso paste'},
-  {group: 'For the Miso Peanut Broth', item: '1–2 tbsp peanut butter'},
-  {group: 'For the Miso Peanut Broth', item: '2 tbsp reduced-sodium soy sauce'},
-  {group: 'For the Miso Peanut Broth', item: '1 tbsp brown sugar'},
-  {group: 'For the Miso Peanut Broth', item: '360 ml (1½ cups) water + 1½ tsp Better Than Bouillon (or 360 ml'},
-  {group: 'stock)', item: '1 tin (400 ml) full-fat coconut milk'},
-  {group: 'stock)', item: '170 g (6 oz) dried ramen noodles (2 packets, noodles only)'},
-  {group: 'Toppings', item: 'Finely sliced cucumber'},
-  {group: 'Toppings', item: 'Fresh coriander and/or spring onion'},
-  {group: 'Toppings', item: 'Chilli crisp'}
-],
-    method: [
-  `Press the tofu with kitchen paper to remove excess moisture, then grate on the medium or large holes of a box grater.`,
-  `Heat the olive oil in a non-stick pan over medium-high heat. Add the grated tofu and sauté for 10–15 minutes until golden and lightly crisped.`,
-  `Add the teriyaki sauce and grated garlic to the tofu. Sauté for another 5–10 minutes until caramelised. Transfer to a bowl and wipe out the pan.`,
-  `In the same pan, heat the curry paste, miso, peanut butter, soy sauce, and brown sugar over medium heat, stirring into a thick paste.`,
-  `Pour in the coconut milk and stock, whisking until smooth. Simmer for 5–10 minutes until slightly thickened and creamy.`,
-  `Meanwhile, boil the ramen noodles in a separate pot for 3–4 minutes. Drain and add to the broth, simmering for 1–2 minutes to coat.`,
-  `Divide between bowls. Ladle extra broth over the top and finish with the crispy tofu, cucumber, fresh herbs, and chilli crisp.`
-],
-    tips: `Better Than Bouillon dissolved in water gives noticeably better flavour than regular stock. For fewer dishes, cook the noodles directly in the broth — increase the liquid to 2 cups. This only works with wheat-based ramen. Leftovers: noodles absorb broth as they sit. Loosen with a splash of water when reheating.`,
-    storage: null,
-    nutrition: null,
-    costPerPortion: null,
-  },
-  52: {
-    ingredients: [
-  {item: '2 packs instant laksa noodles (reserve the flavour sachets)'},
-  {item: '2 tbsp vegetable oil'},
-  {item: '2 tsp minced garlic'},
-  {item: '1 tsp minced ginger'},
-  {item: '2 tbsp laksa paste (or red curry paste)'},
-  {item: '300 ml coconut milk'},
-  {item: '300 ml water'},
-  {item: '1 stalk lemongrass, white part only, bruised'},
-  {item: 'Lime juice, to taste'},
-  {item: '250 g shredded rotisserie chicken'},
-  {group: 'To Garnish', item: 'Bean sprouts'},
-  {group: 'To Garnish', item: 'Fresh coriander (cilantro)'},
-  {group: 'To Garnish', item: 'Fried shallots'},
-  {group: 'To Garnish', item: 'Chilli oil'},
-  {group: 'To Garnish', item: 'Lime wedges'}
-],
-    method: [
-  `Heat the oil in a wok or saucepan over medium heat. Add the garlic and ginger and stir-fry for 2 minutes. Stir in the laksa paste and cook for a further 2–3 minutes until fragrant.`,
-  `Pour in the coconut milk and water. Add the lemongrass stalk and the flavour sachets from the noodle packets. Stir well and simmer on low heat for 5 minutes. Remove the lemongrass and add a squeeze of lime juice.`,
-  `Meanwhile, cook the instant noodles in boiling water for 2 minutes. Drain.`,
-  `Divide the noodles between two bowls. Ladle over the laksa broth and top with shredded chicken, bean sprouts, coriander, fried shallots, and a drizzle of chilli oil. Serve with lime wedges.`
-],
-    tips: null,
-    storage: null,
-    nutrition: null,
-    costPerPortion: null,
-  },
-  53: {
-    ingredients: [
-  {group: 'For the Broth', item: '1 tbsp vegetable oil'},
-  {group: 'For the Broth', item: '1 tbsp chilli crisp'},
-  {group: 'For the Broth', item: '4 garlic cloves, grated'},
-  {group: 'For the Broth', item: '5 cm (2 in) fresh ginger, grated'},
-  {group: 'For the Broth', item: 'Zest and juice of 1 lime'},
-  {group: 'For the Broth', item: '6 spring onions, whites and greens separated'},
-  {group: 'For the Broth', item: '2 tbsp miso paste'},
-  {group: 'For the Broth', item: '2 tbsp maple syrup'},
-  {group: 'For the Broth', item: '1 tbsp rice vinegar'},
-  {group: 'For the Broth', item: '3 tbsp smooth peanut butter'},
-  {group: 'For the Broth', item: '3 tbsp runny tahini'},
-  {group: 'For the Broth', item: '400 ml coconut milk'},
-  {group: 'For the Broth', item: '750 ml vegetable stock'},
-  {group: 'For the Broth', item: '2 tbsp soy sauce'},
-  {group: 'For the Broth', item: '1 tsp vegan fish sauce'},
-  {group: 'For the Broth', item: 'Salt, pepper, and a pinch of sugar, to taste'},
-  {group: 'For the Broth', item: '4 × 100 g packets ramen noodles'},
-  {group: 'For the Smoky Tofu Crumbles', item: '2 tbsp vegetable oil'},
-  {group: 'For the Smoky Tofu Crumbles', item: '1 × 225 g block smoked firm tofu, crumbled'},
-  {group: 'For the Smoky Tofu Crumbles', item: '1 tbsp soy sauce'},
-  {group: 'For the Smoky Tofu Crumbles', item: '1 tsp smoked paprika'},
-  {group: 'For the Smoky Tofu Crumbles', item: '1 tsp liquid smoke (optional)'},
-  {group: 'For the Smoky Tofu Crumbles', item: '1 tsp chilli oil'},
-  {group: 'To Garnish', item: 'Chilli crisp'},
-  {group: 'To Garnish', item: 'Black sesame seeds'},
-  {group: 'To Garnish', item: 'Toasted sesame oil'},
-  {group: 'To Garnish', item: 'Fresh coriander leaves'}
-],
-    method: [
-  `Grate the garlic and ginger. Zest and juice the lime. Slice the spring onions, separating the whites from the greens. Drain and crumble the tofu.`,
-  `Heat the oil and chilli crisp in a large pan over medium heat. Add the garlic, ginger, lime zest, and spring onion whites. Cook for 3–4 minutes until fragrant.`,
-  `Stir in the miso paste, peanut butter, tahini, maple syrup, and rice vinegar until combined. Pour in the coconut milk followed by the vegetable stock. Bring to a gentle simmer.`,
-  `Season with soy sauce, vegan fish sauce, and lime juice. Taste and adjust with salt, pepper, or a pinch of sugar.`,
-  `For the tofu crumbles, heat the oil in a frying pan over medium-high heat. Fry the crumbled tofu for 5–6 minutes until golden. Add the soy sauce, smoked paprika, liquid smoke, and chilli oil. Stir to coat.`,
-  `Cook the ramen noodles according to packet instructions (approx. 3–4 minutes). Drain.`,
-  `Divide the noodles between bowls. Ladle over the broth and top with the smoky tofu crumbles, black sesame seeds, spring onion greens, a drizzle of chilli oil and sesame oil, and fresh coriander.`
-],
-    tips: null,
-    storage: null,
-    nutrition: null,
-    costPerPortion: null,
-  },
-  54: {
-    ingredients: [
-  {group: 'For the Noodles & Toppings', item: '200 g somen noodles (or thin wheat noodles)'},
-  {group: 'For the Noodles & Toppings', item: '150 g oyster mushrooms, torn into pieces'},
-  {group: 'For the Noodles & Toppings', item: '2 soft-boiled eggs'},
-  {group: 'For the Noodles & Toppings', item: '2 handfuls fresh spinach'},
-  {group: 'For the Noodles & Toppings', item: 'Spring onion, finely chopped, for garnish'},
-  {group: 'For the Broth', item: '480 ml (2 cups) reserved noodle water or vegetable stock'},
-  {group: 'For the Broth', item: '1 tsp minced garlic'},
-  {group: 'For the Broth', item: '1 tbsp spring onion, finely chopped'},
-  {group: 'For the Broth', item: '1½ tbsp neutral cooking oil'},
-  {group: 'For the Broth', item: '1 tsp chilli powder (gochugaru or similar)'},
-  {group: 'For the Broth', item: '1 tbsp miso paste'},
-  {group: 'For the Broth', item: '1 tbsp soy sauce'},
-  {group: 'For the Broth', item: '1 tsp sugar'},
-  {group: 'For the Broth', item: '1 tbsp mirin'}
-],
-    method: [
-  `Cook the somen noodles according to packet instructions. Reserve 2 cups of the noodle water before draining. Rinse under cold water and set aside.`,
-  `Prepare your soft-boiled eggs: lower eggs into boiling water and cook for 6½–7 minutes. Transfer to iced water, peel, and halve.`,
-  `Heat the cooking oil in a saucepan over medium heat. Add the garlic and spring onion and cook for 1 minute. Add the chilli powder and stir briefly.`,
-  `Stir in the miso paste, soy sauce, sugar, and mirin. Pour in the reserved noodle water (or stock) and bring to a gentle simmer.`,
-  `In a separate pan, sear the oyster mushrooms in a little oil until golden and crisp. Wilt the spinach in the same pan or directly in the broth.`,
-  `Divide the noodles between bowls. Ladle over the broth, then top with the mushrooms, spinach, soft-boiled egg halves, and chopped spring onion.`
-],
-    tips: null,
-    storage: null,
-    nutrition: null,
-    costPerPortion: null,
-  },
-  55: {
-    ingredients: [
-  {group: 'For the Broth', item: '1 tbsp neutral oil'},
-  {group: 'For the Broth', item: '1 shallot, finely diced'},
-  {group: 'For the Broth', item: '1 spring onion, whites and greens separated'},
-  {group: 'For the Broth', item: '2 garlic cloves, minced'},
-  {group: 'For the Broth', item: '1 tbsp gochujang paste'},
-  {group: 'For the Broth', item: '½ tbsp peanut butter'},
-  {group: 'For the Broth', item: '1 tsp hoisin sauce'},
-  {group: 'For the Broth', item: '1 tsp curry powder'},
-  {group: 'For the Broth', item: '240 ml (1 cup) chicken broth'},
-  {group: 'For the Broth', item: '240 ml (1 cup) coconut milk'},
-  {group: 'For the Broth', item: '1 tsp soy sauce'},
-  {group: 'For the Broth', item: '1 tsp lime juice'},
-  {group: 'For the Broth', item: '1 tsp sugar'},
-  {group: 'For the Pork', item: '70 g pork mince'},
-  {group: 'For the Pork', item: 'Splash of light soy sauce'},
-  {group: 'For the Pork', item: 'Splash of Shaoxing wine'},
-  {group: 'For the Pork', item: 'Splash of oyster sauce'},
-  {group: 'For the Pork', item: 'Splash of dark soy sauce'},
-  {group: 'Noodles & Toppings', item: '1 packet ramen noodles (noodles only, add seasoning packet for extra'},
-  {group: 'kick)', item: '3 lobster balls or fish balls (optional)'},
-  {group: 'kick)', item: '1 soft-boiled egg, halved'},
-  {group: 'kick)', item: 'Fresh coriander, chopped'},
-  {group: 'kick)', item: 'Chilli oil'},
-  {group: 'kick)', item: 'Crispy fried onions'}
-],
-    method: [
-  `Season the pork mince with the sauces. Heat a little oil in a saucepan and cook the pork until browned. Remove and set aside.`,
-  `In the same pan, add a little more oil. Fry the shallot and spring onion whites for about 10 seconds, then add the garlic and cook for 30 seconds.`,
-  `Stir in the gochujang, peanut butter, and hoisin sauce. Cook for 1–2 minutes, stirring constantly.`,
-  `Add the curry powder and stir briefly, then pour in the chicken broth and coconut milk. Season with soy sauce, lime juice, and sugar. Taste and adjust.`,
-  `Bring to a boil, then reduce to a simmer. If using fish balls, add them now, cover, and cook for 4 minutes.`,
-  `Add the ramen noodles, cover, and cook for 3 minutes.`,
-  `Serve topped with the pork mince, a soft-boiled egg, coriander, spring onion greens, crispy onions, and a drizzle of chilli oil.`
-],
-    tips: null,
-    storage: null,
-    nutrition: null,
-    costPerPortion: null,
-  },
-  56: {
-    ingredients: [
-  {group: 'For the Broth', item: '1 kg chicken thighs, skin-on and bone-in'},
-  {group: 'For the Broth', item: '1 whole onion, peeled'},
-  {group: 'For the Broth', item: '5 spring onions, whites and greens separated'},
-  {group: 'For the Broth', item: '4 carrots, peeled'},
-  {group: 'For the Broth', item: '50 g (large knob) fresh ginger, sliced and smashed'},
-  {group: 'For the Broth', item: '1 tbsp salt'},
-  {group: 'For the Broth', item: '2 tbsp chicken powder or bouillon'},
-  {group: 'For the Broth', item: '1 tbsp sugar'},
-  {group: 'For the Broth', item: '1 tsp turmeric powder'},
-  {group: 'For the Broth', item: '3 litres water'},
-  {group: 'For the Broth', item: 'Fish sauce, to taste (add at the end)'},
-  {group: 'For the Noodles', item: '200–300 g glass vermicelli noodles, soaked in hot water for 5–7'},
-  {group: 'For the Garlic Oil', item: '¾ bulb of garlic, cloves peeled'},
-  {group: 'For the Garlic Oil', item: '150–200 ml neutral oil'},
-  {group: 'For the Garlic Oil', item: 'Pinch of sea salt'},
-  {group: 'To Garnish', item: 'Spring onion greens, sliced'},
-  {group: 'To Garnish', item: 'Fresh coriander (cilantro)'},
-  {group: 'To Garnish', item: 'Crispy fried shallots'},
-  {group: 'To Garnish', item: 'Garlic oil (from above)'},
-  {group: 'To Garnish', item: 'Sliced carrots (from the broth)'},
-  {group: 'To Garnish', item: 'Freshly cracked black pepper'},
-  {group: 'To Garnish', item: 'Crispy chicken skin (optional)'}
-],
-    method: [
-  `Place the chicken, whole onion, spring onion whites, carrots, ginger, and water in a large pot. Bring to a boil. Skim off any impurities that rise to the surface.`,
-  `Season the broth with salt, chicken powder, sugar, and turmeric. Reduce the heat and simmer gently for 30 minutes to 1 hour, until the chicken is tender and falling off the bone.`,
-  `Remove the chicken and shred the meat, discarding the bones. Reserve the skin for crisping if desired. Strain the broth and adjust seasoning with fish sauce to taste.`,
-  `For the garlic oil, thinly slice or mince the garlic. Heat the oil in a small saucepan over medium-low heat. Fry the garlic gently until golden and crispy. Remove from heat, add a pinch of salt, and set aside.`,
-  `Soak the glass noodles in hot water for 5–7 minutes until softened. Drain and rinse briefly under cold water.`,
-  `Divide the noodles between bowls. Ladle over the hot broth and top with shredded chicken, sliced carrots, spring onion greens, coriander, fried shallots, a generous spoonful of garlic oil, and freshly cracked pepper.`
-],
-    tips: `Save any excess chicken skin and fry until crispy for an excellent garnish or snack.`,
-    storage: null,
-    nutrition: null,
-    costPerPortion: null,
-  },
-  57: {
-    ingredients: [
-  {group: 'Charred Aromatics', item: '1 tbsp vegetable or neutral oil'},
-  {group: 'Charred Aromatics', item: '2 onions, halved (skin on is fine)'},
-  {group: 'Charred Aromatics', item: '5 cm (2 in) piece of fresh ginger, sliced 0.75 cm thick (unpeeled)'},
-  {group: 'Pho Broth', item: '2 litres (2 quarts) water'},
-  {group: 'Pho Broth', item: '1.5 kg (3 lb) bone-in, skin-on chicken thighs'},
-  {group: 'Pho Broth', item: '1 small bunch fresh coriander (cilantro), stems and leaves'},
-  {group: 'Pho Broth', item: '5 star anise pods'},
-  {group: 'Pho Broth', item: '1 cinnamon stick'},
-  {group: 'Pho Broth', item: '4 cloves'},
-  {group: 'Pho Broth', item: '2 tsp fennel seeds'},
-  {group: 'Pho Broth', item: '2 tsp coriander seeds'},
-  {group: 'Pho Broth', item: '8 tsp fish sauce'},
-  {group: 'Pho Broth', item: '6 tsp white sugar'},
-  {group: 'Pho Broth', item: '¾ tsp cooking salt (or ½ tsp fine salt), added at the end'},
-  {group: 'Noodle Bowls', item: '360 g (13 oz) dried thin flat rice noodles (or 600 g fresh)'},
-  {group: 'Noodle Bowls', item: '2 spring onion stems, finely sliced'},
-  {group: 'Toppings — Help Yourself', item: '3 cups bean sprouts'},
-  {group: 'Toppings — Help Yourself', item: 'Small bunch each: Thai basil, fresh mint, fresh coriander (cilantro)'},
-  {group: 'Toppings — Help Yourself', item: '2 limes, cut into wedges'},
-  {group: 'Toppings — Help Yourself', item: 'Hoisin sauce'},
-  {group: 'Toppings — Help Yourself', item: 'Sriracha'},
-  {group: 'Toppings — Help Yourself', item: 'Red chillies, finely sliced (optional)'}
-],
-    method: [
-  `Char the aromatics: heat the oil in a large pot (at least 6 litres) over high heat. Place the ginger and onion cut-side down and leave undisturbed for 2 minutes until they blacken. Turn and cook for another 2 minutes.`,
-  `Add the water and all remaining broth ingredients except the salt. Bring to a simmer, then lower the heat so the broth simmers very gently with the lid on, cracked open slightly.`,
-  `Simmer gently for 1½ hours. Skim off any scum (dirty foam) that rises to the surface once or twice during cooking.`,
-  `Remove the chicken pieces and set aside. Strain the broth into a clean pot — you should have approximately 1.5 litres. If you have more, simmer to reduce. If less, top up with water.`,
-  `Add the salt and bring the broth to a gentle simmer. It should taste slightly saltier than you want — it dilutes a little once the noodles are added.`,
-  `Shred the chicken meat, discarding the bones and skin. You won't use all the chicken in the pho — see Tips for leftover ideas.`,
-  `Just before serving, prepare the noodles according to packet instructions. Drain very well — excess water dilutes the broth.`,
-  `Place all toppings out on the table for everyone to help themselves.`,
-  `Divide the noodles between bowls. Add the shredded chicken (briefly dunk in the hot broth to reheat), then ladle over approximately 375 ml (1½ cups) of hot broth per bowl. Scatter with spring onion.`,
-  `Pile on toppings of choice, squeeze lime into the broth, and consume immediately.`
-],
-    tips: `For a clear broth, keep the simmer very gentle throughout and skim the scum promptly — don't let it boil vigorously. Don't swap the bone-in, skin-on thighs for breast or boneless cuts — the bones and skin are essential for a rich, flavourful broth. You'll have leftover chicken beautifully infused with Asian flavour. Use it in fried rice, Vietnamese noodle salads, peanut noodle salad, or stir-fried noodles. Bean sprouts from non-Asian stores can be limp. To perk them up, soak in cold water in the fridge for 12 hours before serving. Quick version: use 500 g chicken breast, 6 cups low-sodium stock + 1 cup water instead of just water, and reduce fish sauce to 3 tsp. Simmer only 10 minutes to cook the breast, remove and shred, then simmer the liquid for 30 minutes with the lid ajar before straining. Skip the extra salt step. The broth can be made ahead and frozen for up to 3 months, or refrigerated for up to 5 days. Don't scoop off the chicken fat that firms up in the fridge — it's essential for flavour and mouthfeel. All toppings and noodles must be made fresh.`,
-    storage: null,
-    nutrition: `501 kcal | Protein: 20 g | Carbs: 87 g | Fat: 8 g | Fibre: 4`,
-    costPerPortion: null,
-  },
-  58: {
-    ingredients: [
-  {group: 'For the Soup', item: '450 g (1 lb) whole chicken legs, bone-in and skin-on'},
-  {group: 'For the Soup', item: '5 garlic cloves'},
-  {group: 'For the Soup', item: '3 slices fresh ginger'},
-  {group: 'For the Soup', item: '½ medium onion, roughly chopped'},
-  {group: 'For the Soup', item: '5 spring onions, chopped'},
-  {group: 'For the Soup', item: '½ tsp whole peppercorns'},
-  {group: 'For the Soup', item: 'Salt and pepper, to taste'},
-  {group: 'For the Soup', item: 'Enough water to cover the chicken (approx. 1.5 litres)'},
-  {group: 'For the Dipping Sauce', item: '1 tbsp jalapeño, finely diced'},
-  {group: 'For the Dipping Sauce', item: '5 tbsp soy sauce'},
-  {group: 'For the Dipping Sauce', item: '1 tbsp honey'},
-  {group: 'For the Dipping Sauce', item: '2 tbsp water'},
-  {group: 'To Serve', item: '1½ cups cooked rice'},
-  {group: 'To Serve', item: 'Diced spring onion, for garnish'}
-],
-    method: [
-  `Place the garlic, ginger, onion, spring onions, peppercorns, salt, and pepper in a large pot. Fill with water to about three-quarters full. Bring to a boil.`,
-  `Add the chicken legs. Boil for 30–50 minutes, or until fully cooked through and very tender.`,
-  `Remove the chicken from the pot and shred the meat with two forks, discarding the skin and bones.`,
-  `Strain the broth through a fine sieve. Return the clear broth to the pot.`,
-  `Stir together the jalapeño, soy sauce, honey, and water to make the dipping sauce.`,
-  `Place a scoop of cooked rice in each bowl. Ladle the hot broth over the rice and top with shredded chicken and diced spring onion. Serve the dipping sauce on the side.`
-],
-    tips: null,
-    storage: null,
-    nutrition: null,
-    costPerPortion: null,
-  },
-  59: {
-    ingredients: [
-  {item: '4–5 boneless, skinless chicken thighs'},
-  {item: '3 tbsp olive oil, divided'},
-  {item: '2 tbsp mellow white miso paste'},
-  {item: '2 tbsp + ½ tsp freshly grated ginger, divided'},
-  {item: '2 tbsp mirin (or rice wine vinegar)'},
-  {item: '5 tbsp tamari, divided (3 tbsp for marinade, 2 tbsp for broth)'},
-  {item: '2 tbsp honey'},
-  {item: '2 garlic cloves, minced or grated'},
-  {item: '480 ml (2 cups) chicken bone broth'},
-  {item: '1 baby bok choy, quartered'},
-  {group: 'To Garnish & Serve', item: 'Spring onion, thinly sliced'},
-  {group: 'To Garnish & Serve', item: 'Chilli garlic oil'},
-  {group: 'To Garnish & Serve', item: 'Sesame seeds'},
-  {group: 'To Garnish & Serve', item: 'Cooked white rice'}
-],
-    method: [
-  `Whisk together the miso paste, 2 tbsp ginger, mirin, 3 tbsp tamari, honey, and garlic. Pour over the chicken thighs, toss to coat, and marinate for at least 30 minutes (or up to several hours).`,
-  `Heat 2 tbsp olive oil in a large skillet over medium heat. Add the chicken and cook undisturbed for 7 minutes on the first side. Flip and cook for a further 7 minutes until cooked through (internal temp 74°C / 165°F). Remove and set aside.`,
-  `Add the bok choy to the hot pan and sear on all sides until softened, about 5 minutes. Remove from heat.`,
-  `In a clean pan, heat 1 tbsp olive oil over medium heat. Add the remaining ½ tsp ginger and sauté gently for 1–2 minutes. Pour in the bone broth and remaining 2 tbsp tamari. Bring to a simmer, then remove from heat.`,
-  `Add a scoop of rice to each bowl. Ladle over the ginger broth, then top with the chicken and bok choy. Garnish with sliced spring onion, chilli garlic oil, and sesame seeds. DUMPLINGS & STARTERS`
-],
-    tips: null,
-    storage: null,
-    nutrition: null,
-    costPerPortion: null,
-  },
-};
-const RECIPE_BOOK = [
+const RECIPE_FULL_DATA = {};
+const RECIPE_BOOK = [];
 
-  // ── BREAKFAST ────────────────────────────────────────────────────────────
-  {
-    id: 1, name: "Egg White Protein Oats",
-    mealType: "breakfast", cuisine: "comfort", proteinSource: "eggs",
-    batchCook: true, costTier: 1, servings: 4, prepTime: "12 mins",
-    description: "Egg whites whisk into oats over heat, creating a thick custard-like texture. Endless variations: carrot cake, pumpkin pie, double choc, PB, apple cinnamon, lemon chia.",
-    tags: ["high-protein", "batch-friendly", "no-added-sugar"], cravings: ["comfort"],
-    source: "recipe-book", instagramUrl: null,
-    notes: "Core daily breakfast. Batch 4 portions Saturday. Reheat with a splash of water.",
-    groceryItems: {
-      fridge: ["Liquid egg whites (carton, 1kg)","Medjool dates (pack)"],
-      dry: ["Rolled oats (500g+)","Milled flaxseeds"],
-      extras: ["Vanilla extract","Almond extract (small)"]
-    }
-  },
-  {
-    id: 2, name: "Brownie Batter Overnight Oats",
-    mealType: "breakfast", cuisine: "comfort", proteinSource: "tofu",
-    batchCook: true, costTier: 1, servings: 4, prepTime: "5 mins + overnight",
-    description: "Rich, fudgy, deeply chocolatey no-cook breakfast. Silken tofu and choc protein with quinoa flakes and cocoa. Prep the night before for ready-made pots.",
-    tags: ["batch-friendly","no-cook","chocolate"], cravings: ["comfort"],
-    source: "recipe-book", instagramUrl: null,
-    notes: "Saturday batch. Make 4 pots, keeps 4 days. Top with grated dark chocolate.",
-    groceryItems: {
-      dry: ["Quinoa flakes","Cocoa powder","Vegan chocolate protein powder","Chia seeds","Coconut sugar"],
-      fridge: ["Alpro high-protein soya milk","Silken tofu (pack)"],
-      extras: ["Dark chocolate (85%, bar)","Instant coffee sachet"]
-    }
-  },
-  {
-    id: 3, name: "Chocolate Raspberry Baked Protein Oats",
-    mealType: "breakfast", cuisine: "comfort", proteinSource: "eggs",
-    batchCook: true, costTier: 1, servings: 6, prepTime: "25 mins",
-    description: "Blended and baked into fudgy muffin-shaped portions. Protein-packed, deeply chocolatey, naturally sweetened with Medjool dates. Brilliant meal-prep breakfast.",
-    tags: ["batch-friendly","baked","chocolate"], cravings: ["comfort"],
-    source: "recipe-book", instagramUrl: null,
-    notes: "Bake Saturday or Wednesday. Keeps 4 days in fridge.",
-    groceryItems: {
-      dry: ["Rolled oats","Quinoa flakes","Chia seeds","Cocoa powder","Chocolate protein powder (60g)","Medjool dates"],
-      fridge: ["Alpro high-protein soya milk","Raspberries (fresh or frozen)"],
-      extras: ["Dark chocolate (85%)"]
-    }
-  },
-  {
-    id: 4, name: "Protein Pancakes",
-    mealType: "breakfast", cuisine: "comfort", proteinSource: "eggs",
-    batchCook: false, costTier: 1, servings: 15, prepTime: "30 mins",
-    description: "Light and fluffy, loaded with protein via whipped egg white powder. GF flour base with vegan protein, applesauce, soya yoghurt. Fold in blueberries and dark choc.",
-    tags: ["weekend","fluffy"], cravings: ["comfort"],
-    source: "recipe-book", instagramUrl: null, notes: null,
-    groceryItems: {
-      dry: ["GF self-raising flour","Egg white powder","Vegan protein powder","Coconut sugar"],
-      fridge: ["Plain soya yoghurt","Applesauce (jar)"],
-      extras: ["Blueberries (fresh or frozen)","Dark chocolate chunks"]
-    }
-  },
-  {
-    id: 5, name: "Protein Pumpkin Pancakes",
-    mealType: "breakfast", cuisine: "comfort", proteinSource: "eggs",
-    batchCook: false, costTier: 1, servings: 20, prepTime: "35 mins",
-    description: "Warmly spiced and generously stacked. Pumpkin purée, GF flour, oat flour, protein powder, egg whites, soya milk and yoghurt. Works year-round with tinned pumpkin.",
-    tags: ["weekend","pumpkin-spice"], cravings: ["comfort"],
-    source: "recipe-book", instagramUrl: null, notes: null,
-    groceryItems: {
-      dry: ["GF flour","Oat flour","Protein powder","Pumpkin pie spice"],
-      fridge: ["Liquid egg whites","Plain soya yoghurt","Alpro soya milk"],
-      tins: ["Tinned pumpkin purée"]
-    }
-  },
-  {
-    id: 6, name: "Baked Protein Pancake Bowl (Chocolate)",
-    mealType: "breakfast", cuisine: "comfort", proteinSource: "eggs",
-    batchCook: true, costTier: 1, servings: 3, prepTime: "35 mins",
-    description: "Between a soufflé and a baked oat — light, airy, deeply satisfying. Beaten egg whites give it signature lift. Chocolate variation with espresso and dark chocolate.",
-    tags: ["baked","batch-friendly","chocolate"], cravings: ["comfort"],
-    source: "recipe-book", instagramUrl: null,
-    notes: "Bake in oven-safe dish, portion into 3.",
-    groceryItems: {
-      dry: ["Oat flour","Cocoa powder","Chocolate protein powder","Instant coffee"],
-      fridge: ["Liquid egg whites","Alpro soya milk","Plain soya yoghurt","Applesauce"],
-      extras: ["Dark chocolate (70%)","Raspberries (optional)"]
-    }
-  },
-  {
-    id: 7, name: "Baked Protein Pancake Bowl (Lemon)",
-    mealType: "breakfast", cuisine: "comfort", proteinSource: "eggs",
-    batchCook: true, costTier: 1, servings: 3, prepTime: "35 mins",
-    description: "Lemon zest and juice version of the baked pancake bowl. Salted caramel protein, oat flour, soya milk, yoghurt. Fresh, bright alternative to the chocolate version.",
-    tags: ["baked","batch-friendly","lemon"], cravings: ["comfort","light"],
-    source: "recipe-book", instagramUrl: null, notes: null,
-    groceryItems: {
-      dry: ["Oat flour","Salted caramel protein powder"],
-      fridge: ["Liquid egg whites","Alpro soya milk","Plain soya yoghurt","Applesauce"],
-      produce: ["Lemons (×2)"]
-    }
-  },
-  {
-    id: 8, name: "Microwave Chocolate Protein Oats",
-    mealType: "breakfast", cuisine: "comfort", proteinSource: "eggs",
-    batchCook: false, costTier: 1, servings: 1, prepTime: "5 mins",
-    description: "A five-minute single-bowl bake. Oat flour, cocoa, chocolate protein, soya milk, espresso shot, dark chocolate. Ready in minutes.",
-    tags: ["quick","5-mins","chocolate"], cravings: ["comfort"],
-    source: "recipe-book", instagramUrl: null,
-    notes: "Centre stays slightly underdone — continues to set as it cools.",
-    groceryItems: {
-      dry: ["Oat flour or quinoa flour","Cocoa powder","Chocolate protein powder"],
-      fridge: ["Alpro soya milk"],
-      extras: ["Espresso shot (or instant coffee)","Dark chocolate (85%)","Raspberries"]
-    }
-  },
-  {
-    id: 9, name: "Pumpkin Protein Muffins",
-    mealType: "breakfast", cuisine: "comfort", proteinSource: "eggs",
-    batchCook: true, costTier: 1, servings: 9, prepTime: "35 mins",
-    description: "Warmly spiced, tender, protein-rich muffins. Pumpkin purée, oat flour, protein powder, date purée. Batch on Sunday and breakfast is sorted for the week.",
-    tags: ["batch-friendly","pumpkin-spice","grab-and-go"], cravings: ["comfort"],
-    source: "recipe-book", instagramUrl: null, notes: null,
-    groceryItems: {
-      dry: ["Oat flour","Protein powder","Pumpkin spice / cinnamon"],
-      tins: ["Tinned pumpkin purée"],
-      fridge: ["Medjool dates","Soya milk"],
-      extras: ["Coconut oil (jar)"]
-    }
-  },
+// ─── CLOUD RECIPE LIBRARY ────────────────────────────────────────────────────
+const RECIPE_LIB_URL = 'https://jsxcctrskkkxgdxfaduo.supabase.co';
+const RECIPE_LIB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzeGNjdHJza2treGdkeGZhZHVvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUxMzI0NjUsImV4cCI6MjA5MDcwODQ2NX0.jxnTcKaujOKjWmT9UQLm0ATPzOodaVm-8iOSbKpooUk';
+const RECIPE_LIB_HEADERS = { 'apikey': RECIPE_LIB_KEY, 'Authorization': `Bearer ${RECIPE_LIB_KEY}`, 'Content-Type': 'application/json' };
+const cloudRecipeIds = new Set(); // populated on load
 
-  // ── DESSERTS ───────────────────────────────────────────────────────────────
-  {
-    id: 10, name: "Chocolate Protein Chia Seed Pudding",
-    mealType: "dessert", cuisine: "comfort", proteinSource: "tofu",
-    batchCook: true, costTier: 1, servings: 4, prepTime: "5 mins + 4hrs",
-    description: "The default weekday dessert. Chia seeds, cocoa, soya milk, protein powder, silken tofu. Rich and thick. Batch-make Saturday and Wednesday.",
-    tags: ["batch-friendly","default-dessert","no-cook","chocolate"], cravings: ["comfort"],
-    source: "recipe-book", instagramUrl: null,
-    notes: "Primary weekday dessert. 4 pots Saturday, refill Wednesday.",
-    groceryItems: {
-      dry: ["Chia seeds (bag)","Cocoa powder","Chocolate protein powder","Coconut sugar"],
-      fridge: ["Alpro soya milk (1L)","Silken tofu"],
-      extras: ["Vanilla extract"]
-    }
-  },
-  {
-    id: 11, name: "Protein Brownie (Pumpkin)",
-    mealType: "dessert", cuisine: "comfort", proteinSource: "eggs",
-    batchCook: true, costTier: 1, servings: 3, prepTime: "35 mins",
-    description: "Pumpkin base with 75g chocolate protein powder, cocoa, egg whites, oat flour, PBfit. Higher protein and better for batching than the sweet potato version.",
-    tags: ["batch-friendly","chocolate","recommended-variation"], cravings: ["comfort"],
-    source: "recipe-book", instagramUrl: null,
-    notes: "Preferred over sweet potato — higher protein, better for batching.",
-    groceryItems: {
-      tins: ["Tinned pumpkin purée (240g)"],
-      dry: ["Chocolate protein powder (75g)","Cocoa powder","Oat flour","PBfit powder"],
-      fridge: ["Liquid egg whites"],
-      extras: ["Maple syrup (small bottle)","Dark chocolate (74%)"]
-    }
-  },
-  {
-    id: 12, name: "Protein Brownie (Sweet Potato)",
-    mealType: "dessert", cuisine: "comfort", proteinSource: "eggs",
-    batchCook: true, costTier: 1, servings: 3, prepTime: "35 mins",
-    description: "Sweet potato base with chocolate protein powder, cocoa, egg whites, maple syrup. Dense, chocolatey, naturally sweetened.",
-    tags: ["batch-friendly","chocolate"], cravings: ["comfort"],
-    source: "recipe-book", instagramUrl: null, notes: null,
-    groceryItems: {
-      produce: ["Sweet potatoes (×2, medium)"],
-      dry: ["Chocolate protein powder","Cocoa powder"],
-      fridge: ["Liquid egg whites"],
-      extras: ["Maple syrup","Dark chocolate (74%)"]
-    }
-  },
-  {
-    id: 13, name: "Butternut Chocolate Protein Pudding",
-    mealType: "dessert", cuisine: "comfort", proteinSource: "tofu",
-    batchCook: true, costTier: 1, servings: 4, prepTime: "20 mins + chill",
-    description: "Butternut squash purée, cocoa, protein powder, silken tofu blended into a smooth rich pudding. Alternative to chia pudding.",
-    tags: ["batch-friendly","chocolate"], cravings: ["comfort"],
-    source: "recipe-book", instagramUrl: null, notes: null,
-    groceryItems: {
-      produce: ["Butternut squash (small, or frozen chunks)"],
-      dry: ["Cocoa powder","Protein powder"],
-      fridge: ["Silken tofu"]
-    }
-  },
-  {
-    id: 14, name: "Squash Protein Brownies",
-    mealType: "dessert", cuisine: "comfort", proteinSource: "eggs",
-    batchCook: true, costTier: 1, servings: 4, prepTime: "35 mins",
-    description: "Butternut squash base brownies — dense, fudgy, protein-rich. Batch-friendly and keeps well in the fridge.",
-    tags: ["batch-friendly","chocolate"], cravings: ["comfort"],
-    source: "recipe-book", instagramUrl: null, notes: null,
-    groceryItems: {
-      produce: ["Butternut squash (or frozen)"],
-      dry: ["Protein powder","Cocoa powder","Oat flour"],
-      fridge: ["Liquid egg whites"]
-    }
-  },
-  {
-    id: 15, name: "Butternut PB Protein Mug Cake",
-    mealType: "dessert", cuisine: "comfort", proteinSource: "eggs",
-    batchCook: false, costTier: 1, servings: 1, prepTime: "8 mins",
-    description: "Single-serve butternut and peanut butter protein mug cake. Quick, satisfying, and high-protein.",
-    tags: ["quick","single-serve","peanut-butter"], cravings: ["comfort"],
-    source: "recipe-book", instagramUrl: null, notes: null,
-    groceryItems: {
-      produce: ["Butternut squash (small amount / frozen)"],
-      dry: ["PBfit or peanut flour","Protein powder"],
-      fridge: ["Liquid egg whites"]
-    }
-  },
+function mapSupabaseToApp(row) {
+  return {
+    id: row.id,
+    name: row.name,
+    mealType: row.meal_type || 'dinner',
+    proteinSource: row.protein_source || '',
+    cuisine: row.cuisine || '',
+    tags: row.tags || [],
+    cravings: row.craving_tags || [],
+    servings: row.serves || 2,
+    prepTime: row.prep_cook_time || '',
+    batchCook: row.batch_friendly || false,
+    costTier: row.cost_tier || '',
+    source: row.creator_handle || '',
+    instagramUrl: row.creator_handle ? `https://www.instagram.com/${row.creator_handle.replace(/^@/, '')}` : '',
+    description: row.subtitle || '',
+    notes: row.notes || '',
+  };
+}
 
-  // ── CHICKEN — ROASTED ─────────────────────────────────────────────────────
-  {
-    id: 20, name: "Roast Chicken Breast (Brined)",
-    mealType: "dinner", cuisine: "comfort", proteinSource: "chicken",
-    batchCook: true, costTier: 1, servings: 4, prepTime: "45 mins + brine",
-    description: "Perfectly juicy brined chicken breast. The batch cook anchor — use leftovers in bowls, salads, and noodle dishes across the week.",
-    tags: ["batch-anchor","batch-friendly","lean"], cravings: ["comfort"],
-    source: "recipe-book", instagramUrl: null,
-    notes: "Saturday batch cook anchor. Transform leftovers into Bang Bang Bowl, noodle bowl, etc.",
-    groceryItems: {
-      protein: ["Chicken breasts (large pack, 800g+)"],
-      dry: ["Salt","Herbs (thyme, rosemary)"],
-      produce: ["Garlic (bulb)","Lemon"]
-    }
-  },
-  {
-    id: 21, name: "Chile Lime Chipotle Chicken",
-    mealType: "dinner", cuisine: "mexican", proteinSource: "chicken",
-    batchCook: true, costTier: 1, servings: 4, prepTime: "40 mins",
-    description: "Bold, smoky chipotle chicken with lime and chilli. Versatile base for rice bowls, wraps, or taco bowls.",
-    tags: ["bold-flavour","batch-friendly"], cravings: ["mexican","spicy"],
-    source: "recipe-book", instagramUrl: null, notes: null,
-    groceryItems: {
-      protein: ["Chicken thighs (pack)"],
-      produce: ["Limes (×3)","Fresh coriander","Fresh chillies"],
-      condiments: ["Chipotle paste","Smoked paprika","Ground cumin"]
-    }
-  },
-  {
-    id: 22, name: "Loaf Pan Chicken",
-    mealType: "dinner", cuisine: "comfort", proteinSource: "chicken",
-    batchCook: true, costTier: 1, servings: 4, prepTime: "50 mins",
-    description: "Juicy, deeply savoury chicken cooked in a loaf pan. Locks in moisture and flavour. Great batch cook option.",
-    tags: ["batch-friendly","easy"], cravings: ["comfort"],
-    source: "recipe-book", instagramUrl: null, notes: null,
-    groceryItems: {
-      protein: ["Chicken breasts or thighs (pack)"],
-      produce: ["Garlic","Fresh herbs"],
-      condiments: ["Mixed dried herbs","Olive oil"]
-    }
-  },
-  {
-    id: 23, name: "One-Pan Chicken with Mint Yoghurt Sauce",
-    mealType: "dinner", cuisine: "comfort", proteinSource: "chicken",
-    batchCook: false, costTier: 1, servings: 2, prepTime: "35 mins",
-    description: "Tender chicken with a bright, herby mint soya yoghurt sauce. One pan, minimal washing up.",
-    tags: ["one-pan","easy","fresh"], cravings: ["comfort","light"],
-    source: "recipe-book", instagramUrl: null,
-    notes: "Use soya yoghurt for the sauce.",
-    groceryItems: {
-      protein: ["Chicken breasts (×2)"],
-      produce: ["Fresh mint (bunch)","Garlic","Lemon"],
-      fridge: ["Plain soya yoghurt"]
-    }
-  },
-  {
-    id: 24, name: "High-Protein Chipotle Chicken & Rice Skillet",
-    mealType: "dinner", cuisine: "mexican", proteinSource: "chicken",
-    batchCook: true, costTier: 1, servings: 4, prepTime: "40 mins",
-    description: "Smoky chipotle chicken cooked with rice in a single skillet. Complete one-pan meal.",
-    tags: ["batch-friendly","one-pan","complete-meal"], cravings: ["mexican","spicy"],
-    source: "recipe-book", instagramUrl: null, notes: null,
-    groceryItems: {
-      protein: ["Chicken thighs (pack)"],
-      dry: ["Long-grain white rice (500g)"],
-      tins: ["Tinned tomatoes","Tinned black beans"],
-      condiments: ["Chipotle paste","Smoked paprika","Ground cumin","Ground coriander"]
-    }
-  },
-  {
-    id: 25, name: "High-Protein Chicken Shawarma",
-    mealType: "dinner", cuisine: "comfort", proteinSource: "chicken",
-    batchCook: true, costTier: 1, servings: 4, prepTime: "45 mins",
-    description: "Warmly spiced shawarma with cumin, coriander, paprika, and turmeric. Serve with rice or in a GF wrap.",
-    tags: ["batch-friendly","spiced"], cravings: ["comfort","spicy"],
-    source: "recipe-book", instagramUrl: null, notes: null,
-    groceryItems: {
-      protein: ["Chicken thighs (pack)"],
-      produce: ["Red onion","Garlic","Lemon"],
-      condiments: ["Ground cumin","Ground coriander","Turmeric","Smoked paprika","Cinnamon"]
-    }
-  },
-  {
-    id: 26, name: "Chipotle Chicken with Corn Salsa",
-    mealType: "dinner", cuisine: "mexican", proteinSource: "chicken",
-    batchCook: false, costTier: 1, servings: 2, prepTime: "35 mins",
-    description: "Chipotle-marinated chicken with a fresh corn, tomato, and lime salsa. Vibrant and satisfying.",
-    tags: ["fresh","bold-flavour"], cravings: ["mexican","spicy"],
-    source: "recipe-book", instagramUrl: null, notes: null,
-    groceryItems: {
-      protein: ["Chicken breasts (×2)"],
-      produce: ["Lime (×2)","Tomatoes","Fresh coriander"],
-      tins: ["Tinned sweetcorn"],
-      condiments: ["Chipotle paste"]
-    }
-  },
-  {
-    id: 27, name: "Chicken Shawarma (Sheet Pan)",
-    mealType: "dinner", cuisine: "comfort", proteinSource: "chicken",
-    batchCook: true, costTier: 1, servings: 4, prepTime: "50 mins",
-    description: "Sheet pan shawarma — everything on one tray. Deeply spiced chicken thighs with roasted veg.",
-    tags: ["batch-friendly","sheet-pan","spiced"], cravings: ["comfort","spicy"],
-    source: "recipe-book", instagramUrl: null,
-    notes: "Established recipe. Avoid repeating in back-to-back weeks.",
-    groceryItems: {
-      protein: ["Chicken thighs (pack)"],
-      produce: ["Red onion (×2)","Bell peppers (×2)","Garlic"],
-      condiments: ["Shawarma spice mix or individual: cumin, coriander, paprika, turmeric, cinnamon"]
-    }
-  },
+function flattenIngredientSections(sections) {
+  if (!sections || !Array.isArray(sections)) return [];
+  return sections.flatMap(sec =>
+    (sec.ingredients || []).map(item => ({ group: sec.section_title || undefined, item }))
+  );
+}
 
-  // ── CHICKEN — ASIAN ───────────────────────────────────────────────────────
-  {
-    id: 30, name: "Char Siu Chicken Bowls",
-    mealType: "dinner", cuisine: "asian", proteinSource: "chicken",
-    batchCook: true, costTier: 2, servings: 4, prepTime: "45 mins",
-    description: "Chinese-style char siu glazed chicken with sweet-savoury marinade. Serve over steamed rice with spring onion and sesame.",
-    tags: ["batch-friendly","sweet-savoury","chinese"], cravings: ["asian"],
-    source: "recipe-book", instagramUrl: null,
-    notes: "Use GF tamari instead of soy sauce.",
-    groceryItems: {
-      protein: ["Chicken thighs (pack)"],
-      dry: ["Jasmine rice"],
-      produce: ["Spring onions","Garlic","Fresh ginger"],
-      condiments: ["GF tamari","Hoisin sauce (check GF)","Sesame oil","Five spice powder","Honey or maple syrup"]
-    }
-  },
-  {
-    id: 31, name: "Creamy Thai Coconut Chicken Meatballs",
-    mealType: "dinner", cuisine: "asian", proteinSource: "chicken",
-    batchCook: true, costTier: 2, servings: 4, prepTime: "45 mins",
-    description: "Tender chicken meatballs in a creamy coconut Thai curry sauce. Serve with jasmine rice.",
-    tags: ["batch-friendly","creamy","thai","coconut"], cravings: ["asian","spicy"],
-    source: "recipe-book", instagramUrl: null, notes: null,
-    groceryItems: {
-      protein: ["Chicken mince (500g)"],
-      tins: ["Coconut milk (full-fat)"],
-      produce: ["Garlic","Fresh ginger","Lemongrass (or paste)","Fresh chilli","Lime"],
-      dry: ["Jasmine rice"],
-      condiments: ["Thai red curry paste (check GF/DF)","GF fish sauce","GF tamari"]
-    }
-  },
-  {
-    id: 32, name: "Vietnamese Lemongrass Chicken Rice Bowls",
-    mealType: "dinner", cuisine: "asian", proteinSource: "chicken",
-    batchCook: false, costTier: 2, servings: 2, prepTime: "40 mins",
-    description: "Fragrant lemongrass-marinated chicken over jasmine rice with Vietnamese-style fresh herbs and dipping sauce.",
-    tags: ["vietnamese","fresh","fragrant"], cravings: ["asian","light"],
-    source: "recipe-book", instagramUrl: null, notes: null,
-    groceryItems: {
-      protein: ["Chicken thighs (×4)"],
-      produce: ["Lemongrass (fresh or paste)","Garlic","Fresh chilli","Lime","Fresh herbs (mint, coriander)"],
-      dry: ["Jasmine rice"],
-      condiments: ["GF fish sauce","GF tamari","Rice wine vinegar"]
-    }
-  },
-  {
-    id: 33, name: "Pad Kra Pao (Thai Basil Chicken)",
-    mealType: "dinner", cuisine: "asian", proteinSource: "chicken",
-    batchCook: false, costTier: 1, servings: 2, prepTime: "20 mins",
-    description: "Classic Thai stir-fry — minced chicken, garlic, chillies, Thai basil. Serve over jasmine rice, top with a fried egg.",
-    tags: ["quick","thai","spicy"], cravings: ["asian","spicy"],
-    source: "recipe-book", instagramUrl: null,
-    notes: "Use GF oyster sauce or tamari-based substitute.",
-    groceryItems: {
-      protein: ["Chicken mince (400g)"],
-      produce: ["Thai basil (or regular basil)","Garlic (bulb)","Fresh red chillies"],
-      dry: ["Jasmine rice"],
-      condiments: ["GF oyster sauce or tamari","GF fish sauce","Sesame oil"]
-    }
-  },
-  {
-    id: 34, name: "Bang Bang Chicken Bowls",
-    mealType: "dinner", cuisine: "asian", proteinSource: "chicken",
-    batchCook: false, costTier: 1, servings: 2, prepTime: "25 mins",
-    description: "Crispy or poached chicken with a creamy spicy bang bang sauce over rice or noodles with fresh cucumber and spring onion.",
-    tags: ["crowd-pleaser","spicy-sweet"], cravings: ["asian","spicy"],
-    source: "recipe-book", instagramUrl: null,
-    notes: "Great use of leftover roast chicken. Core rotation dinner.",
-    groceryItems: {
-      protein: ["Chicken (can use leftover roast)"],
-      produce: ["Cucumber","Spring onions","Lime"],
-      dry: ["Jasmine rice or GF rice noodles"],
-      condiments: ["GF sweet chilli sauce","Sriracha","Sesame oil","Rice wine vinegar"]
-    }
-  },
-  {
-    id: 35, name: "Healthy Orange & Cashew Chicken",
-    mealType: "dinner", cuisine: "asian", proteinSource: "chicken",
-    batchCook: false, costTier: 2, servings: 2, prepTime: "35 mins",
-    description: "Sticky orange-glazed chicken with toasted cashews and jasmine rice. Sweet, savoury, and satisfying.",
-    tags: ["sticky","sweet-savoury"], cravings: ["asian"],
-    source: "recipe-book", instagramUrl: null, notes: null,
-    groceryItems: {
-      protein: ["Chicken breast (×2)"],
-      produce: ["Oranges (×2)","Garlic","Fresh ginger","Spring onions"],
-      dry: ["Jasmine rice","Cashews (bag)"],
-      condiments: ["GF tamari","Sesame oil","Rice wine vinegar","Cornflour (GF)"]
-    }
-  },
-  {
-    id: 36, name: "Spicy Tofu Rice Bowl",
-    mealType: "dinner", cuisine: "asian", proteinSource: "tofu",
-    batchCook: false, costTier: 1, servings: 2, prepTime: "30 mins",
-    description: "Crispy pan-fried or air-fryer tofu in a gochujang or chilli sauce over rice with sesame, spring onion, and steamed greens.",
-    tags: ["plant-based","spicy","quick"], cravings: ["asian","spicy","light"],
-    source: "recipe-book", instagramUrl: null, notes: null,
-    groceryItems: {
-      protein: ["Firm tofu (×2 blocks)"],
-      produce: ["Spring onions","Garlic","Fresh ginger","Pak choi or bok choy"],
-      dry: ["Jasmine rice","Sesame seeds"],
-      condiments: ["Gochujang paste (check GF)","GF tamari","Sesame oil","Rice wine vinegar"]
-    }
-  },
-  {
-    id: 37, name: "Chicken Spring Roll Bowl",
-    mealType: "dinner", cuisine: "asian", proteinSource: "chicken",
-    batchCook: false, costTier: 1, servings: 2, prepTime: "25 mins",
-    description: "Deconstructed spring roll bowl — seasoned chicken mince, vermicelli noodles, shredded cabbage, carrot, fresh herbs, and a tangy GF dipping sauce.",
-    tags: ["light","fresh","vietnamese"], cravings: ["asian","light"],
-    source: "recipe-book", instagramUrl: null, notes: null,
-    groceryItems: {
-      protein: ["Chicken mince (400g)"],
-      produce: ["White or savoy cabbage","Carrots","Spring onions","Fresh mint","Fresh coriander","Lime"],
-      dry: ["Glass noodles / vermicelli (GF, mung bean)"],
-      condiments: ["GF fish sauce","Rice wine vinegar","GF sweet chilli sauce","Sesame oil"]
-    }
-  },
-  {
-    id: 38, name: "Vietnamese Chicken & Noodle Bowls",
-    mealType: "dinner", cuisine: "asian", proteinSource: "chicken",
-    batchCook: false, costTier: 1, servings: 2, prepTime: "30 mins",
-    description: "Poached or shredded chicken over GF noodles with nuoc cham sauce, fresh herbs, cucumber, and beansprouts.",
-    tags: ["fresh","vietnamese","light"], cravings: ["asian","light"],
-    source: "recipe-book", instagramUrl: null, notes: null,
-    groceryItems: {
-      protein: ["Chicken breast or thighs (×2)"],
-      produce: ["Cucumber","Beansprouts","Fresh mint","Fresh coriander","Spring onions","Lime","Fresh chilli"],
-      dry: ["GF rice noodles"],
-      condiments: ["GF fish sauce","Rice wine vinegar","Coconut sugar"]
-    }
-  },
-  {
-    id: 39, name: "Pad Thai–Style Saucy Chicken Noodles",
-    mealType: "dinner", cuisine: "asian", proteinSource: "chicken",
-    batchCook: false, costTier: 1, servings: 2, prepTime: "25 mins",
-    description: "Saucy, tangy noodles inspired by pad thai. GF rice noodles, chicken, egg, tamarind-based sauce, beansprouts, spring onion.",
-    tags: ["saucy","noodles","quick"], cravings: ["asian","noodles"],
-    source: "recipe-book", instagramUrl: null,
-    notes: "Use GF rice noodles. Check tamarind paste is GF.",
-    groceryItems: {
-      protein: ["Chicken breast (×2)","Eggs (×2)"],
-      produce: ["Beansprouts","Spring onions","Lime","Fresh chilli"],
-      dry: ["GF rice noodles","Crushed peanuts"],
-      condiments: ["Tamarind paste","GF fish sauce","Coconut sugar","GF tamari"]
-    }
-  },
-  {
-    id: 40, name: "High-Protein Chicken Pad Thai",
-    mealType: "dinner", cuisine: "asian", proteinSource: "chicken",
-    batchCook: false, costTier: 2, servings: 2, prepTime: "30 mins",
-    description: "Protein-forward pad thai with extra chicken and egg, GF rice noodles, classic tamarind sauce, lime, and crushed peanuts.",
-    tags: ["high-protein","noodles","thai"], cravings: ["asian","noodles"],
-    source: "recipe-book", instagramUrl: null,
-    notes: "Use GF rice noodles and GF fish sauce.",
-    groceryItems: {
-      protein: ["Chicken breast (×2)","Eggs (×3)"],
-      produce: ["Beansprouts","Spring onions","Lime","Garlic"],
-      dry: ["GF rice noodles","Crushed peanuts"],
-      condiments: ["Tamarind paste","GF fish sauce","Coconut sugar","GF tamari"]
-    }
-  },
-  {
-    id: 41, name: "Easy Curry Noodles with Crispy Beef",
-    mealType: "dinner", cuisine: "asian", proteinSource: "beef",
-    batchCook: false, costTier: 2, servings: 2, prepTime: "30 mins",
-    description: "Fragrant curry broth with GF noodles and crispy ground beef. Quick weeknight bowl with big flavour.",
-    tags: ["noodles","beef","curry"], cravings: ["asian","noodles","spicy"],
-    source: "recipe-book", instagramUrl: null, notes: null,
-    groceryItems: {
-      protein: ["Lean beef mince (400g)"],
-      produce: ["Garlic","Fresh ginger","Spring onions","Lime","Fresh chilli"],
-      dry: ["GF rice noodles"],
-      condiments: ["Thai red curry paste (GF/DF)","Coconut aminos or GF tamari","GF fish sauce"]
-    }
-  },
+function populateFullDataFromRow(row) {
+  if (!RECIPE_FULL_DATA[row.id]) RECIPE_FULL_DATA[row.id] = {};
+  if (row.ingredient_sections) RECIPE_FULL_DATA[row.id].ingredients = flattenIngredientSections(row.ingredient_sections);
+  if (row.method_steps?.length) RECIPE_FULL_DATA[row.id].method = row.method_steps;
+  if (row.calories != null) RECIPE_FULL_DATA[row.id].nutrition = { kcal: parseFloat(row.calories), protein: parseFloat(row.protein_g), carbs: parseFloat(row.carbs_g), fat: parseFloat(row.fat_g) };
+}
 
-  // ── ASIAN SOUPS & BROTHS ──────────────────────────────────────────────────
-  {
-    id: 50, name: "Sticky Gochujang Chicken & Coconut Broth",
-    mealType: "dinner", cuisine: "asian", proteinSource: "chicken",
-    batchCook: true, costTier: 2, servings: 4, prepTime: "45 mins",
-    description: "Sticky gochujang-glazed chicken in a rich coconut and chilli broth. Bold Korean flavours with rice or noodles.",
-    tags: ["batch-friendly","korean","spicy","coconut"], cravings: ["asian","spicy","brothy"],
-    source: "recipe-book", instagramUrl: null,
-    notes: "Check gochujang is GF (most Korean brands are, but verify).",
-    groceryItems: {
-      protein: ["Chicken thighs (pack)"],
-      tins: ["Coconut milk"],
-      produce: ["Garlic","Fresh ginger","Spring onions","Lime"],
-      condiments: ["Gochujang paste","GF tamari","Sesame oil"],
-      dry: ["Jasmine rice or GF noodles"]
+async function fetchCloudRecipes() {
+  try {
+    const res = await fetch(
+      `${RECIPE_LIB_URL}/rest/v1/recipes?import_status=eq.ready&select=*&order=name.asc`,
+      { headers: RECIPE_LIB_HEADERS }
+    );
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const rows = await res.json();
+    const appRecipes = rows.map(mapSupabaseToApp);
+    // Populate full data cache
+    const fullCache = {};
+    for (const row of rows) {
+      populateFullDataFromRow(row);
+      fullCache[row.id] = {
+        ingredients: flattenIngredientSections(row.ingredient_sections),
+        method: row.method_steps || [],
+        nutrition: row.calories != null ? { kcal: parseFloat(row.calories), protein: parseFloat(row.protein_g), carbs: parseFloat(row.carbs_g), fat: parseFloat(row.fat_g) } : null,
+      };
     }
-  },
-  {
-    id: 51, name: "Miso Peanut Ramen Bowl",
-    mealType: "dinner", cuisine: "asian", proteinSource: "chicken",
-    batchCook: false, costTier: 2, servings: 2, prepTime: "30 mins",
-    description: "Rich miso and peanut butter broth with GF rice ramen, chicken or tofu, soft-boiled egg, spring onion, and nori.",
-    tags: ["ramen","creamy","umami"], cravings: ["asian","brothy","noodles"],
-    source: "recipe-book", instagramUrl: null,
-    notes: "Use GF miso paste and GF rice ramen noodles.",
-    groceryItems: {
-      protein: ["Chicken breast or firm tofu","Eggs (×2, for soft-boiling)"],
-      produce: ["Spring onions","Garlic","Fresh ginger","Pak choi"],
-      dry: ["GF rice ramen noodles"],
-      condiments: ["GF white miso paste","Peanut butter (natural)","GF tamari","Sesame oil","GF vegetable stock"]
-    }
-  },
-  {
-    id: 52, name: "Quick Chicken Laksa",
-    mealType: "dinner", cuisine: "asian", proteinSource: "chicken",
-    batchCook: false, costTier: 2, servings: 2, prepTime: "30 mins",
-    description: "Spicy, fragrant coconut laksa broth with shredded chicken, rice noodles, beansprouts, and lime.",
-    tags: ["spicy","coconut","quick"], cravings: ["asian","spicy","brothy","noodles"],
-    source: "recipe-book", instagramUrl: null,
-    notes: "Check laksa paste for GF/DF — or make your own.",
-    groceryItems: {
-      protein: ["Chicken breast (×2)"],
-      tins: ["Coconut milk"],
-      produce: ["Beansprouts","Spring onions","Lime","Fresh chilli"],
-      dry: ["GF rice noodles"],
-      condiments: ["Laksa paste (GF/DF) or: lemongrass paste, galangal, chilli flakes","GF fish sauce"]
-    }
-  },
-  {
-    id: 53, name: "Creamy Peanut Miso Ramen",
-    mealType: "dinner", cuisine: "asian", proteinSource: "tofu",
-    batchCook: false, costTier: 2, servings: 2, prepTime: "25 mins",
-    description: "Creamy, nutty peanut-miso broth with GF ramen, crispy tofu, spring onion, and sesame.",
-    tags: ["ramen","plant-forward","creamy"], cravings: ["asian","brothy","noodles"],
-    source: "recipe-book", instagramUrl: null, notes: null,
-    groceryItems: {
-      protein: ["Firm tofu (×1 block)"],
-      produce: ["Spring onions","Garlic","Fresh ginger","Pak choi"],
-      dry: ["GF rice ramen","Sesame seeds"],
-      condiments: ["GF white miso paste","Peanut butter","GF tamari","Sesame oil","GF vegetable stock"]
-    }
-  },
-  {
-    id: 54, name: "Garlic Miso Somen Noodles",
-    mealType: "dinner", cuisine: "asian", proteinSource: "chicken",
-    batchCook: false, costTier: 1, servings: 2, prepTime: "20 mins",
-    description: "Light but deeply savoury garlic-miso broth with GF noodles, chicken, and a simple umami-rich finish.",
-    tags: ["quick","light","umami"], cravings: ["asian","light","brothy","noodles"],
-    source: "recipe-book", instagramUrl: null,
-    notes: "Use GF rice noodles in place of somen.",
-    groceryItems: {
-      protein: ["Chicken breast (×2)"],
-      produce: ["Garlic (bulb)","Spring onions","Pak choi"],
-      dry: ["GF rice noodles"],
-      condiments: ["GF white miso paste","GF tamari","Sesame oil","GF chicken stock"]
-    }
-  },
-  {
-    id: 55, name: "Creamy PB Gochujang Ramen",
-    mealType: "dinner", cuisine: "asian", proteinSource: "chicken",
-    batchCook: false, costTier: 2, servings: 2, prepTime: "25 mins",
-    description: "Spicy gochujang and peanut butter broth — bold, creamy, and addictive. GF ramen, chicken, sesame, spring onion.",
-    tags: ["ramen","spicy","creamy"], cravings: ["asian","spicy","brothy","noodles"],
-    source: "recipe-book", instagramUrl: null, notes: null,
-    groceryItems: {
-      protein: ["Chicken breast or thighs (×2)"],
-      produce: ["Spring onions","Garlic","Pak choi","Soft-boiled egg (optional)"],
-      dry: ["GF rice ramen","Sesame seeds"],
-      condiments: ["Gochujang paste","Peanut butter","GF tamari","Sesame oil","GF chicken stock"]
-    }
-  },
-  {
-    id: 56, name: "Miến Gà (Vietnamese Glass Noodle Soup)",
-    mealType: "dinner", cuisine: "asian", proteinSource: "chicken",
-    batchCook: false, costTier: 1, servings: 2, prepTime: "35 mins",
-    description: "Light, clear Vietnamese chicken broth with glass noodles, shredded chicken, wood ear mushrooms, ginger, and fresh herbs.",
-    tags: ["light","vietnamese","clear-broth"], cravings: ["asian","light","brothy","noodles"],
-    source: "recipe-book", instagramUrl: null,
-    notes: "Glass noodles (mung bean) are naturally GF.",
-    groceryItems: {
-      protein: ["Chicken thighs or whole legs (×4)"],
-      produce: ["Fresh ginger (root)","Spring onions","Fresh coriander or Vietnamese herbs","Lime"],
-      dry: ["Glass noodles / mung bean vermicelli"],
-      condiments: ["GF fish sauce","GF chicken stock"]
-    }
-  },
-  {
-    id: 57, name: "Pho Gà (Vietnamese Chicken Pho)",
-    mealType: "dinner", cuisine: "asian", proteinSource: "chicken",
-    batchCook: false, costTier: 2, servings: 4, prepTime: "90 mins",
-    description: "Fragrant star anise and ginger broth with shredded chicken, rice noodles, beansprouts, basil, lime, and chilli. An established favourite.",
-    tags: ["vietnamese","slow-cook","established-recipe"], cravings: ["asian","brothy","light"],
-    source: "recipe-book", instagramUrl: null,
-    notes: "Avoid repeating in back-to-back weeks. Use GF rice noodles and GF fish sauce.",
-    groceryItems: {
-      protein: ["Whole chicken or large chicken pieces"],
-      produce: ["Fresh ginger (large piece)","White onion","Beansprouts","Fresh Thai basil","Fresh coriander","Spring onions","Lime (×3)","Fresh red chilli"],
-      dry: ["GF flat rice noodles (bánh phở)"],
-      condiments: ["Star anise","Cinnamon stick","Cloves","GF fish sauce","GF chicken stock"]
-    }
-  },
-  {
-    id: 58, name: "Dak Gomtang (Korean Chicken Soup)",
-    mealType: "dinner", cuisine: "asian", proteinSource: "chicken",
-    batchCook: true, costTier: 1, servings: 4, prepTime: "75 mins",
-    description: "Milky-white Korean chicken bone broth with rice, spring onion, and ginger. Deeply nourishing and simple.",
-    tags: ["batch-friendly","korean","nourishing","light"], cravings: ["asian","brothy","light"],
-    source: "recipe-book", instagramUrl: null, notes: null,
-    groceryItems: {
-      protein: ["Whole chicken or chicken carcass + thighs"],
-      produce: ["Fresh ginger","Spring onions","Garlic"],
-      dry: ["Short-grain rice (Korean-style, or jasmine)"],
-      condiments: ["GF tamari","Sesame oil","Salt & white pepper"]
-    }
-  },
-  {
-    id: 59, name: "Brothy Miso Ginger Chicken & Rice",
-    mealType: "dinner", cuisine: "asian", proteinSource: "chicken",
-    batchCook: true, costTier: 1, servings: 4, prepTime: "50 mins",
-    description: "Ginger and miso broth with tender chicken thighs and jasmine rice. Wednesday batch cook anchor. Use homemade carcass broth for depth.",
-    tags: ["batch-anchor","batch-friendly","wednesday-cook","comforting"], cravings: ["asian","brothy"],
-    source: "recipe-book", instagramUrl: null,
-    notes: "Wednesday batch cook anchor. Use homemade carcass broth from Saturday roast for max flavour.",
-    groceryItems: {
-      protein: ["Chicken thighs (pack, bone-in or boneless)"],
-      produce: ["Fresh ginger (large knob)","Spring onions","Garlic","Pak choi or spinach"],
-      dry: ["Jasmine rice"],
-      condiments: ["GF white miso paste","GF tamari","Sesame oil","GF chicken stock (if no carcass broth)"]
-    }
+    localStorage.setItem('ds_recipe_cache', JSON.stringify(appRecipes));
+    localStorage.setItem('ds_recipe_cache_full', JSON.stringify(fullCache));
+    localStorage.setItem('ds_recipe_cache_at', new Date().toISOString());
+    return appRecipes;
+  } catch (err) {
+    console.warn('[Daily Shuffle] Cloud recipe fetch failed:', err.message);
+    return null;
   }
-];
+}
+
+function loadCachedRecipes() {
+  try {
+    const cached = localStorage.getItem('ds_recipe_cache');
+    if (!cached) return [];
+    const appRecipes = JSON.parse(cached);
+    const cachedFull = localStorage.getItem('ds_recipe_cache_full');
+    if (cachedFull) {
+      const fullData = JSON.parse(cachedFull);
+      for (const [id, data] of Object.entries(fullData)) {
+        if (!RECIPE_FULL_DATA[id]) RECIPE_FULL_DATA[id] = {};
+        Object.assign(RECIPE_FULL_DATA[id], data);
+      }
+    }
+    return appRecipes;
+  } catch(e) {
+    return [];
+  }
+}
 
 // ─── APP STATE ────────────────────────────────────────────────────────────────
-let recipes = [...RECIPE_BOOK];
+// Load from localStorage cache immediately (offline-first), refresh in background
+const _cachedCloudRecipes = loadCachedRecipes();
+for (const r of _cachedCloudRecipes) cloudRecipeIds.add(r.id);
+let recipes = [..._cachedCloudRecipes];
 try {
   const saved = localStorage.getItem('ds_custom_recipes');
-  if (saved) recipes = [...RECIPE_BOOK, ...JSON.parse(saved)];
+  if (saved) {
+    const customRecipes = JSON.parse(saved);
+    // Merge custom recipes, skipping any IDs already in cloudRecipeIds
+    recipes = [..._cachedCloudRecipes, ...customRecipes.filter(r => !cloudRecipeIds.has(r.id))];
+  }
 } catch(e) {}
 
 // Apply saved overrides to all recipes (metadata + full data)
@@ -3260,7 +1296,7 @@ let supabaseUrl = localStorage.getItem('ds_supabase_url') || '';
 let supabaseKey = localStorage.getItem('ds_supabase_key') || '';
 
 function saveCustom() {
-  try { localStorage.setItem('ds_custom_recipes', JSON.stringify(recipes.filter(r=>!RECIPE_BOOK.find(b=>b.id===r.id)))); } catch(e){}
+  try { localStorage.setItem('ds_custom_recipes', JSON.stringify(recipes.filter(r=>!cloudRecipeIds.has(r.id)))); } catch(e){}
   autoSync();
 }
 function saveHiddenRecipes() {
@@ -3308,17 +1344,28 @@ function saveOverrides() {
 }
 
 // ─── DELETE / RESTORE RECIPES ────────────────────────────────────────────────
-function deleteRecipe(id) {
+async function deleteRecipe(id) {
   const r = recipes.find(x => x.id === id); if (!r) return;
-  const isBuiltIn = !!RECIPE_BOOK.find(b => b.id === id);
-  if (!confirm(`Delete "${r.name}"?${isBuiltIn ? '\n\nThis is a built-in recipe — it will be hidden. You can restore it from Settings.' : ''}`)) return;
-  if (isBuiltIn) {
+  const isCloudRecipe = cloudRecipeIds.has(id);
+  if (!confirm(`Delete "${r.name}"?${isCloudRecipe ? '\n\nThis is a library recipe — it will be hidden. You can restore it from Settings.' : ''}`)) return;
+  if (isCloudRecipe) {
+    // Hide locally immediately; soft-delete in Supabase in the background
     hiddenRecipes.add(id);
     saveHiddenRecipes();
+    fetch(`${RECIPE_LIB_URL}/rest/v1/recipes?id=eq.${id}`, {
+      method: 'PATCH',
+      headers: RECIPE_LIB_HEADERS,
+      body: JSON.stringify({ import_status: 'deleted' })
+    }).catch(err => console.warn('[Daily Shuffle] Soft-delete failed:', err.message));
   } else {
+    // Custom recipe: remove locally and delete from Supabase
     recipes = recipes.filter(x => x.id !== id);
     delete RECIPE_FULL_DATA[id];
     saveCustom();
+    fetch(`${RECIPE_LIB_URL}/rest/v1/recipes?id=eq.${id}`, {
+      method: 'DELETE',
+      headers: RECIPE_LIB_HEADERS,
+    }).catch(err => console.warn('[Daily Shuffle] Recipe delete failed:', err.message));
   }
   closeModal();
   renderRecipes();
@@ -3334,7 +1381,7 @@ function restoreHiddenRecipes() {
 
 // ─── LIBRARY EXPORT / IMPORT ─────────────────────────────────────────────────
 function exportLibrary() {
-  const customRecipes = recipes.filter(r => !RECIPE_BOOK.find(b => b.id === r.id));
+  const customRecipes = recipes.filter(r => !cloudRecipeIds.has(r.id));
   const overrides = JSON.parse(localStorage.getItem('ds_overrides') || '{}');
   const nutrition = JSON.parse(localStorage.getItem('ds_nutrition') || '{}');
   const payload = {
@@ -5356,7 +3403,7 @@ function clearGroceryChecks() {
 }
 
 // ─── ADD RECIPE ──────────────────────────────────────────────────────────────
-function addRecipe() {
+async function addRecipe() {
   const name = document.getElementById('f-name').value.trim();
   const mealType = document.getElementById('f-mealType').value;
   const protein = document.getElementById('f-protein').value;
@@ -5371,25 +3418,65 @@ function addRecipe() {
   const cravings = [...cravingCheckboxes].map(cb=>cb.value);
 
   const ai = window._parsedAiRecipe || null;
+  const creatorHandle = document.getElementById('f-url').value.trim() || null;
 
+  // Build the Supabase row first so we get a real UUID back
+  const supabaseRow = {
+    name,
+    meal_type: mealType,
+    protein_source: protein,
+    cuisine: document.getElementById('f-cuisine').value || 'comfort',
+    batch_friendly: document.getElementById('f-batch').checked,
+    cost_tier: String(parseInt(document.getElementById('f-cost').value) || 1),
+    serves: parseInt(document.getElementById('f-servings').value) || 1,
+    prep_cook_time: document.getElementById('f-time').value || null,
+    subtitle: ai?.description || '',
+    tags: ai?.tags || [],
+    craving_tags: cravings,
+    creator_handle: creatorHandle,
+    notes: document.getElementById('f-notes').value.trim() || null,
+    import_status: 'custom',
+    ingredient_sections: ai?.ingredients?.length
+      ? [{ section_title: null, ingredients: ai.ingredients.map(i => i.item || i) }]
+      : null,
+    method_steps: ai?.method?.length ? ai.method : null,
+  };
+
+  // POST to Supabase and get back the UUID
+  let newId = null;
+  try {
+    const res = await fetch(`${RECIPE_LIB_URL}/rest/v1/recipes`, {
+      method: 'POST',
+      headers: { ...RECIPE_LIB_HEADERS, 'Prefer': 'return=representation' },
+      body: JSON.stringify(supabaseRow)
+    });
+    if (res.ok) {
+      const [created] = await res.json();
+      newId = created?.id || null;
+    }
+  } catch(err) {
+    console.warn('[Daily Shuffle] Failed to POST recipe to Supabase:', err.message);
+  }
+
+  // Fall back to timestamp ID if Supabase POST failed
   const r = {
-    id: Date.now(),
-    name, mealType, cuisine: document.getElementById('f-cuisine').value||'comfort',
+    id: newId || Date.now(),
+    name, mealType, cuisine: supabaseRow.cuisine,
     proteinSource: protein,
-    batchCook: document.getElementById('f-batch').checked,
-    costTier: parseInt(document.getElementById('f-cost').value)||1,
-    servings: parseInt(document.getElementById('f-servings').value)||1,
-    prepTime: document.getElementById('f-time').value||null,
-    description: ai?.description || '',
-    tags: ai?.tags || [], cravings,
+    batchCook: supabaseRow.batch_friendly,
+    costTier: supabaseRow.cost_tier,
+    servings: supabaseRow.serves,
+    prepTime: supabaseRow.prep_cook_time,
+    description: supabaseRow.subtitle,
+    tags: supabaseRow.tags, cravings,
     source: 'instagram',
-    instagramUrl: document.getElementById('f-url').value.trim()||null,
-    notes: document.getElementById('f-notes').value.trim()||null,
+    instagramUrl: creatorHandle,
+    notes: supabaseRow.notes,
     groceryItems
   };
   recipes.push(r);
 
-  // Store full recipe detail (ingredients + method) so modal can render it
+  // Store full recipe detail in RECIPE_FULL_DATA for immediate modal rendering
   if (ai && (ai.ingredients?.length || ai.method?.length)) {
     RECIPE_FULL_DATA[r.id] = {
       ingredients: ai.ingredients || [],
@@ -5403,7 +3490,7 @@ function addRecipe() {
 
   window._parsedAiRecipe = null;
   saveCustom();
-  saveOverrides(); // persist full data (ingredients/method) immediately
+  saveOverrides();
   clearForm();
   // Clear AI inputs
   aiImages = [];
@@ -5564,7 +3651,7 @@ function getLibraryPayload() {
   // Ensure overrides are saved before building payload
   saveOverrides();
   return {
-    customRecipes: recipes.filter(r => !RECIPE_BOOK.find(b => b.id === r.id)),
+    customRecipes: recipes.filter(r => !cloudRecipeIds.has(r.id)),
     overrides: JSON.parse(localStorage.getItem('ds_overrides') || '{}'),
     nutrition: JSON.parse(localStorage.getItem('ds_nutrition') || '{}'),
     hiddenRecipes: [...hiddenRecipes],
@@ -5648,6 +3735,32 @@ function saveSupabaseCredentials() {
   const el = document.getElementById('syncStatus');
   if (el) { el.textContent = '✓ Credentials saved'; el.style.color = 'var(--green)'; }
 }
+
+// ─── CLOUD RECIPE BACKGROUND REFRESH ────────────────────────────────────────
+// Runs silently after app load; refreshes recipe list if cache is stale (>30 min)
+(async () => {
+  const CACHE_TTL = 30 * 60 * 1000; // 30 minutes
+  const cacheAt = localStorage.getItem('ds_recipe_cache_at');
+  const cacheAge = cacheAt ? Date.now() - new Date(cacheAt).getTime() : Infinity;
+  if (cacheAge < CACHE_TTL) return;
+
+  const fresh = await fetchCloudRecipes();
+  if (!fresh || !fresh.length) return;
+
+  // Rebuild cloudRecipeIds from fresh data
+  cloudRecipeIds.clear();
+  for (const r of fresh) cloudRecipeIds.add(r.id);
+
+  // Rebuild recipes: fresh cloud + any existing custom recipes
+  const custom = recipes.filter(r => !cloudRecipeIds.has(r.id));
+  recipes = [...fresh, ...custom];
+
+  // Re-render if the recipes tab is visible
+  if (document.getElementById('tab-recipes')?.classList.contains('active')) {
+    renderRecipes();
+  }
+  showToast(`Library updated — ${fresh.length} recipes loaded ✓`);
+})();
 
 // ─── PICKER ──────────────────────────────────────────────────────────────────
 // Placeholder "recipe" for the protein shake / hot choc default

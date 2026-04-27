@@ -1,7 +1,7 @@
 // Daily Shuffle — Service Worker
 // Cache-first strategy: app loads instantly offline after first visit.
 
-const CACHE = 'daily-shuffle-v11';
+const CACHE = 'daily-shuffle-v12';
 const ASSETS = [
   './index.html',
   './manifest.json',
@@ -32,8 +32,8 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   const url = event.request.url;
 
-  // Always network for API calls
-  if (url.includes('api.anthropic.com')) {
+  // Always network for API calls (never cache dynamic data)
+  if (url.includes('api.anthropic.com') || url.includes('supabase.co') || url.includes('edamam.com')) {
     event.respondWith(fetch(event.request));
     return;
   }
