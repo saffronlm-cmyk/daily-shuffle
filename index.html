@@ -1299,7 +1299,7 @@ try {
       if (o.name) r.name = o.name;
       if (o.description !== undefined) r.description = o.description;
       if (o.mealType) r.mealType = o.mealType;
-      if (o.proteinSource) r.proteinSource = o.proteinSource;
+      if (o.proteinSource !== undefined) r.proteinSource = o.proteinSource;
       if (o.cuisine) r.cuisine = o.cuisine;
       if (o.tags) r.tags = o.tags;
       if (o.cravings) r.cravings = o.cravings;
@@ -2586,12 +2586,14 @@ function openTagEditor(id) {
         <div>
           <span class="tag-editor-sublabel">Protein source</span>
           <select class="edit-meta-select" id="edit-protein">
+            <option value="" ${!r.proteinSource?'selected':''}>— None —</option>
             <option value="chicken" ${r.proteinSource==='chicken'?'selected':''}>🐓 Chicken</option>
             <option value="beef" ${r.proteinSource==='beef'?'selected':''}>🥩 Beef</option>
             <option value="eggs" ${r.proteinSource==='eggs'?'selected':''}>🥚 Eggs</option>
             <option value="tofu" ${r.proteinSource==='tofu'?'selected':''}>🌱 Tofu / Plant</option>
             <option value="fish" ${r.proteinSource==='fish'?'selected':''}>🐟 Fish</option>
             <option value="mixed" ${r.proteinSource==='mixed'?'selected':''}>🍱 Mixed</option>
+            <option value="other" ${r.proteinSource==='other'?'selected':''}>🔀 Other</option>
           </select>
         </div>
         <div>
@@ -2815,19 +2817,77 @@ function saveRecipeEdits(id) {
   RECIPE_FULL_DATA[r.id].tips = tips;
   RECIPE_FULL_DATA[r.id].storage = storage;
 
-  // Persist
+  // Persist locally
   saveOverrides();
   saveCustom();
+
+  // Patch shared Supabase library (fire-and-forget)
+  patchRecipeToLibrary(r.id);
 
   // Update visible modal elements without closing
   const tagsDisplay = document.getElementById('modal-tags-display');
   if (tagsDisplay) tagsDisplay.innerHTML = tags.map(t=>`<span class="modal-tag">${t}</span>`).join('');
 
+  // Saved notice — nudge re-estimation if ingredients were touched
   const notice = document.getElementById('editSavedNotice');
-  if (notice) { notice.style.display='inline'; setTimeout(()=>notice.style.display='none', 2500); }
+  if (notice) {
+    const ingredientsTouched = ingredients.length > 0;
+    notice.textContent = ingredientsTouched
+      ? '✓ Saved — tap ✨ Re-estimate to refresh nutrition'
+      : '✓ Saved!';
+    notice.style.display = 'inline';
+    setTimeout(() => { notice.style.display = 'none'; notice.textContent = '✓ Saved!'; }, ingredientsTouched ? 5000 : 2500);
+    if (ingredientsTouched) {
+      const estimateBtn = document.getElementById('btnEstimateNutrition');
+      if (estimateBtn) estimateBtn.style.outline = '2px solid var(--accent)';
+    }
+  }
 
-  // Re-render recipes grid if visible
-  if (document.getElementById('tab-recipes')?.classList.contains('active')) renderRecipes();
+  // Re-render recipes grid
+  renderRecipes();
+}
+
+// ─── PATCH RECIPE TO SUPABASE LIBRARY ───────────────────────────────────────
+async function patchRecipeToLibrary(id) {
+  const r = recipes.find(x => x.id === id);
+  if (!r || !cloudRecipeIds.has(id)) return; // only patch cloud recipes
+  const fd = RECIPE_FULL_DATA[id] || {};
+
+  // Convert flat [{group,item}] back to [{section_title, ingredients[]}]
+  const sectionMap = [];
+  let currentSection = null;
+  for (const ing of (fd.ingredients || [])) {
+    if (ing.group !== currentSection?.section_title) {
+      currentSection = { section_title: ing.group || '', ingredients: [] };
+      sectionMap.push(currentSection);
+    }
+    currentSection.ingredients.push(ing.item);
+  }
+
+  const payload = {
+    name: r.name,
+    subtitle: r.description || null,
+    meal_type: r.mealType,
+    protein_source: r.proteinSource || null,
+    cuisine: r.cuisine,
+    serves: r.servings,
+    prep_cook_time: r.prepTime || null,
+    batch_friendly: r.batchCook,
+    tags: r.tags || [],
+    notes: r.notes || null,
+    ingredient_sections: sectionMap.length ? sectionMap : null,
+    method_steps: fd.method?.length ? fd.method : null,
+  };
+
+  try {
+    await fetch(`${RECIPE_LIB_URL}/rest/v1/recipes?id=eq.${id}`, {
+      method: 'PATCH',
+      headers: { ...RECIPE_LIB_HEADERS, 'Prefer': 'return=minimal' },
+      body: JSON.stringify(payload),
+    });
+  } catch (err) {
+    console.warn('[Daily Shuffle] Failed to patch recipe to library:', err.message);
+  }
 }
 
 // ─── AI NUTRITION + COST ESTIMATION ─────────────────────────────────────────
@@ -2852,7 +2912,7 @@ async function estimateNutritionWithAI(id) {
 
   const btn = document.getElementById('btnEstimateNutrition');
   const statusEl = document.getElementById('estimateStatus');
-  if(btn) { btn.disabled = true; btn.textContent = '⏳ Estimating…'; }
+  if(btn) { btn.disabled = true; btn.textContent = '⏳ Estimating…'; btn.style.outline = ''; }
   if(statusEl) { statusEl.textContent = ''; }
 
   const recipe = recipes.find(r => r.id === id);
