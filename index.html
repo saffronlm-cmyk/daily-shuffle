@@ -1629,7 +1629,7 @@ function filterTrackPicker() {
     .map(r => {
       const nut = RECIPE_FULL_DATA[r.id]?.nutrition;
       const macroStr = nut ? `${nut.kcal} kcal · ${nut.protein}g protein` : '';
-      return `<div class="picker-item" onclick="selectTrackItem('recipe',${r.id})">
+      return `<div class="picker-item" onclick="selectTrackItem('recipe','${r.id}')">
         <div class="picker-item-name">${r.name}</div>
         <div class="picker-item-meta">
           <span>${TYPE_LABELS[r.mealType]||''}</span>
@@ -2278,8 +2278,8 @@ function renderRecipes() {
   cnt.textContent = `${filtered.length} recipe${filtered.length!==1?'s':''}`;
   if(!filtered.length) { grid.innerHTML='<div class="no-results"><p>No recipes match those filters.</p></div>'; return; }
   grid.innerHTML = filtered.map(r => `
-    <div class="recipe-card" onclick="openModal(${r.id})">
-      <button class="fav-btn${favourites.has(r.id)?' active':''}" onclick="toggleFav(event,${r.id})" title="${favourites.has(r.id)?'Remove from favourites':'Add to favourites'}">♥</button>
+    <div class="recipe-card" onclick="openModal('${r.id}')">
+      <button class="fav-btn${favourites.has(r.id)?' active':''}" onclick="toggleFav(event,'${r.id}')" title="${favourites.has(r.id)?'Remove from favourites':'Add to favourites'}">♥</button>
       <div class="card-meal-type ${TYPE_CLASSES[r.mealType]||''}">${TYPE_LABELS[r.mealType]||r.mealType}</div>
       <div class="card-name">${r.name}</div>
       <div class="card-tags">
@@ -2387,7 +2387,7 @@ function openModal(id) {
           <div class="nutrition-cell"><div class="nc-val">${scl(nut.fat)!=null?scl(nut.fat)+'g':'—'}</div><div class="nc-lbl">fat</div></div>
         </div>
         ${renderCostHtml(cost, srvScale)}
-        ${hasApiKey?`<div style="margin-top:10px"><button class="btn-estimate" id="btnEstimateNutrition" onclick="estimateNutritionWithAI(${r.id})">✨ Re-estimate</button><span id="estimateStatus" style="font-size:12px;color:var(--text3);margin-left:10px"></span></div>`:''}
+        ${hasApiKey?`<div style="margin-top:10px"><button class="btn-estimate" id="btnEstimateNutrition" onclick="estimateNutritionWithAI('${r.id}')">✨ Re-estimate</button><span id="estimateStatus" style="font-size:12px;color:var(--text3);margin-left:10px"></span></div>`:''}
       </div>`;
   } else {
     const hasIngredients = fd && fd.ingredients && fd.ingredients.length > 0;
@@ -2396,7 +2396,7 @@ function openModal(id) {
         <div class="modal-section" id="modal-nutrition-section">
           <h4>Nutrition &amp; Cost</h4>
           <p style="color:var(--text3);font-size:13px;margin-bottom:10px">No nutrition data yet — estimate with AI from the ingredient list.</p>
-          <button class="btn-estimate" id="btnEstimateNutrition" onclick="estimateNutritionWithAI(${r.id})">✨ Estimate with AI</button>
+          <button class="btn-estimate" id="btnEstimateNutrition" onclick="estimateNutritionWithAI('${r.id}')">✨ Estimate with AI</button>
           <span id="estimateStatus" style="font-size:12px;color:var(--text3);margin-left:10px"></span>
         </div>`;
     }
@@ -2406,12 +2406,12 @@ function openModal(id) {
 
   document.getElementById('modalContent').innerHTML = `
     <button class="modal-close" onclick="closeModal()">×</button>
-    <button class="modal-fav-btn${isFav?' active':''}" style="position:absolute;top:16px;right:56px" onclick="toggleFav(null,${r.id})" title="${isFav?'Remove from favourites':'Add to favourites'}">${isFav?'♥ Saved':'♡ Save'}</button>
+    <button class="modal-fav-btn${isFav?' active':''}" style="position:absolute;top:16px;right:56px" onclick="toggleFav(null,'${r.id}')" title="${isFav?'Remove from favourites':'Add to favourites'}">${isFav?'♥ Saved':'♡ Save'}</button>
     <div class="modal-type ${TYPE_CLASSES[r.mealType]||''}">${TYPE_LABELS[r.mealType]||r.mealType} · ${CUISINE_EMOJI[r.cuisine]||''} ${r.cuisine.charAt(0).toUpperCase()+r.cuisine.slice(1)}</div>
     <div class="modal-title">${r.name}</div>
     ${r.description?`<div class="modal-desc">${r.description}</div>`:''}
     <div class="modal-meta">
-      ${r.servings?`<div class="modal-meta-item">👥 <span class="servings-override">Serves <input class="servings-input" type="number" min="1" value="${displayServings}" onchange="updateServingOverride(${r.id},this.value)" title="Change serving count to rescale nutrition"></span></div>`:''}
+      ${r.servings?`<div class="modal-meta-item">👥 <span class="servings-override">Serves <input class="servings-input" type="number" min="1" value="${displayServings}" onchange="updateServingOverride('${r.id}',this.value)" title="Change serving count to rescale nutrition"></span></div>`:''}
       ${r.prepTime?`<div class="modal-meta-item">⏱ <strong>${r.prepTime}</strong></div>`:''}
       ${r.batchCook?`<div class="modal-meta-item">⚡ <strong style="color:var(--green)">Batch-friendly</strong></div>`:''}
       ${'£'.repeat(r.costTier)?`<div class="modal-meta-item">💷 <strong>${'£'.repeat(r.costTier)}</strong></div>`:''}
@@ -2420,8 +2420,8 @@ function openModal(id) {
     ${multiplierHtml}
     ${r.tags&&r.tags.length?`<div class="modal-section"><h4>Tags</h4><div class="modal-tags" id="modal-tags-display">${r.tags.map(t=>`<span class="modal-tag">${t}</span>`).join('')}</div></div>`:'<div class="modal-section" id="modal-tags-section"><div class="modal-tags" id="modal-tags-display"></div></div>'}
     <div style="display:flex;gap:8px;align-items:center;margin:4px 0 8px">
-      <button class="btn-edit-open" onclick="openTagEditor(${r.id})">✏️ Edit recipe</button>
-      <button class="btn-edit-open" style="color:var(--accent);opacity:.7" onclick="deleteRecipe(${r.id})">🗑 Delete</button>
+      <button class="btn-edit-open" onclick="openTagEditor('${r.id}')">✏️ Edit recipe</button>
+      <button class="btn-edit-open" style="color:var(--accent);opacity:.7" onclick="deleteRecipe('${r.id}')">🗑 Delete</button>
     </div>
     <div id="modal-tag-editor" style="display:none"></div>
     ${r.notes?`<div class="modal-section"><h4>Batch cook notes</h4><p>${r.notes}</p></div>`:''}
@@ -2445,7 +2445,7 @@ function toggleFav(event, id) {
   const cards = document.querySelectorAll(`#recipeGrid .recipe-card`);
   cards.forEach(card => {
     const btn = card.querySelector('.fav-btn');
-    if(btn && card.getAttribute('onclick') === `openModal(${id})`) {
+    if(btn && card.getAttribute('onclick') === `openModal('${id}')`) {
       btn.classList.toggle('active', favourites.has(id));
       btn.title = favourites.has(id) ? 'Remove from favourites' : 'Add to favourites';
     }
@@ -3857,7 +3857,7 @@ function filterPicker() {
     ? filtered.map(r => {
         const isSelected = r.id === currentId;
         const isShake = r.id === 0;
-        return `<div class="picker-item${isSelected?' picker-item-selected':''}" onclick="selectFromPicker(${r.id})">
+        return `<div class="picker-item${isSelected?' picker-item-selected':''}" onclick="selectFromPicker('${r.id}')">
           <div class="picker-item-name${isShake?' picker-item-shake':''}">${r.name}</div>
           <div class="picker-item-meta">
             ${r.cuisine?`<span>${CUISINE_EMOJI[r.cuisine]||''} ${r.cuisine}</span>`:''}
