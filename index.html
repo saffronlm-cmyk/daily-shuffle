@@ -2905,15 +2905,20 @@ function saveNutrition() {
 
 async function estimateNutritionWithAI(id) {
   const key = localStorage.getItem('ds_api_key');
-  if(!key) { openSettings(); return; }
+  if(!key) { showToast('Add your Anthropic API key in Settings first'); openSettings(); return; }
 
-  const fd = RECIPE_FULL_DATA[id];
-  if(!fd || !fd.ingredients || !fd.ingredients.length) return;
-
+  // Grab button refs early so we can show spinner before guard checks
   const btn = document.getElementById('btnEstimateNutrition');
   const statusEl = document.getElementById('estimateStatus');
   if(btn) { btn.disabled = true; btn.textContent = '⏳ Estimating…'; btn.style.outline = ''; }
   if(statusEl) { statusEl.textContent = ''; }
+
+  const fd = RECIPE_FULL_DATA[id];
+  if(!fd || !fd.ingredients || !fd.ingredients.length) {
+    if(btn) { btn.disabled = false; btn.textContent = '✨ Re-estimate'; }
+    showToast('No ingredient list found — add ingredients via Edit first');
+    return;
+  }
 
   const recipe = recipes.find(r => r.id === id);
   const name = recipe ? recipe.name : 'this recipe';
@@ -2994,8 +2999,11 @@ Rules:
         </div>`;
     }
   } catch(err) {
-    if(btn) { btn.disabled = false; btn.textContent = '✨ Estimate with AI'; }
-    if(statusEl) { statusEl.textContent = '✗ ' + err.message; statusEl.style.color = 'var(--accent)'; }
+    const b = document.getElementById('btnEstimateNutrition');
+    const s = document.getElementById('estimateStatus');
+    if(b) { b.disabled = false; b.textContent = '✨ Re-estimate'; b.style.outline = ''; }
+    if(s) { s.textContent = '✗ ' + err.message; s.style.color = 'var(--accent)'; }
+    showToast('Estimation failed: ' + err.message);
   }
 }
 
