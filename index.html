@@ -2354,8 +2354,8 @@ function openModal(id) {
     <div class="modal-section" style="padding-bottom:0">
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
         <span style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px">Multiply</span>
-        ${[1,2,3,4].map(n=>`<button class="mult-btn${n===1?' active':''}" data-mult="${n}" onclick="setModalMultiplier(${n},${id})">×${n}</button>`).join('')}
-        <button class="mult-btn" data-mult="custom" onclick="promptCustomMultiplier(${id})">Custom</button>
+        ${[1,2,3,4].map(n=>`<button class="mult-btn${n===1?' active':''}" data-mult="${n}" onclick="setModalMultiplier(${n},'${id}')">×${n}</button>`).join('')}
+        <button class="mult-btn" data-mult="custom" onclick="promptCustomMultiplier('${id}')">Custom</button>
         <span style="font-size:11px;color:var(--text3)" id="modal-servings-scaled"></span>
       </div>
     </div>` : '';
@@ -2364,8 +2364,8 @@ function openModal(id) {
   const unitToggleHtml = hasIngredients ? `
     <div style="display:inline-flex;align-items:center;gap:6px;margin-left:auto">
       <span style="font-size:11px;color:var(--text3)">Units</span>
-      <button class="mult-btn${unitPref==='metric'?' active':''}" onclick="setUnitPref('metric',${id})">Metric</button>
-      <button class="mult-btn${unitPref==='imperial'?' active':''}" onclick="setUnitPref('imperial',${id})">Imperial</button>
+      <button class="mult-btn${unitPref==='metric'?' active':''}" onclick="setUnitPref('metric','${id}')">Metric</button>
+      <button class="mult-btn${unitPref==='imperial'?' active':''}" onclick="setUnitPref('imperial','${id}')">Imperial</button>
     </div>` : '';
 
   // ── Nutrition + Cost HTML ──────────────────────────────────────────────────
@@ -2645,12 +2645,12 @@ function openTagEditor(id) {
       </div>
 
       <div class="edit-actions" style="margin-top:16px">
-        <button class="btn-edit-save" onclick="saveRecipeEdits(${id})">Save changes</button>
-        <button class="btn-edit-cancel" onclick="openTagEditor(${id})">Cancel</button>
+        <button class="btn-edit-save" onclick="saveRecipeEdits('${id}')">Save changes</button>
+        <button class="btn-edit-cancel" onclick="openTagEditor('${id}')">Cancel</button>
         <span class="edit-saved-notice" id="editSavedNotice" style="display:none">✓ Saved!</span>
       </div>
       <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
-        <button class="btn-edit-cancel" style="color:var(--accent)" onclick="deleteRecipe(${id})">🗑 Delete this recipe</button>
+        <button class="btn-edit-cancel" style="color:var(--accent)" onclick="deleteRecipe('${id}')">🗑 Delete this recipe</button>
       </div>
     </div>`;
 
@@ -2922,7 +2922,7 @@ Rules:
         </div>
         ${renderCostHtml(cost)}
         <div style="margin-top:10px">
-          <button class="btn-estimate" id="btnEstimateNutrition" onclick="estimateNutritionWithAI(${id})">✨ Re-estimate</button>
+          <button class="btn-estimate" id="btnEstimateNutrition" onclick="estimateNutritionWithAI('${id}')">✨ Re-estimate</button>
           <span id="estimateStatus" style="font-size:12px;color:var(--green);margin-left:10px">✓ Saved!</span>
         </div>`;
     }
