@@ -1209,9 +1209,11 @@ async function fetchCloudRecipes() {
         nutrition: row.calories != null ? { kcal: parseFloat(row.calories), protein: parseFloat(row.protein_g), carbs: parseFloat(row.carbs_g), fat: parseFloat(row.fat_g) } : null,
       };
     }
-    localStorage.setItem('ds_recipe_cache', JSON.stringify(appRecipes));
-    localStorage.setItem('ds_recipe_cache_full', JSON.stringify(fullCache));
-    localStorage.setItem('ds_recipe_cache_at', new Date().toISOString());
+    if (appRecipes.length > 0) {
+      localStorage.setItem('ds_recipe_cache', JSON.stringify(appRecipes));
+      localStorage.setItem('ds_recipe_cache_full', JSON.stringify(fullCache));
+      localStorage.setItem('ds_recipe_cache_at', new Date().toISOString());
+    }
     return appRecipes;
   } catch (err) {
     _lastFetchError = err.message;
@@ -3772,7 +3774,8 @@ function saveSupabaseCredentials() {
   const CACHE_TTL = 30 * 60 * 1000; // 30 minutes
   const cacheAt = localStorage.getItem('ds_recipe_cache_at');
   const cacheAge = cacheAt ? Date.now() - new Date(cacheAt).getTime() : Infinity;
-  if (cacheAge < CACHE_TTL) return;
+  const cacheEmpty = recipes.length === 0;
+  if (cacheAge < CACHE_TTL && !cacheEmpty) return;
 
   const fresh = await fetchCloudRecipes();
 
