@@ -1187,7 +1187,10 @@ function populateFullDataFromRow(row) {
   if (row.calories != null) RECIPE_FULL_DATA[row.id].nutrition = { kcal: parseFloat(row.calories), protein: parseFloat(row.protein_g), carbs: parseFloat(row.carbs_g), fat: parseFloat(row.fat_g) };
 }
 
+let _lastFetchError = null;
+
 async function fetchCloudRecipes() {
+  _lastFetchError = null;
   try {
     const res = await fetch(
       `${RECIPE_LIB_URL}/rest/v1/recipes?import_status=eq.ready&select=*&order=name.asc`,
@@ -1211,8 +1214,35 @@ async function fetchCloudRecipes() {
     localStorage.setItem('ds_recipe_cache_at', new Date().toISOString());
     return appRecipes;
   } catch (err) {
+    _lastFetchError = err.message;
     console.warn('[Daily Shuffle] Cloud recipe fetch failed:', err.message);
     return null;
+  }
+}
+
+function showRecipeLoadError(msg) {
+  const grid = document.getElementById('recipeGrid');
+  if (!grid) return;
+  grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px 20px;color:var(--text-muted,#888)">
+    <div style="font-size:2rem;margin-bottom:12px">⚠️</div>
+    <div style="font-size:1rem;margin-bottom:16px">${msg}</div>
+    <button onclick="retryLoadRecipes()" style="padding:10px 20px;border-radius:8px;border:none;background:var(--accent,#e87c5a);color:#fff;font-size:0.9rem;cursor:pointer">Reload recipes</button>
+  </div>`;
+}
+
+async function retryLoadRecipes() {
+  const grid = document.getElementById('recipeGrid');
+  if (grid) grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px 20px;color:var(--text-muted,#888)">Loading recipes…</div>`;
+  const fresh = await fetchCloudRecipes();
+  if (fresh && fresh.length) {
+    cloudRecipeIds.clear();
+    for (const r of fresh) cloudRecipeIds.add(r.id);
+    const custom = recipes.filter(r => !cloudRecipeIds.has(r.id));
+    recipes = [...fresh, ...custom];
+    renderRecipes();
+    showToast(`Library loaded — ${fresh.length} recipes ✓`);
+  } else {
+    showRecipeLoadError('Could not load recipes. Check your connection and try again.');
   }
 }
 
@@ -3745,7 +3775,14 @@ function saveSupabaseCredentials() {
   if (cacheAge < CACHE_TTL) return;
 
   const fresh = await fetchCloudRecipes();
-  if (!fresh || !fresh.length) return;
+
+  if (!fresh || !fresh.length) {
+    // Only show error if there's nothing cached to display
+    if (recipes.length === 0) {
+      showRecipeLoadError('Could not load recipes. Check your connection and try again.');
+    }
+    return;
+  }
 
   // Rebuild cloudRecipeIds from fresh data
   cloudRecipeIds.clear();
@@ -3755,10 +3792,7 @@ function saveSupabaseCredentials() {
   const custom = recipes.filter(r => !cloudRecipeIds.has(r.id));
   recipes = [...fresh, ...custom];
 
-  // Re-render if the recipes tab is visible
-  if (document.getElementById('tab-recipes')?.classList.contains('active')) {
-    renderRecipes();
-  }
+  renderRecipes();
   showToast(`Library updated — ${fresh.length} recipes loaded ✓`);
 })();
 
@@ -3859,7 +3893,12 @@ document.addEventListener('DOMContentLoaded',()=>{
   const dd = String(today.getDate()).padStart(2,'0');
   const startEl = document.getElementById('planStartDate');
   if(startEl) startEl.value = `${yyyy}-${mm}-${dd}`;
-  renderRecipes();
+  if (recipes.length === 0) {
+    const grid = document.getElementById('recipeGrid');
+    if (grid) grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px 20px;color:var(--text-muted,#888)">Loading recipes…</div>`;
+  } else {
+    renderRecipes();
+  }
   initApiKeyUI();
   // Silently pull from Supabase if credentials exist and cloud data is newer
   loadFromSupabase(false);
