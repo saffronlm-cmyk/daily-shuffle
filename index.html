@@ -1174,7 +1174,14 @@ function mapSupabaseToApp(row) {
 }
 
 function flattenIngredientSections(sections) {
-  if (!sections || !Array.isArray(sections)) return [];
+  if (!sections) return [];
+  // Old format: {"section name": ["item", ...], ...}
+  if (!Array.isArray(sections)) {
+    return Object.entries(sections).flatMap(([title, items]) =>
+      (Array.isArray(items) ? items : []).map(item => ({ group: title || undefined, item }))
+    );
+  }
+  // New format: [{section_title, ingredients: [...]}, ...]
   return sections.flatMap(sec =>
     (sec.ingredients || []).map(item => ({ group: sec.section_title || undefined, item }))
   );
