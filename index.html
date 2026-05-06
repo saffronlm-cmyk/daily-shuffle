@@ -7,28 +7,56 @@
 
 <!-- PWA -->
 <link rel="manifest" href="./manifest.json">
-<meta name="theme-color" content="#fdf0f3">
+<meta name="theme-color" content="#F5F2EC">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Daily Shuffle">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="apple-touch-icon" href="./icon-192.png">
 <style>
   :root {
-    --bg: #fdf0f3;
-    --surface: #f5e6eb;
-    --surface2: #eddde4;
-    --border: #d9bcc6;
-    --accent: #a8526e;
-    --accent2: #8c3d58;
-    --text: #2a1520;
-    --text2: #6b3d4e;
-    --text3: #9a6878;
+    --bg: #F5F2EC;
+    --surface: #D9D2C6;
+    --surface2: #E8E3DA;
+    --border: #B7A996;
+    --accent: #8C7864;
+    --accent2: #4E4034;
+    --accent-tint: rgba(140,120,100,.12);
+    --text: #4E4034;
+    --text2: #8C7864;
+    --text3: #B7A996;
     --green: #4a8a5a;
     --yellow: #9a7040;
     --blue: #5060a8;
     --purple: #7048a0;
     --radius: 10px;
-    --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+  [data-theme="cafe"] {
+    --bg: #F1EEEB;
+    --surface: #CDC6C3;
+    --surface2: #E4D8CB;
+    --border: #CDC6C3;
+    --accent: #CFB3A9;
+    --accent2: #A09086;
+    --accent-tint: rgba(207,179,169,.12);
+    --text: #5C4E48;
+    --text2: #A09086;
+    --text3: #CFB3A9;
+  }
+  [data-theme="coastal"] {
+    --bg: #FFFFFF;
+    --surface: #C8D9E6;
+    --surface2: #F5EFEB;
+    --border: #C8D9E6;
+    --accent: #567C8D;
+    --accent2: #2F4156;
+    --accent-tint: rgba(86,124,141,.12);
+    --text: #2F4156;
+    --text2: #567C8D;
+    --text3: #8EAAB8;
   }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 14px; line-height: 1.5; min-height: 100vh; }
@@ -44,7 +72,7 @@
   nav::-webkit-scrollbar { display: none; }
   nav button { background: none; color: var(--text2); padding: 6px 14px; border-radius: 6px; font-size: 13px; font-weight: 500; transition: all .15s; flex-shrink: 0; white-space: nowrap; }
   nav button:hover { color: var(--text); background: var(--surface2); }
-  nav button.active { color: var(--accent); background: rgba(200,132,154,.12); }
+  nav button.active { color: var(--accent); background: var(--accent-tint); }
   .header-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
   main { flex: 1; padding-bottom: env(safe-area-inset-bottom); }
   .tab-content { display: none; }
@@ -58,7 +86,7 @@
   .filter-group { display: flex; flex-direction: column; gap: 4px; }
   .filter-btn { background: none; color: var(--text2); padding: 6px 10px; border-radius: 6px; text-align: left; font-size: 13px; transition: all .15s; display: flex; align-items: center; gap: 8px; }
   .filter-btn:hover { color: var(--text); background: var(--surface2); }
-  .filter-btn.active { color: var(--accent); background: rgba(200,132,154,.12); }
+  .filter-btn.active { color: var(--accent); background: var(--accent-tint); }
   .search-box { width: 100%; background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 7px; font-size: 13px; outline: none; margin-bottom: 16px; }
   .search-box:focus { border-color: var(--accent); }
   .search-box::placeholder { color: var(--text3); }
@@ -91,7 +119,7 @@
   .recipe-card { position: relative; }
   .modal-fav-btn { background: none; border: 1px solid var(--border); color: var(--text3); padding: 6px 12px; border-radius: 7px; font-size: 13px; transition: all .15s; }
   .modal-fav-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .modal-fav-btn.active { background: rgba(200,132,154,.15); border-color: var(--accent); color: var(--accent); }
+  .modal-fav-btn.active { background: var(--accent-tint); border-color: var(--accent); color: var(--accent); }
 
   /* Servings override */
   .servings-override { display: inline-flex; align-items: center; gap: 6px; }
@@ -115,7 +143,7 @@
   .modal-section p { font-size: 13px; color: var(--text2); line-height: 1.6; }
   .modal-tags { display: flex; flex-wrap: wrap; gap: 6px; }
   .modal-tag { font-size: 12px; color: var(--text2); background: var(--surface2); padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border); }
-  .modal-instagram-link { display: inline-flex; align-items: center; gap: 6px; background: rgba(200,132,154,.12); color: var(--accent); padding: 8px 16px; border-radius: 7px; font-size: 13px; font-weight: 600; border: 1px solid rgba(200,132,154,.25); }
+  .modal-instagram-link { display: inline-flex; align-items: center; gap: 6px; background: var(--accent-tint); color: var(--accent); padding: 8px 16px; border-radius: 7px; font-size: 13px; font-weight: 600; border: 1px solid var(--accent-tint); }
 
   /* ── Recipe full detail (ingredients + method) ──────────────────────────── */
   .recipe-ingredients { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 4px; }
@@ -124,8 +152,8 @@
   .recipe-ingredient-item { font-size: 13px; color: var(--text); padding: 5px 10px; background: var(--surface2); border-radius: 6px; border-left: 2px solid var(--border); line-height: 1.4; }
   .recipe-method-steps { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; counter-reset: step-counter; }
   .recipe-method-step { font-size: 13px; color: var(--text2); line-height: 1.6; padding: 10px 12px 10px 42px; background: var(--surface2); border-radius: 8px; position: relative; counter-increment: step-counter; }
-  .recipe-method-step::before { content: counter(step-counter); position: absolute; left: 10px; top: 10px; width: 22px; height: 22px; background: rgba(200,132,154,.15); border: 1px solid rgba(200,132,154,.3); color: var(--accent); border-radius: 50%; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
-  .recipe-tips { font-size: 12px; color: var(--text3); line-height: 1.6; background: rgba(200,132,154,.06); border: 1px solid rgba(200,132,154,.15); border-radius: 8px; padding: 12px; white-space: pre-line; }
+  .recipe-method-step::before { content: counter(step-counter); position: absolute; left: 10px; top: 10px; width: 22px; height: 22px; background: var(--accent-tint); border: 1px solid var(--accent-tint); color: var(--accent); border-radius: 50%; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .recipe-tips { font-size: 12px; color: var(--text3); line-height: 1.6; background: var(--accent-tint); border: 1px solid var(--accent-tint); border-radius: 8px; padding: 12px; white-space: pre-line; }
   .recipe-storage { font-size: 12px; color: var(--text3); line-height: 1.6; }
   .modal-divider { height: 1px; background: var(--border); margin: 16px 0; }
 
@@ -142,8 +170,8 @@
   .cost-store-price { font-size: 16px; font-weight: 700; color: var(--text); }
   .cost-store.cheapest .cost-store-price { color: var(--green); }
   .cost-note { font-size: 11px; color: var(--text3); margin-top: 6px; line-height: 1.4; font-style: italic; }
-  .btn-estimate { display: inline-flex; align-items: center; gap: 6px; background: rgba(200,132,154,.1); color: var(--accent); border: 1px solid rgba(200,132,154,.28); padding: 7px 14px; border-radius: 7px; font-size: 12px; font-weight: 600; cursor: pointer; transition: background .15s; }
-  .btn-estimate:hover:not(:disabled) { background: rgba(200,132,154,.2); }
+  .btn-estimate { display: inline-flex; align-items: center; gap: 6px; background: var(--accent-tint); color: var(--accent); border: 1px solid var(--accent-tint); padding: 7px 14px; border-radius: 7px; font-size: 12px; font-weight: 600; cursor: pointer; transition: background .15s; }
+  .btn-estimate:hover:not(:disabled) { background: var(--accent-tint); }
   .btn-estimate:disabled { opacity: .5; cursor: not-allowed; }
 
   /* ── Meal Plan Tab ──────────────────────────────────────────────────────── */
@@ -164,7 +192,7 @@
   .craving-tags { display: flex; flex-wrap: wrap; gap: 8px; }
   .craving-tag { background: var(--surface2); border: 1px solid var(--border); color: var(--text2); padding: 7px 14px; border-radius: 20px; font-size: 13px; transition: all .15s; }
   .craving-tag:hover { border-color: var(--accent); color: var(--text); }
-  .craving-tag.active { background: rgba(200,132,154,.15); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+  .craving-tag.active { background: var(--accent-tint); border-color: var(--accent); color: var(--accent); font-weight: 600; }
 
   /* Slot toggles */
   .slots-section { margin-bottom: 20px; }
@@ -173,7 +201,7 @@
   .slot-toggle { cursor: pointer; }
   .slot-toggle input[type="checkbox"] { display: none; }
   .slot-toggle span { display: inline-flex; align-items: center; gap: 6px; background: var(--surface2); border: 1px solid var(--border); color: var(--text3); padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 500; transition: all .15s; user-select: none; }
-  .slot-toggle input:checked + span { background: rgba(200,132,154,.12); border-color: var(--accent); color: var(--text); font-weight: 600; }
+  .slot-toggle input:checked + span { background: var(--accent-tint); border-color: var(--accent); color: var(--text); font-weight: 600; }
   .slot-toggle span:hover { border-color: var(--text3); color: var(--text); }
 
   .plan-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
@@ -193,12 +221,12 @@
   .cal-day { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); min-width: 160px; overflow: hidden; }
   .cal-day.is-batch { border-color: var(--accent); }
   .cal-day-header { padding: 10px 14px; background: var(--surface2); border-bottom: 1px solid var(--border); }
-  .cal-day.is-batch .cal-day-header { background: rgba(200,132,154,.1); border-bottom-color: rgba(200,132,154,.3); }
+  .cal-day.is-batch .cal-day-header { background: var(--accent-tint); border-bottom-color: var(--accent-tint); }
   .cal-date { font-size: 13px; font-weight: 700; color: var(--text); }
   .cal-day-name { font-size: 11px; color: var(--text3); }
   .cal-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px; margin-top: 4px; }
   .cal-badge-shop { background: rgba(90,154,110,.2); color: #7ac48e; }
-  .cal-badge-batch { background: rgba(200,132,154,.2); color: var(--accent); }
+  .cal-badge-batch { background: var(--accent-tint); color: var(--accent); }
   .cal-meals { padding: 10px 14px; display: flex; flex-direction: column; gap: 8px; }
   .cal-meal { }
   .cal-meal-slot { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--text3); margin-bottom: 2px; }
@@ -209,13 +237,13 @@
   /* ── Plan List View (below calendar) ───────────────────────────────────── */
   .plan-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
   .plan-day-row { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
-  .plan-day-row.is-batch { border-color: rgba(200,132,154,.4); }
+  .plan-day-row.is-batch { border-color: var(--accent); }
   .plan-day-header { display: flex; align-items: center; gap: 12px; padding: 11px 16px; background: var(--surface2); border-bottom: 1px solid var(--border); }
   .plan-day-title { font-size: 13px; font-weight: 700; }
   .plan-day-pills { display: flex; gap: 6px; }
   .plan-day-pill { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
   .pill-shop { background: rgba(90,154,110,.2); color: #7ac48e; }
-  .pill-batch { background: rgba(200,132,154,.2); color: var(--accent); }
+  .pill-batch { background: var(--accent-tint); color: var(--accent); }
   .plan-meals { display: flex; gap: 0; }
   .plan-meal { flex: 1; padding: 10px 14px; border-right: 1px solid var(--border); }
   .plan-meal:last-child { border-right: none; }
@@ -248,7 +276,7 @@
   .picker-list { overflow-y: auto; padding: 8px; flex: 1; }
   .picker-item { padding: 10px 12px; border-radius: 8px; cursor: pointer; border: 1px solid transparent; transition: all .1s; }
   .picker-item:hover { background: var(--surface2); border-color: var(--border); }
-  .picker-item-selected { background: rgba(200,132,154,.1); border-color: rgba(200,132,154,.35) !important; }
+  .picker-item-selected { background: var(--accent-tint); border-color: var(--accent) !important; }
   .picker-item-name { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
   .picker-item-meta { display: flex; gap: 8px; font-size: 11px; color: var(--text3); flex-wrap: wrap; }
   .picker-item-shake { font-style: italic; color: var(--green); }
@@ -315,17 +343,17 @@
   .key-status.ok { color: var(--green); }
 
   /* ── AI Quick Add ───────────────────────────────────────────────────────── */
-  .ai-quick-add { background: var(--surface); border: 1px solid rgba(200,132,154,.3); border-radius: var(--radius); padding: 22px; margin-bottom: 20px; position: relative; }
+  .ai-quick-add { background: var(--surface); border: 1px solid var(--accent-tint); border-radius: var(--radius); padding: 22px; margin-bottom: 20px; position: relative; }
   .ai-quick-add-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
   .ai-quick-add-header h3 { font-size: 15px; font-weight: 700; }
-  .ai-badge { font-size: 10px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; background: rgba(200,132,154,.15); border: 1px solid rgba(200,132,154,.3); color: var(--accent); padding: 3px 8px; border-radius: 20px; }
+  .ai-badge { font-size: 10px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; background: var(--accent-tint); border: 1px solid var(--accent-tint); color: var(--accent); padding: 3px 8px; border-radius: 20px; }
   .ai-tabs { display: flex; gap: 4px; margin-bottom: 14px; }
   .ai-tab-btn { background: var(--surface2); border: 1px solid var(--border); color: var(--text2); padding: 7px 14px; border-radius: 7px; font-size: 13px; transition: all .15s; }
-  .ai-tab-btn.active { background: rgba(200,132,154,.12); border-color: var(--accent); color: var(--text); font-weight: 600; }
+  .ai-tab-btn.active { background: var(--accent-tint); border-color: var(--accent); color: var(--text); font-weight: 600; }
   .ai-input-panel { display: none; }
   .ai-input-panel.active { display: block; }
   .ai-drop-zone { border: 2px dashed var(--border); border-radius: 10px; padding: 32px 20px; text-align: center; cursor: pointer; transition: all .2s; position: relative; }
-  .ai-drop-zone:hover, .ai-drop-zone.drag-over { border-color: var(--accent); background: rgba(200,132,154,.05); }
+  .ai-drop-zone:hover, .ai-drop-zone.drag-over { border-color: var(--accent); background: var(--accent-tint); }
   .ai-drop-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
   .ai-drop-zone-icon { font-size: 28px; margin-bottom: 8px; }
   .ai-drop-zone-text { font-size: 13px; color: var(--text2); }
@@ -375,7 +403,7 @@
   .tag-add-btn:hover { border-color: var(--accent); color: var(--text); }
   .craving-edit-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
   .craving-edit-tag { background: var(--surface2); border: 1px solid var(--border); color: var(--text2); padding: 5px 12px; border-radius: 20px; font-size: 12px; transition: all .15s; cursor: pointer; user-select: none; }
-  .craving-edit-tag.active { background: rgba(200,132,154,.15); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+  .craving-edit-tag.active { background: var(--accent-tint); border-color: var(--accent); color: var(--accent); font-weight: 600; }
   .craving-edit-tag:hover { border-color: var(--text3); color: var(--text); }
   .edit-actions { display: flex; gap: 8px; margin-top: 4px; flex-wrap: wrap; }
   .btn-edit-save { background: var(--accent); color: white; font-weight: 700; padding: 9px 20px; border-radius: 7px; font-size: 13px; transition: background .15s; border: none; }
@@ -386,7 +414,7 @@
   .btn-edit-open:hover { border-color: var(--accent); color: var(--accent); }
   .mult-btn { background: var(--surface2); border: 1px solid var(--border); color: var(--text2); padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; transition: all .15s; }
   .mult-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .mult-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(200,132,154,.12); }
+  .mult-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-tint); }
   /* Full recipe editor */
   .edit-section-divider { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .7px; color: var(--text3); margin: 16px 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
   .edit-full-input { width: 100%; background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 8px 10px; border-radius: 7px; font-size: 13px; font-family: var(--font); outline: none; }
@@ -404,7 +432,7 @@
   .edit-list-input { flex: 1; background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 6px 10px; border-radius: 6px; font-size: 13px; font-family: var(--font); outline: none; }
   .edit-list-input:focus { border-color: var(--accent); }
   .edit-list-input::placeholder { color: var(--text3); }
-  .edit-list-input.group-input { color: var(--accent); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: .4px; background: rgba(200,132,154,.07); border-color: rgba(200,132,154,.3); }
+  .edit-list-input.group-input { color: var(--accent); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: .4px; background: var(--accent-tint); border-color: var(--accent-tint); }
   .edit-list-remove { background: none; border: none; color: var(--text3); font-size: 16px; line-height: 1; padding: 2px 4px; border-radius: 4px; flex-shrink: 0; transition: color .1s; }
   .edit-list-remove:hover { color: #b85555; }
   .edit-list-add-row { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
@@ -507,7 +535,7 @@
   .calc-field input:focus, .calc-field select:focus { border-color: var(--accent); }
   .calc-toggle-row { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
   .calc-toggle { background: var(--surface2); border: 1px solid var(--border); color: var(--text2); padding: 7px 14px; border-radius: 7px; font-size: 13px; font-weight: 500; transition: all .15s; flex: 1; text-align: center; }
-  .calc-toggle.active { background: rgba(200,132,154,.15); border-color: var(--accent); color: var(--accent); font-weight: 700; }
+  .calc-toggle.active { background: var(--accent-tint); border-color: var(--accent); color: var(--accent); font-weight: 700; }
   .calc-preview { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 18px; }
   .calc-preview-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--text3); margin-bottom: 12px; }
   .calc-preview-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 10px; }
@@ -592,7 +620,7 @@
   .reddit-controls { display: flex; gap: 8px; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
   .reddit-subreddit-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
   .btn-reddit-tab { background: var(--surface2); border: 1px solid var(--border); color: var(--text2); padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 500; transition: all .15s; }
-  .btn-reddit-tab.active { background: rgba(200,132,154,.15); border-color: var(--accent); color: var(--accent); font-weight: 700; }
+  .btn-reddit-tab.active { background: var(--accent-tint); border-color: var(--accent); color: var(--accent); font-weight: 700; }
   .btn-reddit-refresh { margin-left: auto; background: none; border: 1px solid var(--border); color: var(--text3); padding: 5px 10px; border-radius: 6px; font-size: 12px; transition: all .15s; }
   .btn-reddit-refresh:hover { border-color: var(--accent); color: var(--accent); }
   .reddit-posts { padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; }
@@ -603,7 +631,7 @@
   .reddit-post-title a:hover { color: var(--accent); text-decoration: underline; }
   .reddit-post-meta { font-size: 11px; color: var(--text3); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
   .reddit-post-score { color: var(--accent); font-weight: 700; }
-  .reddit-post-flair { background: rgba(200,132,154,.12); color: var(--accent); padding: 1px 7px; border-radius: 10px; font-size: 10px; font-weight: 700; }
+  .reddit-post-flair { background: var(--accent-tint); color: var(--accent); padding: 1px 7px; border-radius: 10px; font-size: 10px; font-weight: 700; }
   .btn-reddit-pin { background: none; border: none; font-size: 13px; padding: 2px 4px; border-radius: 4px; color: var(--text3); transition: all .15s; margin-left: auto; }
   .btn-reddit-pin.pinned { color: var(--accent); }
   .btn-reddit-pin:hover { color: var(--accent); }
@@ -611,7 +639,7 @@
   .reddit-saved-empty { font-size: 13px; color: var(--text3); text-align: center; padding: 20px 16px; }
   .reddit-filter-row { display: flex; gap: 8px; padding: 10px 12px 0; flex-wrap: wrap; }
   .btn-wellness-filter { background: var(--surface2); border: 1px solid var(--border); color: var(--text2); padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 500; transition: all .15s; }
-  .btn-wellness-filter.active { background: rgba(200,132,154,.15); border-color: var(--accent); color: var(--accent); font-weight: 700; }
+  .btn-wellness-filter.active { background: var(--accent-tint); border-color: var(--accent); color: var(--accent); font-weight: 700; }
 
   @media (max-width: 768px) {
     .recipes-layout { grid-template-columns: 1fr; }
@@ -648,6 +676,14 @@
   <div class="settings-overlay" id="settingsOverlay" onclick="closeSettingsOnOverlay(event)">
     <div class="settings-panel">
       <button class="modal-close" onclick="closeSettings()">×</button>
+      <div style="margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border)">
+        <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:10px">Theme</div>
+        <div style="display:flex;gap:12px;align-items:center" id="themePicker">
+          <button onclick="setTheme('natural')" title="Natural" style="width:32px;height:32px;border-radius:50%;border:2px solid var(--border);background:linear-gradient(135deg,#F5F2EC 50%,#8C7864 50%);cursor:pointer;transition:border-color .15s;padding:0" data-theme-btn="natural"></button>
+          <button onclick="setTheme('cafe')" title="Cafe" style="width:32px;height:32px;border-radius:50%;border:2px solid var(--border);background:linear-gradient(135deg,#F1EEEB 50%,#CFB3A9 50%);cursor:pointer;transition:border-color .15s;padding:0" data-theme-btn="cafe"></button>
+          <button onclick="setTheme('coastal')" title="Coastal" style="width:32px;height:32px;border-radius:50%;border:2px solid var(--border);background:linear-gradient(135deg,#FFFFFF 50%,#567C8D 50%);cursor:pointer;transition:border-color .15s;padding:0" data-theme-btn="coastal"></button>
+        </div>
+      </div>
       <h3>🔑 Anthropic API Key</h3>
       <p>Used to parse recipes from screenshots or pasted text. Your key is stored only in this browser and never sent anywhere except Anthropic's API. <a href="https://console.anthropic.com/settings/keys" target="_blank" style="color:var(--accent)">Get a key →</a></p>
       <div class="form-group">
@@ -742,6 +778,7 @@
             <button class="filter-btn" data-filter="protein" data-value="eggs" onclick="setFilter('protein','eggs',this)">🥚 Eggs</button>
             <button class="filter-btn" data-filter="protein" data-value="tofu" onclick="setFilter('protein','tofu',this)">🌱 Tofu / Plant</button>
             <button class="filter-btn" data-filter="protein" data-value="fish" onclick="setFilter('protein','fish',this)">🐟 Fish</button>
+            <button class="filter-btn" data-filter="protein" data-value="proteinpowder" onclick="setFilter('protein','proteinpowder',this)">🥤 Protein Powder</button>
           </div>
           <h3>Cuisine</h3>
           <div class="filter-group">
@@ -753,7 +790,9 @@
             <button class="filter-btn" data-filter="cuisine" data-value="american" onclick="setFilter('cuisine','american',this)">🍔 American / BBQ</button>
             <button class="filter-btn" data-filter="cuisine" data-value="mediterranean" onclick="setFilter('cuisine','mediterranean',this)">🫒 Mediterranean</button>
             <button class="filter-btn" data-filter="cuisine" data-value="middleeastern" onclick="setFilter('cuisine','middleeastern',this)">🫙 Middle Eastern</button>
+            <button class="filter-btn" data-filter="cuisine" data-value="italian" onclick="setFilter('cuisine','italian',this)">🍝 Italian</button>
             <button class="filter-btn" data-filter="cuisine" data-value="comfort" onclick="setFilter('cuisine','comfort',this)">🏠 Comfort</button>
+            <button class="filter-btn" data-filter="cuisine" data-value="simple" onclick="setFilter('cuisine','simple',this)">🍳 Simple</button>
           </div>
           <h3>Other</h3>
           <div class="filter-group">
@@ -795,6 +834,8 @@
               <button class="craving-tag" data-craving="brothy" onclick="toggleCraving(this)">🫕 Brothy / Soupy</button>
               <button class="craving-tag" data-craving="noodles" onclick="toggleCraving(this)">🍜 Noodles</button>
               <button class="craving-tag" data-craving="light" onclick="toggleCraving(this)">🥗 Light</button>
+              <button class="craving-tag" data-craving="healthy" onclick="toggleCraving(this)">💚 Healthy</button>
+              <button class="craving-tag" data-craving="simple" onclick="toggleCraving(this)">🍳 Simple</button>
               <button class="craving-tag" data-craving="chicken" onclick="toggleCraving(this)">🐓 Chicken</button>
               <button class="craving-tag" data-craving="beef" onclick="toggleCraving(this)">🥩 Beef</button>
               <button class="craving-tag" data-craving="tofu" onclick="toggleCraving(this)">🌱 Tofu</button>
@@ -959,6 +1000,7 @@
                 <option value="eggs">Eggs</option>
                 <option value="tofu">Tofu / Plant</option>
                 <option value="fish">Fish</option>
+                <option value="proteinpowder">Protein Powder</option>
                 <option value="mixed">Mixed</option>
               </select>
             </div>
@@ -969,10 +1011,12 @@
                 <option value="asian">Asian</option>
                 <option value="japanese">Japanese</option>
                 <option value="indian">Indian</option>
+                <option value="italian">Italian</option>
                 <option value="mexican">Mexican</option>
                 <option value="american">American / BBQ</option>
                 <option value="mediterranean">Mediterranean</option>
                 <option value="middleeastern">Middle Eastern</option>
+                <option value="simple">Simple</option>
                 <option value="other">Other</option>
               </select>
             </div>
@@ -1004,6 +1048,31 @@
               <label>Notes</label>
               <textarea id="f-notes" placeholder="Any adaptations, substitutions, or reminders…"></textarea>
             </div>
+            <div class="form-group full">
+              <label>Ingredients <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text3)">(one per line — use a blank line or ALL CAPS line as a section header)</span></label>
+              <textarea id="f-ingredients-full" placeholder="e.g.&#10;SAUCE&#10;2 tbsp soy sauce&#10;1 tbsp sesame oil&#10;&#10;BOWL&#10;200g rice&#10;2 chicken thighs" style="min-height:100px"></textarea>
+            </div>
+            <div class="form-group full">
+              <label>Method <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text3)">(one step per line)</span></label>
+              <textarea id="f-method" placeholder="e.g.&#10;Combine sauce ingredients in a bowl.&#10;Marinate chicken for 30 mins.&#10;Cook rice according to packet." style="min-height:80px"></textarea>
+            </div>
+            <div class="form-group full">
+              <label>Tips <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text3)">(optional)</span></label>
+              <textarea id="f-tips" placeholder="e.g. Works great with cauliflower rice for lower carbs."></textarea>
+            </div>
+            <div class="form-group full">
+              <label>Storage <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text3)">(optional)</span></label>
+              <input type="text" id="f-storage" placeholder="e.g. Fridge 3 days, freezer 1 month" />
+            </div>
+            <div class="form-group full">
+              <label>Nutrition per serving <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text3)">(optional — leave blank if unknown)</span></label>
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px">
+                <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text3);margin-bottom:4px">Calories</div><input type="number" id="f-kcal" placeholder="kcal" style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:6px;font-size:13px;outline:none"></div>
+                <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text3);margin-bottom:4px">Protein (g)</div><input type="number" id="f-protein-g" placeholder="g" style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:6px;font-size:13px;outline:none"></div>
+                <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text3);margin-bottom:4px">Carbs (g)</div><input type="number" id="f-carbs-g" placeholder="g" style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:6px;font-size:13px;outline:none"></div>
+                <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text3);margin-bottom:4px">Fat (g)</div><input type="number" id="f-fat-g" placeholder="g" style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:6px;font-size:13px;outline:none"></div>
+              </div>
+            </div>
             <div class="form-group" style="align-items:flex-start">
               <label style="margin-bottom:8px">Options</label>
               <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--text2);text-transform:none;letter-spacing:0">
@@ -1017,6 +1086,8 @@
                 <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2);cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" value="light" style="accent-color:var(--accent)"> Light</label>
                 <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2);cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" value="brothy" style="accent-color:var(--accent)"> Brothy</label>
                 <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2);cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" value="noodles" style="accent-color:var(--accent)"> Noodles</label>
+                <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2);cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" value="healthy" style="accent-color:var(--accent)"> Healthy</label>
+                <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2);cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" value="simple" style="accent-color:var(--accent)"> Simple</label>
               </div>
             </div>
           </div>
@@ -1140,6 +1211,29 @@
 </div>
 
 <script>
+// ─── THEME ────────────────────────────────────────────────────────────────────
+(function() {
+  const saved = localStorage.getItem('ds_theme');
+  if (saved && saved !== 'natural') document.body.setAttribute('data-theme', saved);
+})();
+
+function setTheme(name) {
+  if (name === 'natural') {
+    document.body.removeAttribute('data-theme');
+  } else {
+    document.body.setAttribute('data-theme', name);
+  }
+  localStorage.setItem('ds_theme', name);
+  // Update theme picker button highlights
+  document.querySelectorAll('[data-theme-btn]').forEach(btn => {
+    btn.style.borderColor = btn.dataset.themeBtn === name ? 'var(--accent)' : 'var(--border)';
+    btn.style.boxShadow = btn.dataset.themeBtn === name ? '0 0 0 2px var(--accent-tint)' : 'none';
+  });
+  // Update meta theme-color
+  const colors = { natural: '#F5F2EC', cafe: '#F1EEEB', coastal: '#FFFFFF' };
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', colors[name] || '#F5F2EC');
+}
+
 // ─── RECIPE DATA ──────────────────────────────────────────────────────────────
 // All recipes: GF / DF / banana-free by default
 // groceryItems: key things to buy for each recipe, grouped by category
@@ -2274,8 +2368,8 @@ function getFilteredRecipes() {
 // ─── RENDER RECIPES ─────────────────────────────────────────────────────────
 const TYPE_LABELS = { breakfast:'Breakfast', lunch:'Lunch', dinner:'Dinner', sides:'Sides', dessert:'Dessert / Snack', snack:'Snack' };
 const TYPE_CLASSES = { breakfast:'type-breakfast', lunch:'type-lunch', dinner:'type-dinner', sides:'type-sides', dessert:'type-dessert', snack:'type-snack' };
-const CUISINE_EMOJI = { asian:'🥢', japanese:'🍱', indian:'🍛', mexican:'🌮', american:'🍔', mediterranean:'🫒', middleeastern:'🫙', comfort:'🏠', other:'🍴' };
-const PROTEIN_EMOJI = { chicken:'🐓', beef:'🥩', eggs:'🥚', tofu:'🌱', fish:'🐟', mixed:'🍱' };
+const CUISINE_EMOJI = { asian:'🥢', japanese:'🍱', indian:'🍛', italian:'🍝', mexican:'🌮', american:'🍔', mediterranean:'🫒', middleeastern:'🫙', comfort:'🏠', simple:'🍳', other:'🍴' };
+const PROTEIN_EMOJI = { chicken:'🐓', beef:'🥩', eggs:'🥚', tofu:'🌱', fish:'🐟', proteinpowder:'🥤', mixed:'🍱' };
 
 function renderRecipes() {
   const filtered = getFilteredRecipes();
@@ -2495,7 +2589,8 @@ const ALL_CRAVINGS = [
   {value:'asian', label:'🥢 Asian'}, {value:'mexican', label:'🌮 Mexican'},
   {value:'comfort', label:'🏠 Comfort'}, {value:'spicy', label:'🌶 Spicy'},
   {value:'brothy', label:'🫕 Brothy'}, {value:'noodles', label:'🍜 Noodles'},
-  {value:'light', label:'🥗 Light'}, {value:'chicken', label:'🐓 Chicken'},
+  {value:'light', label:'🥗 Light'}, {value:'healthy', label:'💚 Healthy'},
+  {value:'simple', label:'🍳 Simple'}, {value:'chicken', label:'🐓 Chicken'},
   {value:'beef', label:'🥩 Beef'}, {value:'tofu', label:'🌱 Tofu'},
   {value:'sweet', label:'🍫 Sweet'}, {value:'fresh', label:'🥬 Fresh'}
 ];
@@ -2591,6 +2686,7 @@ function openTagEditor(id) {
             <option value="eggs" ${r.proteinSource==='eggs'?'selected':''}>🥚 Eggs</option>
             <option value="tofu" ${r.proteinSource==='tofu'?'selected':''}>🌱 Tofu / Plant</option>
             <option value="fish" ${r.proteinSource==='fish'?'selected':''}>🐟 Fish</option>
+            <option value="proteinpowder" ${r.proteinSource==='proteinpowder'?'selected':''}>🥤 Protein Powder</option>
             <option value="mixed" ${r.proteinSource==='mixed'?'selected':''}>🍱 Mixed</option>
             <option value="other" ${r.proteinSource==='other'?'selected':''}>🔀 Other</option>
           </select>
@@ -2602,10 +2698,12 @@ function openTagEditor(id) {
             <option value="asian" ${r.cuisine==='asian'?'selected':''}>🥢 Asian</option>
             <option value="japanese" ${r.cuisine==='japanese'?'selected':''}>🍱 Japanese</option>
             <option value="indian" ${r.cuisine==='indian'?'selected':''}>🍛 Indian</option>
+            <option value="italian" ${r.cuisine==='italian'?'selected':''}>🍝 Italian</option>
             <option value="mexican" ${r.cuisine==='mexican'?'selected':''}>🌮 Mexican</option>
             <option value="american" ${r.cuisine==='american'?'selected':''}>🍔 American / BBQ</option>
             <option value="mediterranean" ${r.cuisine==='mediterranean'?'selected':''}>🫒 Mediterranean</option>
             <option value="middleeastern" ${r.cuisine==='middleeastern'?'selected':''}>🫙 Middle Eastern</option>
+            <option value="simple" ${r.cuisine==='simple'?'selected':''}>🍳 Simple</option>
             <option value="other" ${r.cuisine==='other'?'selected':''}>🍴 Other</option>
           </select>
         </div>
@@ -3523,6 +3621,54 @@ async function addRecipe() {
   const ai = window._parsedAiRecipe || null;
   const creatorHandle = document.getElementById('f-url').value.trim() || null;
 
+  // Parse manual ingredients (one per line, ALL CAPS or blank line = section header)
+  const manualIngRaw = document.getElementById('f-ingredients-full').value.trim();
+  let manualIngredients = [];
+  if (manualIngRaw) {
+    let currentGroup = null;
+    for (const line of manualIngRaw.split('\n')) {
+      const t = line.trim();
+      if (!t) { currentGroup = null; continue; }
+      if (/^[A-Z][A-Z\s&\/\-]+$/.test(t)) { currentGroup = t; continue; }
+      manualIngredients.push({ group: currentGroup || undefined, item: t });
+    }
+  }
+
+  // Parse manual method steps (one per line)
+  const manualMethodRaw = document.getElementById('f-method').value.trim();
+  const manualMethod = manualMethodRaw ? manualMethodRaw.split('\n').map(s=>s.trim()).filter(Boolean) : [];
+
+  const manualTips = document.getElementById('f-tips').value.trim() || null;
+  const manualStorage = document.getElementById('f-storage').value.trim() || null;
+
+  // Parse manual nutrition
+  const fKcal = parseFloat(document.getElementById('f-kcal').value);
+  const fProtG = parseFloat(document.getElementById('f-protein-g').value);
+  const fCarbG = parseFloat(document.getElementById('f-carbs-g').value);
+  const fFatG = parseFloat(document.getElementById('f-fat-g').value);
+  const hasManualNutrition = !isNaN(fKcal) || !isNaN(fProtG) || !isNaN(fCarbG) || !isNaN(fFatG);
+
+  // Merge AI-parsed data with manual inputs (manual takes priority if both exist)
+  const finalIngredients = manualIngredients.length ? manualIngredients : (ai?.ingredients || []);
+  const finalMethod = manualMethod.length ? manualMethod : (ai?.method || []);
+  const finalTips = manualTips || (ai?.tips || null);
+  const finalStorage = manualStorage || (ai?.storage || null);
+
+  // Build Supabase ingredient_sections from finalIngredients
+  let ingredientSections = null;
+  if (finalIngredients.length) {
+    const groups = {};
+    for (const ing of finalIngredients) {
+      const key = ing.group || '__default__';
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(ing.item || ing);
+    }
+    ingredientSections = Object.entries(groups).map(([k, items]) => ({
+      section_title: k === '__default__' ? null : k,
+      ingredients: items
+    }));
+  }
+
   // Build the Supabase row first so we get a real UUID back
   const supabaseRow = {
     name,
@@ -3539,10 +3685,12 @@ async function addRecipe() {
     creator_handle: creatorHandle,
     notes: document.getElementById('f-notes').value.trim() || null,
     import_status: 'custom',
-    ingredient_sections: ai?.ingredients?.length
-      ? [{ section_title: null, ingredients: ai.ingredients.map(i => i.item || i) }]
-      : null,
-    method_steps: ai?.method?.length ? ai.method : null,
+    ingredient_sections: ingredientSections,
+    method_steps: finalMethod.length ? finalMethod : null,
+    calories: hasManualNutrition ? (fKcal || 0) : null,
+    protein_g: hasManualNutrition ? (fProtG || 0) : null,
+    carbs_g: hasManualNutrition ? (fCarbG || 0) : null,
+    fat_g: hasManualNutrition ? (fFatG || 0) : null,
   };
 
   // POST to Supabase and get back the UUID
@@ -3580,13 +3728,13 @@ async function addRecipe() {
   recipes.push(r);
 
   // Store full recipe detail in RECIPE_FULL_DATA for immediate modal rendering
-  if (ai && (ai.ingredients?.length || ai.method?.length)) {
+  if (finalIngredients.length || finalMethod.length || hasManualNutrition) {
     RECIPE_FULL_DATA[r.id] = {
-      ingredients: ai.ingredients || [],
-      method: ai.method || [],
-      tips: ai.tips || null,
-      storage: ai.storage || null,
-      nutrition: null,
+      ingredients: finalIngredients,
+      method: finalMethod,
+      tips: finalTips,
+      storage: finalStorage,
+      nutrition: hasManualNutrition ? { kcal: fKcal || 0, protein: fProtG || 0, carbs: fCarbG || 0, fat: fFatG || 0 } : null,
       costPerPortion: null,
     };
   }
@@ -3605,7 +3753,7 @@ async function addRecipe() {
 }
 
 function clearForm() {
-  ['f-name','f-servings','f-time','f-url','f-notes','f-ingredients'].forEach(id=>{
+  ['f-name','f-servings','f-time','f-url','f-notes','f-ingredients','f-ingredients-full','f-method','f-tips','f-storage','f-kcal','f-protein-g','f-carbs-g','f-fat-g'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.value=id==='f-servings'?'1':'';
   });
   ['f-mealType','f-protein'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
@@ -3998,6 +4146,12 @@ function openSettings() {
   status.textContent = key ? '✓ Key saved (' + key.slice(0,10) + '…)' : '';
   status.className = 'key-status' + (key ? ' ok' : '');
   document.getElementById('settingsOverlay').classList.add('open');
+  // Highlight active theme swatch
+  const currentTheme = localStorage.getItem('ds_theme') || 'natural';
+  document.querySelectorAll('[data-theme-btn]').forEach(btn => {
+    btn.style.borderColor = btn.dataset.themeBtn === currentTheme ? 'var(--accent)' : 'var(--border)';
+    btn.style.boxShadow = btn.dataset.themeBtn === currentTheme ? '0 0 0 2px var(--accent-tint)' : 'none';
+  });
   // Pre-fill macro targets
   const tf = { 'target-kcal': targets.kcal, 'target-protein': targets.protein, 'target-carbs': targets.carbs, 'target-fat': targets.fat };
   for (const [id, val] of Object.entries(tf)) { const el = document.getElementById(id); if(el) el.value = val; }
