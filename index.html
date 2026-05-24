@@ -1395,7 +1395,19 @@ function renderRecipes() {
   const cnt = document.getElementById('resultsCount');
   if(!grid) return;
   cnt.textContent = `${filtered.length} recipe${filtered.length!==1?'s':''}`;
-  if(!filtered.length) { grid.innerHTML='<div class="no-results"><p>No recipes match those filters.</p></div>'; return; }
+  if(!filtered.length) {
+    // Distinguish "no recipes loaded yet" from "filters too tight".
+    if (recipes.length === 0) {
+      if (_lastFetchError) {
+        showRecipeLoadError('Could not load recipes. Check your connection and try again.');
+      } else {
+        grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px 20px;color:var(--text3)">Loading recipes…</div>`;
+      }
+    } else {
+      grid.innerHTML = '<div class="no-results"><p>No recipes match those filters.</p></div>';
+    }
+    return;
+  }
   grid.innerHTML = filtered.map(r => {
     const types = r.mealTypes || [];
     const primary = types[0] || '';
