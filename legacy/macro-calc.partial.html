@@ -1,0 +1,62 @@
+<!-- ── Macro Calculator Modal ──────────────────────────────────────── -->
+<!-- Lived at end of <body>, before the SW registration <script>. -->
+<div class="calc-overlay" id="calcOverlay" onclick="closeCalcOnOverlay(event)">
+  <div class="calc-panel" id="calcPanel">
+    <h3>🎯 Set My Macro Targets</h3>
+    <p>Enter your details and we'll calculate a starting point using the Mifflin-St Jeor formula. You can always adjust manually in Settings.</p>
+
+    <span class="calc-section-label">Your details</span>
+    <div class="calc-grid">
+      <div class="calc-field">
+        <label>Age</label>
+        <input type="number" id="calcAge" min="16" max="80" value="25" oninput="calcTargets()">
+      </div>
+      <div class="calc-field">
+        <label>Sex at birth</label>
+        <select id="calcSex" onchange="calcTargets()">
+          <option value="female" selected>Female</option>
+          <option value="male">Male</option>
+        </select>
+      </div>
+      <div class="calc-field">
+        <label>Weight (kg)</label>
+        <input type="number" id="calcWeight" min="30" max="200" value="60" oninput="calcTargets()">
+      </div>
+      <div class="calc-field">
+        <label>Height (cm)</label>
+        <input type="number" id="calcHeight" min="130" max="220" value="153" oninput="calcTargets()">
+      </div>
+    </div>
+
+    <span class="calc-section-label">Activity level</span>
+    <div class="calc-toggle-row" id="calcActivityRow">
+      <button class="calc-toggle" data-activity="1.2" onclick="setCalcActivity(this)">Sedentary</button>
+      <button class="calc-toggle active" data-activity="1.375" onclick="setCalcActivity(this)">Light</button>
+      <button class="calc-toggle" data-activity="1.55" onclick="setCalcActivity(this)">Moderate</button>
+      <button class="calc-toggle" data-activity="1.725" onclick="setCalcActivity(this)">Active</button>
+    </div>
+
+    <span class="calc-section-label">Goal</span>
+    <div class="calc-toggle-row" id="calcGoalRow">
+      <button class="calc-toggle" data-goal="-300" onclick="setCalcGoal(this)">Fat loss</button>
+      <button class="calc-toggle active" data-goal="0" onclick="setCalcGoal(this)">Maintenance</button>
+      <button class="calc-toggle" data-goal="250" onclick="setCalcGoal(this)">Muscle gain</button>
+    </div>
+
+    <div class="calc-preview" id="calcPreview">
+      <div class="calc-preview-title">Suggested targets</div>
+      <div class="calc-preview-grid" id="calcPreviewGrid">
+        <div class="calc-preview-cell"><div class="calc-preview-val" id="prevKcal">—</div><div class="calc-preview-lbl">kcal</div></div>
+        <div class="calc-preview-cell"><div class="calc-preview-val" id="prevProtein">—</div><div class="calc-preview-lbl">protein g</div></div>
+        <div class="calc-preview-cell"><div class="calc-preview-val" id="prevCarbs">—</div><div class="calc-preview-lbl">carbs g</div></div>
+        <div class="calc-preview-cell"><div class="calc-preview-val" id="prevFat">—</div><div class="calc-preview-lbl">fat g</div></div>
+      </div>
+      <div class="calc-preview-note" id="calcPreviewNote"></div>
+    </div>
+
+    <div class="calc-actions">
+      <button class="btn-calc-apply" onclick="applyCalcTargets()">Apply these targets</button>
+      <button class="btn-calc-cancel" onclick="closeCalcModal()">Cancel</button>
+    </div>
+  </div>
+</div>

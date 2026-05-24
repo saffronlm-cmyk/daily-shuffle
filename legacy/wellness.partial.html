@@ -1,0 +1,56 @@
+    <!-- ── Wellness Tab ──────────────────────────────────────────────────── -->
+    <div id="tab-wellness" class="tab-content">
+      <div class="wellness-layout">
+
+        <!-- Supplement Tracker -->
+        <div class="wellness-section">
+          <div class="wellness-section-header">
+            <div>
+              <div class="wellness-section-title">💊 Daily Supplements</div>
+              <div class="wellness-section-sub" id="suppDateSub">Loading…</div>
+            </div>
+            <div class="supp-date-nav">
+              <button class="supp-nav-btn" onclick="shiftSuppDate(-1)">‹</button>
+              <span class="supp-date-label" id="suppDateLabel">—</span>
+              <button class="supp-nav-btn" onclick="shiftSuppDate(1)">›</button>
+            </div>
+          </div>
+          <div id="suppList" class="supp-list"></div>
+          <div class="supp-add-row" id="suppAddRow">
+            <button class="btn-supp-add-toggle" id="btnSuppToggle" onclick="toggleSuppForm()">＋ Add supplement</button>
+            <div id="suppForm" style="display:none">
+              <div class="supp-add-form">
+                <input type="text" id="suppName" placeholder="Name (e.g. Magnesium Glycinate)" class="full">
+                <input type="text" id="suppDose" placeholder="Dose (e.g. 400mg)">
+                <input type="text" id="suppTiming" placeholder="Timing (e.g. with dinner)">
+                <input type="text" id="suppNote" placeholder="Note (optional)" class="full">
+              </div>
+              <div class="supp-add-actions">
+                <button class="btn-supp-save" onclick="saveSuppItem()">Add supplement</button>
+                <button class="btn-supp-cancel" onclick="toggleSuppForm()">Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Community / Reddit posts -->
+        <div class="wellness-section">
+          <div class="wellness-section-header">
+            <div>
+              <div class="wellness-section-title">🌐 Community Picks</div>
+              <div class="wellness-section-sub">Top posts from r/PCOS &amp; r/WomensHealth — filtered by relevance</div>
+            </div>
+          </div>
+          <div class="reddit-controls">
+            <div class="reddit-subreddit-tabs">
+              <button class="btn-reddit-tab active" data-sub="PCOS" onclick="setRedditSub(this)">r/PCOS</button>
+              <button class="btn-reddit-tab" data-sub="WomensHealth" onclick="setRedditSub(this)">r/WomensHealth</button>
+              <button class="btn-reddit-tab" data-sub="saved" onclick="setRedditSub(this)">⭐ Saved</button>
+            </div>
+            <button class="btn-reddit-refresh" id="btnRedditRefresh" onclick="fetchRedditPosts()">↻ Refresh</button>
+          </div>
+          <div id="redditPosts"></div>
+        </div>
+
+      </div>
+    </div>

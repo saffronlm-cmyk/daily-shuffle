@@ -447,200 +447,6 @@
   .btn-library { background: none; border: 1px solid var(--border); color: var(--text3); padding: 5px 11px; border-radius: 6px; font-size: 11px; font-weight: 600; transition: all .15s; flex-shrink: 0; }
   .btn-library:hover { color: var(--text); border-color: var(--text3); }
 
-  /* ── Track / Food Log Tab ─────────────────────────────────────────────────── */
-  .track-layout { max-width: 680px; margin: 0 auto; padding: 24px 20px; }
-  .track-date-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 16px; gap: 10px; }
-  .track-date-info { text-align: center; flex: 1; }
-  .track-date-label { font-size: 15px; font-weight: 700; color: var(--text); }
-  .track-date-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
-  .track-nav-btn { background: none; border: 1px solid var(--border); color: var(--text2); width: 34px; height: 34px; border-radius: 7px; font-size: 18px; transition: all .15s; flex-shrink: 0; }
-  .track-nav-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .track-today-btn { background: none; border: 1px solid var(--border); color: var(--text3); padding: 5px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; transition: all .15s; flex-shrink: 0; }
-  .track-today-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .track-slot { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 8px; overflow: hidden; }
-  .track-slot-header { display: flex; align-items: center; justify-content: space-between; padding: 9px 12px; background: var(--surface2); border-bottom: 1px solid var(--border); }
-  .track-slot-left { display: flex; align-items: center; gap: 8px; }
-  .track-slot-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--text3); }
-  .track-slot-kcal { font-size: 11px; color: var(--text3); }
-  .track-add-btn { background: none; border: 1px solid var(--border); color: var(--text3); width: 24px; height: 24px; border-radius: 5px; font-size: 15px; line-height: 1; transition: all .15s; }
-  .track-add-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .track-slot-entries { padding: 4px 8px 6px; display: flex; flex-direction: column; gap: 4px; min-height: 32px; }
-  .track-entry { display: flex; align-items: center; gap: 7px; padding: 6px 8px; background: var(--surface2); border-radius: 6px; border: 1px solid var(--border); }
-  .track-entry-name { flex: 1; font-size: 13px; font-weight: 600; color: var(--text); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .track-entry-srv-wrap { display: flex; align-items: center; gap: 4px; flex-shrink: 0; font-size: 11px; color: var(--text3); }
-  .track-entry-srv { width: 40px; background: var(--bg); border: 1px solid var(--border); color: var(--text2); padding: 3px 5px; border-radius: 5px; font-size: 12px; text-align: center; outline: none; }
-  .track-entry-srv:focus { border-color: var(--accent); }
-  .track-entry-macros { font-size: 11px; color: var(--text3); white-space: nowrap; flex-shrink: 0; }
-  .track-entry-remove { background: none; border: none; color: var(--text3); font-size: 16px; padding: 0 2px; border-radius: 3px; flex-shrink: 0; transition: color .1s; line-height: 1; }
-  .track-entry-remove:hover { color: #b85555; }
-  .track-empty { font-size: 12px; color: var(--text3); padding: 4px 8px 6px; font-style: italic; }
-  .track-totals { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; margin-bottom: 14px; }
-  .track-totals-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-  .track-totals-title { font-size: 13px; font-weight: 700; color: var(--text); }
-  .track-totals-kcal { font-size: 13px; font-weight: 700; color: var(--yellow); }
-  .track-macro-row { margin-bottom: 9px; }
-  .track-macro-row:last-child { margin-bottom: 0; }
-  .track-macro-label { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; }
-  .track-macro-name { color: var(--text2); }
-  .track-macro-value { font-weight: 600; }
-  .track-macro-value.ok { color: var(--green); }
-  .track-macro-value.over { color: #c87070; }
-  .track-macro-value.low { color: var(--text2); }
-  .track-bar-bg { height: 5px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
-  .track-bar-fill { height: 100%; border-radius: 3px; transition: width .4s; max-width: 100%; }
-  .bar-kcal { background: var(--yellow); } .bar-protein { background: var(--accent); } .bar-carbs { background: var(--blue); } .bar-fat { background: var(--green); }
-  /* ── Pantry ─────────────────────────────────────────────────────────────── */
-  .pantry-section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
-  .pantry-header { display: flex; align-items: center; justify-content: space-between; padding: 13px 16px; cursor: pointer; user-select: none; }
-  .pantry-header h3 { font-size: 13px; font-weight: 700; color: var(--text); }
-  .pantry-chevron { color: var(--text3); font-size: 12px; transition: transform .2s; }
-  .pantry-chevron.open { transform: rotate(180deg); }
-  .pantry-body { padding: 12px 14px 14px; border-top: 1px solid var(--border); }
-  .pantry-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: var(--surface2); border-radius: 7px; border: 1px solid var(--border); margin-bottom: 6px; }
-  .pantry-item-info { flex: 1; min-width: 0; }
-  .pantry-item-name { font-size: 13px; font-weight: 600; color: var(--text); }
-  .pantry-item-detail { font-size: 11px; color: var(--text3); margin-top: 2px; }
-  .pantry-item-btns { display: flex; gap: 5px; flex-shrink: 0; }
-  .btn-pi { background: none; border: 1px solid var(--border); color: var(--text3); padding: 3px 8px; border-radius: 5px; font-size: 11px; transition: all .15s; }
-  .btn-pi:hover { border-color: var(--accent); color: var(--accent); }
-  .btn-pi.del:hover { border-color: #b85555; color: #b85555; }
-  .pantry-form { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin-top: 8px; }
-  .pantry-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
-  .pantry-form-grid.four { grid-template-columns: 1fr 1fr 1fr 1fr; }
-  .pf-group { display: flex; flex-direction: column; gap: 4px; }
-  .pf-group label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; color: var(--text3); }
-  .pf-group input { background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 7px 9px; border-radius: 6px; font-size: 12px; font-family: var(--font); outline: none; }
-  .pf-group input:focus { border-color: var(--accent); }
-  .pf-group input::placeholder { color: var(--text3); }
-  .pantry-form-actions { display: flex; gap: 8px; margin-top: 8px; }
-  .btn-pf-save { background: var(--accent); color: white; font-weight: 700; padding: 7px 16px; border-radius: 6px; font-size: 12px; border: none; transition: background .15s; }
-  .btn-pf-save:hover { background: var(--accent2); }
-  .btn-pf-cancel { background: none; border: 1px solid var(--border); color: var(--text2); padding: 7px 12px; border-radius: 6px; font-size: 12px; transition: all .15s; }
-  .btn-pf-cancel:hover { border-color: var(--text2); }
-  .btn-pantry-add { background: none; border: 1px dashed var(--border); color: var(--text3); width: 100%; padding: 9px; border-radius: 7px; font-size: 12px; font-weight: 600; transition: all .15s; margin-top: 4px; }
-  .btn-pantry-add:hover { border-color: var(--accent); color: var(--accent); }
-  .track-no-macros { font-size: 11px; color: var(--text3); font-style: italic; }
-
-  /* ── Macro Calculator Modal ──────────────────────────────────────────────── */
-  .calc-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.75); z-index: 1200; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity .2s; }
-  .calc-overlay.open { opacity: 1; pointer-events: all; }
-  .calc-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 28px; max-width: 480px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative; }
-  .calc-panel h3 { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
-  .calc-panel > p { font-size: 13px; color: var(--text2); margin-bottom: 20px; line-height: 1.5; }
-  .calc-section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--text3); margin-bottom: 8px; display: block; }
-  .calc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
-  .calc-field { display: flex; flex-direction: column; gap: 4px; }
-  .calc-field label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .4px; color: var(--text3); }
-  .calc-field input, .calc-field select { background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 8px 10px; border-radius: 7px; font-size: 13px; font-family: var(--font); outline: none; }
-  .calc-field input:focus, .calc-field select:focus { border-color: var(--accent); }
-  .calc-toggle-row { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
-  .calc-toggle { background: var(--surface2); border: 1px solid var(--border); color: var(--text2); padding: 7px 14px; border-radius: 7px; font-size: 13px; font-weight: 500; transition: all .15s; flex: 1; text-align: center; }
-  .calc-toggle.active { background: var(--accent-tint); border-color: var(--accent); color: var(--accent); font-weight: 700; }
-  .calc-preview { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 18px; }
-  .calc-preview-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--text3); margin-bottom: 12px; }
-  .calc-preview-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 10px; }
-  .calc-preview-cell { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 6px; text-align: center; }
-  .calc-preview-val { font-size: 18px; font-weight: 700; color: var(--text); }
-  .calc-preview-lbl { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: .5px; margin-top: 3px; }
-  .calc-preview-note { font-size: 11px; color: var(--text3); line-height: 1.5; }
-  .calc-actions { display: flex; gap: 10px; align-items: center; }
-  .btn-calc-apply { background: var(--accent); color: white; font-weight: 700; padding: 11px 24px; border-radius: 8px; font-size: 14px; border: none; transition: background .15s; }
-  .btn-calc-apply:hover { background: var(--accent2); }
-  .btn-calc-cancel { background: none; border: 1px solid var(--border); color: var(--text2); padding: 10px 18px; border-radius: 8px; font-size: 13px; transition: all .15s; }
-  .btn-calc-cancel:hover { border-color: var(--text2); color: var(--text); }
-  .btn-track-targets { background: none; border: none; color: var(--text3); font-size: 13px; padding: 2px 4px; border-radius: 4px; transition: color .15s; }
-  .btn-track-targets:hover { color: var(--accent); }
-
-  /* ── Discover Tab ─────────────────────────────────────────────────────────── */
-  .discover-layout { max-width: 680px; margin: 0 auto; padding: 24px 20px; }
-  .discover-search-bar { display: flex; gap: 8px; margin-bottom: 6px; }
-  .discover-input { flex: 1; background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 11px 14px; border-radius: 8px; font-size: 14px; font-family: var(--font); outline: none; transition: border-color .15s; }
-  .discover-input:focus { border-color: var(--accent); }
-  .discover-input::placeholder { color: var(--text3); }
-  .btn-discover-search { background: var(--accent); color: white; font-weight: 700; padding: 11px 20px; border-radius: 8px; font-size: 14px; border: none; transition: background .15s; white-space: nowrap; }
-  .btn-discover-search:hover:not(:disabled) { background: var(--accent2); }
-  .btn-discover-search:disabled { opacity: .55; cursor: not-allowed; }
-  .discover-hint { font-size: 12px; color: var(--text3); margin-bottom: 20px; line-height: 1.5; }
-  .discover-no-key { background: var(--surface); border: 1px dashed var(--border); border-radius: var(--radius); padding: 28px 20px; text-align: center; }
-  .discover-no-key p { font-size: 13px; color: var(--text3); margin-bottom: 10px; line-height: 1.6; }
-  .discover-no-key a { color: var(--accent); cursor: pointer; text-decoration: underline; }
-  .discover-results { display: flex; flex-direction: column; gap: 10px; }
-  .discover-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; display: flex; gap: 14px; transition: border-color .15s; }
-  .discover-card:hover { border-color: var(--accent); }
-  .discover-thumb { width: 72px; height: 72px; border-radius: 8px; object-fit: cover; flex-shrink: 0; background: var(--surface2); }
-  .discover-thumb-ph { width: 72px; height: 72px; border-radius: 8px; flex-shrink: 0; background: var(--surface2); display: flex; align-items: center; justify-content: center; font-size: 26px; }
-  .discover-card-body { flex: 1; min-width: 0; }
-  .discover-card-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 2px; line-height: 1.3; }
-  .discover-card-site { font-size: 11px; color: var(--text3); margin-bottom: 5px; }
-  .discover-card-snippet { font-size: 12px; color: var(--text2); line-height: 1.5; margin-bottom: 10px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-  .discover-card-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-  .btn-discover-add { background: var(--accent); color: white; font-weight: 600; padding: 6px 14px; border-radius: 6px; font-size: 12px; border: none; transition: background .15s; }
-  .btn-discover-add:hover { background: var(--accent2); }
-  .btn-discover-open { background: none; border: 1px solid var(--border); color: var(--text2); padding: 5px 11px; border-radius: 6px; font-size: 12px; transition: all .15s; text-decoration: none; display: inline-block; }
-  .btn-discover-open:hover { border-color: var(--accent); color: var(--accent); }
-  .discover-rich-badge { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--green); }
-  .discover-status { font-size: 13px; color: var(--text3); text-align: center; padding: 48px 20px; }
-
-  /* ── Wellness Tab ─────────────────────────────────────────────────────────── */
-  .wellness-layout { max-width: 720px; margin: 0 auto; padding: 24px 20px; display: flex; flex-direction: column; gap: 28px; }
-  .wellness-section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
-  .wellness-section-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--border); }
-  .wellness-section-title { font-size: 14px; font-weight: 700; }
-  .wellness-section-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
-  .supp-date-nav { display: flex; align-items: center; gap: 8px; }
-  .supp-date-label { font-size: 12px; color: var(--text2); font-weight: 600; }
-  .supp-nav-btn { background: none; border: 1px solid var(--border); color: var(--text2); width: 26px; height: 26px; border-radius: 6px; font-size: 14px; display: flex; align-items: center; justify-content: center; transition: all .15s; padding: 0; }
-  .supp-nav-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .supp-list { padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; }
-  .supp-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: var(--surface2); border-radius: 8px; border: 1px solid var(--border); transition: border-color .15s; }
-  .supp-item:hover { border-color: var(--accent); }
-  .supp-check { width: 20px; height: 20px; accent-color: var(--accent); flex-shrink: 0; cursor: pointer; }
-  .supp-item-info { flex: 1; min-width: 0; }
-  .supp-item-name { font-size: 13px; font-weight: 600; color: var(--text); }
-  .supp-item-detail { font-size: 11px; color: var(--text3); margin-top: 1px; }
-  .supp-item-name.checked { text-decoration: line-through; color: var(--text3); }
-  .supp-item-btns { display: flex; gap: 6px; }
-  .btn-supp-del { background: none; border: none; color: var(--text3); font-size: 16px; padding: 2px 4px; border-radius: 4px; transition: color .15s; line-height: 1; }
-  .btn-supp-del:hover { color: var(--red,#e06c75); }
-  .supp-add-row { padding: 10px 12px; border-top: 1px solid var(--border); }
-  .supp-add-form { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
-  .supp-add-form input { background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 8px 10px; border-radius: 7px; font-size: 13px; font-family: var(--font); outline: none; transition: border-color .15s; }
-  .supp-add-form input:focus { border-color: var(--accent); }
-  .supp-add-form input.full { grid-column: 1 / -1; }
-  .supp-add-actions { display: flex; gap: 8px; }
-  .btn-supp-save { background: var(--accent); color: white; font-weight: 600; padding: 7px 16px; border-radius: 7px; font-size: 13px; border: none; transition: background .15s; }
-  .btn-supp-save:hover { background: var(--accent2); }
-  .btn-supp-cancel { background: none; border: 1px solid var(--border); color: var(--text2); padding: 6px 12px; border-radius: 7px; font-size: 13px; transition: all .15s; }
-  .btn-supp-cancel:hover { border-color: var(--text2); color: var(--text); }
-  .btn-supp-add-toggle { background: none; border: 1px dashed var(--border); color: var(--text3); padding: 8px 14px; border-radius: 7px; font-size: 13px; width: 100%; text-align: center; transition: all .15s; }
-  .btn-supp-add-toggle:hover { border-color: var(--accent); color: var(--accent); }
-  .supp-empty { padding: 24px 16px; text-align: center; font-size: 13px; color: var(--text3); }
-  .supp-streak { font-size: 11px; color: var(--accent); font-weight: 700; }
-  /* Reddit community posts */
-  .reddit-controls { display: flex; gap: 8px; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
-  .reddit-subreddit-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
-  .btn-reddit-tab { background: var(--surface2); border: 1px solid var(--border); color: var(--text2); padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 500; transition: all .15s; }
-  .btn-reddit-tab.active { background: var(--accent-tint); border-color: var(--accent); color: var(--accent); font-weight: 700; }
-  .btn-reddit-refresh { margin-left: auto; background: none; border: 1px solid var(--border); color: var(--text3); padding: 5px 10px; border-radius: 6px; font-size: 12px; transition: all .15s; }
-  .btn-reddit-refresh:hover { border-color: var(--accent); color: var(--accent); }
-  .reddit-posts { padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; }
-  .reddit-post { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; transition: border-color .15s; }
-  .reddit-post:hover { border-color: var(--accent); }
-  .reddit-post-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; line-height: 1.4; }
-  .reddit-post-title a { color: inherit; text-decoration: none; }
-  .reddit-post-title a:hover { color: var(--accent); text-decoration: underline; }
-  .reddit-post-meta { font-size: 11px; color: var(--text3); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-  .reddit-post-score { color: var(--accent); font-weight: 700; }
-  .reddit-post-flair { background: var(--accent-tint); color: var(--accent); padding: 1px 7px; border-radius: 10px; font-size: 10px; font-weight: 700; }
-  .btn-reddit-pin { background: none; border: none; font-size: 13px; padding: 2px 4px; border-radius: 4px; color: var(--text3); transition: all .15s; margin-left: auto; }
-  .btn-reddit-pin.pinned { color: var(--accent); }
-  .btn-reddit-pin:hover { color: var(--accent); }
-  .reddit-status { font-size: 13px; color: var(--text3); text-align: center; padding: 36px 16px; }
-  .reddit-saved-empty { font-size: 13px; color: var(--text3); text-align: center; padding: 20px 16px; }
-  .reddit-filter-row { display: flex; gap: 8px; padding: 10px 12px 0; flex-wrap: wrap; }
-  .btn-wellness-filter { background: var(--surface2); border: 1px solid var(--border); color: var(--text2); padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 500; transition: all .15s; }
-  .btn-wellness-filter.active { background: var(--accent-tint); border-color: var(--accent); color: var(--accent); font-weight: 700; }
-
   @media (max-width: 768px) {
     .recipes-layout { grid-template-columns: 1fr; }
     .sidebar { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--border); }
@@ -660,11 +466,7 @@
     <nav>
       <button class="active" onclick="switchTab('plan',this)">📅 Meal Plan</button>
       <button onclick="switchTab('recipes',this)">🍳 Recipes</button>
-      <button onclick="switchTab('track',this)">📊 Track</button>
-      <button onclick="switchTab('pantry',this)" id="nav-pantry">🥫 Pantry</button>
-      <button onclick="switchTab('discover',this)">🔍 Discover</button>
       <button onclick="switchTab('grocery',this)" id="nav-grocery">🛒 Grocery List</button>
-      <button onclick="switchTab('wellness',this)">🌸 Wellness</button>
       <button onclick="switchTab('add',this)">＋ Add Recipe</button>
     </nav>
     <div class="header-right">
@@ -696,28 +498,6 @@
       </div>
       <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
         <button class="btn-clear-key" onclick="clearApiKey()">Remove key</button>
-      </div>
-      <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
-        <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:8px">Daily Macro Targets</div>
-        <p style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5">Used by the Track tab to show progress bars. Adjust to your goals.</p>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-          <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text3);margin-bottom:4px">Calories (kcal)</div><input type="number" id="target-kcal" style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:6px;font-size:13px;outline:none" placeholder="1800"></div>
-          <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text3);margin-bottom:4px">Protein (g)</div><input type="number" id="target-protein" style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:6px;font-size:13px;outline:none" placeholder="130"></div>
-          <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text3);margin-bottom:4px">Carbs (g)</div><input type="number" id="target-carbs" style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:6px;font-size:13px;outline:none" placeholder="180"></div>
-          <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text3);margin-bottom:4px">Fat (g)</div><input type="number" id="target-fat" style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:6px;font-size:13px;outline:none" placeholder="60"></div>
-        </div>
-        <button class="btn-save-key" onclick="saveTargets()" style="font-size:12px;padding:7px 16px">Save targets</button>
-        <span id="targetsSavedNotice" style="font-size:12px;color:var(--green);margin-left:10px;display:none">✓ Saved</span>
-      </div>
-      <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
-        <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:6px">Edamam Recipe Search</div>
-        <p style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5">Powers the Discover tab. Free — 10,000 calls/month. <a href="https://developer.edamam.com/edamam-recipe-api" target="_blank" style="color:var(--accent)">Get free API keys →</a></p>
-        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px">
-          <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text3);margin-bottom:4px">App ID</div><input type="text" id="edamamAppIdInput" autocomplete="off" style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:6px;font-size:13px;font-family:monospace;outline:none" placeholder="a1b2c3d4"></div>
-          <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text3);margin-bottom:4px">App Key</div><input type="password" id="edamamAppKeyInput" autocomplete="off" style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:6px;font-size:13px;font-family:monospace;outline:none" placeholder="abc123…"></div>
-        </div>
-        <button class="btn-save-key" onclick="saveEdamamKeys()" style="font-size:12px;padding:7px 16px">Save keys</button>
-        <span id="edamamKeysSavedNotice" style="font-size:12px;color:var(--green);margin-left:10px;display:none">✓ Saved</span>
       </div>
       <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
         <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:8px">Recipe Library</div>
@@ -980,16 +760,9 @@
               <label>Recipe Name *</label>
               <input type="text" id="f-name" placeholder="e.g. Soy Glazed Salmon Bowl" />
             </div>
-            <div class="form-group">
-              <label>Meal Type *</label>
-              <select id="f-mealType">
-                <option value="">Select…</option>
-                <option value="breakfast">Breakfast</option>
-                <option value="lunch">Lunch</option>
-                <option value="dinner">Dinner</option>
-                <option value="sides">Sides</option>
-                <option value="dessert">Dessert / Snack</option>
-              </select>
+            <div class="form-group full">
+              <label>Meal Types * <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text3)">(pick any that apply)</span></label>
+              <div class="craving-edit-tags" id="f-mealTypes"></div>
             </div>
             <div class="form-group">
               <label>Protein Source *</label>
@@ -1073,22 +846,13 @@
                 <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text3);margin-bottom:4px">Fat (g)</div><input type="number" id="f-fat-g" placeholder="g" style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:6px;font-size:13px;outline:none"></div>
               </div>
             </div>
-            <div class="form-group" style="align-items:flex-start">
-              <label style="margin-bottom:8px">Options</label>
-              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--text2);text-transform:none;letter-spacing:0">
-                <input type="checkbox" id="f-batch" style="width:14px;height:14px;accent-color:var(--accent);" /> Batch-friendly
-              </label>
+            <div class="form-group">
+              <label>Carb Type</label>
+              <select id="f-carbType"></select>
             </div>
-            <div class="form-group" style="align-items:flex-start">
-              <label style="margin-bottom:8px">Craving tags</label>
-              <div style="display:flex;flex-wrap:wrap;gap:6px" id="f-craving-tags">
-                <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2);cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" value="spicy" style="accent-color:var(--accent)"> Spicy</label>
-                <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2);cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" value="light" style="accent-color:var(--accent)"> Light</label>
-                <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2);cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" value="brothy" style="accent-color:var(--accent)"> Brothy</label>
-                <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2);cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" value="noodles" style="accent-color:var(--accent)"> Noodles</label>
-                <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2);cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" value="healthy" style="accent-color:var(--accent)"> Healthy</label>
-                <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2);cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" value="simple" style="accent-color:var(--accent)"> Simple</label>
-              </div>
+            <div class="form-group full">
+              <label>Cravings / mood</label>
+              <div class="craving-edit-tags" id="f-cravings"></div>
             </div>
           </div>
           <div class="form-actions">
@@ -1096,90 +860,6 @@
             <button class="btn-clear-form" onclick="clearForm()">Clear</button>
           </div>
         </div>
-      </div>
-    </div>
-
-    <!-- ── TRACK TAB ─────────────────────────────────────────────────────── -->
-    <div id="tab-track" class="tab-content">
-      <div class="track-layout" id="trackLayout">
-        <!-- rendered by renderTrackTab() -->
-      </div>
-    </div>
-
-    <!-- ── PANTRY TAB ───────────────────────────────────────────────────── -->
-    <div id="tab-pantry" class="tab-content">
-      <div id="pantryLayout"></div>
-    </div>
-
-    <!-- ── DISCOVER TAB ──────────────────────────────────────────────────── -->
-    <div id="tab-discover" class="tab-content">
-      <div class="discover-layout">
-        <h2 style="font-size:18px;font-weight:700;margin-bottom:6px">🔍 Discover Recipes</h2>
-        <p style="font-size:13px;color:var(--text2);margin-bottom:18px">Search the web for recipes. Results are filtered for gluten-free &amp; dairy-free. Click <strong>Add to Library</strong> to send a result to the AI parser.</p>
-        <div class="discover-search-bar">
-          <input class="discover-input" id="discoverInput" type="text" placeholder="e.g. high protein gluten free chicken bowl…"
-            onkeydown="if(event.key==='Enter') searchRecipes()">
-          <button class="btn-discover-search" id="btnDiscoverSearch" onclick="searchRecipes()">Search</button>
-        </div>
-        <div class="discover-hint" id="discoverHint">Searches add "gluten free dairy free" automatically — tweak the query if you want to cast wider.</div>
-        <div id="discoverResults"></div>
-      </div>
-    </div>
-
-    <!-- ── Wellness Tab ──────────────────────────────────────────────────── -->
-    <div id="tab-wellness" class="tab-content">
-      <div class="wellness-layout">
-
-        <!-- Supplement Tracker -->
-        <div class="wellness-section">
-          <div class="wellness-section-header">
-            <div>
-              <div class="wellness-section-title">💊 Daily Supplements</div>
-              <div class="wellness-section-sub" id="suppDateSub">Loading…</div>
-            </div>
-            <div class="supp-date-nav">
-              <button class="supp-nav-btn" onclick="shiftSuppDate(-1)">‹</button>
-              <span class="supp-date-label" id="suppDateLabel">—</span>
-              <button class="supp-nav-btn" onclick="shiftSuppDate(1)">›</button>
-            </div>
-          </div>
-          <div id="suppList" class="supp-list"></div>
-          <div class="supp-add-row" id="suppAddRow">
-            <button class="btn-supp-add-toggle" id="btnSuppToggle" onclick="toggleSuppForm()">＋ Add supplement</button>
-            <div id="suppForm" style="display:none">
-              <div class="supp-add-form">
-                <input type="text" id="suppName" placeholder="Name (e.g. Magnesium Glycinate)" class="full">
-                <input type="text" id="suppDose" placeholder="Dose (e.g. 400mg)">
-                <input type="text" id="suppTiming" placeholder="Timing (e.g. with dinner)">
-                <input type="text" id="suppNote" placeholder="Note (optional)" class="full">
-              </div>
-              <div class="supp-add-actions">
-                <button class="btn-supp-save" onclick="saveSuppItem()">Add supplement</button>
-                <button class="btn-supp-cancel" onclick="toggleSuppForm()">Cancel</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Community / Reddit posts -->
-        <div class="wellness-section">
-          <div class="wellness-section-header">
-            <div>
-              <div class="wellness-section-title">🌐 Community Picks</div>
-              <div class="wellness-section-sub">Top posts from r/PCOS &amp; r/WomensHealth — filtered by relevance</div>
-            </div>
-          </div>
-          <div class="reddit-controls">
-            <div class="reddit-subreddit-tabs">
-              <button class="btn-reddit-tab active" data-sub="PCOS" onclick="setRedditSub(this)">r/PCOS</button>
-              <button class="btn-reddit-tab" data-sub="WomensHealth" onclick="setRedditSub(this)">r/WomensHealth</button>
-              <button class="btn-reddit-tab" data-sub="saved" onclick="setRedditSub(this)">⭐ Saved</button>
-            </div>
-            <button class="btn-reddit-refresh" id="btnRedditRefresh" onclick="fetchRedditPosts()">↻ Refresh</button>
-          </div>
-          <div id="redditPosts"></div>
-        </div>
-
       </div>
     </div>
 
@@ -1234,6 +914,33 @@ function setTheme(name) {
   document.querySelector('meta[name="theme-color"]')?.setAttribute('content', colors[name] || '#F5F2EC');
 }
 
+// ─── CRAVINGS TAXONOMY ───────────────────────────────────────────────────────
+// Phase 1 keeps the existing tag set (asian, mexican, …). Phase 3 will expand
+// this into a structured `CRAVING_TAXONOMY = { cuisine, texture, mood, dietary }`.
+// `tags` (previously freeform) is being absorbed into `cravings` — see migration.
+const ALL_CRAVINGS = [
+  'asian','mexican','comfort','spicy','brothy','noodles','light','healthy',
+  'simple','chicken','beef','tofu','sweet','fresh',
+];
+const CRAVING_LABELS = {
+  asian:'🥢 Asian', mexican:'🌮 Mexican', comfort:'🏠 Comfort', spicy:'🌶 Spicy',
+  brothy:'🫕 Brothy', noodles:'🍜 Noodles', light:'🥗 Light', healthy:'💚 Healthy',
+  simple:'🍳 Simple', chicken:'🐓 Chicken', beef:'🥩 Beef', tofu:'🌱 Tofu',
+  sweet:'🍫 Sweet', fresh:'🥬 Fresh',
+};
+
+const MEAL_TYPES = ['breakfast','lunch','dinner','sides','dessert','snack'];
+const MEAL_TYPE_LABELS = {
+  breakfast:'🌅 Breakfast', lunch:'🥗 Lunch', dinner:'🍽 Dinner',
+  sides:'🍟 Sides', dessert:'🍫 Dessert', snack:'☕ Snack',
+};
+
+const CARB_TYPES = ['none','rice','pasta','bread','potato','grain'];
+const CARB_TYPE_LABELS = {
+  none:'— None', rice:'🍚 Rice', pasta:'🍝 Pasta', bread:'🥖 Bread',
+  potato:'🥔 Potato', grain:'🌾 Grain',
+};
+
 // ─── RECIPE DATA ──────────────────────────────────────────────────────────────
 // All recipes: GF / DF / banana-free by default
 // groceryItems: key things to buy for each recipe, grouped by category
@@ -1248,17 +955,28 @@ const RECIPE_LIB_HEADERS = { 'apikey': RECIPE_LIB_KEY, 'Authorization': `Bearer 
 const cloudRecipeIds = new Set(); // populated on load
 
 function mapSupabaseToApp(row) {
+  // Cloud schema may include `meal_types text[]` (new) or only `meal_type text`
+  // (old). Tolerate both indefinitely.
+  const mealTypes = Array.isArray(row.meal_types) && row.meal_types.length
+    ? row.meal_types
+    : (row.meal_type ? [row.meal_type] : ['dinner']);
+  // Tags column is being absorbed into cravings. Forward-compat: take any tags
+  // that happen to be in the craving taxonomy and merge them in.
+  const incomingTags = Array.isArray(row.tags) ? row.tags : [];
+  const cravings = [...new Set([
+    ...(Array.isArray(row.craving_tags) ? row.craving_tags : []),
+    ...incomingTags.filter(t => ALL_CRAVINGS.includes(t)),
+  ])];
   return {
     id: row.id,
     name: row.name,
-    mealType: row.meal_type || 'dinner',
+    mealTypes,
     proteinSource: row.protein_source || '',
     cuisine: row.cuisine || '',
-    tags: row.tags || [],
-    cravings: row.craving_tags || [],
+    cravings,
+    carbType: row.carb_type || 'none',
     servings: row.serves || 2,
     prepTime: row.prep_cook_time || '',
-    batchCook: row.batch_friendly || false,
     costTier: row.cost_tier || '',
     source: row.creator_handle || '',
     instagramUrl: row.creator_handle ? `https://www.instagram.com/${row.creator_handle.replace(/^@/, '')}` : '',
@@ -1392,14 +1110,15 @@ try {
       if (!o) continue;
       if (o.name) r.name = o.name;
       if (o.description !== undefined) r.description = o.description;
-      if (o.mealType) r.mealType = o.mealType;
+      // Forward-compat: prefer mealTypes; fall back to legacy single mealType.
+      if (Array.isArray(o.mealTypes) && o.mealTypes.length) r.mealTypes = o.mealTypes;
+      else if (o.mealType) r.mealTypes = [o.mealType];
       if (o.proteinSource !== undefined) r.proteinSource = o.proteinSource;
       if (o.cuisine) r.cuisine = o.cuisine;
-      if (o.tags) r.tags = o.tags;
       if (o.cravings) r.cravings = o.cravings;
+      if (o.carbType) r.carbType = o.carbType;
       if (o.servings) r.servings = o.servings;
       if (o.prepTime !== undefined) r.prepTime = o.prepTime;
-      if (o.batchCook !== undefined) r.batchCook = o.batchCook;
       if (o.costTier !== undefined) r.costTier = o.costTier;
       if (o.source) r.source = o.source;
       if (o.instagramUrl !== undefined) r.instagramUrl = o.instagramUrl;
@@ -1416,7 +1135,37 @@ try {
   }
 } catch(e) {}
 
-let filters = { mealType:'all', protein:'all', cuisine:'all', batch:'all', source:'all', special:'all' };
+// ─── SCHEMA MIGRATION ────────────────────────────────────────────────────────
+// Idempotent: brings cached/loaded recipes onto the new shape on every boot.
+// Old shape: { mealType: string, tags: string[], batchCook: bool }
+// New shape: { mealTypes: string[], cravings: string[], carbType: string }
+function migrateLocalRecipes() {
+  let migrated = 0;
+  for (const r of recipes) {
+    if (!Array.isArray(r.mealTypes) || !r.mealTypes.length) {
+      r.mealTypes = r.mealType ? [r.mealType] : ['dinner'];
+      migrated++;
+    }
+    if (Array.isArray(r.tags) && r.tags.length) {
+      const valid = r.tags.filter(t => ALL_CRAVINGS.includes(t));
+      r.cravings = [...new Set([...(r.cravings || []), ...valid])];
+      migrated++;
+    }
+    if (r.mealType !== undefined) { delete r.mealType; migrated++; }
+    if (r.tags !== undefined)     { delete r.tags;     migrated++; }
+    if (r.batchCook !== undefined){ delete r.batchCook; migrated++; }
+    if (!r.carbType) r.carbType = 'none';
+  }
+  if (migrated > 0) {
+    try { saveCustom(); saveOverrides(); } catch(e) {}
+    localStorage.setItem('ds_schema_version', '2');
+    console.info(`[Daily Shuffle] migrated ${migrated} recipe field(s) to schema v2`);
+  } else if (!localStorage.getItem('ds_schema_version')) {
+    localStorage.setItem('ds_schema_version', '2');
+  }
+}
+
+let filters = { mealType:'all', protein:'all', cuisine:'all', source:'all', special:'all' };
 let activeCravings = new Set();
 let currentPlan = null;
 let groceryChecked = new Set();
@@ -1453,14 +1202,13 @@ function saveOverrides() {
       existing[r.id] = {
         name: r.name,
         description: r.description,
-        mealType: r.mealType,
+        mealTypes: r.mealTypes || [],
         proteinSource: r.proteinSource,
         cuisine: r.cuisine,
-        tags: r.tags || [],
         cravings: r.cravings || [],
+        carbType: r.carbType || 'none',
         servings: r.servings,
         prepTime: r.prepTime,
-        batchCook: r.batchCook,
         costTier: r.costTier,
         source: r.source,
         instagramUrl: r.instagramUrl,
@@ -1578,613 +1326,9 @@ try { const g = localStorage.getItem('ds_grocery'); if(g) groceryChecked = new S
 try { const f = localStorage.getItem('ds_favourites'); if(f) favourites = new Set(JSON.parse(f)); } catch(e){}
 try { const s = localStorage.getItem('ds_serving_overrides'); if(s) servingOverrides = JSON.parse(s); } catch(e){}
 
-// ─── WELLNESS STATE ───────────────────────────────────────────────────────────
-let supplements  = [];  // [{ id, name, dose, timing, note }]
-let suppLog      = {};  // { 'YYYY-MM-DD': [id, ...] } — checked IDs per day
-let savedPosts   = [];  // [{ id, title, url, score, sub, flair }]
-let suppDate     = (() => new Date().toISOString().slice(0,10))();
-let redditSub    = 'PCOS';
-let redditCache  = {};  // { sub: [posts] }
-let suppFormOpen = false;
-
-try { const s = localStorage.getItem('ds_supplements'); if(s) supplements = JSON.parse(s); } catch(e){}
-try { const sl = localStorage.getItem('ds_supp_log');   if(sl) suppLog = JSON.parse(sl); } catch(e){}
-try { const sp = localStorage.getItem('ds_saved_posts'); if(sp) savedPosts = JSON.parse(sp); } catch(e){}
-
-function saveSupplements() { try { localStorage.setItem('ds_supplements', JSON.stringify(supplements)); } catch(e){} }
-function saveSuppLog()     { try { localStorage.setItem('ds_supp_log', JSON.stringify(suppLog));       } catch(e){} }
-function saveSavedPosts()  { try { localStorage.setItem('ds_saved_posts', JSON.stringify(savedPosts));  } catch(e){} }
-
-// ─── TRACK STATE ─────────────────────────────────────────────────────────────
-let trackDate = (() => { const d = new Date(); return d.toISOString().slice(0,10); })();
-let foodLog   = {};   // { 'YYYY-MM-DD': { breakfast:[{type,id,servings}], snack:[], lunch:[], dinner:[], dessert:[] } }
-let targets   = { kcal: 1800, protein: 130, carbs: 180, fat: 60 };
-let pantry    = [];   // [{ id, name, brand, unitLabel, kcal, protein, carbs, fat, aliases:[] }]
-let pantryShowForm = false;
-let pantryEditId   = null;
-
-try { const fl = localStorage.getItem('ds_food_log'); if(fl) foodLog = JSON.parse(fl); } catch(e){}
-try { const tg = localStorage.getItem('ds_targets');  if(tg) targets = { ...targets, ...JSON.parse(tg) }; } catch(e){}
-try { const pt = localStorage.getItem('ds_pantry');   if(pt) pantry  = JSON.parse(pt); } catch(e){}
-
-function saveFoodLog()  { try { localStorage.setItem('ds_food_log', JSON.stringify(foodLog));   } catch(e){} }
-function saveTargets()  {
-  targets.kcal    = parseInt(document.getElementById('target-kcal')?.value,10)    || targets.kcal;
-  targets.protein = parseInt(document.getElementById('target-protein')?.value,10) || targets.protein;
-  targets.carbs   = parseInt(document.getElementById('target-carbs')?.value,10)   || targets.carbs;
-  targets.fat     = parseInt(document.getElementById('target-fat')?.value,10)     || targets.fat;
-  try { localStorage.setItem('ds_targets', JSON.stringify(targets)); } catch(e){}
-  const n = document.getElementById('targetsSavedNotice');
-  if(n) { n.style.display='inline'; setTimeout(()=>n.style.display='none', 2000); }
-  if(document.getElementById('tab-track')?.classList.contains('active')) renderTrackTab();
-}
-function savePantry()   { try { localStorage.setItem('ds_pantry', JSON.stringify(pantry));       } catch(e){} }
-
-// ─── TRACK HELPERS ────────────────────────────────────────────────────────────
-const TRACK_SLOTS = ['breakfast','snack','lunch','dinner','dessert'];
-const TRACK_SLOT_EMOJI = { breakfast:'🌅', snack:'☕', lunch:'🥗', dinner:'🍽', dessert:'🍫' };
-const TRACK_SLOT_LABEL = { breakfast:'Breakfast', snack:'Snack', lunch:'Lunch', dinner:'Dinner', dessert:'Dessert' };
-
-function getDateLabel(dateStr) {
-  const d = new Date(dateStr + 'T12:00:00');
-  const today = new Date(); today.setHours(12,0,0,0);
-  const diff = Math.round((d - today) / 86400000);
-  const dayName = d.toLocaleDateString('en-GB', { weekday:'short' });
-  const dateLabel = d.toLocaleDateString('en-GB', { day:'numeric', month:'short' });
-  if(diff === 0) return { main: 'Today', sub: dateLabel };
-  if(diff === -1) return { main: 'Yesterday', sub: dateLabel };
-  if(diff === 1) return { main: 'Tomorrow', sub: dateLabel };
-  return { main: `${dayName} ${dateLabel}`, sub: '' };
-}
-
-function shiftDate(delta) {
-  const d = new Date(trackDate + 'T12:00:00');
-  d.setDate(d.getDate() + delta);
-  trackDate = d.toISOString().slice(0,10);
-  renderTrackTab();
-}
-
-function goToday() {
-  trackDate = new Date().toISOString().slice(0,10);
-  renderTrackTab();
-}
-
-function ensureDayLog(dateStr) {
-  if (!foodLog[dateStr]) foodLog[dateStr] = { breakfast:[], snack:[], lunch:[], dinner:[], dessert:[] };
-  for (const slot of TRACK_SLOTS) if (!foodLog[dateStr][slot]) foodLog[dateStr][slot] = [];
-  return foodLog[dateStr];
-}
-
-function getEntryMacros(entry) {
-  const srv = entry.servings || 1;
-  if (entry.type === 'recipe') {
-    const fd = RECIPE_FULL_DATA[entry.id];
-    const nut = fd?.nutrition;
-    if (!nut) return null;
-    return {
-      kcal:    Math.round((nut.kcal    || 0) * srv),
-      protein: Math.round((nut.protein || 0) * srv),
-      carbs:   Math.round((nut.carbs   || 0) * srv),
-      fat:     Math.round((nut.fat     || 0) * srv),
-    };
-  }
-  if (entry.type === 'pantry') {
-    const item = pantry.find(p => p.id === entry.id);
-    if (!item) return null;
-    return {
-      kcal:    Math.round((item.kcal    || 0) * srv),
-      protein: Math.round((item.protein || 0) * srv),
-      carbs:   Math.round((item.carbs   || 0) * srv),
-      fat:     Math.round((item.fat     || 0) * srv),
-    };
-  }
-  return null;
-}
-
-function getDayTotals(dateStr) {
-  const day = foodLog[dateStr];
-  if (!day) return { kcal:0, protein:0, carbs:0, fat:0 };
-  const tot = { kcal:0, protein:0, carbs:0, fat:0 };
-  for (const slot of TRACK_SLOTS) {
-    for (const entry of (day[slot]||[])) {
-      const m = getEntryMacros(entry);
-      if (m) { tot.kcal += m.kcal; tot.protein += m.protein; tot.carbs += m.carbs; tot.fat += m.fat; }
-    }
-  }
-  return tot;
-}
-
-function removeLogEntry(slot, idx) {
-  const day = ensureDayLog(trackDate);
-  day[slot].splice(idx, 1);
-  saveFoodLog();
-  renderTrackTab();
-}
-
-function updateLogServings(slot, idx, val) {
-  const n = parseFloat(val);
-  const day = ensureDayLog(trackDate);
-  if (day[slot]?.[idx]) day[slot][idx].servings = n > 0 ? n : 1;
-  saveFoodLog();
-  renderTrackTab();
-}
-
-// ─── TRACK PICKER (extends existing picker overlay) ──────────────────────────
-let trackPickerSlot = null;
-
-function openTrackPicker(slot) {
-  trackPickerSlot = slot;
-  pickerContext = null; // signal: not plan mode
-  document.getElementById('pickerTitle').textContent = `Add to ${TRACK_SLOT_LABEL[slot]||slot}`;
-  document.getElementById('pickerHint').textContent  = 'Pick a recipe or pantry item';
-  document.getElementById('pickerSearch').value = '';
-  filterTrackPicker();
-  document.getElementById('pickerOverlay').classList.add('open');
-  setTimeout(()=>document.getElementById('pickerSearch').focus(), 50);
-}
-
-function filterTrackPicker() {
-  const q = document.getElementById('pickerSearch').value.toLowerCase();
-  const recipeItems = recipes
-    .filter(r => r.name.toLowerCase().includes(q))
-    .map(r => {
-      const nut = RECIPE_FULL_DATA[r.id]?.nutrition;
-      const macroStr = nut ? `${nut.kcal} kcal · ${nut.protein}g protein` : '';
-      return `<div class="picker-item" onclick="selectTrackItem('recipe','${r.id}')">
-        <div class="picker-item-name">${r.name}</div>
-        <div class="picker-item-meta">
-          <span>${TYPE_LABELS[r.mealType]||''}</span>
-          ${macroStr?`<span>${macroStr}</span>`:'<span class="track-no-macros">No macros — estimate first</span>'}
-        </div>
-      </div>`;
-    });
-  const pantryItems = pantry
-    .filter(p => p.name.toLowerCase().includes(q) || (p.brand||'').toLowerCase().includes(q))
-    .map(p => `<div class="picker-item" onclick="selectTrackItem('pantry',${p.id})">
-      <div class="picker-item-name">${p.name}${p.brand?` <span style="font-weight:400;color:var(--text3)">(${p.brand})</span>`:''}</div>
-      <div class="picker-item-meta"><span>🥫 Pantry · ${p.kcal} kcal · ${p.protein}g protein per ${p.unitLabel||'serving'}</span></div>
-    </div>`);
-  const combined = [...pantryItems, ...recipeItems];
-  document.getElementById('pickerList').innerHTML = combined.length
-    ? combined.join('')
-    : '<div style="padding:24px;text-align:center;color:var(--text3)">No matches</div>';
-}
-
-function selectTrackItem(type, id) {
-  if (!trackPickerSlot) return;
-  const day = ensureDayLog(trackDate);
-  day[trackPickerSlot].push({ type, id, servings: 1 });
-  saveFoodLog();
-  closePicker();
-  trackPickerSlot = null;
-  renderTrackTab();
-}
-
-// ─── TRACK RENDER ─────────────────────────────────────────────────────────────
-function renderTrackTab() {
-  const el = document.getElementById('trackLayout'); if (!el) return;
-  const day = foodLog[trackDate] || {};
-  const totals = getDayTotals(trackDate);
-  const { main, sub } = getDateLabel(trackDate);
-  const isToday = trackDate === new Date().toISOString().slice(0,10);
-
-  // Date nav
-  let html = `
-    <div class="track-date-nav">
-      <button class="track-nav-btn" onclick="shiftDate(-1)">‹</button>
-      <div class="track-date-info">
-        <div class="track-date-label">${main}</div>
-        ${sub?`<div class="track-date-sub">${sub}</div>`:''}
-      </div>
-      ${!isToday?`<button class="track-today-btn" onclick="goToday()">Today</button>`:'<div style="width:56px"></div>'}
-      <button class="track-nav-btn" onclick="shiftDate(1)">›</button>
-    </div>`;
-
-  // Meal slots
-  for (const slot of TRACK_SLOTS) {
-    const entries = day[slot] || [];
-    let slotKcal = 0;
-    const entryRows = entries.map((entry, idx) => {
-      const m = getEntryMacros(entry);
-      if (m) slotKcal += m.kcal;
-      const name = entry.type === 'recipe'
-        ? (recipes.find(r => r.id === entry.id)?.name || 'Unknown recipe')
-        : (pantry.find(p => p.id === entry.id)?.name || 'Unknown item');
-      const badge = entry.type === 'pantry' ? `<span style="font-size:10px;color:var(--green);margin-left:4px">🥫</span>` : '';
-      const macroStr = m ? `${m.kcal} kcal · ${m.protein}g P` : '<span class="track-no-macros">no macros</span>';
-      return `<div class="track-entry">
-        <div class="track-entry-name">${name}${badge}</div>
-        <div class="track-entry-srv-wrap">
-          <input class="track-entry-srv" type="number" min="0.5" step="0.5" value="${entry.servings||1}"
-            onchange="updateLogServings('${slot}',${idx},this.value)" title="Servings">
-          <span>×</span>
-        </div>
-        <div class="track-entry-macros">${macroStr}</div>
-        <button class="track-entry-remove" onclick="removeLogEntry('${slot}',${idx})" title="Remove">×</button>
-      </div>`;
-    }).join('');
-
-    html += `<div class="track-slot">
-      <div class="track-slot-header">
-        <div class="track-slot-left">
-          <span class="track-slot-label">${TRACK_SLOT_EMOJI[slot]} ${TRACK_SLOT_LABEL[slot]}</span>
-          ${slotKcal?`<span class="track-slot-kcal">${slotKcal} kcal</span>`:''}
-        </div>
-        <button class="track-add-btn" onclick="openTrackPicker('${slot}')" title="Add food">+</button>
-      </div>
-      <div class="track-slot-entries">
-        ${entryRows || `<div class="track-empty">Nothing logged yet</div>`}
-      </div>
-    </div>`;
-  }
-
-  // Macro totals
-  const pct = (val, target) => Math.min(100, target > 0 ? Math.round(val / target * 100) : 0);
-  const valueClass = (val, target) => val > target * 1.05 ? 'over' : val >= target * 0.9 ? 'ok' : 'low';
-  html += `<div class="track-totals">
-    <div class="track-totals-header">
-      <span class="track-totals-title">Daily Totals</span>
-      <div style="display:flex;align-items:center;gap:8px">
-        <span class="track-totals-kcal">${totals.kcal} / ${targets.kcal} kcal</span>
-        <button class="btn-track-targets" onclick="openCalcModal()" title="Recalculate targets">⚙</button>
-      </div>
-    </div>
-    ${[
-      { key:'protein', label:'Protein', unit:'g', colour:'bar-protein' },
-      { key:'carbs',   label:'Carbs',   unit:'g', colour:'bar-carbs'   },
-      { key:'fat',     label:'Fat',     unit:'g', colour:'bar-fat'     },
-    ].map(m => `<div class="track-macro-row">
-      <div class="track-macro-label">
-        <span class="track-macro-name">${m.label}</span>
-        <span class="track-macro-value ${valueClass(totals[m.key], targets[m.key])}">${totals[m.key]}g / ${targets[m.key]}g</span>
-      </div>
-      <div class="track-bar-bg"><div class="track-bar-fill ${m.colour}" style="width:${pct(totals[m.key],targets[m.key])}%"></div></div>
-    </div>`).join('')}
-    <div class="track-macro-row">
-      <div class="track-macro-label">
-        <span class="track-macro-name">Calories</span>
-        <span class="track-macro-value ${valueClass(totals.kcal, targets.kcal)}">${totals.kcal} / ${targets.kcal} kcal</span>
-      </div>
-      <div class="track-bar-bg"><div class="track-bar-fill bar-kcal" style="width:${pct(totals.kcal,targets.kcal)}%"></div></div>
-    </div>
-  </div>`;
-
-  el.innerHTML = html;
-
-  // Populate target inputs if settings panel is open
-  populateTargetInputs();
-}
-
-// ─── PANTRY ───────────────────────────────────────────────────────────────────
-function renderPantryTab() {
-  const el = document.getElementById('pantryLayout'); if (!el) return;
-  const items = pantry.map(item => `
-    <div class="pantry-item">
-      <div class="pantry-item-info">
-        <div class="pantry-item-name">${item.name}${item.brand?` <span style="font-weight:400;font-size:11px;color:var(--text3)">(${item.brand})</span>`:''}</div>
-        <div class="pantry-item-detail">${item.kcal} kcal · ${item.protein}g P · ${item.carbs}g C · ${item.fat}g F per ${item.unitLabel||'serving'}${item.aliases?.length?` · aliases: ${item.aliases.join(', ')}`:''}</div>
-      </div>
-      <div class="pantry-item-btns">
-        <button class="btn-pi" onclick="openPantryForm(${item.id})">Edit</button>
-        <button class="btn-pi del" onclick="deletePantryItem(${item.id})">×</button>
-      </div>
-    </div>`).join('');
-
-  const emptyMsg = pantry.length === 0 && !pantryShowForm
-    ? `<p style="font-size:13px;color:var(--text3);text-align:center;padding:24px 0">No items yet — add your first product below.</p>`
-    : '';
-
-  const aiPreviewsHtml = pantryAiImages.map((img, i) => `
-    <div class="ai-preview-thumb">
-      <img src="${img.dataUrl}" alt="Preview ${i+1}">
-      <button class="ai-preview-thumb-remove" onclick="removePantryAiImage(${i})" title="Remove">×</button>
-    </div>`).join('');
-
-  el.innerHTML = `
-    <div style="max-width:640px;margin:0 auto;padding:16px 0">
-      <h2 style="font-size:18px;font-weight:700;margin-bottom:4px">🥫 My Pantry</h2>
-      <p style="font-size:12px;color:var(--text3);margin-bottom:16px;line-height:1.5">Save your go-to branded foods with exact macros. They'll appear first when you log food in the Track tab.</p>
-
-      <div class="ai-quick-add" style="margin-bottom:20px">
-        <div class="ai-quick-add-header">
-          <h3>✨ Quick Add with AI</h3>
-          <span class="ai-badge">Claude Haiku</span>
-        </div>
-        <div class="ai-tabs">
-          <button class="ai-tab-btn active" id="pantryAiTabImg" onclick="switchPantryAiTab('image',this)">📷 Screenshot</button>
-          <button class="ai-tab-btn" id="pantryAiTabText" onclick="switchPantryAiTab('text',this)">📋 Paste text</button>
-        </div>
-        <div class="ai-input-panel active" id="pantry-ai-panel-image">
-          <div class="ai-drop-zone" id="pantryAiDropZone">
-            <input type="file" id="pantryAiImageInput" accept="image/*" multiple onchange="handlePantryImageSelect(event)" />
-            <div class="ai-drop-zone-icon">📸</div>
-            <div class="ai-drop-zone-text">Drop a nutrition label screenshot here, or click to choose</div>
-            <div class="ai-drop-zone-sub">Works with product packaging, nutrition labels, or any macro info</div>
-          </div>
-          <div class="ai-preview-grid" id="pantryAiPreviewGrid">${aiPreviewsHtml}</div>
-        </div>
-        <div class="ai-input-panel" id="pantry-ai-panel-text">
-          <textarea class="ai-text-input" id="pantryAiText" placeholder="Paste the product name, brand, and nutrition info here…"></textarea>
-        </div>
-        <div class="ai-actions">
-          <button class="btn-parse" id="btnPantryParse" onclick="parsePantryWithAI()">
-            <span id="pantryParseSpinner" style="display:none">⏳</span>
-            ✨ Parse product
-          </button>
-          <span class="ai-parse-status ${pantryAiStatus.cls}" id="pantryAiStatus">${pantryAiStatus.text}</span>
-        </div>
-      </div>
-
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
-        <div style="flex:1;height:1px;background:var(--border)"></div>
-        <span style="font-size:11px;color:var(--text3);white-space:nowrap">or add manually</span>
-        <div style="flex:1;height:1px;background:var(--border)"></div>
-      </div>
-
-      ${items}
-      ${emptyMsg}
-      ${!pantryShowForm?`<button class="btn-pantry-add" onclick="openPantryForm(null)">+ Add food item</button>`:''}
-      ${pantryShowForm ? buildPantryForm() : ''}
-    </div>`;
-
-  setupPantryDropZone();
-}
-
-function switchPantryAiTab(tab, btn) {
-  document.querySelectorAll('#pantryLayout .ai-tab-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('#pantryLayout .ai-input-panel').forEach(p => p.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('pantry-ai-panel-' + tab).classList.add('active');
-  pantryAiStatus = { text: '', cls: '' };
-  document.getElementById('pantryAiStatus').textContent = '';
-}
-
-function handlePantryImageSelect(evt) {
-  const files = [...(evt.target.files || [])];
-  if (!files.length) return;
-  let loaded = 0;
-  files.forEach(file => {
-    if (!file.type.startsWith('image/')) return;
-    const reader = new FileReader();
-    reader.onload = e => {
-      const dataUrl = e.target.result;
-      const match = dataUrl.match(/^data:(image\/[^;]+);base64,(.+)$/);
-      if (!match) return;
-      pantryAiImages.push({ base64: match[2], mediaType: match[1], dataUrl });
-      loaded++;
-      if (loaded === files.length) {
-        const grid = document.getElementById('pantryAiPreviewGrid');
-        if (grid) grid.innerHTML = pantryAiImages.map((img, i) => `
-          <div class="ai-preview-thumb">
-            <img src="${img.dataUrl}" alt="Preview ${i+1}">
-            <button class="ai-preview-thumb-remove" onclick="removePantryAiImage(${i})" title="Remove">×</button>
-          </div>`).join('');
-      }
-    };
-    reader.readAsDataURL(file);
-  });
-  pantryAiStatus = { text: '', cls: '' };
-}
-
-function removePantryAiImage(idx) {
-  pantryAiImages.splice(idx, 1);
-  const grid = document.getElementById('pantryAiPreviewGrid');
-  if (grid) grid.innerHTML = pantryAiImages.map((img, i) => `
-    <div class="ai-preview-thumb">
-      <img src="${img.dataUrl}" alt="Preview ${i+1}">
-      <button class="ai-preview-thumb-remove" onclick="removePantryAiImage(${i})" title="Remove">×</button>
-    </div>`).join('');
-}
-
-function setupPantryDropZone() {
-  const zone = document.getElementById('pantryAiDropZone');
-  if (!zone || zone._dropSetup) return;
-  zone._dropSetup = true;
-  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
-  zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
-  zone.addEventListener('drop', e => {
-    e.preventDefault();
-    zone.classList.remove('drag-over');
-    const files = [...e.dataTransfer.files].filter(f => f.type.startsWith('image/'));
-    if (files.length) handlePantryImageSelect({ target: { files } });
-  });
-}
-
-async function parsePantryWithAI() {
-  const key = localStorage.getItem('ds_api_key');
-  if (!key) { openSettings(); return; }
-
-  const activePanel = document.querySelector('#pantryLayout .ai-input-panel.active');
-  const isImagePanel = activePanel?.id === 'pantry-ai-panel-image';
-  const statusEl = document.getElementById('pantryAiStatus');
-  const spinner  = document.getElementById('pantryParseSpinner');
-  const btn      = document.getElementById('btnPantryParse');
-
-  if (isImagePanel && !pantryAiImages.length) {
-    pantryAiStatus = { text: 'Please select at least one image first.', cls: 'error' };
-    statusEl.textContent = pantryAiStatus.text;
-    statusEl.className = 'ai-parse-status error';
-    return;
-  }
-  const pastedText = document.getElementById('pantryAiText')?.value.trim() || '';
-  if (!isImagePanel && !pastedText) {
-    pantryAiStatus = { text: 'Please paste some product info first.', cls: 'error' };
-    statusEl.textContent = pantryAiStatus.text;
-    statusEl.className = 'ai-parse-status error';
-    return;
-  }
-
-  btn.disabled = true;
-  spinner.style.display = 'inline';
-  statusEl.textContent = 'Parsing…';
-  statusEl.className = 'ai-parse-status';
-
-  const systemPrompt = `You are a nutrition label parser. Extract product information from nutrition labels, packaging photos, or product descriptions and return ONLY a valid JSON object — no markdown, no explanation.
-
-{
-  "name": string,
-  "brand": string | null,
-  "kcal": number,
-  "protein": number,
-  "carbs": number,
-  "fat": number,
-  "unitLabel": string,
-  "aliases": [string]
-}
-
-Rules:
-- Extract macros PER SERVING (not per 100g unless that IS the serving size)
-- Round all macro values to 1 decimal place
-- unitLabel should clearly describe the serving, e.g. "30g scoop", "1 sausage (85g)", "100ml", "1 bar (45g)"
-- aliases: 2–4 lowercase shorthand names useful for search, e.g. ["protein powder", "whey", "free soul"]
-- Return ONLY the JSON. No other text.`;
-
-  const userContent = isImagePanel
-    ? [
-        ...pantryAiImages.map(img => ({ type: 'image', source: { type: 'base64', media_type: img.mediaType, data: img.base64 } })),
-        { type: 'text', text: `Extract this product's nutrition info into the specified JSON format.${pantryAiImages.length > 1 ? ' Information may be spread across multiple images — combine it.' : ''}` }
-      ]
-    : [{ type: 'text', text: 'Extract this product\'s nutrition info into the specified JSON format:\n\n' + pastedText }];
-
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': key,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 512,
-        system: systemPrompt,
-        messages: [{ role: 'user', content: userContent }]
-      })
-    });
-
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.error?.message || `API error ${res.status}`);
-    }
-
-    const data = await res.json();
-    const raw  = data.content?.[0]?.text || '';
-    const cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
-    const parsed  = JSON.parse(cleaned);
-
-    pantryAiStatus = { text: '✓ Form pre-filled — review and save!', cls: 'success' };
-    pantryShowForm = true;
-    pantryEditId   = null;
-    renderPantryTab();
-
-    setTimeout(() => {
-      const set = (id, val) => { const el = document.getElementById(id); if (el && val != null) el.value = val; };
-      set('pf-name',    parsed.name);
-      set('pf-brand',   parsed.brand);
-      set('pf-kcal',    parsed.kcal);
-      set('pf-protein', parsed.protein);
-      set('pf-carbs',   parsed.carbs);
-      set('pf-fat',     parsed.fat);
-      set('pf-unit',    parsed.unitLabel);
-      if (parsed.aliases?.length) {
-        const el = document.getElementById('pf-aliases');
-        if (el) el.value = parsed.aliases.join(', ');
-      }
-      document.getElementById('pantryForm')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 50);
-
-  } catch (err) {
-    console.error(err);
-    pantryAiStatus = { text: '⚠ ' + (err.message || 'Something went wrong. Check your API key and try again.'), cls: 'error' };
-    statusEl.textContent = pantryAiStatus.text;
-    statusEl.className = 'ai-parse-status error';
-  } finally {
-    const b = document.getElementById('btnPantryParse');
-    const s = document.getElementById('pantryParseSpinner');
-    if (b) b.disabled = false;
-    if (s) s.style.display = 'none';
-  }
-}
-
-function buildPantryForm() {
-  const item = pantryEditId !== null ? pantry.find(p => p.id === pantryEditId) : null;
-  return `<div class="pantry-form" id="pantryForm">
-    <div class="pantry-form-grid">
-      <div class="pf-group"><label>Name *</label><input id="pf-name" value="${item?.name||''}" placeholder="e.g. Protein Powder"></div>
-      <div class="pf-group"><label>Brand</label><input id="pf-brand" value="${item?.brand||''}" placeholder="e.g. Free Soul"></div>
-    </div>
-    <div class="pantry-form-grid four">
-      <div class="pf-group"><label>Kcal</label><input type="number" id="pf-kcal" value="${item?.kcal||''}" placeholder="105"></div>
-      <div class="pf-group"><label>Protein (g)</label><input type="number" id="pf-protein" value="${item?.protein||''}" placeholder="20"></div>
-      <div class="pf-group"><label>Carbs (g)</label><input type="number" id="pf-carbs" value="${item?.carbs||''}" placeholder="5"></div>
-      <div class="pf-group"><label>Fat (g)</label><input type="number" id="pf-fat" value="${item?.fat||''}" placeholder="2"></div>
-    </div>
-    <div class="pantry-form-grid">
-      <div class="pf-group"><label>Per unit / serving label</label><input id="pf-unit" value="${item?.unitLabel||''}" placeholder="e.g. 30g scoop"></div>
-      <div class="pf-group"><label>Aliases (comma-separated)</label><input id="pf-aliases" value="${(item?.aliases||[]).join(', ')}" placeholder="protein powder, whey"></div>
-    </div>
-    <div class="pantry-form-actions">
-      <button class="btn-pf-save" onclick="savePantryItem()">Save</button>
-      <button class="btn-pf-cancel" onclick="closePantryForm()">Cancel</button>
-    </div>
-  </div>`;
-}
-
-function openPantryForm(id) {
-  pantryShowForm = true;
-  pantryEditId = id;
-  renderPantryTab();
-  setTimeout(() => document.getElementById('pf-name')?.focus(), 50);
-}
-
-function closePantryForm() {
-  pantryShowForm = false;
-  pantryEditId   = null;
-  pantryAiStatus = { text: '', cls: '' };
-  renderPantryTab();
-}
-
-function savePantryItem() {
-  const name = document.getElementById('pf-name')?.value.trim();
-  if (!name) { alert('Name is required'); return; }
-  const item = {
-    id:        pantryEditId !== null ? pantryEditId : Date.now(),
-    name,
-    brand:     document.getElementById('pf-brand')?.value.trim() || '',
-    kcal:      parseFloat(document.getElementById('pf-kcal')?.value)    || 0,
-    protein:   parseFloat(document.getElementById('pf-protein')?.value) || 0,
-    carbs:     parseFloat(document.getElementById('pf-carbs')?.value)   || 0,
-    fat:       parseFloat(document.getElementById('pf-fat')?.value)     || 0,
-    unitLabel: document.getElementById('pf-unit')?.value.trim()         || 'serving',
-    aliases:   document.getElementById('pf-aliases')?.value.split(',').map(s=>s.trim().toLowerCase()).filter(Boolean) || [],
-  };
-  if (pantryEditId !== null) {
-    const idx = pantry.findIndex(p => p.id === pantryEditId);
-    if (idx !== -1) pantry[idx] = item; else pantry.push(item);
-  } else {
-    pantry.push(item);
-  }
-  savePantry();
-  pantryShowForm = false;
-  pantryEditId = null;
-  renderPantryTab();
-}
-
-function deletePantryItem(id) {
-  pantry = pantry.filter(p => p.id !== id);
-  savePantry();
-  renderPantryTab();
-}
-
-// ─── SETTINGS HELPERS ────────────────────────────────────────────────────────
-function populateTargetInputs() {
-  const map = { 'target-kcal': targets.kcal, 'target-protein': targets.protein, 'target-carbs': targets.carbs, 'target-fat': targets.fat };
-  for (const [id, val] of Object.entries(map)) {
-    const el = document.getElementById(id);
-    if (el && !el.value) el.value = val;
-  }
-}
+// Stripped: WELLNESS STATE, TRACK STATE, PANTRY STATE moved to legacy/{wellness,track,pantry}.js
+// The AI plan prompt still reads `targets` for kcal/protein hints — keep a frozen default.
+const targets = { kcal: 1800, protein: 130, carbs: 180, fat: 60 };
 
 // Load persisted AI nutrition estimates into RECIPE_FULL_DATA
 try {
@@ -2203,126 +1347,6 @@ try {
   }
 } catch(e) {}
 
-// ─── DISCOVER STATE ──────────────────────────────────────────────────────────
-let edamamAppId  = localStorage.getItem('ds_edamam_id')  || '';
-let edamamAppKey = localStorage.getItem('ds_edamam_key') || '';
-let discoverItems = []; // cached last search results for addDiscoverRecipe()
-
-function saveEdamamKeys() {
-  const idEl  = document.getElementById('edamamAppIdInput');
-  const keyEl = document.getElementById('edamamAppKeyInput');
-  if (idEl?.value.trim())  { edamamAppId  = idEl.value.trim();  localStorage.setItem('ds_edamam_id',  edamamAppId);  }
-  if (keyEl?.value.trim()) { edamamAppKey = keyEl.value.trim(); localStorage.setItem('ds_edamam_key', edamamAppKey); }
-  const n = document.getElementById('edamamKeysSavedNotice');
-  if (n) { n.style.display='inline'; setTimeout(()=>n.style.display='none', 2000); }
-}
-
-// ─── DISCOVER SEARCH ─────────────────────────────────────────────────────────
-async function searchRecipes() {
-  const resultsEl = document.getElementById('discoverResults');
-  if (!edamamAppId || !edamamAppKey) {
-    resultsEl.innerHTML = `<div class="discover-no-key">
-      <p>No Edamam API keys saved yet.</p>
-      <p>Set them up in <a onclick="openSettings()">⚙ Settings</a> — it only takes a minute and it's free.</p>
-    </div>`;
-    return;
-  }
-
-  const rawQuery = (document.getElementById('discoverInput')?.value || '').trim();
-  if (!rawQuery) return;
-
-  const btn = document.getElementById('btnDiscoverSearch');
-  if (btn) { btn.disabled = true; btn.textContent = '⏳ Searching…'; }
-  resultsEl.innerHTML = '<div class="discover-status">Searching…</div>';
-
-  try {
-    const url = `https://api.edamam.com/api/recipes/v2?type=public&q=${encodeURIComponent(rawQuery)}&app_id=${encodeURIComponent(edamamAppId)}&app_key=${encodeURIComponent(edamamAppKey)}&health=gluten-free&health=dairy-free`;
-    const res = await fetch(url, { headers: { 'Edamam-Account-User': edamamAppId } });
-    if (!res.ok) {
-      const err = await res.json().catch(()=>({}));
-      const msg = err.message || `HTTP ${res.status}`;
-      throw new Error(msg);
-    }
-    const data = await res.json();
-    discoverItems = (data.hits || []).map(h => h.recipe);
-    if (!discoverItems.length) {
-      resultsEl.innerHTML = '<div class="discover-status">No results found. Try different keywords.</div>';
-      return;
-    }
-    renderDiscoverResults(discoverItems);
-  } catch (err) {
-    resultsEl.innerHTML = `<div class="discover-status" style="color:#c87070">Search failed: ${err.message}</div>`;
-  } finally {
-    if (btn) { btn.disabled = false; btn.textContent = 'Search'; }
-  }
-}
-
-function renderDiscoverResults(items) {
-  const el = document.getElementById('discoverResults');
-  el.innerHTML = `<div class="discover-results">${items.map((recipe, i) => {
-    const thumb = recipe.image || '';
-    const site  = recipe.source || '';
-    const kcal    = recipe.calories && recipe.yield ? Math.round(recipe.calories / recipe.yield) : null;
-    const protein = recipe.totalNutrients?.PROCNT?.quantity && recipe.yield ? Math.round(recipe.totalNutrients.PROCNT.quantity / recipe.yield) : null;
-    const macroStr = (kcal || protein) ? [kcal ? `${kcal} kcal` : null, protein ? `${protein}g protein` : null].filter(Boolean).join(' · ') + ' per serving' : '';
-    const thumbHtml = thumb
-      ? `<img class="discover-thumb" src="${thumb}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
-        + `<div class="discover-thumb-ph" style="display:none">🍽</div>`
-      : `<div class="discover-thumb-ph">🍽</div>`;
-
-    return `<div class="discover-card">
-      ${thumbHtml}
-      <div class="discover-card-body">
-        <div class="discover-card-title">${recipe.label||'Recipe'}</div>
-        <div class="discover-card-site">${site}${macroStr ? ` <span class="discover-rich-badge">· ${macroStr}</span>` : ''}</div>
-        <div class="discover-card-snippet">${recipe.ingredientLines?.slice(0,3).join(', ')||''}</div>
-        <div class="discover-card-actions">
-          <button class="btn-discover-add" onclick="addDiscoverRecipe(${i})">＋ Add to Library</button>
-          <a class="btn-discover-open" href="${recipe.url}" target="_blank" rel="noopener">Open ↗</a>
-        </div>
-      </div>
-    </div>`;
-  }).join('')}</div>`;
-}
-
-function addDiscoverRecipe(idx) {
-  const recipe = discoverItems[idx]; if (!recipe) return;
-
-  const lines = [];
-  lines.push(`RECIPE SOURCE: ${recipe.url}`);
-  lines.push(`TITLE: ${recipe.label||''}`);
-  if (recipe.yield)                        lines.push(`SERVINGS: ${recipe.yield}`);
-  if (recipe.calories && recipe.yield)     lines.push(`CALORIES PER SERVING: ${Math.round(recipe.calories / recipe.yield)} kcal`);
-
-  const n = recipe.totalNutrients || {};
-  const perServing = key => recipe.yield && n[key]?.quantity ? Math.round(n[key].quantity / recipe.yield) : null;
-  const macros = [
-    n.PROCNT ? `Protein: ${perServing('PROCNT')}g` : null,
-    n.CHOCDF ? `Carbs: ${perServing('CHOCDF')}g`   : null,
-    n.FAT    ? `Fat: ${perServing('FAT')}g`         : null,
-  ].filter(Boolean);
-  if (macros.length) lines.push(`MACROS PER SERVING: ${macros.join(', ')}`);
-  if (recipe.dietLabels?.length)   lines.push(`DIET: ${recipe.dietLabels.join(', ')}`);
-  if (recipe.healthLabels?.length) lines.push(`HEALTH LABELS: ${recipe.healthLabels.join(', ')}`);
-  if (recipe.ingredientLines?.length) lines.push(`\nINGREDIENTS:\n${recipe.ingredientLines.join('\n')}`);
-
-  const textBlob = lines.join('\n');
-
-  // Switch to Add Recipe tab, activate text panel, pre-fill textarea
-  const addBtn = [...document.querySelectorAll('nav button')].find(b => b.textContent.includes('Add Recipe'));
-  if (addBtn) switchTab('add', addBtn);
-
-  const textPanelBtn = document.querySelector('.ai-tab-btn:not(:first-child)');
-  if (textPanelBtn) switchAiTab('text', textPanelBtn);
-
-  const ta = document.getElementById('aiTextInput');
-  if (ta) { ta.value = textBlob; ta.focus(); }
-
-  const statusEl = document.getElementById('aiParseStatus');
-  if (statusEl) { statusEl.textContent = '✓ Rich recipe data loaded — hit Parse!'; statusEl.className = 'ai-parse-status success'; }
-
-  showToast('✓ Recipe data loaded — review and parse');
-}
 
 // ─── TAB SWITCHING ─────────────────────────────────────────────────────────
 function switchTab(tab, btn) {
@@ -2331,12 +1355,6 @@ function switchTab(tab, btn) {
   document.getElementById('tab-'+tab).classList.add('active');
   if(btn) btn.classList.add('active');
   if(tab==='recipes') renderRecipes();
-  if(tab==='track') {
-    renderTrackTab();
-    if (!localStorage.getItem('ds_targets')) setTimeout(openCalcModal, 200);
-  }
-  if(tab==='pantry') renderPantryTab();
-  if(tab==='wellness') renderWellnessTab();
 }
 
 // ─── FILTERS ───────────────────────────────────────────────────────────────
@@ -2351,13 +1369,13 @@ function getFilteredRecipes() {
   const search = (document.getElementById('searchInput')||{}).value||'';
   return recipes.filter(r => {
     if(hiddenRecipes.has(r.id)) return false;
+    const types = r.mealTypes || [];
     if(filters.mealType !== 'all') {
-      if(filters.mealType==='dessert' && r.mealType!=='dessert' && r.mealType!=='snack') return false;
-      if(filters.mealType!=='dessert' && r.mealType!==filters.mealType) return false;
+      const wanted = filters.mealType === 'dessert' ? ['dessert','snack'] : [filters.mealType];
+      if(!wanted.some(t => types.includes(t))) return false;
     }
     if(filters.protein!=='all' && r.proteinSource!==filters.protein) return false;
     if(filters.cuisine!=='all' && r.cuisine!==filters.cuisine) return false;
-    if(filters.batch!=='all' && String(r.batchCook)!==filters.batch) return false;
     if(filters.source!=='all' && r.source!==filters.source) return false;
     if(filters.special==='favourites' && !favourites.has(r.id)) return false;
     if(search && !r.name.toLowerCase().includes(search.toLowerCase()) && !(r.description||'').toLowerCase().includes(search.toLowerCase())) return false;
@@ -2378,21 +1396,26 @@ function renderRecipes() {
   if(!grid) return;
   cnt.textContent = `${filtered.length} recipe${filtered.length!==1?'s':''}`;
   if(!filtered.length) { grid.innerHTML='<div class="no-results"><p>No recipes match those filters.</p></div>'; return; }
-  grid.innerHTML = filtered.map(r => `
+  grid.innerHTML = filtered.map(r => {
+    const types = r.mealTypes || [];
+    const primary = types[0] || '';
+    const typeLabel = types.length > 1
+      ? types.map(t => TYPE_LABELS[t] || t).join(' · ')
+      : (TYPE_LABELS[primary] || primary);
+    return `
     <div class="recipe-card" onclick="openModal('${r.id}')">
       <button class="fav-btn${favourites.has(r.id)?' active':''}" onclick="toggleFav(event,'${r.id}')" title="${favourites.has(r.id)?'Remove from favourites':'Add to favourites'}">♥</button>
-      <div class="card-meal-type ${TYPE_CLASSES[r.mealType]||''}">${TYPE_LABELS[r.mealType]||r.mealType}</div>
+      <div class="card-meal-type ${TYPE_CLASSES[primary]||''}">${typeLabel}</div>
       <div class="card-name">${r.name}</div>
       <div class="card-tags">
         <span class="card-tag">${CUISINE_EMOJI[r.cuisine]||''} ${r.cuisine.charAt(0).toUpperCase()+r.cuisine.slice(1)}</span>
         <span class="card-tag">${PROTEIN_EMOJI[r.proteinSource]||''} ${r.proteinSource.charAt(0).toUpperCase()+r.proteinSource.slice(1)}</span>
-        ${r.batchCook?'<span class="card-tag green">⚡ Batch</span>':''}
         ${'£'.repeat(r.costTier)?`<span class="card-tag">${'£'.repeat(r.costTier)}</span>`:''}
         ${r.prepTime?`<span class="card-tag">⏱ ${r.prepTime}</span>`:''}
         ${r.source==='instagram'?'<span class="card-tag accent">📱 Insta</span>':''}
       </div>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 }
 
 // ─── MODAL ──────────────────────────────────────────────────────────────────
@@ -2504,21 +1527,23 @@ function openModal(id) {
 
   const isFav = favourites.has(r.id);
 
+  const types = r.mealTypes || [];
+  const primaryType = types[0] || '';
+  const typeLabel = types.map(t => TYPE_LABELS[t] || t).join(' · ');
+
   document.getElementById('modalContent').innerHTML = `
     <button class="modal-close" onclick="closeModal()">×</button>
     <button class="modal-fav-btn${isFav?' active':''}" style="position:absolute;top:16px;right:56px" onclick="toggleFav(null,'${r.id}')" title="${isFav?'Remove from favourites':'Add to favourites'}">${isFav?'♥ Saved':'♡ Save'}</button>
-    <div class="modal-type ${TYPE_CLASSES[r.mealType]||''}">${TYPE_LABELS[r.mealType]||r.mealType} · ${CUISINE_EMOJI[r.cuisine]||''} ${r.cuisine.charAt(0).toUpperCase()+r.cuisine.slice(1)}</div>
+    <div class="modal-type ${TYPE_CLASSES[primaryType]||''}">${typeLabel} · ${CUISINE_EMOJI[r.cuisine]||''} ${r.cuisine.charAt(0).toUpperCase()+r.cuisine.slice(1)}</div>
     <div class="modal-title">${r.name}</div>
     ${r.description?`<div class="modal-desc">${r.description}</div>`:''}
     <div class="modal-meta">
       ${r.servings?`<div class="modal-meta-item">👥 <span class="servings-override">Serves <input class="servings-input" type="number" min="1" value="${displayServings}" onchange="updateServingOverride('${r.id}',this.value)" title="Change serving count to rescale nutrition"></span></div>`:''}
       ${r.prepTime?`<div class="modal-meta-item">⏱ <strong>${r.prepTime}</strong></div>`:''}
-      ${r.batchCook?`<div class="modal-meta-item">⚡ <strong style="color:var(--green)">Batch-friendly</strong></div>`:''}
       ${'£'.repeat(r.costTier)?`<div class="modal-meta-item">💷 <strong>${'£'.repeat(r.costTier)}</strong></div>`:''}
       ${unitToggleHtml}
     </div>
     ${multiplierHtml}
-    ${r.tags&&r.tags.length?`<div class="modal-section"><h4>Tags</h4><div class="modal-tags" id="modal-tags-display">${r.tags.map(t=>`<span class="modal-tag">${t}</span>`).join('')}</div></div>`:'<div class="modal-section" id="modal-tags-section"><div class="modal-tags" id="modal-tags-display"></div></div>'}
     <div style="display:flex;gap:8px;align-items:center;margin:4px 0 8px">
       <button class="btn-edit-open" onclick="openTagEditor('${r.id}')">✏️ Edit recipe</button>
       <button class="btn-edit-open" style="color:var(--accent);opacity:.7" onclick="deleteRecipe('${r.id}')">🗑 Delete</button>
@@ -2585,18 +1610,8 @@ function updateServingOverride(id, val) {
 }
 
 // ─── TAG EDITOR ──────────────────────────────────────────────────────────────
-const ALL_CRAVINGS = [
-  {value:'asian', label:'🥢 Asian'}, {value:'mexican', label:'🌮 Mexican'},
-  {value:'comfort', label:'🏠 Comfort'}, {value:'spicy', label:'🌶 Spicy'},
-  {value:'brothy', label:'🫕 Brothy'}, {value:'noodles', label:'🍜 Noodles'},
-  {value:'light', label:'🥗 Light'}, {value:'healthy', label:'💚 Healthy'},
-  {value:'simple', label:'🍳 Simple'}, {value:'chicken', label:'🐓 Chicken'},
-  {value:'beef', label:'🥩 Beef'}, {value:'tofu', label:'🌱 Tofu'},
-  {value:'sweet', label:'🍫 Sweet'}, {value:'fresh', label:'🥬 Fresh'}
-];
-
-let _editorTags = [];
-let _editorCravings = new Set();
+let _editorMealTypes = new Set();
+let _editorCravings  = new Set();
 let _editorIngredients = []; // [{type:'group'|'item', text:''}]
 let _editorMethod = [];      // ['step text', ...]
 
@@ -2605,8 +1620,8 @@ function openTagEditor(id) {
   const fd = RECIPE_FULL_DATA[r.id] || {};
 
   // Initialise editor state
-  _editorTags = [...(r.tags || [])];
-  _editorCravings = new Set(r.cravings || []);
+  _editorMealTypes = new Set(r.mealTypes || []);
+  _editorCravings  = new Set(r.cravings  || []);
   // Convert ingredients [{group,item}] to flat editor rows [{type,text}]
   _editorIngredients = [];
   let lastGroup = null;
@@ -2651,7 +1666,7 @@ function openTagEditor(id) {
           <input class="edit-full-input" id="edit-prepTime" placeholder="e.g. 20 mins" value="${r.prepTime||''}">
         </div>
         <div class="edit-field-group">
-          <label>Cost tier</label>
+          <label>Cost tier <span style="font-weight:400;color:var(--text3);font-size:10px">(fallback)</span></label>
           <select class="edit-meta-select" id="edit-costTier">
             <option value="" ${!r.costTier?'selected':''}>None</option>
             <option value="1" ${r.costTier===1?'selected':''}>£</option>
@@ -2660,23 +1675,12 @@ function openTagEditor(id) {
           </select>
         </div>
       </div>
-      <div class="edit-checkbox-row">
-        <input type="checkbox" id="edit-batchCook" ${r.batchCook?'checked':''}>
-        <label for="edit-batchCook">Batch-friendly</label>
-      </div>
+
+      <div class="edit-section-divider">Meal types <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text3);font-size:11px">(pick any that apply)</span></div>
+      <div class="craving-edit-tags" id="editor-mealtypes-display"></div>
 
       <div class="edit-section-divider">Categories</div>
       <div class="edit-meta-grid">
-        <div>
-          <span class="tag-editor-sublabel">Meal type</span>
-          <select class="edit-meta-select" id="edit-mealType">
-            <option value="breakfast" ${r.mealType==='breakfast'?'selected':''}>Breakfast</option>
-            <option value="lunch" ${r.mealType==='lunch'?'selected':''}>Lunch</option>
-            <option value="dinner" ${r.mealType==='dinner'?'selected':''}>Dinner</option>
-            <option value="sides" ${r.mealType==='sides'?'selected':''}>Sides</option>
-            <option value="dessert" ${r.mealType==='dessert'?'selected':''}>Dessert / Snack</option>
-          </select>
-        </div>
         <div>
           <span class="tag-editor-sublabel">Protein source</span>
           <select class="edit-meta-select" id="edit-protein">
@@ -2707,16 +1711,15 @@ function openTagEditor(id) {
             <option value="other" ${r.cuisine==='other'?'selected':''}>🍴 Other</option>
           </select>
         </div>
+        <div>
+          <span class="tag-editor-sublabel">Carb type</span>
+          <select class="edit-meta-select" id="edit-carbType">
+            ${CARB_TYPES.map(t => `<option value="${t}" ${(r.carbType||'none')===t?'selected':''}>${CARB_TYPE_LABELS[t]}</option>`).join('')}
+          </select>
+        </div>
       </div>
 
-      <div class="edit-section-divider">Tags &amp; Mood</div>
-      <span class="tag-editor-sublabel">Tags</span>
-      <div class="editable-tags" id="editor-tags-display"></div>
-      <div class="tag-add-row">
-        <input type="text" class="tag-add-input" id="newTagInput" placeholder="Add a tag…" onkeydown="if(event.key==='Enter'){addEditorTag();event.preventDefault();}">
-        <button class="tag-add-btn" onclick="addEditorTag()">+ Add</button>
-      </div>
-      <span class="tag-editor-sublabel">Cravings / mood</span>
+      <div class="edit-section-divider">Cravings / mood</div>
       <div class="craving-edit-tags" id="editor-cravings-display"></div>
 
       <div class="edit-section-divider">Ingredients</div>
@@ -2760,38 +1763,29 @@ function openTagEditor(id) {
       </div>
     </div>`;
 
-  renderEditorTags();
+  renderEditorMealTypes();
   renderEditorCravings();
   renderEditorIngredients();
   renderEditorMethod();
 }
 
-function renderEditorTags() {
-  const el = document.getElementById('editor-tags-display'); if (!el) return;
-  el.innerHTML = _editorTags.map((t, i) => `
-    <span class="editable-tag">${t}<button class="remove-tag" onclick="removeEditorTag(${i})" title="Remove">×</button></span>
+function renderEditorMealTypes() {
+  const el = document.getElementById('editor-mealtypes-display'); if (!el) return;
+  el.innerHTML = MEAL_TYPES.map(t => `
+    <span class="craving-edit-tag${_editorMealTypes.has(t)?' active':''}" onclick="toggleEditorMealType('${t}',this)">${MEAL_TYPE_LABELS[t]}</span>
   `).join('');
+}
+
+function toggleEditorMealType(val, el) {
+  if (_editorMealTypes.has(val)) { _editorMealTypes.delete(val); el.classList.remove('active'); }
+  else { _editorMealTypes.add(val); el.classList.add('active'); }
 }
 
 function renderEditorCravings() {
   const el = document.getElementById('editor-cravings-display'); if (!el) return;
-  el.innerHTML = ALL_CRAVINGS.map(c => `
-    <span class="craving-edit-tag${_editorCravings.has(c.value)?' active':''}" onclick="toggleEditorCraving('${c.value}',this)">${c.label}</span>
+  el.innerHTML = ALL_CRAVINGS.map(v => `
+    <span class="craving-edit-tag${_editorCravings.has(v)?' active':''}" onclick="toggleEditorCraving('${v}',this)">${CRAVING_LABELS[v]||v}</span>
   `).join('');
-}
-
-function addEditorTag() {
-  const input = document.getElementById('newTagInput'); if (!input) return;
-  const val = input.value.trim().toLowerCase().replace(/\s+/g,'-');
-  if (!val || _editorTags.includes(val)) { input.value=''; return; }
-  _editorTags.push(val);
-  input.value = '';
-  renderEditorTags();
-}
-
-function removeEditorTag(idx) {
-  _editorTags.splice(idx, 1);
-  renderEditorTags();
 }
 
 function toggleEditorCraving(val, el) {
@@ -2861,18 +1855,17 @@ function saveRecipeEdits(id) {
   // Read all fields from editor inputs
   const name        = document.getElementById('edit-name')?.value.trim() || r.name;
   const description = document.getElementById('edit-description')?.value || '';
-  const mealType    = document.getElementById('edit-mealType')?.value || r.mealType;
+  const mealTypes   = _editorMealTypes.size ? [..._editorMealTypes] : (r.mealTypes || ['dinner']);
   const proteinSource = document.getElementById('edit-protein')?.value || r.proteinSource;
   const cuisine     = document.getElementById('edit-cuisine')?.value || r.cuisine;
+  const carbType    = document.getElementById('edit-carbType')?.value || r.carbType || 'none';
   const servings    = parseInt(document.getElementById('edit-servings')?.value, 10) || r.servings;
   const prepTime    = document.getElementById('edit-prepTime')?.value || '';
-  const batchCook   = document.getElementById('edit-batchCook')?.checked ?? r.batchCook;
   const costTier    = parseInt(document.getElementById('edit-costTier')?.value, 10) || 0;
   const notes       = document.getElementById('edit-notes')?.value || '';
   const instagramUrl = document.getElementById('edit-instagramUrl')?.value.trim() || '';
   const tips        = document.getElementById('edit-tips')?.value || '';
   const storage     = document.getElementById('edit-storage')?.value || '';
-  const tags        = [..._editorTags];
   const cravings    = [..._editorCravings];
 
   // Sync current input values for ingredients (in case oninput didn't fire on last edit)
@@ -2895,16 +1888,15 @@ function saveRecipeEdits(id) {
   // Apply to recipe in memory
   r.name = name;
   r.description = description;
-  r.mealType = mealType;
+  r.mealTypes = mealTypes;
   r.proteinSource = proteinSource;
   r.cuisine = cuisine;
+  r.carbType = carbType;
   r.servings = servings;
   r.prepTime = prepTime;
-  r.batchCook = batchCook;
   r.costTier = costTier || undefined;
   r.notes = notes;
   r.instagramUrl = instagramUrl;
-  r.tags = tags;
   r.cravings = cravings;
 
   // Apply full data to RECIPE_FULL_DATA
@@ -2920,10 +1912,6 @@ function saveRecipeEdits(id) {
 
   // Patch shared Supabase library (fire-and-forget)
   patchRecipeToLibrary(r.id);
-
-  // Update visible modal elements without closing
-  const tagsDisplay = document.getElementById('modal-tags-display');
-  if (tagsDisplay) tagsDisplay.innerHTML = tags.map(t=>`<span class="modal-tag">${t}</span>`).join('');
 
   // Saved notice + highlight Re-estimate button if ingredients were edited
   const notice = document.getElementById('editSavedNotice');
@@ -2961,13 +1949,17 @@ async function patchRecipeToLibrary(id) {
   const payload = {
     name: r.name,
     subtitle: r.description || null,
-    meal_type: r.mealType,
+    // Forward-compat: send `meal_types` (new). Also send `meal_type` (legacy
+    // singular) so old cloud schemas still get a valid value — older readers
+    // ignore meal_types, newer readers prefer it.
+    meal_type: (r.mealTypes && r.mealTypes[0]) || 'dinner',
+    meal_types: r.mealTypes || [],
     protein_source: r.proteinSource || null,
     cuisine: r.cuisine,
+    carb_type: r.carbType || 'none',
+    craving_tags: r.cravings || [],
     serves: r.servings,
     prep_cook_time: r.prepTime || null,
-    batch_friendly: r.batchCook,
-    tags: r.tags || [],
     notes: r.notes || null,
     ingredient_sections: sectionMap.length ? sectionMap : null,
     method_steps: fd.method?.length ? fd.method : null,
@@ -3163,23 +2155,22 @@ function generatePlan() {
     alert('Select at least one meal slot to plan for.'); return;
   }
 
+  const hasType = (r, t) => (r.mealTypes || []).includes(t);
   // Breakfast pool (all breakfast recipes)
-  const bfPool = recipes.filter(r=>r.mealType==='breakfast');
-  // Dinner pool: batch-cook only, filtered by cravings
-  const dinPool = recipes.filter(r=>r.mealType==='dinner' && r.batchCook && matchesCravings(r));
-  // Fallback if no batch-cook dinners match cravings — relax the craving filter
-  const dinPoolFallback = recipes.filter(r=>r.mealType==='dinner' && r.batchCook);
+  const bfPool = recipes.filter(r => hasType(r, 'breakfast'));
+  // Dinner pool: filtered by cravings (batch-friendly is now assumed for every recipe)
+  const dinPool = recipes.filter(r => hasType(r, 'dinner') && matchesCravings(r));
+  // Fallback if no dinners match cravings — relax the craving filter
+  const dinPoolFallback = recipes.filter(r => hasType(r, 'dinner'));
   const activeDinPool = dinPool.length ? dinPool : dinPoolFallback;
-  // Dessert pool
-  const chiaP = recipes.find(r=>r.id===10);
-  const brownieP = recipes.find(r=>r.id===11) || recipes.find(r=>r.id===12);
-  const dessertPool = recipes.filter(r=>r.mealType==='dessert');
+  // Dessert pool — straightforward filter, no hardcoded ID specials
+  const dessertPool = recipes.filter(r => hasType(r, 'dessert') || hasType(r, 'snack'));
 
   if(activeSlots.breakfast && !bfPool.length) {
     alert('No breakfast recipes in your library yet.'); return;
   }
   if(activeSlots.dinner && !activeDinPool.length) {
-    alert('No batch-cook dinner recipes found. Add some recipes with "Batch-friendly" checked.'); return;
+    alert('No dinner recipes in your library yet.'); return;
   }
 
   // Determine start date
@@ -3192,6 +2183,11 @@ function generatePlan() {
   // Breakfast: 'same' = one recipe all week; 'vary' = batch schedule per servings
   const firstBf = bfMode==='same' ? pickRandom(bfPool) : null;
   const bfSchedule = bfMode==='same' ? null : buildBatchSchedule(bfPool, days);
+
+  // Dessert: rotate through the pool day by day; avoid back-to-back repeats.
+  const dessertSchedule = activeSlots.dessert && dessertPool.length
+    ? buildBatchSchedule(dessertPool, days)
+    : null;
 
   const plan = [];
   for(let d=0; d<days; d++) {
@@ -3221,7 +2217,7 @@ function generatePlan() {
       breakfast:       activeSlots.breakfast       ? bf  : null,
       secondBreakfast: activeSlots.secondBreakfast ? SHAKE : null,
       dinner:          activeSlots.dinner           ? din : null,
-      dessert:         activeSlots.dessert          ? ((d===1||d===4)?(brownieP||chiaP||dessertPool[0]):(chiaP||dessertPool[0])) : null,
+      dessert:         activeSlots.dessert          ? (dessertSchedule?.[d] || null) : null,
     });
   }
 
@@ -3261,17 +2257,18 @@ async function generatePlanWithAI() {
     return `  ${r.id}: ${r.name}${macros}${favIds.includes(r.id) ? ' ★' : ''}`;
   };
 
+  const hasType = (r, t) => (r.mealTypes || []).includes(t);
   let catalog = '';
   if (activeSlots.breakfast) {
-    const pool = recipes.filter(r => r.mealType === 'breakfast');
+    const pool = recipes.filter(r => hasType(r, 'breakfast'));
     if (pool.length) catalog += `BREAKFAST (ID: name):\n${pool.map(formatR).join('\n')}\n\n`;
   }
   if (activeSlots.dinner) {
-    const pool = recipes.filter(r => r.mealType === 'dinner' && r.batchCook);
-    if (pool.length) catalog += `DINNER — batch-cookable only (ID: name):\n${pool.map(formatR).join('\n')}\n\n`;
+    const pool = recipes.filter(r => hasType(r, 'dinner'));
+    if (pool.length) catalog += `DINNER (ID: name):\n${pool.map(formatR).join('\n')}\n\n`;
   }
   if (activeSlots.dessert) {
-    const pool = recipes.filter(r => r.mealType === 'dessert');
+    const pool = recipes.filter(r => hasType(r, 'dessert') || hasType(r, 'snack'));
     if (pool.length) catalog += `DESSERT (ID: name):\n${pool.map(formatR).join('\n')}\n\n`;
   }
 
@@ -3286,7 +2283,7 @@ async function generatePlanWithAI() {
 Constraints:
 - User: gluten-free, dairy-free, banana-free
 - Daily targets: ~${targets.kcal} kcal, ${targets.protein}g protein
-- Batch cook day: ${batchDayName}${cravingNote}
+- Batch cook day: ${batchDayName} (every dinner recipe is batch-friendly)${cravingNote}
 - ${bfRule}
 - Dinner: group the SAME dinner ID across 2–4 consecutive days (one batch cook covers multiple days). Do NOT repeat the same dinner in back-to-back batches. Prefer ★ favourites.
 - Dessert: vary — avoid the same ID on consecutive days.
@@ -3385,18 +2382,22 @@ function buildPlanFromAIDays(aiDays, startDate, activeSlots) {
 function respinDay(dayIndex, slot) {
   if(!currentPlan) return;
   const day = currentPlan[dayIndex];
+  const hasType = (r, t) => (r.mealTypes || []).includes(t);
   if(slot==='breakfast') {
-    const pool = recipes.filter(r=>r.mealType==='breakfast'&&r.id!==day.breakfast?.id);
+    const pool = recipes.filter(r => hasType(r, 'breakfast') && r.id !== day.breakfast?.id);
     if(pool.length) day.breakfast = pool[Math.floor(Math.random()*pool.length)];
   } else if(slot==='secondBreakfast') {
-    // Cycle: shake → random breakfast/snack → shake
-    const pool = recipes.filter(r=>(r.mealType==='breakfast'||r.mealType==='dessert')&&r.id!==day.secondBreakfast?.id);
+    // Cycle: shake → random breakfast/dessert/snack → shake
+    const pool = recipes.filter(r =>
+      (hasType(r,'breakfast') || hasType(r,'dessert') || hasType(r,'snack')) &&
+      r.id !== day.secondBreakfast?.id
+    );
     day.secondBreakfast = pool.length ? pool[Math.floor(Math.random()*pool.length)] : SHAKE;
   } else if(slot==='dinner') {
-    const pool = recipes.filter(r=>r.mealType==='dinner'&&matchesCravings(r)&&r.id!==day.dinner?.id);
+    const pool = recipes.filter(r => hasType(r,'dinner') && matchesCravings(r) && r.id !== day.dinner?.id);
     if(pool.length) day.dinner = pool[Math.floor(Math.random()*pool.length)];
   } else if(slot==='dessert') {
-    const pool = recipes.filter(r=>r.mealType==='dessert'&&r.id!==day.dessert?.id);
+    const pool = recipes.filter(r => (hasType(r,'dessert') || hasType(r,'snack')) && r.id !== day.dessert?.id);
     if(pool.length) day.dessert = pool[Math.floor(Math.random()*pool.length)];
   }
   renderPlanOutput(currentPlan);
@@ -3603,20 +2604,52 @@ function clearGroceryChecks() {
   if(currentPlan) renderPlanOutput(currentPlan);
 }
 
+// ─── ADD RECIPE FORM CHIP STATE ──────────────────────────────────────────────
+let _addFormMealTypes = new Set();
+let _addFormCravings  = new Set();
+
+function renderAddFormChips() {
+  const mtEl = document.getElementById('f-mealTypes');
+  if (mtEl) {
+    mtEl.innerHTML = MEAL_TYPES.map(t => `
+      <span class="craving-edit-tag${_addFormMealTypes.has(t)?' active':''}" onclick="toggleAddFormMealType('${t}',this)">${MEAL_TYPE_LABELS[t]}</span>
+    `).join('');
+  }
+  const crEl = document.getElementById('f-cravings');
+  if (crEl) {
+    crEl.innerHTML = ALL_CRAVINGS.map(v => `
+      <span class="craving-edit-tag${_addFormCravings.has(v)?' active':''}" onclick="toggleAddFormCraving('${v}',this)">${CRAVING_LABELS[v]||v}</span>
+    `).join('');
+  }
+  const carbEl = document.getElementById('f-carbType');
+  if (carbEl && !carbEl.options.length) {
+    carbEl.innerHTML = CARB_TYPES.map(t => `<option value="${t}">${CARB_TYPE_LABELS[t]}</option>`).join('');
+  }
+}
+
+function toggleAddFormMealType(val, el) {
+  if (_addFormMealTypes.has(val)) { _addFormMealTypes.delete(val); el.classList.remove('active'); }
+  else { _addFormMealTypes.add(val); el.classList.add('active'); }
+}
+function toggleAddFormCraving(val, el) {
+  if (_addFormCravings.has(val)) { _addFormCravings.delete(val); el.classList.remove('active'); }
+  else { _addFormCravings.add(val); el.classList.add('active'); }
+}
+
 // ─── ADD RECIPE ──────────────────────────────────────────────────────────────
 async function addRecipe() {
   const name = document.getElementById('f-name').value.trim();
-  const mealType = document.getElementById('f-mealType').value;
+  const mealTypes = [..._addFormMealTypes];
   const protein = document.getElementById('f-protein').value;
   if(!name) { alert('Please enter a recipe name.'); return; }
-  if(!mealType) { alert('Please select a meal type.'); return; }
+  if(!mealTypes.length) { alert('Please pick at least one meal type.'); return; }
   if(!protein) { alert('Please select a protein source.'); return; }
 
   const ingRaw = document.getElementById('f-ingredients').value;
   const groceryItems = ingRaw.trim() ? { extras: ingRaw.split(',').map(s=>s.trim()).filter(Boolean) } : {};
 
-  const cravingCheckboxes = document.querySelectorAll('#f-craving-tags input[type="checkbox"]:checked');
-  const cravings = [...cravingCheckboxes].map(cb=>cb.value);
+  const cravings = [..._addFormCravings];
+  const carbType = document.getElementById('f-carbType').value || 'none';
 
   const ai = window._parsedAiRecipe || null;
   const creatorHandle = document.getElementById('f-url').value.trim() || null;
@@ -3672,15 +2705,17 @@ async function addRecipe() {
   // Build the Supabase row first so we get a real UUID back
   const supabaseRow = {
     name,
-    meal_type: mealType,
+    // Send both shapes — `meal_type` (legacy) gets the primary, `meal_types`
+    // (new) gets the full set. Newer schema readers prefer the array.
+    meal_type: mealTypes[0],
+    meal_types: mealTypes,
     protein_source: protein,
     cuisine: document.getElementById('f-cuisine').value || 'comfort',
-    batch_friendly: document.getElementById('f-batch').checked,
+    carb_type: carbType,
     cost_tier: String(parseInt(document.getElementById('f-cost').value) || 1),
     serves: parseInt(document.getElementById('f-servings').value) || 1,
     prep_cook_time: document.getElementById('f-time').value || null,
     subtitle: ai?.description || '',
-    tags: ai?.tags || [],
     craving_tags: cravings,
     creator_handle: creatorHandle,
     notes: document.getElementById('f-notes').value.trim() || null,
@@ -3712,14 +2747,14 @@ async function addRecipe() {
   // Fall back to timestamp ID if Supabase POST failed
   const r = {
     id: newId || Date.now(),
-    name, mealType, cuisine: supabaseRow.cuisine,
+    name, mealTypes, cuisine: supabaseRow.cuisine,
     proteinSource: protein,
-    batchCook: supabaseRow.batch_friendly,
+    carbType,
     costTier: supabaseRow.cost_tier,
     servings: supabaseRow.serves,
     prepTime: supabaseRow.prep_cook_time,
     description: supabaseRow.subtitle,
-    tags: supabaseRow.tags, cravings,
+    cravings,
     source: 'instagram',
     instagramUrl: creatorHandle,
     notes: supabaseRow.notes,
@@ -3756,11 +2791,13 @@ function clearForm() {
   ['f-name','f-servings','f-time','f-url','f-notes','f-ingredients','f-ingredients-full','f-method','f-tips','f-storage','f-kcal','f-protein-g','f-carbs-g','f-fat-g'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.value=id==='f-servings'?'1':'';
   });
-  ['f-mealType','f-protein'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  const protEl = document.getElementById('f-protein'); if (protEl) protEl.value = '';
   document.getElementById('f-cuisine').value='comfort';
   document.getElementById('f-cost').value='1';
-  document.getElementById('f-batch').checked=false;
-  document.querySelectorAll('#f-craving-tags input').forEach(cb=>cb.checked=false);
+  const carbEl = document.getElementById('f-carbType'); if (carbEl) carbEl.value = 'none';
+  _addFormMealTypes.clear();
+  _addFormCravings.clear();
+  renderAddFormChips();
   window._parsedAiRecipe = null;
 }
 
@@ -3901,17 +2938,25 @@ function autoSync() {
 function getLibraryPayload() {
   // Ensure overrides are saved before building payload
   saveOverrides();
+  // Pass through stashed legacy keys verbatim so cloud rows from older clients
+  // still round-trip. We don't read these locally any more.
+  const passthrough = (key, fallback) => {
+    try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
+    catch { return fallback; }
+  };
   return {
+    schemaVersion: 2,
     customRecipes: recipes.filter(r => !cloudRecipeIds.has(r.id)),
-    overrides: JSON.parse(localStorage.getItem('ds_overrides') || '{}'),
-    nutrition: JSON.parse(localStorage.getItem('ds_nutrition') || '{}'),
+    overrides: passthrough('ds_overrides', {}),
+    nutrition: passthrough('ds_nutrition', {}),
     hiddenRecipes: [...hiddenRecipes],
-    foodLog: JSON.parse(localStorage.getItem('ds_food_log') || '{}'),
-    targets: JSON.parse(localStorage.getItem('ds_targets') || '{}'),
-    pantry: JSON.parse(localStorage.getItem('ds_pantry') || '[]'),
-    supplements: JSON.parse(localStorage.getItem('ds_supplements') || '[]'),
-    suppLog: JSON.parse(localStorage.getItem('ds_supp_log') || '{}'),
-    savedPosts: JSON.parse(localStorage.getItem('ds_saved_posts') || '[]'),
+    // Legacy passthrough (Track, Pantry, Wellness) — see legacy/README.md
+    foodLog:     passthrough('ds_food_log', {}),
+    targets:     passthrough('ds_targets', {}),
+    pantry:      passthrough('ds_pantry', []),
+    supplements: passthrough('ds_supplements', []),
+    suppLog:     passthrough('ds_supp_log', {}),
+    savedPosts:  passthrough('ds_saved_posts', []),
     unitPref,
     updated_at: new Date().toISOString()
   };
@@ -3951,17 +2996,13 @@ async function loadFromSupabase(manual=false) {
     const remoteTs = rows[0].updated_at || '';
     const localTs = localStorage.getItem('ds_last_sync') || '';
     if (!manual && localTs && localTs >= remoteTs) return;
-    // Apply cloud data
+    // Apply cloud data — foundational keys only. Legacy keys (foodLog/targets/
+    // pantry/supplements/suppLog/savedPosts) are still passed through in
+    // getLibraryPayload so older clients keep working; we don't read them here.
     if (d.customRecipes) localStorage.setItem('ds_custom_recipes', JSON.stringify(d.customRecipes));
     if (d.overrides) localStorage.setItem('ds_overrides', JSON.stringify(d.overrides));
     if (d.nutrition) localStorage.setItem('ds_nutrition', JSON.stringify(d.nutrition));
     if (d.hiddenRecipes) localStorage.setItem('ds_hidden_recipes', JSON.stringify(d.hiddenRecipes));
-    if (d.foodLog) localStorage.setItem('ds_food_log', JSON.stringify(d.foodLog));
-    if (d.targets) localStorage.setItem('ds_targets', JSON.stringify(d.targets));
-    if (d.pantry) localStorage.setItem('ds_pantry', JSON.stringify(d.pantry));
-    if (d.supplements) localStorage.setItem('ds_supplements', JSON.stringify(d.supplements));
-    if (d.suppLog) localStorage.setItem('ds_supp_log', JSON.stringify(d.suppLog));
-    if (d.savedPosts) localStorage.setItem('ds_saved_posts', JSON.stringify(d.savedPosts));
     if (d.unitPref) localStorage.setItem('ds_unit_pref', d.unitPref);
     localStorage.setItem('ds_last_sync', remoteTs);
     showToast('Cloud data loaded — reloading…');
@@ -4032,11 +3073,12 @@ const SLOT_LABELS = {
 };
 
 function getPickerPool(slot) {
+  const hasType = (r, t) => (r.mealTypes || []).includes(t);
   switch(slot) {
-    case 'breakfast':       return recipes.filter(r=>r.mealType==='breakfast');
-    case 'secondBreakfast': return [SHAKE, ...recipes.filter(r=>r.mealType==='breakfast'||r.mealType==='dessert')];
-    case 'dinner':          return recipes.filter(r=>r.mealType==='dinner');
-    case 'dessert':         return recipes.filter(r=>r.mealType==='dessert');
+    case 'breakfast':       return recipes.filter(r => hasType(r,'breakfast'));
+    case 'secondBreakfast': return [SHAKE, ...recipes.filter(r => hasType(r,'breakfast') || hasType(r,'dessert') || hasType(r,'snack'))];
+    case 'dinner':          return recipes.filter(r => hasType(r,'dinner'));
+    case 'dessert':         return recipes.filter(r => hasType(r,'dessert') || hasType(r,'snack'));
     default:                return recipes;
   }
 }
@@ -4065,8 +3107,7 @@ function closePickerOnOverlay(e) {
 }
 
 function filterPicker() {
-  // If opened from track tab, delegate to track picker filter
-  if(!pickerContext) { if(trackPickerSlot) filterTrackPicker(); return; }
+  if(!pickerContext) return;
   const q = document.getElementById('pickerSearch').value.toLowerCase();
   const pool = getPickerPool(pickerContext.slot);
   const filtered = pool.filter(r=>r.name.toLowerCase().includes(q));
@@ -4081,7 +3122,6 @@ function filterPicker() {
           <div class="picker-item-meta">
             ${r.cuisine?`<span>${CUISINE_EMOJI[r.cuisine]||''} ${r.cuisine}</span>`:''}
             ${PROTEIN_EMOJI[r.proteinSource]?`<span>${PROTEIN_EMOJI[r.proteinSource]} ${r.proteinSource}</span>`:''}
-            ${r.batchCook?'<span style="color:var(--green)">⚡ batch</span>':''}
             ${r.source==='instagram'?'<span style="color:var(--accent)">📱 Instagram</span>':''}
             ${isSelected?'<span style="color:var(--accent);font-weight:700">✓ current</span>':''}
           </div>
@@ -4107,6 +3147,9 @@ document.addEventListener('keydown', e=>{
 });
 
 // ─── INIT ────────────────────────────────────────────────────────────────────
+// Run migration before the first paint so badges/filters see the new shape.
+migrateLocalRecipes();
+
 document.addEventListener('DOMContentLoaded',()=>{
   // Set default start date to today
   const today = new Date();
@@ -4121,6 +3164,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   } else {
     renderRecipes();
   }
+  renderAddFormChips();
   initApiKeyUI();
   // Silently pull from Supabase if credentials exist and cloud data is newer
   loadFromSupabase(false);
@@ -4152,14 +3196,6 @@ function openSettings() {
     btn.style.borderColor = btn.dataset.themeBtn === currentTheme ? 'var(--accent)' : 'var(--border)';
     btn.style.boxShadow = btn.dataset.themeBtn === currentTheme ? '0 0 0 2px var(--accent-tint)' : 'none';
   });
-  // Pre-fill macro targets
-  const tf = { 'target-kcal': targets.kcal, 'target-protein': targets.protein, 'target-carbs': targets.carbs, 'target-fat': targets.fat };
-  for (const [id, val] of Object.entries(tf)) { const el = document.getElementById(id); if(el) el.value = val; }
-  // Pre-fill Edamam keys (masked)
-  const eidEl = document.getElementById('edamamAppIdInput');
-  if (eidEl) eidEl.placeholder = edamamAppId ? `Saved (${edamamAppId.slice(0,4)}…)` : 'a1b2c3d4';
-  const ekEl = document.getElementById('edamamAppKeyInput');
-  if (ekEl) ekEl.placeholder = edamamAppKey ? `Key saved (${edamamAppKey.slice(0,6)}…)` : 'abc123…';
   // Pre-fill Supabase fields
   const subUrlEl = document.getElementById('supabaseUrlInput');
   if (subUrlEl) subUrlEl.placeholder = supabaseUrl ? `Saved (${supabaseUrl.slice(8,20)}…)` : 'https://xxxx.supabase.co';
@@ -4212,10 +3248,6 @@ function updateAiNotice() {
 // ─── AI QUICK ADD (RECIPES) ───────────────────────────────────────────────────
 // aiImages: array of { base64, mediaType, dataUrl }
 let aiImages = [];
-
-// ─── AI QUICK ADD (PANTRY) ────────────────────────────────────────────────────
-let pantryAiImages = [];
-let pantryAiStatus  = { text: '', cls: '' };
 
 function switchAiTab(tab, btn) {
   document.querySelectorAll('.ai-tab-btn').forEach(b => b.classList.remove('active'));
@@ -4306,28 +3338,28 @@ async function parseWithAI() {
 The JSON must have these fields (use null for anything not found):
 {
   "name": string,
-  "mealType": "breakfast" | "dinner" | "dessert" | null,
-  "cuisine": "comfort" | "asian" | "mexican" | "middleeastern" | "other",
-  "proteinSource": "chicken" | "beef" | "eggs" | "tofu" | "fish" | "mixed" | null,
+  "mealTypes": ["breakfast" | "lunch" | "dinner" | "sides" | "dessert" | "snack"],
+  "cuisine": "comfort" | "asian" | "japanese" | "indian" | "italian" | "mexican" | "american" | "mediterranean" | "middleeastern" | "simple" | "other",
+  "proteinSource": "chicken" | "beef" | "eggs" | "tofu" | "fish" | "proteinpowder" | "mixed" | "other" | null,
+  "carbType": "rice" | "pasta" | "bread" | "potato" | "grain" | "none",
   "servings": number | null,
   "prepTime": string | null,
-  "batchCook": boolean,
   "costTier": 1 | 2 | 3,
   "description": string,
   "ingredients": [{"group": string | null, "item": string}],
   "method": [string],
   "tips": string | null,
   "storage": string | null,
-  "tags": [string],
-  "cravings": [string],
+  "cravings": ["asian"|"mexican"|"comfort"|"spicy"|"brothy"|"noodles"|"light"|"healthy"|"simple"|"chicken"|"beef"|"tofu"|"sweet"|"fresh"],
   "notes": string | null,
   "instagramUrl": string | null
 }
 
 Rules:
 - All recipes are gluten-free, dairy-free, and banana-free by default. Flag any adaptations needed in notes.
-- cravings should be descriptive mood tags like "spicy", "light", "brothy", "comfort", "sweet", "noodles", "fresh".
-- tags should be functional like "batch-friendly", "high-protein", "no-cook", "baked", "quick".
+- mealTypes is an array — a recipe can fit multiple slots (e.g. ["lunch","dinner"]). Always include at least one.
+- carbType: identify the dominant carb if any (rice/pasta/bread/potato/grain), else "none".
+- cravings: pick ONLY from the listed values. Descriptive mood/cuisine tags.
 - costTier: 1=cheap (under £5/serving), 2=moderate (£5-8), 3=pricier (over £8).
 - Return ONLY the JSON. No other text.`;
 
@@ -4401,19 +3433,26 @@ function prefillForm(r) {
     const opt = [...el.options].find(o => o.value === val);
     if (opt) el.value = val;
   };
-  setSelect('f-mealType', r.mealType);
   setSelect('f-protein', r.proteinSource);
   setSelect('f-cuisine', r.cuisine);
   setSelect('f-cost', r.costTier ? String(r.costTier) : null);
+  setSelect('f-carbType', r.carbType);
 
-  // Checkbox
-  const batchEl = document.getElementById('f-batch');
-  if (batchEl) batchEl.checked = !!r.batchCook;
+  // Meal types — accept new `mealTypes` array, legacy single `mealType`,
+  // or fall back to dinner.
+  _addFormMealTypes = new Set(
+    Array.isArray(r.mealTypes) && r.mealTypes.length ? r.mealTypes
+      : r.mealType ? [r.mealType]
+      : []
+  );
 
-  // Craving tags
-  document.querySelectorAll('#f-craving-tags input').forEach(cb => {
-    cb.checked = Array.isArray(r.cravings) && r.cravings.includes(cb.value);
-  });
+  // Cravings — keep any that fit the taxonomy; absorb stray `tags` too.
+  const cravingPool = [
+    ...(Array.isArray(r.cravings) ? r.cravings : []),
+    ...(Array.isArray(r.tags) ? r.tags : []),
+  ];
+  _addFormCravings = new Set(cravingPool.filter(t => ALL_CRAVINGS.includes(t)));
+  renderAddFormChips();
 
   // Build notes field — combine description, tips, storage, and any notes
   const noteParts = [];
@@ -4432,346 +3471,8 @@ function prefillForm(r) {
   window._parsedAiRecipe = r;
 }
 
-// ─── WELLNESS / SUPPLEMENT TRACKER ───────────────────────────────────────────
-function renderWellnessTab() {
-  renderSuppList();
-  renderRedditPosts();
-  updateSuppDateUI();
-}
-
-function updateSuppDateUI() {
-  const label = document.getElementById('suppDateLabel');
-  const sub   = document.getElementById('suppDateSub');
-  if (!label) return;
-  const today = new Date().toISOString().slice(0,10);
-  const d = new Date(suppDate + 'T12:00:00');
-  const isToday = suppDate === today;
-  label.textContent = isToday ? 'Today' : d.toLocaleDateString('en-GB', { day:'numeric', month:'short' });
-
-  // Streak: count consecutive days back from today where all supplements were taken
-  let streak = 0;
-  const cur = new Date(today + 'T12:00:00');
-  while (streak < 365) {
-    const key = cur.toISOString().slice(0,10);
-    const checked = suppLog[key] || [];
-    if (supplements.length === 0 || checked.length < supplements.length) break;
-    streak++;
-    cur.setDate(cur.getDate() - 1);
-  }
-  if (sub) sub.innerHTML = streak > 0
-    ? `<span class="supp-streak">🔥 ${streak}-day streak</span>`
-    : `Track your daily supplements`;
-}
-
-function shiftSuppDate(dir) {
-  const d = new Date(suppDate + 'T12:00:00');
-  d.setDate(d.getDate() + dir);
-  const today = new Date().toISOString().slice(0,10);
-  const next = d.toISOString().slice(0,10);
-  if (next > today) return; // don't go into future
-  suppDate = next;
-  updateSuppDateUI();
-  renderSuppList();
-}
-
-function toggleSuppForm() {
-  suppFormOpen = !suppFormOpen;
-  const form = document.getElementById('suppForm');
-  const btn  = document.getElementById('btnSuppToggle');
-  if (!form) return;
-  form.style.display = suppFormOpen ? 'block' : 'none';
-  btn.style.display  = suppFormOpen ? 'none'  : 'block';
-  if (suppFormOpen) document.getElementById('suppName')?.focus();
-}
-
-function saveSuppItem() {
-  const name = document.getElementById('suppName')?.value.trim();
-  if (!name) return;
-  const dose   = document.getElementById('suppDose')?.value.trim()   || '';
-  const timing = document.getElementById('suppTiming')?.value.trim() || '';
-  const note   = document.getElementById('suppNote')?.value.trim()   || '';
-  const id = Date.now();
-  supplements.push({ id, name, dose, timing, note });
-  saveSupplements();
-  // Clear form
-  ['suppName','suppDose','suppTiming','suppNote'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
-  suppFormOpen = false;
-  renderSuppList();
-  updateSuppDateUI();
-  const form = document.getElementById('suppForm');
-  const btn  = document.getElementById('btnSuppToggle');
-  if (form) form.style.display = 'none';
-  if (btn)  btn.style.display  = 'block';
-}
-
-function toggleSuppCheck(id) {
-  const checked = new Set(suppLog[suppDate] || []);
-  if (checked.has(id)) checked.delete(id); else checked.add(id);
-  suppLog[suppDate] = [...checked];
-  saveSuppLog();
-  renderSuppList();
-  updateSuppDateUI();
-}
-
-function deleteSuppItem(id) {
-  supplements = supplements.filter(s => s.id !== id);
-  saveSupplements();
-  renderSuppList();
-  updateSuppDateUI();
-}
-
-function renderSuppList() {
-  const el = document.getElementById('suppList');
-  if (!el) return;
-  const checked = new Set(suppLog[suppDate] || []);
-  if (!supplements.length) {
-    el.innerHTML = `<div class="supp-empty">No supplements added yet. Hit the button below to start your stack.</div>`;
-    return;
-  }
-  el.innerHTML = supplements.map(s => {
-    const done = checked.has(s.id);
-    const detail = [s.dose, s.timing, s.note].filter(Boolean).join(' · ');
-    return `<div class="supp-item">
-      <input type="checkbox" class="supp-check" ${done ? 'checked' : ''} onchange="toggleSuppCheck(${s.id})">
-      <div class="supp-item-info">
-        <div class="supp-item-name${done?' checked':''}">${s.name}</div>
-        ${detail ? `<div class="supp-item-detail">${detail}</div>` : ''}
-      </div>
-      <div class="supp-item-btns">
-        <button class="btn-supp-del" onclick="deleteSuppItem(${s.id})" title="Remove">×</button>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-// ─── WELLNESS / REDDIT COMMUNITY ──────────────────────────────────────────────
-const REDDIT_KEYWORDS = ['supplement','pcos','hormone','nutrition','protein','vitamin','magnesium','inositol','spearmint','omega','thyroid','insulin','period','cycle'];
-
-function setRedditSub(btn) {
-  document.querySelectorAll('.btn-reddit-tab').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  redditSub = btn.dataset.sub;
-  const refreshBtn = document.getElementById('btnRedditRefresh');
-  if (refreshBtn) refreshBtn.style.display = redditSub === 'saved' ? 'none' : '';
-  renderRedditPosts();
-  if (redditSub !== 'saved' && !redditCache[redditSub]) fetchRedditPosts();
-}
-
-async function fetchRedditPosts() {
-  const el = document.getElementById('redditPosts');
-  if (!el || redditSub === 'saved') return;
-  el.innerHTML = `<div class="reddit-status">Loading posts…</div>`;
-  try {
-    const url = `https://www.reddit.com/r/${redditSub}/search.json?q=${encodeURIComponent('supplement OR nutrition OR hormone')}&restrict_sr=1&sort=top&t=month&limit=25`;
-    const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-    const posts = (data?.data?.children || [])
-      .map(c => c.data)
-      .filter(p => {
-        const text = (p.title + ' ' + (p.selftext||'')).toLowerCase();
-        return REDDIT_KEYWORDS.some(kw => text.includes(kw));
-      })
-      .slice(0, 15)
-      .map(p => ({
-        id:    p.id,
-        title: p.title,
-        url:   `https://www.reddit.com${p.permalink}`,
-        score: p.score,
-        sub:   p.subreddit,
-        flair: p.link_flair_text || '',
-        comments: p.num_comments || 0,
-      }));
-    redditCache[redditSub] = posts;
-    renderRedditPosts();
-  } catch(e) {
-    el.innerHTML = `<div class="reddit-status">Couldn't load posts — check your connection and try again.</div>`;
-  }
-}
-
-function renderRedditPosts() {
-  const el = document.getElementById('redditPosts');
-  if (!el) return;
-
-  if (redditSub === 'saved') {
-    if (!savedPosts.length) {
-      el.innerHTML = `<div class="reddit-saved-empty">Pin posts you find useful with ⭐ — they'll appear here.</div>`;
-      return;
-    }
-    el.innerHTML = `<div class="reddit-posts">${savedPosts.map(p => redditPostHTML(p, true)).join('')}</div>`;
-    return;
-  }
-
-  const posts = redditCache[redditSub];
-  if (!posts) {
-    el.innerHTML = `<div class="reddit-status">Hit ↻ to load top posts from r/${redditSub}.</div>`;
-    return;
-  }
-  if (!posts.length) {
-    el.innerHTML = `<div class="reddit-status">No matching posts found. Try refreshing.</div>`;
-    return;
-  }
-  el.innerHTML = `<div class="reddit-posts">${posts.map(p => redditPostHTML(p, false)).join('')}</div>`;
-}
-
-function redditPostHTML(p, pinned) {
-  const isPinned = pinned || savedPosts.some(s => s.id === p.id);
-  return `<div class="reddit-post">
-    <div class="reddit-post-title"><a href="${p.url}" target="_blank" rel="noopener">${p.title}</a></div>
-    <div class="reddit-post-meta">
-      <span class="reddit-post-score">▲ ${p.score.toLocaleString()}</span>
-      <span>r/${p.sub}</span>
-      <span>${p.comments} comments</span>
-      ${p.flair ? `<span class="reddit-post-flair">${p.flair}</span>` : ''}
-      <button class="btn-reddit-pin${isPinned?' pinned':''}" onclick="togglePinPost(${JSON.stringify(p).replace(/"/g,'&quot;')},this)" title="${isPinned?'Unpin':'Pin'}">⭐</button>
-    </div>
-  </div>`;
-}
-
-function togglePinPost(p, btn) {
-  const idx = savedPosts.findIndex(s => s.id === p.id);
-  if (idx >= 0) {
-    savedPosts.splice(idx, 1);
-    btn.classList.remove('pinned');
-  } else {
-    savedPosts.push(p);
-    btn.classList.add('pinned');
-  }
-  saveSavedPosts();
-  if (redditSub === 'saved') renderRedditPosts();
-}
-
-// ─── MACRO CALCULATOR ────────────────────────────────────────────────────────
-let _calcActivity = 1.375;
-let _calcGoal = 0;
-
-function openCalcModal() {
-  document.getElementById('calcOverlay').classList.add('open');
-  calcTargets();
-}
-function closeCalcModal() {
-  document.getElementById('calcOverlay').classList.remove('open');
-}
-function closeCalcOnOverlay(e) {
-  if (e.target === document.getElementById('calcOverlay')) closeCalcModal();
-}
-function setCalcActivity(btn) {
-  document.querySelectorAll('#calcActivityRow .calc-toggle').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  _calcActivity = parseFloat(btn.dataset.activity);
-  calcTargets();
-}
-function setCalcGoal(btn) {
-  document.querySelectorAll('#calcGoalRow .calc-toggle').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  _calcGoal = parseInt(btn.dataset.goal);
-  calcTargets();
-}
-function calcTargets() {
-  const age    = parseFloat(document.getElementById('calcAge').value)    || 25;
-  const weight = parseFloat(document.getElementById('calcWeight').value) || 60;
-  const height = parseFloat(document.getElementById('calcHeight').value) || 153;
-  const sex    = document.getElementById('calcSex').value;
-
-  // Mifflin-St Jeor BMR
-  let bmr = sex === 'female'
-    ? (10 * weight) + (6.25 * height) - (5 * age) - 161
-    : (10 * weight) + (6.25 * height) - (5 * age) + 5;
-
-  const tdee = Math.round(bmr * _calcActivity);
-  const kcal = Math.max(1200, tdee + _calcGoal);
-
-  // Protein: 2g per kg for muscle retention
-  const protein = Math.round(weight * 2);
-  // Fat: ~25% of kcal
-  const fat = Math.round((kcal * 0.25) / 9);
-  // Carbs: remaining kcal
-  const carbs = Math.round((kcal - (protein * 4) - (fat * 9)) / 4);
-
-  document.getElementById('prevKcal').textContent    = kcal;
-  document.getElementById('prevProtein').textContent = protein;
-  document.getElementById('prevCarbs').textContent   = Math.max(0, carbs);
-  document.getElementById('prevFat').textContent     = fat;
-
-  const goalLabel = _calcGoal < 0 ? 'fat loss' : _calcGoal > 0 ? 'muscle gain' : 'maintenance';
-  document.getElementById('calcPreviewNote').textContent =
-    `TDEE: ~${tdee} kcal · Goal adjustment: ${_calcGoal >= 0 ? '+' : ''}${_calcGoal} kcal · Protein set at 2g/kg for ${goalLabel}.`;
-
-  // Stash for applyCalcTargets
-  window._calcResult = { kcal, protein, carbs: Math.max(0, carbs), fat };
-}
-function applyCalcTargets() {
-  if (!window._calcResult) return;
-  const r = window._calcResult;
-  targets = { ...targets, ...r };
-  saveTargets();
-  populateTargetInputs();
-  renderTrackTab();
-  closeCalcModal();
-}
 </script>
 
-<!-- ── Macro Calculator Modal ──────────────────────────────────────── -->
-<div class="calc-overlay" id="calcOverlay" onclick="closeCalcOnOverlay(event)">
-  <div class="calc-panel" id="calcPanel">
-    <h3>🎯 Set My Macro Targets</h3>
-    <p>Enter your details and we'll calculate a starting point using the Mifflin-St Jeor formula. You can always adjust manually in Settings.</p>
-
-    <span class="calc-section-label">Your details</span>
-    <div class="calc-grid">
-      <div class="calc-field">
-        <label>Age</label>
-        <input type="number" id="calcAge" min="16" max="80" value="25" oninput="calcTargets()">
-      </div>
-      <div class="calc-field">
-        <label>Sex at birth</label>
-        <select id="calcSex" onchange="calcTargets()">
-          <option value="female" selected>Female</option>
-          <option value="male">Male</option>
-        </select>
-      </div>
-      <div class="calc-field">
-        <label>Weight (kg)</label>
-        <input type="number" id="calcWeight" min="30" max="200" value="60" oninput="calcTargets()">
-      </div>
-      <div class="calc-field">
-        <label>Height (cm)</label>
-        <input type="number" id="calcHeight" min="130" max="220" value="153" oninput="calcTargets()">
-      </div>
-    </div>
-
-    <span class="calc-section-label">Activity level</span>
-    <div class="calc-toggle-row" id="calcActivityRow">
-      <button class="calc-toggle" data-activity="1.2" onclick="setCalcActivity(this)">Sedentary</button>
-      <button class="calc-toggle active" data-activity="1.375" onclick="setCalcActivity(this)">Light</button>
-      <button class="calc-toggle" data-activity="1.55" onclick="setCalcActivity(this)">Moderate</button>
-      <button class="calc-toggle" data-activity="1.725" onclick="setCalcActivity(this)">Active</button>
-    </div>
-
-    <span class="calc-section-label">Goal</span>
-    <div class="calc-toggle-row" id="calcGoalRow">
-      <button class="calc-toggle" data-goal="-300" onclick="setCalcGoal(this)">Fat loss</button>
-      <button class="calc-toggle active" data-goal="0" onclick="setCalcGoal(this)">Maintenance</button>
-      <button class="calc-toggle" data-goal="250" onclick="setCalcGoal(this)">Muscle gain</button>
-    </div>
-
-    <div class="calc-preview" id="calcPreview">
-      <div class="calc-preview-title">Suggested targets</div>
-      <div class="calc-preview-grid" id="calcPreviewGrid">
-        <div class="calc-preview-cell"><div class="calc-preview-val" id="prevKcal">—</div><div class="calc-preview-lbl">kcal</div></div>
-        <div class="calc-preview-cell"><div class="calc-preview-val" id="prevProtein">—</div><div class="calc-preview-lbl">protein g</div></div>
-        <div class="calc-preview-cell"><div class="calc-preview-val" id="prevCarbs">—</div><div class="calc-preview-lbl">carbs g</div></div>
-        <div class="calc-preview-cell"><div class="calc-preview-val" id="prevFat">—</div><div class="calc-preview-lbl">fat g</div></div>
-      </div>
-      <div class="calc-preview-note" id="calcPreviewNote"></div>
-    </div>
-
-    <div class="calc-actions">
-      <button class="btn-calc-apply" onclick="applyCalcTargets()">Apply these targets</button>
-      <button class="btn-calc-cancel" onclick="closeCalcModal()">Cancel</button>
-    </div>
-  </div>
-</div>
 
 <!-- Service Worker registration -->
 <script>
