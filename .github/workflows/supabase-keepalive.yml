@@ -1,0 +1,38 @@
+# Free-tier Supabase projects auto-pause after ~7 days of API inactivity.
+# This workflow hits a trivial read endpoint daily so the project stays warm
+# and the deployed PWA can always reach it. GitHub Actions schedule triggers
+# only fire from the default branch, so this must be on `main` to run.
+
+name: Supabase keep-alive
+
+on:
+  schedule:
+    - cron: '17 6 * * *'  # 06:17 UTC daily — off the top-of-hour stampede
+  workflow_dispatch: {}
+
+permissions: {}
+
+concurrency:
+  group: supabase-keepalive
+  cancel-in-progress: false
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Ping recipes endpoint
+        env:
+          SUPABASE_URL: https://jsxcctrskkkxgdxfaduo.supabase.co
+          # Anon key is already public in the client-side PWA (index.html); inlining here is no-op exposure.
+          SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzeGNjdHJza2treGdkeGZhZHVvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUxMzI0NjUsImV4cCI6MjA5MDcwODQ2NX0.jxnTcKaujOKjWmT9UQLm0ATPzOodaVm-8iOSbKpooUk
+        run: |
+          set -euo pipefail
+          status=$(curl -sS --max-time 30 --retry 3 --retry-delay 5 \
+            -o /tmp/body -w "%{http_code}" \
+            -H "apikey: $SUPABASE_ANON_KEY" \
+            -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
+            "$SUPABASE_URL/rest/v1/recipes?select=id&limit=1")
+          echo "HTTP $status"
+          head -c 200 /tmp/body; echo
+          test "$status" = "200"
