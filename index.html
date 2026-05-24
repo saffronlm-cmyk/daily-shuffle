@@ -457,6 +457,25 @@
     .plan-meal:last-child { border-bottom: none; }
     header { gap: 12px; }
   }
+
+  /* ── Price Book & Cost Engine ───────────────────────────────────────────── */
+  .pb-table { width: 100%; border-collapse: collapse; font-size: 12px; margin: 6px 0 10px; }
+  .pb-table th { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--text3); text-align: left; padding: 0 8px 4px 0; border-bottom: 1px solid var(--border); }
+  .pb-table td { padding: 4px 8px 4px 0; color: var(--text2); border-bottom: 1px solid var(--border); font-size: 12px; vertical-align: middle; }
+  .pb-table tr:last-child td { border-bottom: none; }
+  .pb-name { color: var(--text); font-weight: 500; max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pb-input { background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 5px 8px; border-radius: 6px; font-size: 12px; font-family: var(--font); outline: none; }
+  .pb-input:focus { border-color: var(--accent); }
+  .pb-input::placeholder { color: var(--text3); }
+  .pb-row { display: flex; gap: 5px; margin-top: 8px; flex-wrap: wrap; align-items: center; }
+  .rcpt-row { display: flex; gap: 4px; align-items: center; margin-bottom: 4px; }
+  .rcpt-row input, .rcpt-row select { background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 4px 6px; border-radius: 5px; font-size: 12px; font-family: var(--font); outline: none; }
+  .rcpt-row input:focus, .rcpt-row select:focus { border-color: var(--accent); }
+  .rcpt-history-item { font-size: 11px; color: var(--text2); padding: 4px 0; border-bottom: 1px solid var(--border); }
+  .rcpt-history-item:last-child { border-bottom: none; }
+  .computed-cost { font-size: 13px; color: var(--green); margin-top: 6px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .computed-cost strong { color: var(--green); }
+  .computed-cost-note { font-size: 11px; color: var(--text3); }
 </style>
 </head>
 <body>
@@ -513,6 +532,41 @@
         <p style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5">Built-in recipes that you delete are hidden, not permanently removed. Restore them here.</p>
         <button class="btn-library" onclick="restoreHiddenRecipes()">↩ Restore hidden recipes</button>
         <span id="restoreNotice" style="font-size:12px;color:var(--green);margin-left:10px;display:none">✓ Restored</span>
+      </div>
+      <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+        <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:6px">💷 Price Book</div>
+        <p style="font-size:12px;color:var(--text2);margin-bottom:8px;line-height:1.5">Add ingredient prices to get £/portion estimates on recipes. Enter the price per unit (e.g. £0.009 per g for chicken).</p>
+        <div id="pbTableWrap"></div>
+        <div class="pb-row">
+          <input class="pb-input" id="pb-name" placeholder="Ingredient name" style="flex:2;min-width:100px">
+          <input class="pb-input" id="pb-price" placeholder="£/unit" type="number" step="0.0001" style="width:72px">
+          <select class="pb-input" id="pb-unit" style="width:62px">
+            <option value="g">g</option>
+            <option value="ml">ml</option>
+            <option value="each">each</option>
+            <option value="tbsp">tbsp</option>
+            <option value="tsp">tsp</option>
+            <option value="l">litre</option>
+            <option value="kg">kg</option>
+          </select>
+          <input class="pb-input" id="pb-store" placeholder="Store" style="width:68px">
+          <button class="btn-save-key" onclick="addPriceBookEntry()" style="font-size:12px;padding:6px 12px">Add</button>
+        </div>
+      </div>
+      <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+        <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:6px">🧾 Log Receipt</div>
+        <p style="font-size:12px;color:var(--text2);margin-bottom:8px;line-height:1.5">Log items from a receipt to update the price book automatically.</p>
+        <div style="display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap">
+          <input class="pb-input" id="rc-date" type="date" style="width:135px">
+          <input class="pb-input" id="rc-store" placeholder="Store (e.g. Aldi)" style="flex:1;min-width:100px">
+        </div>
+        <div id="rcRows"></div>
+        <div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap;align-items:center">
+          <button class="btn-library" onclick="addReceiptRow()">+ Add item</button>
+          <button class="btn-save-key" onclick="saveReceipt()" style="font-size:12px;padding:6px 12px">Save receipt</button>
+          <span id="rcStatus" style="font-size:12px;color:var(--text3)"></span>
+        </div>
+        <div id="rcHistory"></div>
       </div>
       <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
         <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:6px">☁ Supabase Cloud Sync</div>
@@ -1176,6 +1230,11 @@ try { const hr = localStorage.getItem('ds_hidden_recipes'); if(hr) hiddenRecipes
 let unitPref = localStorage.getItem('ds_unit_pref') || 'metric';
 let supabaseUrl = localStorage.getItem('ds_supabase_url') || '';
 let supabaseKey = localStorage.getItem('ds_supabase_key') || '';
+let priceBook = {};
+let receipts = [];
+let _rcRows = [];
+try { const pb = localStorage.getItem('ds_pricebook'); if (pb) priceBook = JSON.parse(pb); } catch(e) {}
+try { const rc = localStorage.getItem('ds_receipts'); if (rc) receipts = JSON.parse(rc); } catch(e) {}
 
 function saveCustom() {
   try { localStorage.setItem('ds_custom_recipes', JSON.stringify(recipes.filter(r=>!cloudRecipeIds.has(r.id)))); } catch(e){}
@@ -1422,7 +1481,7 @@ function renderRecipes() {
       <div class="card-tags">
         <span class="card-tag">${CUISINE_EMOJI[r.cuisine]||''} ${r.cuisine.charAt(0).toUpperCase()+r.cuisine.slice(1)}</span>
         <span class="card-tag">${PROTEIN_EMOJI[r.proteinSource]||''} ${r.proteinSource.charAt(0).toUpperCase()+r.proteinSource.slice(1)}</span>
-        ${'£'.repeat(r.costTier)?`<span class="card-tag">${'£'.repeat(r.costTier)}</span>`:''}
+        ${costTagHtml(r.id, r.costTier)}
         ${r.prepTime?`<span class="card-tag">⏱ ${r.prepTime}</span>`:''}
         ${r.source==='instagram'?'<span class="card-tag accent">📱 Insta</span>':''}
       </div>
@@ -1522,17 +1581,19 @@ function openModal(id) {
           <div class="nutrition-cell"><div class="nc-val">${scl(nut.carbs)!=null?scl(nut.carbs)+'g':'—'}</div><div class="nc-lbl">carbs</div></div>
           <div class="nutrition-cell"><div class="nc-val">${scl(nut.fat)!=null?scl(nut.fat)+'g':'—'}</div><div class="nc-lbl">fat</div></div>
         </div>
-        ${renderCostHtml(cost, srvScale)}
+        ${renderComputedCostHtml(r.id, srvScale)}
         ${hasApiKey?`<div style="margin-top:10px"><button class="btn-estimate" id="btnEstimateNutrition" onclick="estimateNutritionWithAI('${r.id}')">✨ Re-estimate</button><span id="estimateStatus" style="font-size:12px;color:var(--text3);margin-left:10px"></span></div>`:''}
       </div>`;
   } else {
-    if(hasApiKey) {
+    const computedCostHtml = renderComputedCostHtml(r.id, srvScale);
+    if(hasApiKey || computedCostHtml) {
       nutritionHtml = `<div class="modal-divider"></div>
         <div class="modal-section" id="modal-nutrition-section">
           <h4>Nutrition &amp; Cost</h4>
-          <p style="color:var(--text3);font-size:13px;margin-bottom:10px">No nutrition data yet — estimate with AI from the ingredient list.</p>
+          ${computedCostHtml}
+          ${hasApiKey?`<p style="color:var(--text3);font-size:13px;margin-bottom:10px;margin-top:${computedCostHtml?'10':'0'}px">No nutrition data yet — estimate with AI from the ingredient list.</p>
           <button class="btn-estimate" id="btnEstimateNutrition" onclick="estimateNutritionWithAI('${r.id}')">✨ Estimate with AI</button>
-          <span id="estimateStatus" style="font-size:12px;color:var(--text3);margin-left:10px"></span>
+          <span id="estimateStatus" style="font-size:12px;color:var(--text3);margin-left:10px"></span>`:''}
         </div>`;
     }
   }
@@ -1999,6 +2060,270 @@ function saveNutrition() {
     }
     localStorage.setItem('ds_nutrition', JSON.stringify(out));
   } catch(e) {}
+}
+
+// ─── PRICE BOOK & COST ENGINE ─────────────────────────────────────────────────
+function savePriceBook() {
+  try { localStorage.setItem('ds_pricebook', JSON.stringify(priceBook)); } catch(e) {}
+  // Invalidate cached costs so cards + modals recompute
+  for (const id of Object.keys(RECIPE_FULL_DATA)) delete RECIPE_FULL_DATA[id].costPerPortionComputed;
+  autoSync();
+}
+function saveReceipts() {
+  try { localStorage.setItem('ds_receipts', JSON.stringify(receipts)); } catch(e) {}
+  autoSync();
+}
+
+const _FRAC_QTY = { '½':0.5, '¼':0.25, '¾':0.75, '⅓':1/3, '⅔':2/3, '⅛':0.125 };
+const _UNIT_RE  = /^(fl\s*oz|tbsp?|tsp|cups?|kg|ml|litre|liter|l\b|oz|lbs?|lb|g\b|x\b)\s*/i;
+const _STOP_ADJ = new Set(['fresh','organic','large','small','medium','baby','whole','finely','roughly',
+  'free-range','boneless','skinless','ripe','raw','cooked','dried','frozen','chopped','sliced',
+  'diced','minced','ground','a','an','the','of']);
+
+function parseQty(text) {
+  if (!text) return { qty: null, unit: null, name: '', note: null };
+  let t = String(text).trim();
+  let note = null;
+  // Extract trailing parenthetical note
+  t = t.replace(/\s*\(([^)]+)\)\s*$/, (_, n) => { note = n; return ''; }).trim();
+  // Match leading quantity (integers, decimals, unicode fractions, e.g. "1½", "2.5")
+  let qty = null;
+  const qm = t.match(/^([\d½¼¾⅓⅔⅛][½¼¾⅓⅔⅛\d.\s]*?)\s+(?=[a-zA-Z(])/);
+  if (qm) {
+    let val = 0;
+    for (const p of qm[1].trim().split(/\s+/)) val += (_FRAC_QTY[p] ?? (parseFloat(p) || 0));
+    qty = val || null;
+    t = t.slice(qm[0].length);
+  }
+  // Match unit
+  let unit = null;
+  const um = t.match(_UNIT_RE);
+  if (um) {
+    unit = um[1].toLowerCase().replace(/\s+/g,'').replace(/s$/, '');
+    if (unit === 'litre' || unit === 'liter') unit = 'l';
+    if (unit === 'tbs') unit = 'tbsp';
+    t = t.slice(um[0].length);
+  }
+  const name = t.replace(/^of\s+/i, '').trim();
+  return { qty, unit, name, note };
+}
+
+function canonicalise(name) {
+  return (name || '').toLowerCase()
+    .replace(/\(.*?\)/g, '')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .split(/\s+/)
+    .filter(w => !_STOP_ADJ.has(w))
+    .join(' ')
+    .replace(/ies\b/g, 'y')
+    .replace(/([^aeiou])es\b/g, '$1e')
+    .replace(/([^aeiou])s\b/g, '$1')
+    .trim();
+}
+
+function lookupPriceBook(key) {
+  if (!key) return null;
+  if (priceBook[key]) return priceBook[key];
+  // Alias lookup
+  for (const [k, v] of Object.entries(priceBook)) {
+    if ((v.aliases || []).includes(key)) return v;
+  }
+  // Partial match: key contains a PB entry or vice-versa
+  for (const [k, v] of Object.entries(priceBook)) {
+    if (k.length >= 3 && (key.includes(k) || k.includes(key))) return v;
+  }
+  return null;
+}
+
+function _toBase(qty, unit) {
+  // Normalise qty+unit to {qty, base} where base is 'g', 'ml', or 'each'
+  if (!qty) return null;
+  const u = (unit || '').toLowerCase();
+  const map = { g:'g', kg:'g', ml:'ml', l:'ml', 'fl oz':'ml', floz:'ml',
+                tbsp:'ml', tsp:'ml', cup:'ml', oz:'g', lb:'g', each:'each', x:'each', '':'g' };
+  const mult = { g:1, kg:1000, ml:1, l:1000, 'fl oz':29.574, floz:29.574,
+                 tbsp:15, tsp:5, cup:240, oz:28.35, lb:453.6, each:1, x:1, '':1 };
+  const base = map[u];
+  if (!base) return null;
+  return { qty: qty * (mult[u] ?? 1), base };
+}
+
+function computeRecipeCost(recipeId) {
+  const fd = RECIPE_FULL_DATA[recipeId];
+  if (fd?.costPerPortionComputed !== undefined) return fd.costPerPortionComputed;
+  const r = recipes.find(x => x.id === recipeId);
+  if (!fd || !fd.ingredients || !fd.ingredients.length) return null;
+  const servings = r?.servings || 1;
+  let total = 0, unpriced = 0;
+  const missing = [];
+  for (const ing of fd.ingredients) {
+    const text = typeof ing === 'string' ? ing : (ing.item || ing.name || '');
+    if (!text.trim()) continue;
+    const { qty, unit, name } = parseQty(text);
+    const key = canonicalise(name || text);
+    const pb = lookupPriceBook(key);
+    if (!pb || !pb.unitPrice) { unpriced++; missing.push(name || text); continue; }
+    const ingBase = _toBase(qty, unit);
+    const pbBase  = _toBase(1, pb.unit);
+    if (!ingBase || !pbBase || ingBase.base !== pbBase.base) {
+      unpriced++; missing.push(name || text); continue;
+    }
+    total += ingBase.qty * pb.unitPrice;
+  }
+  const perPortion = servings > 0 ? total / servings : total;
+  const result = { total, perPortion, unpriced, missing, servings };
+  if (!RECIPE_FULL_DATA[recipeId]) RECIPE_FULL_DATA[recipeId] = {};
+  RECIPE_FULL_DATA[recipeId].costPerPortionComputed = result;
+  return result;
+}
+
+function applyReceiptToPriceBook(receipt) {
+  for (const item of (receipt.items || [])) {
+    if (!item.name || !item.price || !item.qty || !item.unit) continue;
+    const key = item.mapsTo || canonicalise(item.name);
+    if (!key) continue;
+    const unitPrice = parseFloat(item.price) / parseFloat(item.qty);
+    if (isNaN(unitPrice) || unitPrice <= 0) continue;
+    priceBook[key] = {
+      ...(priceBook[key] || { aliases: [] }),
+      unitPrice, unit: item.unit,
+      store: receipt.store || '',
+      updatedAt: receipt.date || new Date().toISOString().slice(0, 10),
+    };
+  }
+  savePriceBook();
+}
+
+// ── Cost display helpers ──────────────────────────────────────────────────────
+function costTagHtml(recipeId, costTier) {
+  const cost = computeRecipeCost(recipeId);
+  if (cost && cost.total > 0) {
+    const unpricedNote = cost.unpriced > 0 ? `<span style="color:var(--text3)"> +${cost.unpriced}</span>` : '';
+    return `<span class="card-tag" style="color:var(--green)">£${cost.perPortion.toFixed(2)}/srv${unpricedNote}</span>`;
+  }
+  const tier = Number(costTier) || 0;
+  return tier ? `<span class="card-tag">${'£'.repeat(tier)}</span>` : '';
+}
+
+function renderComputedCostHtml(recipeId, srvScale) {
+  const cost = computeRecipeCost(recipeId);
+  const fallback = RECIPE_FULL_DATA[recipeId]?.costPerPortion;
+  if (cost && cost.total > 0) {
+    const sc = srvScale || 1;
+    const pp = (cost.perPortion * sc).toFixed(2);
+    const tot = (cost.total * sc).toFixed(2);
+    const note = cost.unpriced > 0
+      ? `<span class="computed-cost-note">+${cost.unpriced} ingredient${cost.unpriced>1?'s':''} unpriced</span>` : '';
+    return `<div class="computed-cost">💷 <strong>£${pp}</strong>/portion · <strong>£${tot}</strong> total ${note}</div>`;
+  }
+  if (cost && cost.unpriced > 0 && cost.total === 0) {
+    return `<div class="cost-note" style="margin-top:6px">💷 Cost unknown — <a style="color:var(--accent);cursor:pointer;text-decoration:underline" onclick="closeModal();openSettings()">add prices to price book →</a></div>`;
+  }
+  return fallback ? renderCostHtml(fallback, srvScale || 1) : '';
+}
+
+// ── Price Book UI ─────────────────────────────────────────────────────────────
+function renderPriceBook() {
+  const wrap = document.getElementById('pbTableWrap');
+  if (!wrap) return;
+  const entries = Object.entries(priceBook);
+  if (!entries.length) {
+    wrap.innerHTML = '<p style="font-size:12px;color:var(--text3);margin-bottom:4px">No entries yet. Add an ingredient below.</p>';
+    return;
+  }
+  wrap.innerHTML = `<table class="pb-table">
+    <thead><tr><th>Ingredient</th><th>£/unit</th><th>Unit</th><th>Store</th><th>Updated</th><th></th></tr></thead>
+    <tbody>${entries.slice(0, 25).map(([key, v]) => `
+      <tr>
+        <td class="pb-name">${key}</td>
+        <td>${v.unitPrice != null ? '£' + v.unitPrice.toFixed(4) : '—'}</td>
+        <td>${v.unit || '—'}</td>
+        <td>${v.store || '—'}</td>
+        <td>${(v.updatedAt || '').slice(0, 10) || '—'}</td>
+        <td><button style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px;line-height:1;padding:2px 4px" onclick="deletePbEntry(${JSON.stringify(key)})">×</button></td>
+      </tr>`).join('')}
+    </tbody></table>
+    ${entries.length > 25 ? `<p style="font-size:11px;color:var(--text3);margin-top:2px">${entries.length-25} more not shown</p>` : ''}`;
+}
+
+function addPriceBookEntry() {
+  const name  = document.getElementById('pb-name')?.value.trim();
+  const price = parseFloat(document.getElementById('pb-price')?.value);
+  const unit  = document.getElementById('pb-unit')?.value || 'g';
+  const store = document.getElementById('pb-store')?.value.trim() || '';
+  if (!name || isNaN(price) || price <= 0) { showToast('Enter a name and a valid price.'); return; }
+  const key = canonicalise(name);
+  priceBook[key] = { ...(priceBook[key] || { aliases: [] }), unitPrice: price, unit, store, updatedAt: new Date().toISOString().slice(0, 10) };
+  savePriceBook();
+  ['pb-name','pb-price','pb-store'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
+  renderPriceBook();
+  showToast(`"${key}" added to price book ✓`);
+}
+
+function deletePbEntry(key) {
+  delete priceBook[key];
+  savePriceBook();
+  renderPriceBook();
+}
+
+// ── Receipt UI ────────────────────────────────────────────────────────────────
+function renderReceiptRows() {
+  const el = document.getElementById('rcRows');
+  if (!el) return;
+  const unitOpts = ['g','ml','each','tbsp','tsp','l','kg','oz','lb'];
+  el.innerHTML = _rcRows.map((row, i) => `
+    <div class="rcpt-row">
+      <input placeholder="Item name" value="${(row.name||'').replace(/"/g,'&quot;')}" oninput="_rcRows[${i}].name=this.value" style="flex:2;min-width:90px">
+      <input placeholder="Qty" type="number" step="any" value="${row.qty||''}" oninput="_rcRows[${i}].qty=this.value" style="width:58px">
+      <select oninput="_rcRows[${i}].unit=this.value" style="width:58px">
+        ${unitOpts.map(u=>`<option value="${u}"${row.unit===u?' selected':''}>${u}</option>`).join('')}
+      </select>
+      <input placeholder="£" type="number" step="0.01" value="${row.price||''}" oninput="_rcRows[${i}].price=this.value" style="width:60px">
+      <button style="background:none;border:none;color:var(--text3);font-size:16px;cursor:pointer;padding:0 4px;line-height:1" onclick="removeReceiptRow(${i})">×</button>
+    </div>`).join('');
+}
+
+function addReceiptRow() {
+  _rcRows.push({ name:'', qty:'', unit:'g', price:'' });
+  renderReceiptRows();
+  // focus the new name input
+  const inputs = document.querySelectorAll('#rcRows .rcpt-row input');
+  if (inputs.length) inputs[inputs.length - 4]?.focus();
+}
+
+function removeReceiptRow(idx) {
+  _rcRows.splice(idx, 1);
+  renderReceiptRows();
+}
+
+function saveReceipt() {
+  const date  = document.getElementById('rc-date')?.value  || new Date().toISOString().slice(0,10);
+  const store = document.getElementById('rc-store')?.value.trim() || '';
+  const items = _rcRows.filter(r => r.name && r.qty && r.price);
+  if (!items.length) { showToast('Add at least one item first.'); return; }
+  const receipt = { id: Date.now().toString(), date, store, items };
+  receipts.unshift(receipt);
+  if (receipts.length > 50) receipts.length = 50;
+  saveReceipts();
+  applyReceiptToPriceBook(receipt);
+  _rcRows = [];
+  renderReceiptRows();
+  renderPriceBook();
+  renderReceiptHistory();
+  const el = document.getElementById('rc-store'); if(el) el.value = '';
+  const st = document.getElementById('rcStatus');
+  if (st) { st.textContent='✓ Saved — price book updated'; setTimeout(()=>st.textContent='', 3000); }
+}
+
+function renderReceiptHistory() {
+  const el = document.getElementById('rcHistory');
+  if (!el) return;
+  if (!receipts.length) { el.innerHTML=''; return; }
+  el.innerHTML = '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-top:12px;margin-bottom:5px">Recent receipts</div>'
+    + receipts.slice(0,5).map(r =>
+        `<div class="rcpt-history-item">${r.date||'—'} · ${r.store||'—'} · ${(r.items||[]).length} item${(r.items||[]).length!==1?'s':''}</div>`
+      ).join('');
 }
 
 async function estimateNutritionWithAI(id) {
@@ -2507,6 +2832,26 @@ function renderPlanOutput(plan) {
   });
   html += `</div>`;
 
+  // ── Plan cost summary ─────────────────────────────────────────────────────
+  {
+    const planIds = [...new Set(
+      plan.flatMap(d => [d.breakfast, d.secondBreakfast, d.dinner, d.dessert])
+        .filter(r => r && r.id !== 0).map(r => r.id)
+    )];
+    let planTotal = 0, planUnpriced = 0, planHasCost = false;
+    for (const id of planIds) {
+      const cost = computeRecipeCost(id);
+      if (cost && cost.total > 0) { planTotal += cost.total; planHasCost = true; }
+      else if (cost && cost.unpriced > 0) planUnpriced++;
+    }
+    if (planHasCost || planUnpriced > 0) {
+      html += `<div style="text-align:center;padding:8px 0 4px;font-size:13px;color:var(--text2)">
+        ${planHasCost ? `💷 Estimated grocery cost: <strong style="color:var(--green)">£${planTotal.toFixed(2)}</strong>` : ''}
+        ${planUnpriced > 0 ? `<span style="color:var(--text3)"> · ${planUnpriced} recipe${planUnpriced>1?'s':''} unpriced</span>` : ''}
+      </div>`;
+    }
+  }
+
   // ── Grocery nudge at bottom of plan ──────────────────────────────────────
   html += `
     <div style="text-align:center;padding:16px 0 8px">
@@ -2582,11 +2927,14 @@ function renderGroceryList(plan) {
     items.forEach((item, idx) => {
       const key = `${cat}-${idx}-${item.slice(0,10)}`;
       const checked = groceryChecked.has(key);
+      const { name: ingName } = parseQty(item);
+      const pb = lookupPriceBook(canonicalise(ingName || item));
+      const priceHint = pb ? `<span style="font-size:10px;color:var(--text3);margin-left:5px">£${pb.unitPrice.toFixed(3)}/${pb.unit}</span>` : '';
       html += `
         <li>
           <div class="grocery-item${checked?' checked':''}" onclick="toggleGrocery(this,'${key}')">
             <input type="checkbox" ${checked?'checked':''} onclick="event.stopPropagation();toggleGrocery(this.parentElement,'${key}')">
-            <label>${item}</label>
+            <label>${item}${priceHint}</label>
           </div>
         </li>`;
     });
@@ -2969,6 +3317,8 @@ function getLibraryPayload() {
     supplements: passthrough('ds_supplements', []),
     suppLog:     passthrough('ds_supp_log', {}),
     savedPosts:  passthrough('ds_saved_posts', []),
+    priceBook,
+    receipts,
     unitPref,
     updated_at: new Date().toISOString()
   };
@@ -3016,6 +3366,8 @@ async function loadFromSupabase(manual=false) {
     if (d.nutrition) localStorage.setItem('ds_nutrition', JSON.stringify(d.nutrition));
     if (d.hiddenRecipes) localStorage.setItem('ds_hidden_recipes', JSON.stringify(d.hiddenRecipes));
     if (d.unitPref) localStorage.setItem('ds_unit_pref', d.unitPref);
+    if (d.priceBook) localStorage.setItem('ds_pricebook', JSON.stringify(d.priceBook));
+    if (d.receipts) localStorage.setItem('ds_receipts', JSON.stringify(d.receipts));
     localStorage.setItem('ds_last_sync', remoteTs);
     showToast('Cloud data loaded — reloading…');
     setTimeout(() => location.reload(), 1200);
@@ -3215,6 +3567,13 @@ function openSettings() {
   const lastSync = localStorage.getItem('ds_last_sync');
   const syncEl = document.getElementById('syncStatus');
   if (syncEl && lastSync) syncEl.textContent = '☁ Last synced ' + new Date(lastSync).toLocaleString();
+  // Price book + receipt
+  renderPriceBook();
+  renderReceiptHistory();
+  if (!_rcRows.length) { _rcRows = [{ name:'', qty:'', unit:'g', price:'' }]; }
+  renderReceiptRows();
+  const rcDate = document.getElementById('rc-date');
+  if (rcDate && !rcDate.value) rcDate.value = new Date().toISOString().slice(0, 10);
 }
 function closeSettings() { document.getElementById('settingsOverlay').classList.remove('open'); }
 function closeSettingsOnOverlay(e) { if(e.target===document.getElementById('settingsOverlay')) closeSettings(); }
