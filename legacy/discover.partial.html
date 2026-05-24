@@ -1,0 +1,14 @@
+    <!-- ── DISCOVER TAB ──────────────────────────────────────────────────── -->
+    <div id="tab-discover" class="tab-content">
+      <div class="discover-layout">
+        <h2 style="font-size:18px;font-weight:700;margin-bottom:6px">🔍 Discover Recipes</h2>
+        <p style="font-size:13px;color:var(--text2);margin-bottom:18px">Search the web for recipes. Results are filtered for gluten-free &amp; dairy-free. Click <strong>Add to Library</strong> to send a result to the AI parser.</p>
+        <div class="discover-search-bar">
+          <input class="discover-input" id="discoverInput" type="text" placeholder="e.g. high protein gluten free chicken bowl…"
+            onkeydown="if(event.key==='Enter') searchRecipes()">
+          <button class="btn-discover-search" id="btnDiscoverSearch" onclick="searchRecipes()">Search</button>
+        </div>
+        <div class="discover-hint" id="discoverHint">Searches add "gluten free dairy free" automatically — tweak the query if you want to cast wider.</div>
+        <div id="discoverResults"></div>
+      </div>
+    </div>

@@ -1,0 +1,46 @@
+  /* ── Track / Food Log Tab ─────────────────────────────────────────────────── */
+  .track-layout { max-width: 680px; margin: 0 auto; padding: 24px 20px; }
+  .track-date-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 16px; gap: 10px; }
+  .track-date-info { text-align: center; flex: 1; }
+  .track-date-label { font-size: 15px; font-weight: 700; color: var(--text); }
+  .track-date-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
+  .track-nav-btn { background: none; border: 1px solid var(--border); color: var(--text2); width: 34px; height: 34px; border-radius: 7px; font-size: 18px; transition: all .15s; flex-shrink: 0; }
+  .track-nav-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .track-today-btn { background: none; border: 1px solid var(--border); color: var(--text3); padding: 5px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; transition: all .15s; flex-shrink: 0; }
+  .track-today-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .track-slot { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 8px; overflow: hidden; }
+  .track-slot-header { display: flex; align-items: center; justify-content: space-between; padding: 9px 12px; background: var(--surface2); border-bottom: 1px solid var(--border); }
+  .track-slot-left { display: flex; align-items: center; gap: 8px; }
+  .track-slot-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--text3); }
+  .track-slot-kcal { font-size: 11px; color: var(--text3); }
+  .track-add-btn { background: none; border: 1px solid var(--border); color: var(--text3); width: 24px; height: 24px; border-radius: 5px; font-size: 15px; line-height: 1; transition: all .15s; }
+  .track-add-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .track-slot-entries { padding: 4px 8px 6px; display: flex; flex-direction: column; gap: 4px; min-height: 32px; }
+  .track-entry { display: flex; align-items: center; gap: 7px; padding: 6px 8px; background: var(--surface2); border-radius: 6px; border: 1px solid var(--border); }
+  .track-entry-name { flex: 1; font-size: 13px; font-weight: 600; color: var(--text); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .track-entry-srv-wrap { display: flex; align-items: center; gap: 4px; flex-shrink: 0; font-size: 11px; color: var(--text3); }
+  .track-entry-srv { width: 40px; background: var(--bg); border: 1px solid var(--border); color: var(--text2); padding: 3px 5px; border-radius: 5px; font-size: 12px; text-align: center; outline: none; }
+  .track-entry-srv:focus { border-color: var(--accent); }
+  .track-entry-macros { font-size: 11px; color: var(--text3); white-space: nowrap; flex-shrink: 0; }
+  .track-entry-remove { background: none; border: none; color: var(--text3); font-size: 16px; padding: 0 2px; border-radius: 3px; flex-shrink: 0; transition: color .1s; line-height: 1; }
+  .track-entry-remove:hover { color: #b85555; }
+  .track-empty { font-size: 12px; color: var(--text3); padding: 4px 8px 6px; font-style: italic; }
+  .track-totals { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; margin-bottom: 14px; }
+  .track-totals-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .track-totals-title { font-size: 13px; font-weight: 700; color: var(--text); }
+  .track-totals-kcal { font-size: 13px; font-weight: 700; color: var(--yellow); }
+  .track-macro-row { margin-bottom: 9px; }
+  .track-macro-row:last-child { margin-bottom: 0; }
+  .track-macro-label { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; }
+  .track-macro-name { color: var(--text2); }
+  .track-macro-value { font-weight: 600; }
+  .track-macro-value.ok { color: var(--green); }
+  .track-macro-value.over { color: #c87070; }
+  .track-macro-value.low { color: var(--text2); }
+  .track-bar-bg { height: 5px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+  .track-bar-fill { height: 100%; border-radius: 3px; transition: width .4s; max-width: 100%; }
+  .bar-kcal { background: var(--yellow); } .bar-protein { background: var(--accent); } .bar-carbs { background: var(--blue); } .bar-fat { background: var(--green); }
+
+  .track-no-macros { font-size: 11px; color: var(--text3); font-style: italic; }
+  .btn-track-targets { background: none; border: none; color: var(--text3); font-size: 13px; padding: 2px 4px; border-radius: 4px; transition: color .15s; }
+  .btn-track-targets:hover { color: var(--accent); }
