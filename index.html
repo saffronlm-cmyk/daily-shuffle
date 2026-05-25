@@ -549,7 +549,7 @@
             <option value="tbsp">tbsp</option>
             <option value="tsp">tsp</option>
           </select>
-          <input class="pb-input" id="pb-pack-price" placeholder="£/pk" type="number" step="0.01" style="width:68px" title="Price for the whole pack">
+          <input class="pb-input" id="pb-pack-price" placeholder="£/pk" type="number" step="any" style="width:68px" title="Price for the whole pack">
           <input class="pb-input" id="pb-store" placeholder="Store" style="width:68px">
           <button class="btn-save-key" onclick="addPriceBookEntry()" style="font-size:12px;padding:6px 12px">Add</button>
         </div>
@@ -2306,7 +2306,7 @@ function renderReceiptRows() {
         ${unitOpts.map(u=>`<option value="${u}"${(row.packUnit||'each')===u?' selected':''}>${u}</option>`).join('')}
       </select>
       <input placeholder="# pks" type="number" step="1" min="1" value="${row.packs||1}" oninput="_rcRows[${i}].packs=this.value;renderReceiptRows()" style="width:50px" title="How many packs bought">
-      <input placeholder="£/pk" type="number" step="0.01" value="${row.packPrice||''}" oninput="_rcRows[${i}].packPrice=this.value;renderReceiptRows()" style="width:60px" title="Price per pack">
+      <input placeholder="£/pk" type="number" step="any" value="${row.packPrice||''}" oninput="_rcRows[${i}].packPrice=this.value;renderReceiptRows()" style="width:60px" title="Price per pack">
       ${perUnit ? `<span style="font-size:11px;color:var(--text3);white-space:nowrap;align-self:center">${perUnit}</span>` : ''}
       <button style="background:none;border:none;color:var(--text3);font-size:16px;cursor:pointer;padding:0 4px;line-height:1" onclick="removeReceiptRow(${i})">×</button>
     </div>`;
