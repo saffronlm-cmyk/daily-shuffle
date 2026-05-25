@@ -1042,15 +1042,18 @@ function mapSupabaseToApp(row) {
 
 function flattenIngredientSections(sections) {
   if (!sections) return [];
-  // Old format: {"section name": ["item", ...], ...}
+  const toStructured = item => {
+    if (item && typeof item === 'object') return item;
+    const p = parseQty(String(item));
+    return { qty: p.qty, unit: p.unit, name: p.name || String(item), note: p.note || null };
+  };
   if (!Array.isArray(sections)) {
     return Object.entries(sections).flatMap(([title, items]) =>
-      (Array.isArray(items) ? items : []).map(item => ({ group: title || undefined, item }))
+      (Array.isArray(items) ? items : []).map(item => ({ group: title || undefined, ...toStructured(item) }))
     );
   }
-  // New format: [{section_title, ingredients: [...]}, ...]
   return sections.flatMap(sec =>
-    (sec.ingredients || []).map(item => ({ group: sec.section_title || undefined, item }))
+    (sec.ingredients || []).map(item => ({ group: sec.section_title || undefined, ...toStructured(item) }))
   );
 }
 
@@ -1764,7 +1767,10 @@ function openTagEditor(id) {
       _editorIngredients.push({ type: 'group', text: ing.group });
       lastGroup = ing.group;
     }
-    _editorIngredients.push({ type: 'item', text: ing.item });
+    const itm = ing.item != null
+      ? (() => { const p = parseQty(ing.item); return { qty: p.qty ?? '', unit: p.unit || 'g', name: p.name || ing.item, note: p.note || '' }; })()
+      : { qty: ing.qty ?? '', unit: ing.unit || 'g', name: ing.name || '', note: ing.note || '' };
+    _editorIngredients.push({ type: 'item', ...itm });
   }
   _editorMethod = [...(fd.method || [])];
 
@@ -1930,21 +1936,38 @@ function toggleEditorCraving(val, el) {
 // ── Ingredient editor helpers ─────────────────────────────────────────────────
 function renderEditorIngredients() {
   const el = document.getElementById('editor-ingredients-list'); if (!el) return;
-  el.innerHTML = _editorIngredients.map((row, i) => `
-    <div class="edit-list-row">
-      <input class="edit-list-input${row.type==='group'?' group-input':''}" value="${row.text.replace(/"/g,'&quot;')}"
-        placeholder="${row.type==='group'?'Group header…':'Ingredient…'}"
-        oninput="_editorIngredients[${i}].text=this.value">
-      <button class="edit-list-remove" onclick="removeEditorIngredient(${i})" title="Remove">×</button>
-    </div>`).join('');
+  const unitOpts = ['g','ml','each','kg','l','tbsp','tsp','oz','lb'];
+  el.innerHTML = _editorIngredients.map((row, i) => {
+    if (row.type === 'group') {
+      return `<div class="edit-list-row">
+        <input class="edit-list-input group-input" style="flex:1" value="${(row.text||'').replace(/"/g,'&quot;')}"
+          placeholder="Group header…" oninput="_editorIngredients[${i}].text=this.value">
+        <button class="edit-list-remove" onclick="removeEditorIngredient(${i})">×</button>
+      </div>`;
+    }
+    return `<div class="edit-list-row" style="flex-wrap:wrap;gap:4px">
+      <input type="number" step="any" placeholder="Qty" value="${row.qty||''}"
+        oninput="_editorIngredients[${i}].qty=this.value" style="width:52px;flex:none" class="edit-list-input">
+      <select class="edit-list-input" style="width:60px;flex:none" onchange="_editorIngredients[${i}].unit=this.value">
+        ${unitOpts.map(u=>`<option value="${u}"${(row.unit||'g')===u?' selected':''}>${u}</option>`).join('')}
+      </select>
+      <input placeholder="Name" value="${(row.name||'').replace(/"/g,'&quot;')}"
+        oninput="_editorIngredients[${i}].name=this.value" style="flex:2;min-width:80px" class="edit-list-input">
+      <input placeholder="Note" value="${(row.note||'').replace(/"/g,'&quot;')}"
+        oninput="_editorIngredients[${i}].note=this.value" style="width:80px;flex:none;font-size:11px" class="edit-list-input">
+      <button class="edit-list-remove" onclick="removeEditorIngredient(${i})">×</button>
+    </div>`;
+  }).join('');
 }
 
 function addEditorIngredient() {
-  _editorIngredients.push({ type: 'item', text: '' });
+  _editorIngredients.push({ type: 'item', qty: '', unit: 'g', name: '', note: '' });
   renderEditorIngredients();
-  // Focus last input
-  const inputs = document.querySelectorAll('#editor-ingredients-list .edit-list-input');
-  if (inputs.length) inputs[inputs.length-1].focus();
+  const rows = document.querySelectorAll('#editor-ingredients-list .edit-list-row');
+  if (rows.length) {
+    const lastInputs = rows[rows.length-1].querySelectorAll('input');
+    if (lastInputs[1]) lastInputs[1].focus(); // index 1 = name input (after qty)
+  }
 }
 
 function addEditorGroup() {
@@ -2002,20 +2025,27 @@ function saveRecipeEdits(id) {
   const storage     = document.getElementById('edit-storage')?.value || '';
   const cravings    = [..._editorCravings];
 
-  // Sync current input values for ingredients (in case oninput didn't fire on last edit)
-  document.querySelectorAll('#editor-ingredients-list .edit-list-input').forEach((inp, i) => {
-    if (_editorIngredients[i]) _editorIngredients[i].text = inp.value;
-  });
+  // Sync current method textarea values (in case oninput didn't fire on last edit)
   document.querySelectorAll('#editor-method-list textarea').forEach((ta, i) => {
     if (_editorMethod[i] !== undefined) _editorMethod[i] = ta.value;
   });
 
-  // Convert ingredient editor rows back to [{group, item}] format
   const ingredients = [];
   let currentGroup = null;
   for (const row of _editorIngredients) {
-    if (row.type === 'group') { currentGroup = row.text; }
-    else if (row.text.trim()) { ingredients.push({ group: currentGroup || undefined, item: row.text }); }
+    if (row.type === 'group') {
+      currentGroup = row.text?.trim() || null;
+    } else {
+      const name = (row.name || row.text || '').trim();
+      if (!name) continue;
+      ingredients.push({
+        group: currentGroup || undefined,
+        qty:   (row.qty !== '' && row.qty != null) ? parseFloat(row.qty) : null,
+        unit:  row.unit || null,
+        name,
+        note:  row.note?.trim() || null,
+      });
+    }
   }
   const method = _editorMethod.filter(s => s.trim());
 
@@ -2219,16 +2249,20 @@ function computeRecipeCost(recipeId) {
   let total = 0, unpriced = 0;
   const missing = [];
   for (const ing of fd.ingredients) {
-    const text = typeof ing === 'string' ? ing : (ing.item || ing.name || '');
-    if (!text.trim()) continue;
-    const { qty, unit, name } = parseQty(text);
-    const key = canonicalise(name || text);
+    let qty, unit, name;
+    if (ing.item != null) {
+      ({ qty, unit, name } = parseQty(ing.item));
+    } else {
+      qty = ing.qty; unit = ing.unit || 'each'; name = ing.name;
+    }
+    if (!name?.trim()) continue;
+    const key = canonicalise(name);
     const pb = lookupPriceBook(key);
-    if (!pb || !pb.unitPrice) { unpriced++; missing.push(name || text); continue; }
+    if (!pb || !pb.unitPrice) { unpriced++; missing.push(name); continue; }
     const ingBase = _toBase(qty, unit);
     const pbBase  = _toBase(1, pb.unit);
     if (!ingBase || !pbBase || ingBase.base !== pbBase.base) {
-      unpriced++; missing.push(name || text); continue;
+      unpriced++; missing.push(name); continue;
     }
     total += ingBase.qty * pb.unitPrice;
   }
@@ -3019,34 +3053,54 @@ function renderGroceryList(plan) {
     if(!agg[cat].some(x=>x.toLowerCase().includes(norm.split(' ')[0]))) agg[cat].push(item);
   });
 
+  let planTotal = 0, planHasCost = false, planUnpriced = 0;
+  const allPlanMeals = (plan||[]).flatMap(d => [d.breakfast, d.secondBreakfast, d.dinner, d.dessert]).filter(m => m && m.id !== 0);
+  for (const meal of allPlanMeals) {
+    const cost = computeRecipeCost(meal.id);
+    if (cost && cost.perPortion > 0) { planTotal += cost.perPortion; planHasCost = true; }
+    else if (cost && cost.unpriced > 0) planUnpriced++;
+  }
+  const planCostLabel = planHasCost
+    ? `£${planTotal.toFixed(2)} est.${planUnpriced > 0 ? ` · ${planUnpriced} meal${planUnpriced>1?'s':''} unpriced` : ''}`
+    : planUnpriced > 0 ? 'add prices in Settings to see cost' : '';
+
   let html = `
     <div class="grocery-section">
       <div class="grocery-header">
         <h3>🛒 Grocery List</h3>
         <button class="btn-clear-checks" onclick="clearGroceryChecks()">↺ Uncheck all</button>
       </div>
-      <p class="grocery-subtitle">Based on your ${plan.length}-day plan · Lidl + Sainsbury's · ~£35–42</p>
+      <p class="grocery-subtitle">Based on your ${plan.length}-day plan${planCostLabel ? ' · ' + planCostLabel : ''}</p>
       <div class="grocery-grid">
   `;
 
   for(const [cat, items] of Object.entries(agg)) {
     if(!items.length) continue;
-    html += `<div class="grocery-cat"><h4>${catLabels[cat]||cat}</h4><ul>`;
-    items.forEach((item, idx) => {
+    let catTotal = 0, catHasCost = false;
+    const itemRows = items.map((item, idx) => {
       const key = `${cat}-${idx}-${item.slice(0,10)}`;
       const checked = groceryChecked.has(key);
-      const { name: ingName } = parseQty(item);
+      const { qty, unit, name: ingName } = parseQty(item);
       const pb = lookupPriceBook(canonicalise(ingName || item));
-      const priceHint = pb ? `<span style="font-size:10px;color:var(--text3);margin-left:5px">£${pb.unitPrice.toFixed(3)}/${pb.unit}</span>` : '';
-      html += `
-        <li>
-          <div class="grocery-item${checked?' checked':''}" onclick="toggleGrocery(this,'${key}')">
-            <input type="checkbox" ${checked?'checked':''} onclick="event.stopPropagation();toggleGrocery(this.parentElement,'${key}')">
-            <label>${item}${priceHint}</label>
-          </div>
-        </li>`;
+      let priceHint = '';
+      if (pb) {
+        const ingBase = _toBase(qty, unit);
+        const pbBase  = _toBase(1, pb.unit);
+        if (ingBase && pbBase && ingBase.base === pbBase.base) {
+          const cost = ingBase.qty * pb.unitPrice;
+          catTotal += cost; catHasCost = true;
+          priceHint = `<span style="font-size:10px;color:var(--green);margin-left:5px">£${cost.toFixed(2)}</span>`;
+        } else {
+          priceHint = `<span style="font-size:10px;color:var(--text3);margin-left:5px">£${pb.unitPrice < 0.01 ? pb.unitPrice.toFixed(4) : pb.unitPrice.toFixed(3)}/${pb.unit}</span>`;
+        }
+      }
+      return `<li><div class="grocery-item${checked?' checked':''}" onclick="toggleGrocery(this,'${key}')">
+        <input type="checkbox" ${checked?'checked':''} onclick="event.stopPropagation();toggleGrocery(this.parentElement,'${key}')">
+        <label>${item}${priceHint}</label>
+      </div></li>`;
     });
-    html += `</ul></div>`;
+    const subtotal = catHasCost ? ` <span style="font-size:11px;font-weight:400;color:var(--green)">≥£${catTotal.toFixed(2)}</span>` : '';
+    html += `<div class="grocery-cat"><h4>${catLabels[cat]||cat}${subtotal}</h4><ul>${itemRows.join('')}</ul></div>`;
   }
   html += `</div></div>`;
   return html;
@@ -3131,7 +3185,8 @@ async function addRecipe() {
       const t = line.trim();
       if (!t) { currentGroup = null; continue; }
       if (/^[A-Z][A-Z\s&\/\-]+$/.test(t)) { currentGroup = t; continue; }
-      manualIngredients.push({ group: currentGroup || undefined, item: t });
+      const p = parseQty(t);
+      manualIngredients.push({ group: currentGroup || undefined, qty: p.qty, unit: p.unit, name: p.name || t, note: p.note || null });
     }
   }
 
@@ -3340,6 +3395,14 @@ function multiplyIngredientText(text, factor) {
   });
 }
 
+function _ingToText(ing) {
+  if (ing.item != null) return ing.item;
+  const q = ing.qty != null ? ing.qty + ' ' : '';
+  const u = (ing.unit && ing.unit !== 'each') ? ing.unit + ' ' : '';
+  const n = ing.note ? ` (${ing.note})` : '';
+  return `${q}${u}${ing.name || ''}${n}`.trim();
+}
+
 function buildIngredientsHtml(fd, multiplier, toImperial) {
   if (!fd || !fd.ingredients || !fd.ingredients.length) return '';
   let lastGroup = null;
@@ -3349,7 +3412,7 @@ function buildIngredientsHtml(fd, multiplier, toImperial) {
       items += `<li class="recipe-ingredient-group">${ing.group}</li>`;
       lastGroup = ing.group;
     }
-    let item = ing.item;
+    let item = _ingToText(ing);
     if (multiplier !== 1) item = multiplyIngredientText(item, multiplier);
     if (toImperial) item = convertIngredientText(item, true);
     items += `<li class="recipe-ingredient-item">${item}</li>`;
