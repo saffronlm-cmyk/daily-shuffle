@@ -79,21 +79,49 @@
   .tab-content.active { display: block; }
 
   /* ── Recipes Tab ───────────────────────────────────────────────────────── */
-  .recipes-layout { display: grid; grid-template-columns: 220px 1fr; min-height: calc(100vh - 56px); }
-  .sidebar { background: var(--surface); border-right: 1px solid var(--border); padding: 20px 16px; position: sticky; top: 56px; height: calc(100vh - 56px); overflow-y: auto; }
-  .sidebar h3 { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .8px; color: var(--text3); margin-bottom: 10px; margin-top: 20px; }
-  .sidebar h3:first-child { margin-top: 0; }
-  .filter-group { display: flex; flex-direction: column; gap: 4px; }
-  .filter-btn { background: none; color: var(--text2); padding: 6px 10px; border-radius: 6px; text-align: left; font-size: 13px; transition: all .15s; display: flex; align-items: center; gap: 8px; }
-  .filter-btn:hover { color: var(--text); background: var(--surface2); }
-  .filter-btn.active { color: var(--accent); background: var(--accent-tint); }
-  .search-box { width: 100%; background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 7px; font-size: 13px; outline: none; margin-bottom: 16px; }
+  .recipes-layout { max-width: 1200px; margin: 0 auto; }
+  .recipes-main { padding: 20px 24px; }
+  .recipes-toolbar { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
+  .search-box { background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 7px; font-size: 13px; outline: none; flex: 1; min-width: 200px; max-width: 360px; }
   .search-box:focus { border-color: var(--accent); }
   .search-box::placeholder { color: var(--text3); }
-  .recipes-main { padding: 20px 24px; }
   .recipes-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
   .recipes-header h2 { font-size: 16px; font-weight: 600; }
   .results-count { color: var(--text2); font-size: 13px; }
+
+  /* ── Filter bar (replaces sidebar) ────────────────────────────────────── */
+  .recipes-filterbar { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 18px; align-items: center; }
+  .filterbar-chip { position: relative; background: var(--surface2); border: 1px solid var(--border); color: var(--text2); padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; transition: all .15s; white-space: nowrap; font-family: var(--font); }
+  .filterbar-chip:hover { border-color: var(--accent); color: var(--text); }
+  .filterbar-chip.has-active { background: var(--accent-tint); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+  .filterbar-chip-count { background: var(--accent); color: white; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 10px; min-width: 18px; text-align: center; line-height: 1.3; }
+  .filterbar-clear { background: none; border: 1px dashed var(--border); color: var(--text3); padding: 6px 12px; border-radius: 20px; font-size: 11px; cursor: pointer; font-family: var(--font); }
+  .filterbar-clear:hover { color: var(--accent); border-color: var(--accent); }
+
+  /* Filter panel — desktop dropdown / mobile bottom sheet */
+  .filter-overlay { position: fixed; inset: 0; z-index: 199; display: none; }
+  .filter-overlay.open { display: block; }
+  .filter-panel { display: none; position: absolute; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; min-width: 260px; max-width: 400px; box-shadow: 0 8px 24px rgba(0,0,0,.18); z-index: 200; }
+  .filter-panel-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--text3); margin-bottom: 12px; }
+  .filter-panel-body { display: flex; flex-wrap: wrap; gap: 6px; }
+  .filter-panel-chip { background: var(--surface2); border: 1px solid var(--border); color: var(--text2); padding: 5px 12px; border-radius: 16px; font-size: 12px; cursor: pointer; transition: all .15s; font-family: var(--font); }
+  .filter-panel-chip:hover { border-color: var(--text3); color: var(--text); }
+  .filter-panel-chip.active { background: var(--accent-tint); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+  .filter-panel-actions { display: flex; gap: 8px; justify-content: space-between; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
+  .filter-panel-actions button { background: none; border: 1px solid var(--border); color: var(--text2); padding: 6px 14px; border-radius: 7px; font-size: 12px; cursor: pointer; font-family: var(--font); }
+  .filter-panel-actions button:hover { border-color: var(--accent); color: var(--accent); }
+  .filter-panel-actions .btn-apply { background: var(--accent); color: white; border: 1px solid var(--accent); font-weight: 600; }
+  .filter-panel-actions .btn-apply:hover { background: var(--accent2); }
+  .filter-range-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+  .filter-range-row > label { font-size: 11px; color: var(--text3); min-width: 64px; font-weight: 600; text-transform: uppercase; letter-spacing: .4px; }
+  .filter-range-row input { flex: 1; min-width: 60px; background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 6px 10px; border-radius: 6px; font-size: 12px; outline: none; font-family: var(--font); }
+  .filter-range-row input:focus { border-color: var(--accent); }
+  .filter-group-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--text3); margin: 10px 0 4px; }
+  .filter-group-label:first-child { margin-top: 0; }
+  @media (max-width: 767px) {
+    .filter-overlay.open { background: rgba(0,0,0,.4); }
+    .filter-panel { position: fixed; bottom: 0; left: 0; right: 0; max-width: 100%; min-width: 0; border-radius: 14px 14px 0 0; padding: 20px 20px calc(20px + env(safe-area-inset-bottom)); max-height: 75vh; overflow-y: auto; }
+  }
 
   /* Recipe Cards — no macros, richer tags */
   .recipe-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
@@ -203,6 +231,10 @@
   .slot-toggle span { display: inline-flex; align-items: center; gap: 6px; background: var(--surface2); border: 1px solid var(--border); color: var(--text3); padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 500; transition: all .15s; user-select: none; }
   .slot-toggle input:checked + span { background: var(--accent-tint); border-color: var(--accent); color: var(--text); font-weight: 600; }
   .slot-toggle span:hover { border-color: var(--text3); color: var(--text); }
+  .slot-toggle input:disabled + span { opacity: .4; cursor: not-allowed; }
+  .slot-toggle input:disabled + span:hover { border-color: var(--border); color: var(--text3); }
+  .craving-group-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--text3); margin: 8px 0 6px; }
+  .craving-group-label:first-child { margin-top: 0; }
 
   .plan-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
   .btn-generate { background: var(--accent); color: white; font-weight: 700; font-size: 14px; padding: 12px 28px; border-radius: 8px; transition: all .15s; }
@@ -448,14 +480,13 @@
   .btn-library:hover { color: var(--text); border-color: var(--text3); }
 
   @media (max-width: 768px) {
-    .recipes-layout { grid-template-columns: 1fr; }
-    .sidebar { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--border); }
     .form-grid { grid-template-columns: 1fr; }
     .controls-grid { grid-template-columns: 1fr 1fr; }
     .plan-meals { flex-direction: column; }
     .plan-meal { border-right: none; border-bottom: 1px solid var(--border); }
     .plan-meal:last-child { border-bottom: none; }
     header { gap: 12px; }
+    .recipes-main { padding: 16px 16px 24px; }
   }
 
   /* ── Price Book & Cost Engine ───────────────────────────────────────────── */
@@ -590,58 +621,11 @@
     <!-- ── RECIPES TAB ──────────────────────────────────────────────────── -->
     <div id="tab-recipes" class="tab-content">
       <div class="recipes-layout">
-        <aside class="sidebar">
-          <input type="text" class="search-box" id="searchInput" placeholder="Search recipes…" oninput="applyFilters()">
-          <h3>Quick</h3>
-          <div class="filter-group">
-            <button class="filter-btn" id="favFilterBtn" data-filter="special" data-value="favourites" onclick="toggleFavFilter(this)">♥ Favourites</button>
-          </div>
-          <h3>Meal Type</h3>
-          <div class="filter-group">
-            <button class="filter-btn active" data-filter="mealType" data-value="all" onclick="setFilter('mealType','all',this)">All</button>
-            <button class="filter-btn" data-filter="mealType" data-value="breakfast" onclick="setFilter('mealType','breakfast',this)">🌅 Breakfast</button>
-            <button class="filter-btn" data-filter="mealType" data-value="lunch" onclick="setFilter('mealType','lunch',this)">🥗 Lunch</button>
-            <button class="filter-btn" data-filter="mealType" data-value="dinner" onclick="setFilter('mealType','dinner',this)">🍽 Dinner</button>
-            <button class="filter-btn" data-filter="mealType" data-value="sides" onclick="setFilter('mealType','sides',this)">🍟 Sides</button>
-            <button class="filter-btn" data-filter="mealType" data-value="dessert" onclick="setFilter('mealType','dessert',this)">🍫 Dessert / Snack</button>
-          </div>
-          <h3>Protein Source</h3>
-          <div class="filter-group">
-            <button class="filter-btn active" data-filter="protein" data-value="all" onclick="setFilter('protein','all',this)">All</button>
-            <button class="filter-btn" data-filter="protein" data-value="chicken" onclick="setFilter('protein','chicken',this)">🐓 Chicken</button>
-            <button class="filter-btn" data-filter="protein" data-value="beef" onclick="setFilter('protein','beef',this)">🥩 Beef</button>
-            <button class="filter-btn" data-filter="protein" data-value="eggs" onclick="setFilter('protein','eggs',this)">🥚 Eggs</button>
-            <button class="filter-btn" data-filter="protein" data-value="tofu" onclick="setFilter('protein','tofu',this)">🌱 Tofu / Plant</button>
-            <button class="filter-btn" data-filter="protein" data-value="fish" onclick="setFilter('protein','fish',this)">🐟 Fish</button>
-            <button class="filter-btn" data-filter="protein" data-value="proteinpowder" onclick="setFilter('protein','proteinpowder',this)">🥤 Protein Powder</button>
-          </div>
-          <h3>Cuisine</h3>
-          <div class="filter-group">
-            <button class="filter-btn active" data-filter="cuisine" data-value="all" onclick="setFilter('cuisine','all',this)">All</button>
-            <button class="filter-btn" data-filter="cuisine" data-value="asian" onclick="setFilter('cuisine','asian',this)">🥢 Asian</button>
-            <button class="filter-btn" data-filter="cuisine" data-value="japanese" onclick="setFilter('cuisine','japanese',this)">🍱 Japanese</button>
-            <button class="filter-btn" data-filter="cuisine" data-value="indian" onclick="setFilter('cuisine','indian',this)">🍛 Indian</button>
-            <button class="filter-btn" data-filter="cuisine" data-value="mexican" onclick="setFilter('cuisine','mexican',this)">🌮 Mexican</button>
-            <button class="filter-btn" data-filter="cuisine" data-value="american" onclick="setFilter('cuisine','american',this)">🍔 American / BBQ</button>
-            <button class="filter-btn" data-filter="cuisine" data-value="mediterranean" onclick="setFilter('cuisine','mediterranean',this)">🫒 Mediterranean</button>
-            <button class="filter-btn" data-filter="cuisine" data-value="middleeastern" onclick="setFilter('cuisine','middleeastern',this)">🫙 Middle Eastern</button>
-            <button class="filter-btn" data-filter="cuisine" data-value="italian" onclick="setFilter('cuisine','italian',this)">🍝 Italian</button>
-            <button class="filter-btn" data-filter="cuisine" data-value="comfort" onclick="setFilter('cuisine','comfort',this)">🏠 Comfort</button>
-            <button class="filter-btn" data-filter="cuisine" data-value="simple" onclick="setFilter('cuisine','simple',this)">🍳 Simple</button>
-          </div>
-          <h3>Other</h3>
-          <div class="filter-group">
-            <button class="filter-btn active" data-filter="batch" data-value="all" onclick="setFilter('batch','all',this)">All</button>
-            <button class="filter-btn" data-filter="batch" data-value="true" onclick="setFilter('batch','true',this)">⚡ Batch-Friendly</button>
-          </div>
-          <h3>Source</h3>
-          <div class="filter-group">
-            <button class="filter-btn active" data-filter="source" data-value="all" onclick="setFilter('source','all',this)">All</button>
-            <button class="filter-btn" data-filter="source" data-value="recipe-book" onclick="setFilter('source','recipe-book',this)">📖 Recipe Book</button>
-            <button class="filter-btn" data-filter="source" data-value="instagram" onclick="setFilter('source','instagram',this)">📱 Instagram</button>
-          </div>
-        </aside>
         <div class="recipes-main">
+          <div class="recipes-toolbar">
+            <input type="text" class="search-box" id="searchInput" placeholder="Search recipes…" oninput="applyFilters()">
+          </div>
+          <div class="recipes-filterbar" id="recipesFilterbar"></div>
           <div class="recipes-header">
             <h2>Recipe Library</h2>
             <span class="results-count" id="resultsCount"></span>
@@ -651,6 +635,10 @@
       </div>
     </div>
 
+    <!-- Filter panel: desktop dropdown / mobile bottom sheet -->
+    <div class="filter-overlay" id="filterOverlay" onclick="closeFilterPanel()"></div>
+    <div class="filter-panel" id="filterPanel" onclick="event.stopPropagation()"></div>
+
     <!-- ── MEAL PLAN TAB ────────────────────────────────────────────────── -->
     <div id="tab-plan" class="tab-content active">
       <div class="plan-layout">
@@ -658,23 +646,16 @@
         <div class="plan-controls">
           <h2>Plan Your Week</h2>
 
-          <!-- Craving tags -->
+          <!-- Craving tags (grouped by taxonomy) -->
           <div class="cravings-section">
             <label>What are you feeling? <span style="color:var(--text3);font-weight:400;text-transform:none;letter-spacing:0">(leave blank for anything)</span></label>
-            <div class="craving-tags" id="cravingTags">
-              <button class="craving-tag" data-craving="asian" onclick="toggleCraving(this)">🥢 Asian</button>
-              <button class="craving-tag" data-craving="mexican" onclick="toggleCraving(this)">🌮 Mexican</button>
-              <button class="craving-tag" data-craving="comfort" onclick="toggleCraving(this)">🏠 Comforting</button>
-              <button class="craving-tag" data-craving="spicy" onclick="toggleCraving(this)">🌶 Spicy</button>
-              <button class="craving-tag" data-craving="brothy" onclick="toggleCraving(this)">🫕 Brothy / Soupy</button>
-              <button class="craving-tag" data-craving="noodles" onclick="toggleCraving(this)">🍜 Noodles</button>
-              <button class="craving-tag" data-craving="light" onclick="toggleCraving(this)">🥗 Light</button>
-              <button class="craving-tag" data-craving="healthy" onclick="toggleCraving(this)">💚 Healthy</button>
-              <button class="craving-tag" data-craving="simple" onclick="toggleCraving(this)">🍳 Simple</button>
-              <button class="craving-tag" data-craving="chicken" onclick="toggleCraving(this)">🐓 Chicken</button>
-              <button class="craving-tag" data-craving="beef" onclick="toggleCraving(this)">🥩 Beef</button>
-              <button class="craving-tag" data-craving="tofu" onclick="toggleCraving(this)">🌱 Tofu</button>
-            </div>
+            <div id="cravingTaxonomy"></div>
+          </div>
+
+          <!-- Protein chips -->
+          <div class="cravings-section">
+            <label>Protein <span style="color:var(--text3);font-weight:400;text-transform:none;letter-spacing:0">(any selected = match any)</span></label>
+            <div class="craving-tags" id="proteinChips"></div>
           </div>
 
           <!-- Slot toggles -->
@@ -682,20 +663,24 @@
             <span>Which meals to include?</span>
             <div class="slot-toggles">
               <label class="slot-toggle">
-                <input type="checkbox" id="slot-breakfast" checked>
+                <input type="checkbox" id="slot-breakfast" onchange="savePlanSlots()" checked>
                 <span>🌅 Breakfast</span>
               </label>
               <label class="slot-toggle">
-                <input type="checkbox" id="slot-secondBreakfast" checked>
-                <span>🥣 2nd breakfast / snack</span>
+                <input type="checkbox" id="slot-secondBreakfast" onchange="savePlanSlots()" checked>
+                <span>🥣 2nd breakfast</span>
               </label>
               <label class="slot-toggle">
-                <input type="checkbox" id="slot-dinner" checked>
+                <input type="checkbox" id="slot-dinner" onchange="savePlanSlots()" checked>
                 <span>🍽 Dinner</span>
               </label>
               <label class="slot-toggle">
-                <input type="checkbox" id="slot-dessert" checked>
-                <span>🍫 Dessert</span>
+                <input type="checkbox" id="slot-snack" onchange="savePlanSlots()" checked>
+                <span>🍫 Snack</span>
+              </label>
+              <label class="slot-toggle" id="slot-snack2-wrap">
+                <input type="checkbox" id="slot-snack2" onchange="savePlanSlots()">
+                <span>🍪 Snack 2</span>
               </label>
             </div>
           </div>
@@ -705,10 +690,11 @@
             <div class="control-group">
               <label>Days</label>
               <select class="control-select" id="planDays">
+                <option value="1">1 day</option>
+                <option value="2">2 days</option>
+                <option value="3" selected>3 days</option>
                 <option value="4">4 days</option>
                 <option value="5">5 days</option>
-                <option value="6">6 days</option>
-                <option value="7">7 days</option>
               </select>
             </div>
             <div class="control-group">
@@ -970,18 +956,43 @@ function setTheme(name) {
 }
 
 // ─── CRAVINGS TAXONOMY ───────────────────────────────────────────────────────
-// Phase 1 keeps the existing tag set (asian, mexican, …). Phase 3 will expand
-// this into a structured `CRAVING_TAXONOMY = { cuisine, texture, mood, dietary }`.
-// `tags` (previously freeform) is being absorbed into `cravings` — see migration.
+// Structured into groups for the Shuffle tab UI.
+// Recipes still store .cravings as a flat string[]; the taxonomy is purely a
+// presentation layer that groups chip rendering by category.
+const CRAVING_TAXONOMY = {
+  cuisine: ['asian','mexican','japanese','indian','italian','mediterranean','middleeastern','american','comfort'],
+  texture: ['noodles','brothy','crunchy','creamy'],
+  mood:    ['spicy','light','fresh','sweet','simple','healthy'],
+  dietary: ['highprotein','lowcarb','glutenfree','dairyfree'],
+};
+const CRAVING_GROUP_LABELS = {
+  cuisine: 'Cuisine', texture: 'Texture', mood: 'Mood', dietary: 'Dietary',
+};
+// Flat list of every valid craving value (incl. legacy ones still on recipes
+// like chicken/beef/tofu which moved to the Protein chip group).
 const ALL_CRAVINGS = [
-  'asian','mexican','comfort','spicy','brothy','noodles','light','healthy',
-  'simple','chicken','beef','tofu','sweet','fresh',
+  ...new Set([
+    ...Object.values(CRAVING_TAXONOMY).flat(),
+    'chicken','beef','tofu',
+  ]),
 ];
 const CRAVING_LABELS = {
-  asian:'🥢 Asian', mexican:'🌮 Mexican', comfort:'🏠 Comfort', spicy:'🌶 Spicy',
-  brothy:'🫕 Brothy', noodles:'🍜 Noodles', light:'🥗 Light', healthy:'💚 Healthy',
-  simple:'🍳 Simple', chicken:'🐓 Chicken', beef:'🥩 Beef', tofu:'🌱 Tofu',
-  sweet:'🍫 Sweet', fresh:'🥬 Fresh',
+  asian:'🥢 Asian', mexican:'🌮 Mexican', japanese:'🍱 Japanese', indian:'🍛 Indian',
+  italian:'🍝 Italian', mediterranean:'🫒 Mediterranean', middleeastern:'🫙 Middle Eastern',
+  american:'🍔 American', comfort:'🏠 Comfort',
+  noodles:'🍜 Noodles', brothy:'🫕 Brothy', crunchy:'🥨 Crunchy', creamy:'🥛 Creamy',
+  spicy:'🌶 Spicy', light:'🥗 Light', fresh:'🥬 Fresh', sweet:'🍫 Sweet',
+  simple:'🍳 Simple', healthy:'💚 Healthy',
+  highprotein:'💪 High-protein', lowcarb:'🥑 Low-carb',
+  glutenfree:'🌾 GF', dairyfree:'🥛 DF',
+  chicken:'🐓 Chicken', beef:'🥩 Beef', tofu:'🌱 Tofu',
+};
+
+// ─── PROTEIN CHIPS (Shuffle tab) ─────────────────────────────────────────────
+const PLAN_PROTEINS = ['chicken','beef','eggs','tofu','fish','proteinpowder','mixed','other'];
+const PROTEIN_LABELS = {
+  chicken:'🐓 Chicken', beef:'🥩 Beef', eggs:'🥚 Eggs', tofu:'🌱 Tofu',
+  fish:'🐟 Fish', proteinpowder:'🥤 Protein Powder', mixed:'🍱 Mixed', other:'🔀 Other',
 };
 
 const MEAL_TYPES = ['breakfast','lunch','dinner','sides','dessert','snack'];
@@ -1223,8 +1234,24 @@ function migrateLocalRecipes() {
   }
 }
 
-let filters = { mealType:'all', protein:'all', cuisine:'all', source:'all', special:'all' };
+// Multi-select / range filter model for the Recipes tab (Step 10).
+let filters = {
+  mealTypes: new Set(),
+  proteins:  new Set(),
+  cuisines:  new Set(),
+  cravings:  new Set(),
+  source:    '',
+  carbType:  '',
+  costMin: null,    costMax: null,
+  kcalMin: null,    kcalMax: null,
+  proteinMin: null, proteinMax: null,
+  carbsMin: null,   carbsMax: null,
+  fatMin: null,     fatMax: null,
+  prepMin: null,    prepMax: null,
+  favourites: false,
+};
 let activeCravings = new Set();
+let activeProteins = new Set();
 let currentPlan = null;
 let groceryChecked = new Set();
 let favourites = new Set();
@@ -1239,6 +1266,8 @@ let receipts = [];
 let _rcRows = [];
 try { const pb = localStorage.getItem('ds_pricebook'); if (pb) priceBook = JSON.parse(pb); } catch(e) {}
 try { const rc = localStorage.getItem('ds_receipts'); if (rc) receipts = JSON.parse(rc); } catch(e) {}
+let groceryQtyOverrides = {};
+try { const gq = localStorage.getItem('ds_grocery_qty'); if (gq) groceryQtyOverrides = JSON.parse(gq); } catch(e) {}
 
 // Seed from Lidl audit Feb–Apr 2026 + FreeSoul/Amazon protein data.
 // Runs once; flag 'ds_pb_seeded_v2' prevents re-seeding on reload.
@@ -1481,29 +1510,313 @@ function switchTab(tab, btn) {
 }
 
 // ─── FILTERS ───────────────────────────────────────────────────────────────
-function setFilter(type, value, btn) {
-  filters[type] = value;
-  document.querySelectorAll(`[data-filter="${type}"]`).forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  applyFilters();
+function applyFilters() { renderRecipes(); renderFilterBar(); }
+
+function parsePrepMinutes(text) {
+  if (!text) return null;
+  const s = String(text).toLowerCase();
+  let total = 0;
+  const hm = s.match(/(\d+)\s*h/);
+  const mm = s.match(/(\d+)\s*m/);
+  if (hm) total += parseInt(hm[1], 10) * 60;
+  if (mm) total += parseInt(mm[1], 10);
+  if (!hm && !mm) {
+    const n = s.match(/(\d+)/);
+    if (n) total = parseInt(n[1], 10);
+  }
+  return total > 0 ? total : null;
 }
-function applyFilters() { renderRecipes(); }
+
 function getFilteredRecipes() {
   const search = (document.getElementById('searchInput')||{}).value||'';
+  const q = search.toLowerCase();
   return recipes.filter(r => {
-    if(hiddenRecipes.has(r.id)) return false;
+    if (hiddenRecipes.has(r.id)) return false;
     const types = r.mealTypes || [];
-    if(filters.mealType !== 'all') {
-      const wanted = filters.mealType === 'dessert' ? ['dessert','snack'] : [filters.mealType];
-      if(!wanted.some(t => types.includes(t))) return false;
+    // Meal types — multi (OR within)
+    if (filters.mealTypes.size > 0) {
+      if (!types.some(t => filters.mealTypes.has(t))) return false;
     }
-    if(filters.protein!=='all' && r.proteinSource!==filters.protein) return false;
-    if(filters.cuisine!=='all' && r.cuisine!==filters.cuisine) return false;
-    if(filters.source!=='all' && r.source!==filters.source) return false;
-    if(filters.special==='favourites' && !favourites.has(r.id)) return false;
-    if(search && !r.name.toLowerCase().includes(search.toLowerCase()) && !(r.description||'').toLowerCase().includes(search.toLowerCase())) return false;
+    // Proteins — multi
+    if (filters.proteins.size > 0 && !filters.proteins.has(r.proteinSource)) return false;
+    // Cuisines — multi
+    if (filters.cuisines.size > 0 && !filters.cuisines.has(r.cuisine)) return false;
+    // Cravings — multi (recipe needs at least one)
+    if (filters.cravings.size > 0) {
+      const rc = r.cravings || [];
+      let hit = false;
+      for (const c of filters.cravings) { if (rc.includes(c)) { hit = true; break; } }
+      if (!hit) return false;
+    }
+    // Source — single
+    if (filters.source && r.source !== filters.source) return false;
+    // Carb type — single
+    if (filters.carbType && (r.carbType || 'none') !== filters.carbType) return false;
+    // Favourites — toggle
+    if (filters.favourites && !favourites.has(r.id)) return false;
+    // Cost — range (via computeRecipeCost per-portion)
+    if (filters.costMin != null || filters.costMax != null) {
+      const c = computeRecipeCost(r.id);
+      const v = (c && c.total > 0) ? c.perPortion : null;
+      if (v == null) return false;
+      if (filters.costMin != null && v < filters.costMin) return false;
+      if (filters.costMax != null && v > filters.costMax) return false;
+    }
+    // Time — range
+    if (filters.prepMin != null || filters.prepMax != null) {
+      const m = parsePrepMinutes(r.prepTime);
+      if (m == null) return false;
+      if (filters.prepMin != null && m < filters.prepMin) return false;
+      if (filters.prepMax != null && m > filters.prepMax) return false;
+    }
+    // Macro ranges (per serving)
+    const nut = RECIPE_FULL_DATA[r.id]?.nutrition;
+    const macroChecks = [
+      ['kcal',    filters.kcalMin,    filters.kcalMax],
+      ['protein', filters.proteinMin, filters.proteinMax],
+      ['carbs',   filters.carbsMin,   filters.carbsMax],
+      ['fat',     filters.fatMin,     filters.fatMax],
+    ];
+    for (const [k, lo, hi] of macroChecks) {
+      if (lo == null && hi == null) continue;
+      const v = nut?.[k];
+      if (v == null) return false;
+      if (lo != null && v < lo) return false;
+      if (hi != null && v > hi) return false;
+    }
+    // Search
+    if (q) {
+      if (!r.name.toLowerCase().includes(q) && !(r.description||'').toLowerCase().includes(q)) return false;
+    }
     return true;
   });
+}
+
+// ─── FILTER BAR + PANEL ───────────────────────────────────────────────────
+let _activeFilterType = null;
+
+const FILTER_CHIPS = [
+  { type: 'favourites', label: '♥' },
+  { type: 'mealType',   label: 'Meal Type' },
+  { type: 'protein',    label: 'Protein' },
+  { type: 'cuisine',    label: 'Cuisine' },
+  { type: 'cravings',   label: 'Cravings' },
+  { type: 'cost',       label: '💷 Cost' },
+  { type: 'time',       label: '⏱ Time' },
+  { type: 'macros',     label: '📊 Macros' },
+  { type: 'carbType',   label: '🌾 Carb' },
+  { type: 'source',     label: '📱 Source' },
+];
+
+const FILTER_PANEL_TITLE = {
+  mealType: 'Meal Type', protein: 'Protein', cuisine: 'Cuisine',
+  cravings: 'Cravings', cost: 'Cost per portion', time: 'Prep + cook time',
+  macros: 'Macros (per serving)', carbType: 'Carb Type', source: 'Source',
+};
+
+function _filterChipState(type) {
+  switch (type) {
+    case 'favourites': return { active: filters.favourites, count: 0 };
+    case 'mealType':   return { active: filters.mealTypes.size>0, count: filters.mealTypes.size };
+    case 'protein':    return { active: filters.proteins.size>0,  count: filters.proteins.size };
+    case 'cuisine':    return { active: filters.cuisines.size>0,  count: filters.cuisines.size };
+    case 'cravings':   return { active: filters.cravings.size>0,  count: filters.cravings.size };
+    case 'cost':       return { active: filters.costMin!=null || filters.costMax!=null, count: 1 };
+    case 'time':       return { active: filters.prepMin!=null || filters.prepMax!=null, count: 1 };
+    case 'macros': {
+      const keys = ['kcalMin','kcalMax','proteinMin','proteinMax','carbsMin','carbsMax','fatMin','fatMax'];
+      const n = keys.filter(k => filters[k]!=null).length;
+      return { active: n>0, count: n };
+    }
+    case 'carbType': return { active: !!filters.carbType, count: 0 };
+    case 'source':   return { active: !!filters.source,   count: 0 };
+  }
+  return { active: false, count: 0 };
+}
+
+function renderFilterBar() {
+  const bar = document.getElementById('recipesFilterbar');
+  if (!bar) return;
+  const anyActive = FILTER_CHIPS.some(c => _filterChipState(c.type).active);
+  bar.innerHTML = FILTER_CHIPS.map(c => {
+    const s = _filterChipState(c.type);
+    const cnt = s.count > 0 ? `<span class="filterbar-chip-count">${s.count}</span>` : '';
+    return `<button class="filterbar-chip${s.active?' has-active':''}" data-filter-chip="${c.type}" onclick="onFilterChipClick(event,'${c.type}')">${c.label}${cnt}</button>`;
+  }).join('') + (anyActive ? `<button class="filterbar-clear" onclick="clearAllFilters()">× Clear all</button>` : '');
+}
+
+function onFilterChipClick(evt, type) {
+  evt.stopPropagation();
+  if (type === 'favourites') {
+    filters.favourites = !filters.favourites;
+    applyFilters();
+    return;
+  }
+  if (_activeFilterType === type) { closeFilterPanel(); return; }
+  openFilterPanel(type, evt.currentTarget);
+}
+
+function openFilterPanel(type, anchorBtn) {
+  closeFilterPanel();
+  _activeFilterType = type;
+  const overlay = document.getElementById('filterOverlay');
+  const panel = document.getElementById('filterPanel');
+  if (!panel || !overlay) return;
+  panel.innerHTML = `
+    <div class="filter-panel-title">${FILTER_PANEL_TITLE[type] || type}</div>
+    <div class="filter-panel-body">${renderFilterBody(type)}</div>
+    <div class="filter-panel-actions">
+      <button onclick="clearFilter('${type}')">Clear</button>
+      <button class="btn-apply" onclick="closeFilterPanel()">Done</button>
+    </div>`;
+  panel.style.display = 'block';
+  overlay.classList.add('open');
+
+  // Desktop dropdown vs mobile bottom sheet
+  if (window.matchMedia('(min-width: 768px)').matches && anchorBtn) {
+    const rect = anchorBtn.getBoundingClientRect();
+    panel.style.position = 'absolute';
+    panel.style.top = (rect.bottom + window.scrollY + 6) + 'px';
+    panel.style.left = Math.min(rect.left + window.scrollX, window.innerWidth - 380 - 16) + 'px';
+    panel.style.right = ''; panel.style.bottom = ''; panel.style.maxHeight = '';
+  } else {
+    panel.style.position = 'fixed';
+    panel.style.top = ''; panel.style.left = '0'; panel.style.right = '0';
+    panel.style.bottom = '0';
+  }
+}
+
+function closeFilterPanel() {
+  const overlay = document.getElementById('filterOverlay');
+  const panel = document.getElementById('filterPanel');
+  if (panel) panel.style.display = 'none';
+  if (overlay) overlay.classList.remove('open');
+  _activeFilterType = null;
+}
+
+function clearFilter(type) {
+  switch (type) {
+    case 'mealType': filters.mealTypes.clear(); break;
+    case 'protein':  filters.proteins.clear();  break;
+    case 'cuisine':  filters.cuisines.clear();  break;
+    case 'cravings': filters.cravings.clear();  break;
+    case 'cost':     filters.costMin = filters.costMax = null; break;
+    case 'time':     filters.prepMin = filters.prepMax = null; break;
+    case 'macros':
+      ['kcalMin','kcalMax','proteinMin','proteinMax','carbsMin','carbsMax','fatMin','fatMax']
+        .forEach(k => filters[k] = null);
+      break;
+    case 'carbType': filters.carbType = ''; break;
+    case 'source':   filters.source = '';   break;
+  }
+  // Re-render panel body so the user sees the cleared state, plus the chip + grid
+  if (_activeFilterType === type) {
+    const panel = document.getElementById('filterPanel');
+    const body = panel?.querySelector('.filter-panel-body');
+    if (body) body.innerHTML = renderFilterBody(type);
+  }
+  applyFilters();
+}
+
+function clearAllFilters() {
+  filters.mealTypes.clear(); filters.proteins.clear(); filters.cuisines.clear(); filters.cravings.clear();
+  filters.source = ''; filters.carbType = '';
+  ['costMin','costMax','prepMin','prepMax','kcalMin','kcalMax','proteinMin','proteinMax','carbsMin','carbsMax','fatMin','fatMax']
+    .forEach(k => filters[k] = null);
+  filters.favourites = false;
+  closeFilterPanel();
+  applyFilters();
+}
+
+// ── Panel body builders ──────────────────────────────────────────────────────
+function _multiChipsHtml(filterSet, values, labels, type) {
+  return values.map(v => `
+    <span class="filter-panel-chip${filterSet.has(v)?' active':''}" onclick="toggleFilterMulti('${type}','${v}',this)">${labels[v] || v}</span>
+  `).join('');
+}
+
+function _singleChipsHtml(currentVal, values, labels, type) {
+  return values.map(v => `
+    <span class="filter-panel-chip${currentVal===v?' active':''}" onclick="setFilterSingle('${type}','${v}')">${labels[v] || v}</span>
+  `).join('');
+}
+
+function _rangeRowHtml(label, minKey, maxKey, minPh, maxPh, step) {
+  const stepAttr = step ? `step="${step}"` : '';
+  return `<div class="filter-range-row">
+    <label>${label}</label>
+    <input type="number" ${stepAttr} placeholder="${minPh}" value="${filters[minKey] ?? ''}" oninput="setFilterRange('${minKey}', this.value)">
+    <span style="color:var(--text3);font-size:11px">–</span>
+    <input type="number" ${stepAttr} placeholder="${maxPh}" value="${filters[maxKey] ?? ''}" oninput="setFilterRange('${maxKey}', this.value)">
+  </div>`;
+}
+
+function renderFilterBody(type) {
+  switch (type) {
+    case 'mealType':
+      return `<div style="display:flex;flex-wrap:wrap;gap:6px;width:100%">${_multiChipsHtml(filters.mealTypes, MEAL_TYPES, MEAL_TYPE_LABELS, 'mealType')}</div>`;
+    case 'protein':
+      return `<div style="display:flex;flex-wrap:wrap;gap:6px;width:100%">${_multiChipsHtml(filters.proteins, PLAN_PROTEINS, PROTEIN_LABELS, 'protein')}</div>`;
+    case 'cuisine': {
+      const cuisines = ['comfort','asian','japanese','indian','italian','mexican','american','mediterranean','middleeastern','simple','other'];
+      const labels = Object.fromEntries(cuisines.map(c => [c, `${CUISINE_EMOJI[c]||''} ${c.charAt(0).toUpperCase()+c.slice(1)}`]));
+      return `<div style="display:flex;flex-wrap:wrap;gap:6px;width:100%">${_multiChipsHtml(filters.cuisines, cuisines, labels, 'cuisine')}</div>`;
+    }
+    case 'cravings': {
+      const groups = Object.entries(CRAVING_TAXONOMY).map(([g, vals]) => `
+        <div style="width:100%">
+          <div class="filter-group-label">${CRAVING_GROUP_LABELS[g]||g}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">${_multiChipsHtml(filters.cravings, vals, CRAVING_LABELS, 'cravings')}</div>
+        </div>
+      `).join('');
+      return groups;
+    }
+    case 'cost':
+      return `<div style="width:100%">${_rangeRowHtml('£ / portion','costMin','costMax','min','max','0.10')}
+        <div style="font-size:11px;color:var(--text3);margin-top:4px">Only matches recipes with priced ingredients.</div></div>`;
+    case 'time':
+      return `<div style="width:100%">${_rangeRowHtml('Minutes','prepMin','prepMax','5','120','1')}</div>`;
+    case 'macros':
+      return `<div style="width:100%">
+        ${_rangeRowHtml('kcal',    'kcalMin',    'kcalMax',    '0', '1500', '10')}
+        ${_rangeRowHtml('protein (g)','proteinMin','proteinMax','0', '100',  '1')}
+        ${_rangeRowHtml('carbs (g)', 'carbsMin', 'carbsMax', '0', '200',  '1')}
+        ${_rangeRowHtml('fat (g)',   'fatMin',   'fatMax',   '0', '100',  '1')}
+        <div style="font-size:11px;color:var(--text3);margin-top:4px">Only matches recipes with AI-estimated nutrition.</div>
+      </div>`;
+    case 'carbType':
+      return `<div style="display:flex;flex-wrap:wrap;gap:6px;width:100%">${_singleChipsHtml(filters.carbType, CARB_TYPES, CARB_TYPE_LABELS, 'carbType')}</div>`;
+    case 'source':
+      return `<div style="display:flex;flex-wrap:wrap;gap:6px;width:100%">${_singleChipsHtml(filters.source, ['recipe-book','instagram'], { 'recipe-book':'📖 Recipe Book', 'instagram':'📱 Instagram' }, 'source')}</div>`;
+  }
+  return '';
+}
+
+function toggleFilterMulti(type, value, el) {
+  const setMap = { mealType: filters.mealTypes, protein: filters.proteins, cuisine: filters.cuisines, cravings: filters.cravings };
+  const s = setMap[type];
+  if (!s) return;
+  if (s.has(value)) { s.delete(value); el.classList.remove('active'); }
+  else { s.add(value); el.classList.add('active'); }
+  applyFilters();
+}
+
+function setFilterSingle(type, value) {
+  // Toggle off if clicking the active value
+  if (filters[type] === value) filters[type] = '';
+  else filters[type] = value;
+  // Re-render panel body to reflect selection
+  if (_activeFilterType === type) {
+    const body = document.querySelector('#filterPanel .filter-panel-body');
+    if (body) body.innerHTML = renderFilterBody(type);
+  }
+  applyFilters();
+}
+
+function setFilterRange(key, val) {
+  const num = val === '' || val == null ? null : parseFloat(val);
+  filters[key] = (num == null || isNaN(num)) ? null : num;
+  applyFilters();
 }
 
 // ─── RENDER RECIPES ─────────────────────────────────────────────────────────
@@ -1720,18 +2033,14 @@ function toggleFav(event, id) {
     modalBtn.title = favourites.has(id) ? 'Remove from favourites' : 'Add to favourites';
   }
   // If favourites filter is active and we unfavourited, re-render
-  if(filters.special === 'favourites' && !favourites.has(id)) renderRecipes();
+  if(filters.favourites && !favourites.has(id)) renderRecipes();
 }
 
-function toggleFavFilter(btn) {
-  if(filters.special === 'favourites') {
-    filters.special = 'all';
-    btn.classList.remove('active');
-  } else {
-    filters.special = 'favourites';
-    btn.classList.add('active');
-  }
-  renderRecipes();
+// Kept as a no-op shim for any old callers; the new filter bar handles favourites
+// via the ♥ chip toggle (see onFilterChipClick).
+function toggleFavFilter() {
+  filters.favourites = !filters.favourites;
+  applyFilters();
 }
 
 function updateServingOverride(id, val) {
@@ -2213,6 +2522,49 @@ function canonicalise(name) {
     .trim();
 }
 
+// ── 12-Aisle Classifier ──────────────────────────────────────────────────────
+const AISLES = {
+  produce:    '🥦 Produce',
+  meat:       '🥩 Meat & Seafood',
+  dairy:      '🧀 Dairy & Eggs',
+  bakery:     '🥖 Bakery',
+  pantry:     '🌾 Pantry / Dry Goods',
+  canned:     '🥫 Canned & Jarred',
+  frozen:     '🧊 Frozen',
+  condiments: '🫙 Condiments & Sauces',
+  snacks:     '🍫 Snacks & Confectionery',
+  beverages:  '🥤 Beverages',
+  spices:     '🌶 Spices & Herbs',
+  other:      '🛒 Household / Other',
+};
+const AISLE_ORDER = ['produce','meat','dairy','bakery','pantry','canned','frozen','condiments','snacks','beverages','spices','other'];
+
+// Order matters — first regex match wins. Keep the strongest signals first.
+const _AISLE_RULES = [
+  [/\b(frozen|ice cream|sorbet)\b/, 'frozen'],
+  [/\b(canned|tinned|jar of|tin of|tomato passata|chopped tomato|baked bean|coconut milk)\b/, 'canned'],
+  [/\b(yogurt|yoghurt|cheese|butter|cream|egg|eggs|egg white|milk|halloumi|feta|paneer|alpro|oatly)\b/, 'dairy'],
+  [/\b(chicken|beef|pork|lamb|turkey|mince|sausage|bacon|ham|prosciutto|chorizo|salmon|tuna|cod|haddock|prawn|shrimp|fish|anchovy|sardine|tofu|tempeh|seitan)\b/, 'meat'],
+  [/\b(bread|baguette|roll|bun|pita|tortilla|naan|wrap|brioche|sourdough|crumpet|muffin top|pizza base)\b/, 'bakery'],
+  [/\b(sauce|vinegar|mayo|ketchup|mustard|soy sauce|tamari|fish sauce|hot sauce|sriracha|hoisin|miso|sesame oil|olive oil|coconut oil|vegetable oil|sunflower oil|rapeseed oil|tahini|pesto|harissa|gochujang|sambal|chilli sauce|chili sauce)\b/, 'condiments'],
+  [/\b(salt|pepper|cumin|turmeric|paprika|chilli powder|chili powder|cinnamon|nutmeg|cardamom|clove|fennel seed|oregano|sumac|za'?atar|chilli flake|chili flake|garam masala|curry powder|five spice|bay leaf|herb mix|spice mix|stock cube|bouillon)\b/, 'spices'],
+  [/\b(juice|tea|coffee|soda|sparkling water|kombucha|beer|wine|lemonade|cordial|squash)\b/, 'beverages'],
+  [/\b(chocolate|cocoa|candy|crisp|crisps|chip|popcorn|cookie|biscuit|brownie|cake|protein bar|granola bar|wafer|jelly)\b/, 'snacks'],
+  [/\b(rice|pasta|spaghetti|noodle|noodles|oat|oats|quinoa|flour|sugar|cornflour|cornstarch|baking powder|baking soda|bicarbonate|yeast|seed|seeds|lentil|lentils|bean|beans|chickpea|nut|nuts|almond|cashew|walnut|peanut|chia|flax|tahini|honey|maple syrup|vanilla|stock|broth|polenta|couscous|bulgur|raisin|sultana|date|dates|cocoa nibs|coconut|protein powder|peanut butter powder)\b/, 'pantry'],
+  [/\b(apple|apples|banana|berry|berries|blueberry|raspberry|strawberry|blackberry|lettuce|spinach|kale|rocket|tomato|tomatoes|onion|onions|shallot|garlic|pepper|peppers|capsicum|carrot|carrots|broccoli|cabbage|cauliflower|courgette|zucchini|aubergine|eggplant|cucumber|squash|butternut|pumpkin|potato|potatoes|sweet potato|herb|herbs|coriander|cilantro|basil|parsley|mint|thyme|rosemary|sage|dill|chive|chives|ginger|lemon|lime|orange|grapefruit|avocado|avocados|mushroom|mushrooms|spring onion|scallion|chilli|chili|date|fig|grape|peach|pear|plum|pineapple|kiwi|mango|melon|watermelon|celery|leek|asparagus|beetroot|radish|fennel|sprout|sprouts|beansprout|beansprouts|peas|sweetcorn|corn|edamame)\b/, 'produce'],
+];
+
+function classifyAisle(name) {
+  if (!name) return 'other';
+  const n = String(name).toLowerCase();
+  // Honour explicit override in priceBook if author set one
+  const key = canonicalise(name);
+  const pb = priceBook[key];
+  if (pb && pb.aisle && AISLES[pb.aisle]) return pb.aisle;
+  for (const [re, aisle] of _AISLE_RULES) if (re.test(n)) return aisle;
+  return 'other';
+}
+
 function lookupPriceBook(key) {
   if (!key) return null;
   if (priceBook[key]) return priceBook[key];
@@ -2572,23 +2924,90 @@ Rules:
   }
 }
 
-// ─── CRAVINGS ─────────────────────────────────────────────────────────────
+// ─── CRAVINGS + PROTEIN CHIPS ─────────────────────────────────────────────
+function renderCravingTaxonomy() {
+  const wrap = document.getElementById('cravingTaxonomy');
+  if (!wrap) return;
+  wrap.innerHTML = Object.entries(CRAVING_TAXONOMY).map(([group, values]) => `
+    <div class="craving-group-label">${CRAVING_GROUP_LABELS[group] || group}</div>
+    <div class="craving-tags" style="margin-bottom:8px">
+      ${values.map(v => `
+        <button class="craving-tag${activeCravings.has(v)?' active':''}" data-craving="${v}" onclick="toggleCraving(this)">${CRAVING_LABELS[v]||v}</button>
+      `).join('')}
+    </div>
+  `).join('');
+}
+
+function renderProteinChips() {
+  const wrap = document.getElementById('proteinChips');
+  if (!wrap) return;
+  wrap.innerHTML = PLAN_PROTEINS.map(p => `
+    <button class="craving-tag${activeProteins.has(p)?' active':''}" data-protein="${p}" onclick="toggleProtein(this)">${PROTEIN_LABELS[p]||p}</button>
+  `).join('');
+}
+
 function toggleCraving(btn) {
   const c = btn.dataset.craving;
   if(activeCravings.has(c)) { activeCravings.delete(c); btn.classList.remove('active'); }
   else { activeCravings.add(c); btn.classList.add('active'); }
 }
 
-function matchesCravings(recipe) {
-  if(activeCravings.size === 0) return true;
-  // Any craving tag match on cuisine
-  if(activeCravings.has(recipe.cuisine)) return true;
-  // Protein cravings
-  if(activeCravings.has(recipe.proteinSource)) return true;
-  // Tag-based cravings
-  const recipeCravings = recipe.cravings || [];
-  for(const c of activeCravings) { if(recipeCravings.includes(c)) return true; }
-  return false;
+function toggleProtein(btn) {
+  const p = btn.dataset.protein;
+  if(activeProteins.has(p)) { activeProteins.delete(p); btn.classList.remove('active'); }
+  else { activeProteins.add(p); btn.classList.add('active'); }
+}
+
+// AND of: craving match (OR within), protein match (OR within).
+function matchesPlanFilters(recipe) {
+  if (activeCravings.size > 0) {
+    const recipeCravings = recipe.cravings || [];
+    let hit = activeCravings.has(recipe.cuisine);
+    if (!hit) for (const c of activeCravings) { if (recipeCravings.includes(c)) { hit = true; break; } }
+    if (!hit) return false;
+  }
+  if (activeProteins.size > 0) {
+    if (!activeProteins.has(recipe.proteinSource)) return false;
+  }
+  return true;
+}
+
+// ─── PLAN SLOTS PERSISTENCE ───────────────────────────────────────────────
+const _PLAN_SLOT_KEYS = ['breakfast','secondBreakfast','dinner','snack','snack2'];
+
+function savePlanSlots() {
+  const slots = {};
+  for (const k of _PLAN_SLOT_KEYS) {
+    const el = document.getElementById('slot-' + k);
+    if (el) slots[k] = el.checked;
+  }
+  try { localStorage.setItem('ds_plan_slots', JSON.stringify(slots)); } catch(e) {}
+  // Snack 2 is gated on Snack being on
+  const snackEl = document.getElementById('slot-snack');
+  const snack2El = document.getElementById('slot-snack2');
+  if (snack2El) {
+    snack2El.disabled = !snackEl?.checked;
+    if (!snackEl?.checked && snack2El.checked) { snack2El.checked = false; }
+  }
+}
+
+function loadPlanSlots() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('ds_plan_slots') || 'null');
+    if (saved) {
+      for (const k of _PLAN_SLOT_KEYS) {
+        const el = document.getElementById('slot-' + k);
+        if (el && typeof saved[k] === 'boolean') el.checked = saved[k];
+      }
+    }
+  } catch(e) {}
+  // Enforce snack2 gating after load
+  const snackEl = document.getElementById('slot-snack');
+  const snack2El = document.getElementById('slot-snack2');
+  if (snack2El) {
+    snack2El.disabled = !snackEl?.checked;
+    if (!snackEl?.checked) snack2El.checked = false;
+  }
 }
 
 // ─── MEAL PLAN GENERATOR ─────────────────────────────────────────────────────
@@ -2618,17 +3037,19 @@ function buildBatchSchedule(pool, days) {
 }
 
 function generatePlan() {
-  const days = parseInt(document.getElementById('planDays').value)||4;
+  const days = parseInt(document.getElementById('planDays').value)||3;
   const bfMode = document.getElementById('planBreakfast').value;
   const startDateVal = document.getElementById('planStartDate').value;
   const batchDayPref = document.getElementById('planBatchDay').value;
 
   // Which slots to plan for
+  const snackOn = document.getElementById('slot-snack').checked;
   const activeSlots = {
     breakfast:       document.getElementById('slot-breakfast').checked,
     secondBreakfast: document.getElementById('slot-secondBreakfast').checked,
     dinner:          document.getElementById('slot-dinner').checked,
-    dessert:         document.getElementById('slot-dessert').checked,
+    snack:           snackOn,
+    snack2:          snackOn && document.getElementById('slot-snack2').checked,
   };
   if(!Object.values(activeSlots).some(Boolean)) {
     alert('Select at least one meal slot to plan for.'); return;
@@ -2637,13 +3058,13 @@ function generatePlan() {
   const hasType = (r, t) => (r.mealTypes || []).includes(t);
   // Breakfast pool (all breakfast recipes)
   const bfPool = recipes.filter(r => hasType(r, 'breakfast'));
-  // Dinner pool: filtered by cravings (batch-friendly is now assumed for every recipe)
-  const dinPool = recipes.filter(r => hasType(r, 'dinner') && matchesCravings(r));
-  // Fallback if no dinners match cravings — relax the craving filter
+  // Dinner pool: filtered by craving + protein chips (AND across groups, OR within)
+  const dinPool = recipes.filter(r => hasType(r, 'dinner') && matchesPlanFilters(r));
+  // Fallback if no dinners match filters — relax to all dinners
   const dinPoolFallback = recipes.filter(r => hasType(r, 'dinner'));
   const activeDinPool = dinPool.length ? dinPool : dinPoolFallback;
-  // Dessert pool — straightforward filter, no hardcoded ID specials
-  const dessertPool = recipes.filter(r => hasType(r, 'dessert') || hasType(r, 'snack'));
+  // Snack pool — snack or dessert mealType, no hardcoded ID specials
+  const snackPool = recipes.filter(r => hasType(r, 'snack') || hasType(r, 'dessert'));
 
   if(activeSlots.breakfast && !bfPool.length) {
     alert('No breakfast recipes in your library yet.'); return;
@@ -2663,10 +3084,9 @@ function generatePlan() {
   const firstBf = bfMode==='same' ? pickRandom(bfPool) : null;
   const bfSchedule = bfMode==='same' ? null : buildBatchSchedule(bfPool, days);
 
-  // Dessert: rotate through the pool day by day; avoid back-to-back repeats.
-  const dessertSchedule = activeSlots.dessert && dessertPool.length
-    ? buildBatchSchedule(dessertPool, days)
-    : null;
+  // Snack(s) — rotate through the pool day by day; avoid back-to-back repeats.
+  const snackSchedule  = activeSlots.snack  && snackPool.length ? buildBatchSchedule(snackPool, days) : null;
+  const snack2Schedule = activeSlots.snack2 && snackPool.length ? buildBatchSchedule(snackPool, days) : null;
 
   const plan = [];
   for(let d=0; d<days; d++) {
@@ -2689,14 +3109,15 @@ function generatePlan() {
 
     plan.push({
       day: d+1, date,
-      isBatch: isNewCook,   // cook day = first day of new dinner batch
+      isBatch: isNewCook,
       isNewCook,
       dinnerBatchDay, dinnerBatchTotal,
       activeSlots,
       breakfast:       activeSlots.breakfast       ? bf  : null,
       secondBreakfast: activeSlots.secondBreakfast ? SHAKE : null,
       dinner:          activeSlots.dinner           ? din : null,
-      dessert:         activeSlots.dessert          ? (dessertSchedule?.[d] || null) : null,
+      snack:           activeSlots.snack            ? (snackSchedule?.[d]  || null) : null,
+      snack2:          activeSlots.snack2           ? (snack2Schedule?.[d] || null) : null,
     });
   }
 
@@ -2710,15 +3131,17 @@ async function generatePlanWithAI() {
   const key = localStorage.getItem('ds_api_key');
   if (!key) { openSettings(); return; }
 
-  const days        = parseInt(document.getElementById('planDays').value) || 4;
+  const days        = parseInt(document.getElementById('planDays').value) || 3;
   const bfMode      = document.getElementById('planBreakfast').value;
   const startDateVal= document.getElementById('planStartDate').value;
   const batchDayPref= document.getElementById('planBatchDay').value;
+  const snackOn     = document.getElementById('slot-snack').checked;
   const activeSlots = {
     breakfast:       document.getElementById('slot-breakfast').checked,
     secondBreakfast: document.getElementById('slot-secondBreakfast').checked,
     dinner:          document.getElementById('slot-dinner').checked,
-    dessert:         document.getElementById('slot-dessert').checked,
+    snack:           snackOn,
+    snack2:          snackOn && document.getElementById('slot-snack2').checked,
   };
 
   const startDate = startDateVal ? new Date(startDateVal+'T00:00:00') : new Date();
@@ -2746,9 +3169,9 @@ async function generatePlanWithAI() {
     const pool = recipes.filter(r => hasType(r, 'dinner'));
     if (pool.length) catalog += `DINNER (ID: name):\n${pool.map(formatR).join('\n')}\n\n`;
   }
-  if (activeSlots.dessert) {
-    const pool = recipes.filter(r => hasType(r, 'dessert') || hasType(r, 'snack'));
-    if (pool.length) catalog += `DESSERT (ID: name):\n${pool.map(formatR).join('\n')}\n\n`;
+  if (activeSlots.snack || activeSlots.snack2) {
+    const pool = recipes.filter(r => hasType(r, 'snack') || hasType(r, 'dessert'));
+    if (pool.length) catalog += `SNACK (ID: name):\n${pool.map(formatR).join('\n')}\n\n`;
   }
 
   const cravingList = [...activeCravings];
@@ -2765,11 +3188,11 @@ Constraints:
 - Batch cook day: ${batchDayName} (every dinner recipe is batch-friendly)${cravingNote}
 - ${bfRule}
 - Dinner: group the SAME dinner ID across 2–4 consecutive days (one batch cook covers multiple days). Do NOT repeat the same dinner in back-to-back batches. Prefer ★ favourites.
-- Dessert: vary — avoid the same ID on consecutive days.
+- Snack / Snack 2: vary — avoid the same ID on consecutive days. If both snack slots are on, they should differ on a given day.
 - secondBreakfast: always 0 (protein shake).
 
 Return ONLY valid JSON — no markdown fences, no explanation:
-{"days":[{"breakfast":<id>,"secondBreakfast":0,"dinner":<id>,"dessert":<id>}]}
+{"days":[{"breakfast":<id>,"secondBreakfast":0,"dinner":<id>,"snack":<id>,"snack2":<id>}]}
 Exactly ${days} objects. Use null for slots not being planned.`;
 
   const userMsg = `${catalog}Plan ${days} days starting ${startDayName}.`;
@@ -2853,7 +3276,8 @@ function buildPlanFromAIDays(aiDays, startDate, activeSlots) {
       breakfast:       activeSlots.breakfast       ? find(aiDay.breakfast)                        : null,
       secondBreakfast: activeSlots.secondBreakfast ? (find(aiDay.secondBreakfast) || SHAKE)       : null,
       dinner:          activeSlots.dinner           ? find(aiDay.dinner)                           : null,
-      dessert:         activeSlots.dessert          ? find(aiDay.dessert)                          : null,
+      snack:           activeSlots.snack            ? find(aiDay.snack)                            : null,
+      snack2:          activeSlots.snack2           ? find(aiDay.snack2)                           : null,
     };
   });
 }
@@ -2866,18 +3290,17 @@ function respinDay(dayIndex, slot) {
     const pool = recipes.filter(r => hasType(r, 'breakfast') && r.id !== day.breakfast?.id);
     if(pool.length) day.breakfast = pool[Math.floor(Math.random()*pool.length)];
   } else if(slot==='secondBreakfast') {
-    // Cycle: shake → random breakfast/dessert/snack → shake
     const pool = recipes.filter(r =>
       (hasType(r,'breakfast') || hasType(r,'dessert') || hasType(r,'snack')) &&
       r.id !== day.secondBreakfast?.id
     );
     day.secondBreakfast = pool.length ? pool[Math.floor(Math.random()*pool.length)] : SHAKE;
   } else if(slot==='dinner') {
-    const pool = recipes.filter(r => hasType(r,'dinner') && matchesCravings(r) && r.id !== day.dinner?.id);
+    const pool = recipes.filter(r => hasType(r,'dinner') && matchesPlanFilters(r) && r.id !== day.dinner?.id);
     if(pool.length) day.dinner = pool[Math.floor(Math.random()*pool.length)];
-  } else if(slot==='dessert') {
-    const pool = recipes.filter(r => (hasType(r,'dessert') || hasType(r,'snack')) && r.id !== day.dessert?.id);
-    if(pool.length) day.dessert = pool[Math.floor(Math.random()*pool.length)];
+  } else if(slot==='snack' || slot==='snack2') {
+    const pool = recipes.filter(r => (hasType(r,'snack') || hasType(r,'dessert')) && r.id !== day[slot]?.id);
+    if(pool.length) day[slot] = pool[Math.floor(Math.random()*pool.length)];
   }
   renderPlanOutput(currentPlan);
 }
@@ -2922,9 +3345,13 @@ function renderPlanOutput(plan) {
             <div class="cal-meal-slot">🍽 Dinner${dinLeftover}</div>
             <div class="cal-meal-name"><button class="cal-meal-pick-btn" onclick="openPicker(${i},'dinner')">${day.dinner?.name||'—'}</button> <button class="cal-meal-respin" onclick="respinDay(${i},'dinner')">↺</button></div>
           </div>` : ''}
-          ${day.activeSlots.dessert ? `<div class="cal-meal">
-            <div class="cal-meal-slot">🍫 Dessert</div>
-            <div class="cal-meal-name"><button class="cal-meal-pick-btn" onclick="openPicker(${i},'dessert')">${day.dessert?.name||'—'}</button> <button class="cal-meal-respin" onclick="respinDay(${i},'dessert')">↺</button></div>
+          ${day.activeSlots.snack ? `<div class="cal-meal">
+            <div class="cal-meal-slot">🍫 Snack</div>
+            <div class="cal-meal-name"><button class="cal-meal-pick-btn" onclick="openPicker(${i},'snack')">${day.snack?.name||'—'}</button> <button class="cal-meal-respin" onclick="respinDay(${i},'snack')">↺</button></div>
+          </div>` : ''}
+          ${day.activeSlots.snack2 ? `<div class="cal-meal">
+            <div class="cal-meal-slot">🍪 Snack 2</div>
+            <div class="cal-meal-name"><button class="cal-meal-pick-btn" onclick="openPicker(${i},'snack2')">${day.snack2?.name||'—'}</button> <button class="cal-meal-respin" onclick="respinDay(${i},'snack2')">↺</button></div>
           </div>` : ''}
         </div>
       </div>
@@ -2963,10 +3390,15 @@ function renderPlanOutput(plan) {
             <button class="meal-pick-btn" onclick="openPicker(${i},'dinner')">${day.dinner?.name||'—'}</button>
             <button class="plan-meal-respin" onclick="respinDay(${i},'dinner')">↺</button>
           </div>` : ''}
-          ${day.activeSlots.dessert ? `<div class="plan-meal">
-            <div class="plan-meal-slot">🍫 Dessert</div>
-            <button class="meal-pick-btn" onclick="openPicker(${i},'dessert')">${day.dessert?.name||'—'}</button>
-            <button class="plan-meal-respin" onclick="respinDay(${i},'dessert')">↺</button>
+          ${day.activeSlots.snack ? `<div class="plan-meal">
+            <div class="plan-meal-slot">🍫 Snack</div>
+            <button class="meal-pick-btn" onclick="openPicker(${i},'snack')">${day.snack?.name||'—'}</button>
+            <button class="plan-meal-respin" onclick="respinDay(${i},'snack')">↺</button>
+          </div>` : ''}
+          ${day.activeSlots.snack2 ? `<div class="plan-meal">
+            <div class="plan-meal-slot">🍪 Snack 2</div>
+            <button class="meal-pick-btn" onclick="openPicker(${i},'snack2')">${day.snack2?.name||'—'}</button>
+            <button class="plan-meal-respin" onclick="respinDay(${i},'snack2')">↺</button>
           </div>` : ''}
         </div>
       </div>
@@ -2977,7 +3409,7 @@ function renderPlanOutput(plan) {
   // ── Plan cost summary ─────────────────────────────────────────────────────
   {
     const planIds = [...new Set(
-      plan.flatMap(d => [d.breakfast, d.secondBreakfast, d.dinner, d.dessert])
+      plan.flatMap(d => [d.breakfast, d.secondBreakfast, d.dinner, d.snack, d.snack2])
         .filter(r => r && r.id !== 0).map(r => r.id)
     )];
     let planTotal = 0, planUnpriced = 0, planHasCost = false;
@@ -3008,61 +3440,103 @@ function renderPlanOutput(plan) {
 }
 
 // ─── GROCERY LIST ────────────────────────────────────────────────────────────
-function renderGroceryList(plan) {
-  if(!plan||!plan.length) return '';
+// Ingredient-driven aggregation: walk RECIPE_FULL_DATA[id].ingredients, run
+// each through parseQty + canonicalise, group by classifyAisle(name).
+// Quantities sum across recipes when (canonical key + unit) match.
+// Per-row quantity override: localStorage.ds_grocery_qty[key].
 
-  // Aggregate all grocery items from the plan's recipes
-  const agg = { protein:[], produce:[], fridge:[], tins:[], dry:[], condiments:[], extras:[] };
-  const catLabels = {
-    protein:'🥩 Protein & Eggs', produce:'🥦 Fresh Produce',
-    fridge:'🧊 Fridge (dairy-free)', tins:'🥫 Tins & Jars',
-    dry:'🌾 Dry Goods', condiments:'🧂 Condiments & Spices', extras:'🍫 Extras'
-  };
+function _formatGroceryQty(qty, unit) {
+  if (qty == null || qty === 0) return '';
+  // Convert base units back to friendly display
+  let q = qty, u = unit || '';
+  if (u === 'g' && q >= 1000) { q = q / 1000; u = 'kg'; }
+  else if (u === 'ml' && q >= 1000) { q = q / 1000; u = 'l'; }
+  const rounded = q >= 10 ? Math.round(q) : Math.round(q * 10) / 10;
+  return u && u !== 'each' && u !== '' ? `${rounded}${u}` : (u === 'each' ? `×${rounded}` : `${rounded}`);
+}
 
-  const addItems = (r) => {
-    if(!r || !r.groceryItems) return;
-    for(const [cat, items] of Object.entries(r.groceryItems)) {
-      if(agg[cat] && Array.isArray(items)) {
-        items.forEach(item => {
-          // Simple dedup by normalising
-          const norm = item.toLowerCase().replace(/\(.*?\)/g,'').trim();
-          const already = agg[cat].some(x => x.toLowerCase().replace(/\(.*?\)/g,'').trim() === norm);
-          if(!already) agg[cat].push(item);
-        });
+function _groceryAggregate(plan) {
+  // Collect unique recipe IDs from the plan (skip SHAKE id=0)
+  const allRecipes = plan.flatMap(d => [d.breakfast, d.secondBreakfast, d.dinner, d.snack, d.snack2])
+    .filter(r => r && r.id !== 0);
+  const idCounts = {};
+  for (const r of allRecipes) idCounts[r.id] = (idCounts[r.id] || 0) + 1;
+  const uniqueIds = Object.keys(idCounts);
+
+  // agg key = `${canonKey}|${baseUnit}` so different units stay separate
+  const agg = {}; // { key: { canonKey, displayName, unit, qty, aisle, hasQty, sources:[{recipe,qty,unit}], unpriced } }
+
+  for (const idStr of uniqueIds) {
+    const id = isNaN(Number(idStr)) ? idStr : Number(idStr);
+    const fd = RECIPE_FULL_DATA[id];
+    const r = recipes.find(x => x.id === id || x.id === idStr);
+    if (!fd || !fd.ingredients || !fd.ingredients.length) continue;
+    const portionScale = (idCounts[idStr] || 1); // recipe used N times in plan
+    for (const ing of fd.ingredients) {
+      let qty, unit, name;
+      if (ing.item != null) {
+        ({ qty, unit, name } = parseQty(ing.item));
+      } else {
+        qty = ing.qty; unit = ing.unit || ''; name = ing.name;
+      }
+      if (!name || !String(name).trim()) continue;
+      const canonKey = canonicalise(name);
+      if (!canonKey) continue;
+      const base = qty != null ? _toBase(qty, unit) : null;
+      const baseUnit = base ? base.base : (unit || 'each');
+      const aggKey = `${canonKey}|${baseUnit}`;
+      if (!agg[aggKey]) {
+        agg[aggKey] = {
+          canonKey, displayName: name, unit: baseUnit, qty: 0,
+          aisle: classifyAisle(name),
+          hasQty: false, sources: [], priceCost: 0, priceKnown: false,
+        };
+      }
+      if (base) {
+        agg[aggKey].qty += base.qty * portionScale;
+        agg[aggKey].hasQty = true;
+      }
+      agg[aggKey].sources.push({ recipe: r?.name || `Recipe ${id}`, qty, unit });
+      // Cost contribution
+      const pb = lookupPriceBook(canonKey);
+      if (pb && pb.unitPrice && base) {
+        const pbBase = _toBase(1, pb.unit);
+        if (pbBase && pbBase.base === base.base) {
+          agg[aggKey].priceCost += base.qty * pb.unitPrice * portionScale;
+          agg[aggKey].priceKnown = true;
+        }
       }
     }
-  };
+  }
+  return agg;
+}
 
-  // Add from all plan meals
-  const allRecipes = plan.flatMap(d => [d.breakfast, d.secondBreakfast, d.dinner, d.dessert]).filter(r=>r&&r.id!==0);
-  const uniqueIds = [...new Set(allRecipes.map(r=>r.id))];
-  uniqueIds.forEach(id => addItems(recipes.find(r=>r.id===id)));
+function renderGroceryList(plan) {
+  if (!plan || !plan.length) return '';
 
-  // Always-have staples (check you have these)
-  const staples = [
-    { cat:'dry', item:'Oats / quinoa flakes' },
-    { cat:'fridge', item:'Alpro high-protein soya milk' },
-    { cat:'fridge', item:'Plain soya yoghurt' },
-    { cat:'dry', item:'Chocolate protein powder' },
-    { cat:'dry', item:'Chia seeds' },
-    { cat:'dry', item:'Milled flaxseeds' },
-    { cat:'extras', item:'Dark chocolate (85%)' },
-  ];
-  staples.forEach(({cat, item}) => {
-    const norm = item.toLowerCase();
-    if(!agg[cat].some(x=>x.toLowerCase().includes(norm.split(' ')[0]))) agg[cat].push(item);
-  });
+  const agg = _groceryAggregate(plan);
 
-  let planTotal = 0, planHasCost = false, planUnpriced = 0;
-  const allPlanMeals = (plan||[]).flatMap(d => [d.breakfast, d.secondBreakfast, d.dinner, d.dessert]).filter(m => m && m.id !== 0);
+  // Bucket by aisle
+  const byAisle = {};
+  for (const ais of AISLE_ORDER) byAisle[ais] = [];
+  for (const [key, row] of Object.entries(agg)) {
+    (byAisle[row.aisle] || byAisle.other).push({ key, ...row });
+  }
+  // Sort items within aisle: alpha by displayName
+  for (const ais of AISLE_ORDER) byAisle[ais].sort((a, b) => a.displayName.localeCompare(b.displayName));
+
+  // Plan cost summary (sum of per-portion across plan slots)
+  let planTotal = 0, planHasCost = false, planUnpricedMeals = 0;
+  const allPlanMeals = plan.flatMap(d => [d.breakfast, d.secondBreakfast, d.dinner, d.snack, d.snack2])
+    .filter(m => m && m.id !== 0);
   for (const meal of allPlanMeals) {
     const cost = computeRecipeCost(meal.id);
     if (cost && cost.perPortion > 0) { planTotal += cost.perPortion; planHasCost = true; }
-    else if (cost && cost.unpriced > 0) planUnpriced++;
+    else if (cost && cost.unpriced > 0) planUnpricedMeals++;
   }
   const planCostLabel = planHasCost
-    ? `£${planTotal.toFixed(2)} est.${planUnpriced > 0 ? ` · ${planUnpriced} meal${planUnpriced>1?'s':''} unpriced` : ''}`
-    : planUnpriced > 0 ? 'add prices in Settings to see cost' : '';
+    ? `£${planTotal.toFixed(2)} est.${planUnpricedMeals > 0 ? ` · ${planUnpricedMeals} meal${planUnpricedMeals>1?'s':''} unpriced` : ''}`
+    : planUnpricedMeals > 0 ? 'add prices in Settings to see cost' : '';
 
   let html = `
     <div class="grocery-section">
@@ -3074,36 +3548,73 @@ function renderGroceryList(plan) {
       <div class="grocery-grid">
   `;
 
-  for(const [cat, items] of Object.entries(agg)) {
-    if(!items.length) continue;
+  for (const ais of AISLE_ORDER) {
+    const items = byAisle[ais];
+    if (!items.length) continue;
     let catTotal = 0, catHasCost = false;
-    const itemRows = items.map((item, idx) => {
-      const key = `${cat}-${idx}-${item.slice(0,10)}`;
-      const checked = groceryChecked.has(key);
-      const { qty, unit, name: ingName } = parseQty(item);
-      const pb = lookupPriceBook(canonicalise(ingName || item));
+    const itemRows = items.map(row => {
+      const checked = groceryChecked.has(row.key);
+      const override = groceryQtyOverrides[row.key];
+      const displayQty = override != null ? override : (row.hasQty ? row.qty : null);
+      const qtyLabel = displayQty != null ? _formatGroceryQty(displayQty, row.unit) : '';
+      // Cost for this row
       let priceHint = '';
-      if (pb) {
-        const ingBase = _toBase(qty, unit);
-        const pbBase  = _toBase(1, pb.unit);
-        if (ingBase && pbBase && ingBase.base === pbBase.base) {
-          const cost = ingBase.qty * pb.unitPrice;
-          catTotal += cost; catHasCost = true;
-          priceHint = `<span style="font-size:10px;color:var(--green);margin-left:5px">£${cost.toFixed(2)}</span>`;
-        } else {
+      if (row.priceKnown && row.priceCost > 0) {
+        // scale priceCost by override / original if override present
+        let cost = row.priceCost;
+        if (override != null && row.hasQty && row.qty > 0) {
+          cost = row.priceCost * (override / row.qty);
+        }
+        catTotal += cost; catHasCost = true;
+        priceHint = `<span style="font-size:10px;color:var(--green);margin-left:5px">£${cost.toFixed(2)}</span>`;
+      } else {
+        const pb = lookupPriceBook(row.canonKey);
+        if (pb && pb.unitPrice) {
           priceHint = `<span style="font-size:10px;color:var(--text3);margin-left:5px">£${pb.unitPrice < 0.01 ? pb.unitPrice.toFixed(4) : pb.unitPrice.toFixed(3)}/${pb.unit}</span>`;
         }
       }
-      return `<li><div class="grocery-item${checked?' checked':''}" onclick="toggleGrocery(this,'${key}')">
-        <input type="checkbox" ${checked?'checked':''} onclick="event.stopPropagation();toggleGrocery(this.parentElement,'${key}')">
-        <label>${item}${priceHint}</label>
+      const sourcesTitle = row.sources.length > 1
+        ? ` title="From: ${row.sources.map(s => s.recipe).join(', ')}"`
+        : ` title="From: ${row.sources[0]?.recipe || ''}"`;
+      const qtyInput = `<input type="number" step="any" min="0" value="${displayQty != null ? displayQty : ''}"
+        placeholder="${row.hasQty ? row.qty.toFixed(row.qty<10?1:0) : '—'}"
+        onclick="event.stopPropagation()"
+        oninput="setGroceryQty('${row.key.replace(/'/g,"\\'")}', this.value)"
+        style="width:54px;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:2px 5px;border-radius:5px;font-size:11px;font-family:var(--font);outline:none;margin-right:6px;text-align:right">`;
+      const unitLabel = (row.unit && row.unit !== 'each' && row.unit !== '') ? row.unit : '';
+      return `<li><div class="grocery-item${checked?' checked':''}"${sourcesTitle} onclick="toggleGrocery(this,'${row.key.replace(/'/g,"\\'")}')">
+        <input type="checkbox" ${checked?'checked':''} onclick="event.stopPropagation();toggleGrocery(this.parentElement,'${row.key.replace(/'/g,"\\'")}')">
+        <label style="display:flex;align-items:center;flex-wrap:wrap;gap:2px;flex:1;min-width:0">
+          ${qtyInput}<span style="font-size:10px;color:var(--text3);margin-right:5px">${unitLabel}</span>
+          <span style="flex:1;min-width:0">${row.displayName}</span>
+          ${priceHint}
+        </label>
       </div></li>`;
     });
     const subtotal = catHasCost ? ` <span style="font-size:11px;font-weight:400;color:var(--green)">≥£${catTotal.toFixed(2)}</span>` : '';
-    html += `<div class="grocery-cat"><h4>${catLabels[cat]||cat}${subtotal}</h4><ul>${itemRows.join('')}</ul></div>`;
+    html += `<div class="grocery-cat"><h4>${AISLES[ais]}${subtotal}</h4><ul>${itemRows.join('')}</ul></div>`;
   }
+
+  // If nothing aggregated at all (e.g. recipes lack structured ingredients), show note
+  const totalItems = Object.values(byAisle).reduce((s, arr) => s + arr.length, 0);
+  if (totalItems === 0) {
+    html += `<div style="grid-column:1/-1;padding:24px;text-align:center;color:var(--text3)">
+      No structured ingredients found for the recipes in this plan.<br>Edit a recipe to add ingredients with quantities.
+    </div>`;
+  }
+
   html += `</div></div>`;
   return html;
+}
+
+function setGroceryQty(key, val) {
+  const num = val === '' || val == null ? null : parseFloat(val);
+  if (num == null || isNaN(num)) {
+    delete groceryQtyOverrides[key];
+  } else {
+    groceryQtyOverrides[key] = num;
+  }
+  try { localStorage.setItem('ds_grocery_qty', JSON.stringify(groceryQtyOverrides)); } catch(e) {}
 }
 
 function toggleGrocery(el, key) {
@@ -3604,7 +4115,8 @@ const SLOT_LABELS = {
   breakfast: 'Breakfast',
   secondBreakfast: '2nd Breakfast / Snack',
   dinner: 'Dinner',
-  dessert: 'Dessert'
+  snack: 'Snack',
+  snack2: 'Snack 2',
 };
 
 function getPickerPool(slot) {
@@ -3613,7 +4125,8 @@ function getPickerPool(slot) {
     case 'breakfast':       return recipes.filter(r => hasType(r,'breakfast'));
     case 'secondBreakfast': return [SHAKE, ...recipes.filter(r => hasType(r,'breakfast') || hasType(r,'dessert') || hasType(r,'snack'))];
     case 'dinner':          return recipes.filter(r => hasType(r,'dinner'));
-    case 'dessert':         return recipes.filter(r => hasType(r,'dessert') || hasType(r,'snack'));
+    case 'snack':
+    case 'snack2':          return recipes.filter(r => hasType(r,'snack') || hasType(r,'dessert'));
     default:                return recipes;
   }
 }
@@ -3676,6 +4189,7 @@ function selectFromPicker(id) {
 
 document.addEventListener('keydown', e=>{
   if(e.key==='Escape') {
+    if(_activeFilterType) { closeFilterPanel(); return; }
     if(document.getElementById('pickerOverlay').classList.contains('open')) closePicker();
     else closeModal();
   }
@@ -3700,6 +4214,10 @@ document.addEventListener('DOMContentLoaded',()=>{
     renderRecipes();
   }
   renderAddFormChips();
+  renderCravingTaxonomy();
+  renderProteinChips();
+  renderFilterBar();
+  loadPlanSlots();
   initApiKeyUI();
   // Silently pull from Supabase if credentials exist and cloud data is newer
   loadFromSupabase(false);
