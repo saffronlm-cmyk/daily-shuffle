@@ -1237,6 +1237,66 @@ let _rcRows = [];
 try { const pb = localStorage.getItem('ds_pricebook'); if (pb) priceBook = JSON.parse(pb); } catch(e) {}
 try { const rc = localStorage.getItem('ds_receipts'); if (rc) receipts = JSON.parse(rc); } catch(e) {}
 
+// Seed from Lidl audit Feb–Apr 2026 + FreeSoul/Amazon protein data.
+// Runs once; flag 'ds_pb_seeded_v1' prevents re-seeding on reload.
+(function seedPriceBook() {
+  if (localStorage.getItem('ds_pb_seeded_v1')) return;
+  const D = '2026-04-06';
+  // [key, packSize, packUnit, packPrice, store, updatedAt]
+  const rows = [
+    // Proteins
+    ['chicken mince',                    500,  'g',    2.49,  'Lidl',     D],
+    ['egg white',                        500,  'ml',   3.45,  'Lidl',     D],
+    ['egg',                              6,    'each', 2.49,  'Lidl',     D],
+    ['turkey mince',                     500,  'g',    2.99,  'Lidl',     D],
+    ['chicken',                          1000, 'g',    5.15,  'Lidl',     D],
+    // Fresh produce
+    ['spring onion',                     1,    'each', 0.61,  'Lidl',     D],
+    ['butternut squash',                 1,    'each', 1.45,  'Lidl',     D],
+    ['apple',                            6,    'each', 2.19,  'Lidl',     D],
+    ['avocado',                          1,    'each', 1.39,  'Lidl',     D],
+    ['date',                             1,    'each', 3.99,  'Lidl',     D],
+    ['sweet potato',                     1,    'each', 1.18,  'Lidl',     D],
+    ['potato',                           1,    'each', 0.48,  'Lidl',     D],
+    ['beansprout',                       1,    'each', 0.79,  'Lidl',     D],
+    ['onion',                            1,    'each', 0.95,  'Lidl',     D],
+    ['broccoli',                         1,    'each', 1.88,  'Lidl',     D],
+    ['mushroom',                         1,    'each', 0.99,  'Lidl',     D],
+    ['coriander',                        1,    'each', 0.52,  'Lidl',     D],
+    ['basil',                            1,    'each', 0.52,  'Lidl',     D],
+    ['ginger',                           1,    'each', 0.92,  'Lidl',     D],
+    ['lime',                             1,    'each', 0.48,  'Lidl',     D],
+    // Frozen
+    ['blueberry',                        350,  'g',    1.99,  'Lidl',     D],
+    ['raspberry',                        350,  'g',    1.99,  'Lidl',     D],
+    ['broccoli cauliflower',             1000, 'g',    1.35,  'Lidl',     D],
+    // Dairy / plant-based
+    ['soya yogurt',                      1,    'each', 0.99,  'Lidl',     D],
+    ['soya milk',                        1000, 'ml',   0.85,  'Lidl',     D],
+    ['vegan cheese',                     1,    'each', 1.95,  'Lidl',     D],
+    // Condiments
+    ['sriracha',                         1,    'each', 1.99,  'Lidl',     D],
+    ['mayo',                             1,    'each', 2.49,  'Lidl',     D],
+    ['ketchup',                          1,    'each', 3.99,  'Lidl',     D],
+    ['pesto',                            1,    'each', 1.79,  'Lidl',     D],
+    ['chilli sauce',                     1,    'each', 0.85,  'Lidl',     D],
+    // Pantry
+    ['dark chocolate',                   100,  'g',    1.69,  'Lidl',     D],
+    ['cocoa powder',                     500,  'g',    2.89,  'Lidl',     D],
+    ['protein pasta',                    500,  'g',    1.99,  'Lidl',     D],
+    ['spaghetti',                        500,  'g',    1.99,  'Lidl',     D],
+    // Protein powders & supplements
+    ['vegan protein powder',             600,  'g',    14.49, 'FreeSoul', '2026-03-17'],
+    ['peanut butter powder',             1,    'each', 14.35, 'Amazon',   '2026-03-06'],
+    ['chocolate peanut butter powder',   1,    'each', 8.99,  'Amazon',   '2026-03-08'],
+  ];
+  for (const [k, ps, pu, pp, st, ua] of rows) {
+    priceBook[k] = { aliases: [], unitPrice: pp / ps, unit: pu, packSize: ps, packUnit: pu, packPrice: pp, store: st, updatedAt: ua };
+  }
+  try { localStorage.setItem('ds_pricebook', JSON.stringify(priceBook)); } catch(e) {}
+  localStorage.setItem('ds_pb_seeded_v1', '1');
+})();
+
 function saveCustom() {
   try { localStorage.setItem('ds_custom_recipes', JSON.stringify(recipes.filter(r=>!cloudRecipeIds.has(r.id)))); } catch(e){}
   autoSync();
