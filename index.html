@@ -535,27 +535,28 @@
       </div>
       <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
         <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:6px">💷 Price Book</div>
-        <p style="font-size:12px;color:var(--text2);margin-bottom:8px;line-height:1.5">Add ingredient prices to get £/portion estimates on recipes. Enter the price per unit (e.g. £0.009 per g for chicken).</p>
+        <p style="font-size:12px;color:var(--text2);margin-bottom:8px;line-height:1.5">Enter pack contents and price. E.g. Eggs → 6 each · £1.80/pk. Chicken → 500 g · £3.50/pk. Loose p/kg items → 1000 g · £X/pk.</p>
         <div id="pbTableWrap"></div>
         <div class="pb-row">
           <input class="pb-input" id="pb-name" placeholder="Ingredient name" style="flex:2;min-width:100px">
-          <input class="pb-input" id="pb-price" placeholder="£/unit" type="number" step="0.0001" style="width:72px">
-          <select class="pb-input" id="pb-unit" style="width:62px">
+          <input class="pb-input" id="pb-pack-qty" placeholder="Pk qty" type="number" step="any" style="width:64px" title="Qty per pack (e.g. 6 eggs, 500g chicken)">
+          <select class="pb-input" id="pb-pack-unit" style="width:62px">
+            <option value="each">each</option>
             <option value="g">g</option>
             <option value="ml">ml</option>
-            <option value="each">each</option>
+            <option value="kg">kg</option>
+            <option value="l">litre</option>
             <option value="tbsp">tbsp</option>
             <option value="tsp">tsp</option>
-            <option value="l">litre</option>
-            <option value="kg">kg</option>
           </select>
+          <input class="pb-input" id="pb-pack-price" placeholder="£/pk" type="number" step="0.01" style="width:68px" title="Price for the whole pack">
           <input class="pb-input" id="pb-store" placeholder="Store" style="width:68px">
           <button class="btn-save-key" onclick="addPriceBookEntry()" style="font-size:12px;padding:6px 12px">Add</button>
         </div>
       </div>
       <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
         <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:6px">🧾 Log Receipt</div>
-        <p style="font-size:12px;color:var(--text2);margin-bottom:8px;line-height:1.5">Log items from a receipt to update the price book automatically.</p>
+        <p style="font-size:12px;color:var(--text2);margin-bottom:8px;line-height:1.5">Log items from a receipt. Enter pack size (e.g. 6 each), how many packs bought, and price per pack. Price book updates automatically.</p>
         <div style="display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap">
           <input class="pb-input" id="rc-date" type="date" style="width:135px">
           <input class="pb-input" id="rc-store" placeholder="Store (e.g. Aldi)" style="flex:1;min-width:100px">
@@ -2180,14 +2181,19 @@ function computeRecipeCost(recipeId) {
 
 function applyReceiptToPriceBook(receipt) {
   for (const item of (receipt.items || [])) {
-    if (!item.name || !item.price || !item.qty || !item.unit) continue;
+    if (!item.name) continue;
     const key = item.mapsTo || canonicalise(item.name);
     if (!key) continue;
-    const unitPrice = parseFloat(item.price) / parseFloat(item.qty);
-    if (isNaN(unitPrice) || unitPrice <= 0) continue;
+    // Support both new pack model and legacy qty/unit/price shape
+    const packSize  = parseFloat(item.packSize  ?? item.qty);
+    const packUnit  = item.packUnit ?? item.unit ?? 'each';
+    const packPrice = parseFloat(item.packPrice ?? item.price);
+    if (isNaN(packSize) || packSize <= 0 || isNaN(packPrice) || packPrice <= 0) continue;
+    const unitPrice = packPrice / packSize;
     priceBook[key] = {
       ...(priceBook[key] || { aliases: [] }),
-      unitPrice, unit: item.unit,
+      unitPrice, unit: packUnit,
+      packSize, packUnit, packPrice,
       store: receipt.store || '',
       updatedAt: receipt.date || new Date().toISOString().slice(0, 10),
     };
@@ -2233,30 +2239,46 @@ function renderPriceBook() {
     return;
   }
   wrap.innerHTML = `<table class="pb-table">
-    <thead><tr><th>Ingredient</th><th>£/unit</th><th>Unit</th><th>Store</th><th>Updated</th><th></th></tr></thead>
-    <tbody>${entries.slice(0, 25).map(([key, v]) => `
-      <tr>
+    <thead><tr><th>Ingredient</th><th>Pack</th><th>Per unit</th><th>Store</th><th>Updated</th><th></th></tr></thead>
+    <tbody>${entries.slice(0, 25).map(([key, v]) => {
+      const packLabel = v.packSize != null
+        ? `${v.packSize} ${v.packUnit||'each'} · £${(v.packPrice||0).toFixed(2)}/pk`
+        : '—';
+      const unitLabel = v.unitPrice != null
+        ? `£${v.unitPrice < 0.01 ? v.unitPrice.toFixed(4) : v.unitPrice.toFixed(3)}/${v.unit||'unit'}`
+        : '—';
+      return `<tr>
         <td class="pb-name">${key}</td>
-        <td>${v.unitPrice != null ? '£' + v.unitPrice.toFixed(4) : '—'}</td>
-        <td>${v.unit || '—'}</td>
+        <td style="white-space:nowrap;color:var(--text)">${packLabel}</td>
+        <td style="white-space:nowrap">${unitLabel}</td>
         <td>${v.store || '—'}</td>
         <td>${(v.updatedAt || '').slice(0, 10) || '—'}</td>
         <td><button style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px;line-height:1;padding:2px 4px" onclick="deletePbEntry(${JSON.stringify(key)})">×</button></td>
-      </tr>`).join('')}
+      </tr>`;
+    }).join('')}
     </tbody></table>
     ${entries.length > 25 ? `<p style="font-size:11px;color:var(--text3);margin-top:2px">${entries.length-25} more not shown</p>` : ''}`;
 }
 
 function addPriceBookEntry() {
-  const name  = document.getElementById('pb-name')?.value.trim();
-  const price = parseFloat(document.getElementById('pb-price')?.value);
-  const unit  = document.getElementById('pb-unit')?.value || 'g';
-  const store = document.getElementById('pb-store')?.value.trim() || '';
-  if (!name || isNaN(price) || price <= 0) { showToast('Enter a name and a valid price.'); return; }
+  const name      = document.getElementById('pb-name')?.value.trim();
+  const packSize  = parseFloat(document.getElementById('pb-pack-qty')?.value);
+  const packUnit  = document.getElementById('pb-pack-unit')?.value || 'each';
+  const packPrice = parseFloat(document.getElementById('pb-pack-price')?.value);
+  const store     = document.getElementById('pb-store')?.value.trim() || '';
+  if (!name || isNaN(packSize) || packSize <= 0 || isNaN(packPrice) || packPrice <= 0) {
+    showToast('Enter a name, pack qty, and pack price.'); return;
+  }
   const key = canonicalise(name);
-  priceBook[key] = { ...(priceBook[key] || { aliases: [] }), unitPrice: price, unit, store, updatedAt: new Date().toISOString().slice(0, 10) };
+  const unitPrice = packPrice / packSize;
+  priceBook[key] = {
+    ...(priceBook[key] || { aliases: [] }),
+    unitPrice, unit: packUnit,
+    packSize, packUnit, packPrice,
+    store, updatedAt: new Date().toISOString().slice(0, 10),
+  };
   savePriceBook();
-  ['pb-name','pb-price','pb-store'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
+  ['pb-name','pb-pack-qty','pb-pack-price','pb-store'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
   renderPriceBook();
   showToast(`"${key}" added to price book ✓`);
 }
@@ -2271,25 +2293,31 @@ function deletePbEntry(key) {
 function renderReceiptRows() {
   const el = document.getElementById('rcRows');
   if (!el) return;
-  const unitOpts = ['g','ml','each','tbsp','tsp','l','kg','oz','lb'];
-  el.innerHTML = _rcRows.map((row, i) => `
-    <div class="rcpt-row">
+  const unitOpts = ['each','g','ml','kg','l','tbsp','tsp','oz'];
+  el.innerHTML = _rcRows.map((row, i) => {
+    const totalSpend = (parseFloat(row.packPrice)||0) * (parseFloat(row.packs)||1);
+    const perUnit    = (parseFloat(row.packSize)||0) > 0
+      ? '£' + (totalSpend / ((parseFloat(row.packs)||1) * parseFloat(row.packSize))).toFixed(3) + '/' + (row.packUnit||'each')
+      : '';
+    return `<div class="rcpt-row" style="flex-wrap:wrap">
       <input placeholder="Item name" value="${(row.name||'').replace(/"/g,'&quot;')}" oninput="_rcRows[${i}].name=this.value" style="flex:2;min-width:90px">
-      <input placeholder="Qty" type="number" step="any" value="${row.qty||''}" oninput="_rcRows[${i}].qty=this.value" style="width:58px">
-      <select oninput="_rcRows[${i}].unit=this.value" style="width:58px">
-        ${unitOpts.map(u=>`<option value="${u}"${row.unit===u?' selected':''}>${u}</option>`).join('')}
+      <input placeholder="Pk size" type="number" step="any" value="${row.packSize||''}" oninput="_rcRows[${i}].packSize=this.value;renderReceiptRows()" style="width:60px" title="Qty per pack (e.g. 6 eggs, 500g)">
+      <select oninput="_rcRows[${i}].packUnit=this.value" style="width:60px">
+        ${unitOpts.map(u=>`<option value="${u}"${(row.packUnit||'each')===u?' selected':''}>${u}</option>`).join('')}
       </select>
-      <input placeholder="£" type="number" step="0.01" value="${row.price||''}" oninput="_rcRows[${i}].price=this.value" style="width:60px">
+      <input placeholder="# pks" type="number" step="1" min="1" value="${row.packs||1}" oninput="_rcRows[${i}].packs=this.value;renderReceiptRows()" style="width:50px" title="How many packs bought">
+      <input placeholder="£/pk" type="number" step="0.01" value="${row.packPrice||''}" oninput="_rcRows[${i}].packPrice=this.value;renderReceiptRows()" style="width:60px" title="Price per pack">
+      ${perUnit ? `<span style="font-size:11px;color:var(--text3);white-space:nowrap;align-self:center">${perUnit}</span>` : ''}
       <button style="background:none;border:none;color:var(--text3);font-size:16px;cursor:pointer;padding:0 4px;line-height:1" onclick="removeReceiptRow(${i})">×</button>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 function addReceiptRow() {
-  _rcRows.push({ name:'', qty:'', unit:'g', price:'' });
+  _rcRows.push({ name:'', packSize:'', packUnit:'each', packs:1, packPrice:'' });
   renderReceiptRows();
-  // focus the new name input
   const inputs = document.querySelectorAll('#rcRows .rcpt-row input');
-  if (inputs.length) inputs[inputs.length - 4]?.focus();
+  if (inputs.length) inputs[inputs.length - 5]?.focus();
 }
 
 function removeReceiptRow(idx) {
@@ -2300,7 +2328,7 @@ function removeReceiptRow(idx) {
 function saveReceipt() {
   const date  = document.getElementById('rc-date')?.value  || new Date().toISOString().slice(0,10);
   const store = document.getElementById('rc-store')?.value.trim() || '';
-  const items = _rcRows.filter(r => r.name && r.qty && r.price);
+  const items = _rcRows.filter(r => r.name && r.packSize && r.packPrice);
   if (!items.length) { showToast('Add at least one item first.'); return; }
   const receipt = { id: Date.now().toString(), date, store, items };
   receipts.unshift(receipt);
@@ -2321,9 +2349,16 @@ function renderReceiptHistory() {
   if (!el) return;
   if (!receipts.length) { el.innerHTML=''; return; }
   el.innerHTML = '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-top:12px;margin-bottom:5px">Recent receipts</div>'
-    + receipts.slice(0,5).map(r =>
-        `<div class="rcpt-history-item">${r.date||'—'} · ${r.store||'—'} · ${(r.items||[]).length} item${(r.items||[]).length!==1?'s':''}</div>`
-      ).join('');
+    + receipts.slice(0,5).map(r => {
+        const spend = (r.items||[]).reduce((s, it) => {
+          const pp = parseFloat(it.packPrice ?? it.price) || 0;
+          const pks = parseFloat(it.packs) || 1;
+          return s + pp * pks;
+        }, 0);
+        const spendLabel = spend > 0 ? ` · £${spend.toFixed(2)}` : '';
+        const n = (r.items||[]).length;
+        return `<div class="rcpt-history-item">${r.date||'—'} · ${r.store||'—'} · ${n} item${n!==1?'s':''}${spendLabel}</div>`;
+      }).join('');
 }
 
 async function estimateNutritionWithAI(id) {
@@ -3570,7 +3605,7 @@ function openSettings() {
   // Price book + receipt
   renderPriceBook();
   renderReceiptHistory();
-  if (!_rcRows.length) { _rcRows = [{ name:'', qty:'', unit:'g', price:'' }]; }
+  if (!_rcRows.length) { _rcRows = [{ name:'', packSize:'', packUnit:'each', packs:1, packPrice:'' }]; }
   renderReceiptRows();
   const rcDate = document.getElementById('rc-date');
   if (rcDate && !rcDate.value) rcDate.value = new Date().toISOString().slice(0, 10);
