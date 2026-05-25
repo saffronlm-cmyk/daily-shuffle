@@ -2290,24 +2290,37 @@ function deletePbEntry(key) {
 }
 
 // ── Receipt UI ────────────────────────────────────────────────────────────────
+function _rcptPerUnit(row) {
+  const ps = parseFloat(row.packSize);
+  const pp = parseFloat(row.packPrice);
+  const pk = parseFloat(row.packs) || 1;
+  if (!ps || ps <= 0 || !pp || pp <= 0) return '';
+  return '£' + (pp / ps).toFixed(3) + '/' + (row.packUnit || 'each');
+}
+
+function updateRcptPreview(i) {
+  const span = document.getElementById('rcpt-preview-' + i);
+  if (!span) return;
+  const label = _rcptPerUnit(_rcRows[i]);
+  span.textContent = label;
+  span.style.display = label ? '' : 'none';
+}
+
 function renderReceiptRows() {
   const el = document.getElementById('rcRows');
   if (!el) return;
   const unitOpts = ['each','g','ml','kg','l','tbsp','tsp','oz'];
   el.innerHTML = _rcRows.map((row, i) => {
-    const totalSpend = (parseFloat(row.packPrice)||0) * (parseFloat(row.packs)||1);
-    const perUnit    = (parseFloat(row.packSize)||0) > 0
-      ? '£' + (totalSpend / ((parseFloat(row.packs)||1) * parseFloat(row.packSize))).toFixed(3) + '/' + (row.packUnit||'each')
-      : '';
+    const perUnit = _rcptPerUnit(row);
     return `<div class="rcpt-row" style="flex-wrap:wrap">
       <input placeholder="Item name" value="${(row.name||'').replace(/"/g,'&quot;')}" oninput="_rcRows[${i}].name=this.value" style="flex:2;min-width:90px">
-      <input placeholder="Pk size" type="number" step="any" value="${row.packSize||''}" oninput="_rcRows[${i}].packSize=this.value;renderReceiptRows()" style="width:60px" title="Qty per pack (e.g. 6 eggs, 500g)">
-      <select oninput="_rcRows[${i}].packUnit=this.value" style="width:60px">
+      <input placeholder="Pk size" type="number" step="any" value="${row.packSize||''}" oninput="_rcRows[${i}].packSize=this.value;updateRcptPreview(${i})" style="width:60px" title="Qty per pack (e.g. 6 eggs, 500g)">
+      <select oninput="_rcRows[${i}].packUnit=this.value;updateRcptPreview(${i})" style="width:60px">
         ${unitOpts.map(u=>`<option value="${u}"${(row.packUnit||'each')===u?' selected':''}>${u}</option>`).join('')}
       </select>
-      <input placeholder="# pks" type="number" step="1" min="1" value="${row.packs||1}" oninput="_rcRows[${i}].packs=this.value;renderReceiptRows()" style="width:50px" title="How many packs bought">
-      <input placeholder="£/pk" type="number" step="any" value="${row.packPrice||''}" oninput="_rcRows[${i}].packPrice=this.value;renderReceiptRows()" style="width:60px" title="Price per pack">
-      ${perUnit ? `<span style="font-size:11px;color:var(--text3);white-space:nowrap;align-self:center">${perUnit}</span>` : ''}
+      <input placeholder="# pks" type="number" step="any" min="1" value="${row.packs||1}" oninput="_rcRows[${i}].packs=this.value" style="width:50px" title="How many packs bought">
+      <input placeholder="£/pk" type="number" step="any" value="${row.packPrice||''}" oninput="_rcRows[${i}].packPrice=this.value;updateRcptPreview(${i})" style="width:60px" title="Price per pack">
+      <span id="rcpt-preview-${i}" style="font-size:11px;color:var(--text3);white-space:nowrap;align-self:center${perUnit ? '' : ';display:none'}">${perUnit}</span>
       <button style="background:none;border:none;color:var(--text3);font-size:16px;cursor:pointer;padding:0 4px;line-height:1" onclick="removeReceiptRow(${i})">×</button>
     </div>`;
   }).join('');
