@@ -1,7 +1,7 @@
 // Daily Shuffle — Service Worker
 // Cache-first strategy: app loads instantly offline after first visit.
 
-const CACHE = 'daily-shuffle-v14';
+const CACHE = 'daily-shuffle-v15';
 const ASSETS = [
   './index.html',
   './manifest.json',

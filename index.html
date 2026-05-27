@@ -1257,8 +1257,6 @@ let receipts = [];
 let _rcRows = [];
 try { const pb = localStorage.getItem('ds_pricebook'); if (pb) priceBook = JSON.parse(pb); } catch(e) {}
 try { const rc = localStorage.getItem('ds_receipts'); if (rc) receipts = JSON.parse(rc); } catch(e) {}
-let groceryQtyOverrides = {};
-try { const gq = localStorage.getItem('ds_grocery_qty'); if (gq) groceryQtyOverrides = JSON.parse(gq); } catch(e) {}
 
 // Seed from Lidl audit Feb–Apr 2026 + FreeSoul/Amazon protein data.
 // Runs once; flag 'ds_pb_seeded_v2' prevents re-seeding on reload.
@@ -2476,31 +2474,63 @@ const _STOP_ADJ = new Set([
   'a','an','the','of','to','for','your','some',
 ]);
 
+// Consume a leading qty + unit pair from `t`. Returns whatever it parsed plus
+// the remaining text. Used by parseQty so it can pick up compound forms like
+// "1/2 cup 1 tbsp butternut puree" and sum them into one quantity.
+function _consumeQtyUnit(t) {
+  let qty = null, rest = t;
+  // ASCII fractions (with optional whole-number prefix)
+  const ascii = t.match(/^(\d+\s+)?(\d+)\s*\/\s*(\d+)(?=\s|$)/);
+  if (ascii) {
+    const whole = ascii[1] ? parseFloat(ascii[1]) : 0;
+    const denom = parseFloat(ascii[3]);
+    qty = denom > 0 ? whole + parseFloat(ascii[2]) / denom : null;
+    rest = t.slice(ascii[0].length).replace(/^\s+/, '');
+  } else {
+    const qm = t.match(/^([\d½¼¾⅓⅔⅛][½¼¾⅓⅔⅛\d.\s]*?)\s+(?=[a-zA-Z(])/);
+    if (qm) {
+      let val = 0;
+      for (const p of qm[1].trim().split(/\s+/)) val += (_FRAC_QTY[p] ?? (parseFloat(p) || 0));
+      qty = val || null;
+      rest = t.slice(qm[0].length);
+    }
+  }
+  let unit = null;
+  const um = rest.match(_UNIT_RE);
+  if (um) {
+    unit = um[1].toLowerCase().replace(/\s+/g,'').replace(/s$/, '');
+    if (unit === 'litre' || unit === 'liter') unit = 'l';
+    if (unit === 'tbs') unit = 'tbsp';
+    rest = rest.slice(um[0].length);
+  }
+  return { qty, unit, rest };
+}
+
 function parseQty(text) {
   if (!text) return { qty: null, unit: null, name: '', note: null };
   let t = String(text).trim();
   let note = null;
   // Extract trailing parenthetical note
   t = t.replace(/\s*\(([^)]+)\)\s*$/, (_, n) => { note = n; return ''; }).trim();
-  // Match leading quantity (integers, decimals, unicode fractions, e.g. "1½", "2.5")
-  let qty = null;
-  const qm = t.match(/^([\d½¼¾⅓⅔⅛][½¼¾⅓⅔⅛\d.\s]*?)\s+(?=[a-zA-Z(])/);
-  if (qm) {
-    let val = 0;
-    for (const p of qm[1].trim().split(/\s+/)) val += (_FRAC_QTY[p] ?? (parseFloat(p) || 0));
-    qty = val || null;
-    t = t.slice(qm[0].length);
+
+  const first = _consumeQtyUnit(t);
+  let { qty, unit } = first;
+  t = first.rest.replace(/^[\s,;:]+/, '');
+
+  // Compound forms ("1/2 cup, 1 tbsp X" or "1/2 cup 1 tbsp X"): pick up a
+  // second qty+unit and sum if both convert to the same base unit.
+  const second = _consumeQtyUnit(t);
+  if (second.qty != null && second.unit && qty != null && unit) {
+    const aBase = _toBase(qty, unit);
+    const bBase = _toBase(second.qty, second.unit);
+    if (aBase && bBase && aBase.base === bBase.base) {
+      qty = aBase.qty + bBase.qty;
+      unit = aBase.base;
+      t = second.rest;
+    }
   }
-  // Match unit
-  let unit = null;
-  const um = t.match(_UNIT_RE);
-  if (um) {
-    unit = um[1].toLowerCase().replace(/\s+/g,'').replace(/s$/, '');
-    if (unit === 'litre' || unit === 'liter') unit = 'l';
-    if (unit === 'tbs') unit = 'tbsp';
-    t = t.slice(um[0].length);
-  }
-  const name = t.replace(/^of\s+/i, '').trim();
+  // Strip leading punctuation/whitespace before the name proper
+  const name = t.replace(/^of\s+/i, '').replace(/^[\s,;:.-]+/, '').trim();
   return { qty, unit, name, note };
 }
 
@@ -3460,8 +3490,7 @@ function renderPlanOutput(plan) {
 // ─── GROCERY LIST ────────────────────────────────────────────────────────────
 // Ingredient-driven aggregation: walk RECIPE_FULL_DATA[id].ingredients, run
 // each through parseQty + canonicalise, group by classifyAisle(name).
-// Quantities sum across recipes when (canonical key + unit) match.
-// Per-row quantity override: localStorage.ds_grocery_qty[key].
+// Quantities sum across recipes when (canonical key + base unit) match.
 
 // Aisles where ml display matches the bottle/jar label. Everything else
 // (spices, pantry, produce, snacks) gets ml→g 1:1 — at kitchen-spoon scale
@@ -3584,18 +3613,12 @@ function renderGroceryList(plan) {
     let catTotal = 0, catHasCost = false;
     const itemRows = items.map(row => {
       const checked = groceryChecked.has(row.key);
-      const override = groceryQtyOverrides[row.key];
-      const displayQty = override != null ? override : (row.hasQty ? row.qty : null);
-      const qtyLabel = displayQty != null ? _formatGroceryQty(displayQty, row.unit, row.aisle) : '—';
+      const qtyLabel = row.hasQty ? _formatGroceryQty(row.qty, row.unit, row.aisle) : '';
       // Cost for this row
       let priceHint = '';
       if (row.priceKnown && row.priceCost > 0) {
-        let cost = row.priceCost;
-        if (override != null && row.hasQty && row.qty > 0) {
-          cost = row.priceCost * (override / row.qty);
-        }
-        catTotal += cost; catHasCost = true;
-        priceHint = `<span style="font-size:10px;color:var(--green);margin-left:5px">£${cost.toFixed(2)}</span>`;
+        catTotal += row.priceCost; catHasCost = true;
+        priceHint = `<span style="font-size:10px;color:var(--green);margin-left:5px">£${row.priceCost.toFixed(2)}</span>`;
       } else {
         const pb = lookupPriceBook(row.canonKey);
         if (pb && pb.unitPrice) {
@@ -3604,15 +3627,13 @@ function renderGroceryList(plan) {
       }
       const sourcesTitle = ` title="From: ${row.sources.map(s => s.recipe).join(', ').replace(/"/g,'&quot;')}"`;
       const safeKey = row.key.replace(/'/g,"\\'");
-      const qtyInput = `<input type="number" step="any" min="0" value="${displayQty != null ? displayQty : ''}"
-        placeholder="${row.hasQty ? row.qty.toFixed(row.qty<10?1:0) : '—'}"
-        onclick="event.stopPropagation()"
-        oninput="setGroceryQty('${safeKey}', this.value)"
-        style="width:54px;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:2px 5px;border-radius:5px;font-size:11px;font-family:var(--font);outline:none;margin-right:6px;text-align:right">`;
+      const qtyHtml = qtyLabel
+        ? `<span style="font-size:12px;font-weight:600;color:var(--text);min-width:48px;text-align:right">${qtyLabel}</span>`
+        : '<span style="font-size:11px;color:var(--text3);min-width:48px;text-align:right">—</span>';
       return `<li><div class="grocery-item${checked?' checked':''}"${sourcesTitle} onclick="toggleGrocery(this,'${safeKey}')">
         <input type="checkbox" ${checked?'checked':''} onclick="event.stopPropagation();toggleGrocery(this.parentElement,'${safeKey}')">
-        <label style="display:flex;align-items:center;flex-wrap:wrap;gap:4px;flex:1;min-width:0">
-          ${qtyInput}<span style="font-size:11px;color:var(--text2);min-width:34px">${qtyLabel}</span>
+        <label style="display:flex;align-items:baseline;gap:8px;flex:1;min-width:0">
+          ${qtyHtml}
           <span style="flex:1;min-width:0">${row.displayName}</span>
           ${priceHint}
         </label>
@@ -3632,16 +3653,6 @@ function renderGroceryList(plan) {
 
   html += `</div></div>`;
   return html;
-}
-
-function setGroceryQty(key, val) {
-  const num = val === '' || val == null ? null : parseFloat(val);
-  if (num == null || isNaN(num)) {
-    delete groceryQtyOverrides[key];
-  } else {
-    groceryQtyOverrides[key] = num;
-  }
-  try { localStorage.setItem('ds_grocery_qty', JSON.stringify(groceryQtyOverrides)); } catch(e) {}
 }
 
 function toggleGrocery(el, key) {
