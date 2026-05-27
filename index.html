@@ -514,7 +514,7 @@
   <header>
     <div class="logo">Daily <span>Shuffle</span></div>
     <nav>
-      <button class="active" onclick="switchTab('plan',this)">📅 Meal Plan</button>
+      <button class="active" onclick="switchTab('plan',this)">🔀 Shuffle</button>
       <button onclick="switchTab('recipes',this)">🍳 Recipes</button>
       <button onclick="switchTab('grocery',this)" id="nav-grocery">🛒 Grocery List</button>
       <button onclick="switchTab('add',this)">＋ Add Recipe</button>
@@ -667,8 +667,8 @@
                 <span>🌅 Breakfast</span>
               </label>
               <label class="slot-toggle">
-                <input type="checkbox" id="slot-secondBreakfast" onchange="savePlanSlots()" checked>
-                <span>🥣 2nd breakfast</span>
+                <input type="checkbox" id="slot-lunch" onchange="savePlanSlots()" checked>
+                <span>🥗 Lunch</span>
               </label>
               <label class="slot-toggle">
                 <input type="checkbox" id="slot-dinner" onchange="savePlanSlots()" checked>
@@ -700,15 +700,6 @@
             <div class="control-group">
               <label>Start Date</label>
               <input type="date" class="control-input" id="planStartDate" />
-            </div>
-            <div class="control-group">
-              <label>Batch Cook Day</label>
-              <select class="control-select" id="planBatchDay">
-                <option value="0">Sunday</option>
-                <option value="6">Saturday</option>
-                <option value="3">Wednesday</option>
-                <option value="-1">Same as start</option>
-              </select>
             </div>
             <div class="control-group">
               <label>Breakfast</label>
@@ -2476,9 +2467,14 @@ function saveReceipts() {
 
 const _FRAC_QTY = { '½':0.5, '¼':0.25, '¾':0.75, '⅓':1/3, '⅔':2/3, '⅛':0.125 };
 const _UNIT_RE  = /^(fl\s*oz|tbsp?|tsp|cups?|kg|ml|litre|liter|l\b|oz|lbs?|lb|g\b|x\b)\s*/i;
-const _STOP_ADJ = new Set(['fresh','organic','large','small','medium','baby','whole','finely','roughly',
+const _STOP_ADJ = new Set([
+  'fresh','organic','large','small','medium','baby','whole','finely','roughly',
   'free-range','boneless','skinless','ripe','raw','cooked','dried','frozen','chopped','sliced',
-  'diced','minced','ground','a','an','the','of']);
+  'diced','minced','ground','grated','crushed','peeled','cubed','halved','quartered','shredded',
+  'mashed','beaten','softened','melted','cooled','toasted','roasted','torn','julienned',
+  'thinly','thickly','coarsely','optional','approx','approximately','about','around',
+  'a','an','the','of','to','for','your','some',
+]);
 
 function parseQty(text) {
   if (!text) return { qty: null, unit: null, name: '', note: null };
@@ -2520,6 +2516,23 @@ function canonicalise(name) {
     .replace(/([^aeiou])es\b/g, '$1e')
     .replace(/([^aeiou])s\b/g, '$1')
     .trim();
+}
+
+// Strip trailing prep clauses ("carrot, cut into small pieces" → "carrot").
+// Kept separate from canonicalise() so cost engine / price book lookups can
+// still match either form.
+function _stripPrep(rawName) {
+  return String(rawName || '').split(/[,;]/)[0].trim();
+}
+
+// Display-friendly ingredient name for the grocery list. Strips prep clauses,
+// canonicalises, then title-cases. Falls back to the raw stripped name if
+// canonicalisation eats everything.
+function _displayName(rawName) {
+  const stripped = _stripPrep(rawName);
+  const canon = canonicalise(stripped);
+  const words = (canon || stripped).split(/\s+/).filter(Boolean);
+  return words.map(w => w[0].toUpperCase() + w.slice(1)).join(' ');
 }
 
 // ── 12-Aisle Classifier ──────────────────────────────────────────────────────
@@ -2973,7 +2986,7 @@ function matchesPlanFilters(recipe) {
 }
 
 // ─── PLAN SLOTS PERSISTENCE ───────────────────────────────────────────────
-const _PLAN_SLOT_KEYS = ['breakfast','secondBreakfast','dinner','snack','snack2'];
+const _PLAN_SLOT_KEYS = ['breakfast','lunch','dinner','snack','snack2'];
 
 function savePlanSlots() {
   const slots = {};
@@ -2995,6 +3008,11 @@ function loadPlanSlots() {
   try {
     const saved = JSON.parse(localStorage.getItem('ds_plan_slots') || 'null');
     if (saved) {
+      // Migrate legacy `secondBreakfast` key → `lunch` (Phase 3 rename)
+      if (saved.secondBreakfast != null && saved.lunch == null) {
+        saved.lunch = saved.secondBreakfast;
+        delete saved.secondBreakfast;
+      }
       for (const k of _PLAN_SLOT_KEYS) {
         const el = document.getElementById('slot-' + k);
         if (el && typeof saved[k] === 'boolean') el.checked = saved[k];
@@ -3040,16 +3058,15 @@ function generatePlan() {
   const days = parseInt(document.getElementById('planDays').value)||3;
   const bfMode = document.getElementById('planBreakfast').value;
   const startDateVal = document.getElementById('planStartDate').value;
-  const batchDayPref = document.getElementById('planBatchDay').value;
 
   // Which slots to plan for
   const snackOn = document.getElementById('slot-snack').checked;
   const activeSlots = {
-    breakfast:       document.getElementById('slot-breakfast').checked,
-    secondBreakfast: document.getElementById('slot-secondBreakfast').checked,
-    dinner:          document.getElementById('slot-dinner').checked,
-    snack:           snackOn,
-    snack2:          snackOn && document.getElementById('slot-snack2').checked,
+    breakfast: document.getElementById('slot-breakfast').checked,
+    lunch:     document.getElementById('slot-lunch').checked,
+    dinner:    document.getElementById('slot-dinner').checked,
+    snack:     snackOn,
+    snack2:    snackOn && document.getElementById('slot-snack2').checked,
   };
   if(!Object.values(activeSlots).some(Boolean)) {
     alert('Select at least one meal slot to plan for.'); return;
@@ -3058,6 +3075,8 @@ function generatePlan() {
   const hasType = (r, t) => (r.mealTypes || []).includes(t);
   // Breakfast pool (all breakfast recipes)
   const bfPool = recipes.filter(r => hasType(r, 'breakfast'));
+  // Lunch pool
+  const lunchPool = recipes.filter(r => hasType(r, 'lunch'));
   // Dinner pool: filtered by craving + protein chips (AND across groups, OR within)
   const dinPool = recipes.filter(r => hasType(r, 'dinner') && matchesPlanFilters(r));
   // Fallback if no dinners match filters — relax to all dinners
@@ -3084,6 +3103,8 @@ function generatePlan() {
   const firstBf = bfMode==='same' ? pickRandom(bfPool) : null;
   const bfSchedule = bfMode==='same' ? null : buildBatchSchedule(bfPool, days);
 
+  // Lunch — rotate through the pool day by day.
+  const lunchSchedule = activeSlots.lunch && lunchPool.length ? buildBatchSchedule(lunchPool, days) : null;
   // Snack(s) — rotate through the pool day by day; avoid back-to-back repeats.
   const snackSchedule  = activeSlots.snack  && snackPool.length ? buildBatchSchedule(snackPool, days) : null;
   const snack2Schedule = activeSlots.snack2 && snackPool.length ? buildBatchSchedule(snackPool, days) : null;
@@ -3113,11 +3134,11 @@ function generatePlan() {
       isNewCook,
       dinnerBatchDay, dinnerBatchTotal,
       activeSlots,
-      breakfast:       activeSlots.breakfast       ? bf  : null,
-      secondBreakfast: activeSlots.secondBreakfast ? SHAKE : null,
-      dinner:          activeSlots.dinner           ? din : null,
-      snack:           activeSlots.snack            ? (snackSchedule?.[d]  || null) : null,
-      snack2:          activeSlots.snack2           ? (snack2Schedule?.[d] || null) : null,
+      breakfast: activeSlots.breakfast ? bf  : null,
+      lunch:     activeSlots.lunch     ? (lunchSchedule?.[d]  || null) : null,
+      dinner:    activeSlots.dinner    ? din : null,
+      snack:     activeSlots.snack     ? (snackSchedule?.[d]  || null) : null,
+      snack2:    activeSlots.snack2    ? (snack2Schedule?.[d] || null) : null,
     });
   }
 
@@ -3134,22 +3155,18 @@ async function generatePlanWithAI() {
   const days        = parseInt(document.getElementById('planDays').value) || 3;
   const bfMode      = document.getElementById('planBreakfast').value;
   const startDateVal= document.getElementById('planStartDate').value;
-  const batchDayPref= document.getElementById('planBatchDay').value;
   const snackOn     = document.getElementById('slot-snack').checked;
   const activeSlots = {
-    breakfast:       document.getElementById('slot-breakfast').checked,
-    secondBreakfast: document.getElementById('slot-secondBreakfast').checked,
-    dinner:          document.getElementById('slot-dinner').checked,
-    snack:           snackOn,
-    snack2:          snackOn && document.getElementById('slot-snack2').checked,
+    breakfast: document.getElementById('slot-breakfast').checked,
+    lunch:     document.getElementById('slot-lunch').checked,
+    dinner:    document.getElementById('slot-dinner').checked,
+    snack:     snackOn,
+    snack2:    snackOn && document.getElementById('slot-snack2').checked,
   };
 
   const startDate = startDateVal ? new Date(startDateVal+'T00:00:00') : new Date();
   startDate.setHours(0,0,0,0);
   const startDayName = DAY_FULL[startDate.getDay()];
-
-  const batchNum = parseInt(batchDayPref, 10);
-  const batchDayName = batchNum >= 0 ? DAY_FULL[batchNum] : startDayName;
 
   // Compact recipe catalog — only send slots we're planning for
   const favIds = [...favourites];
@@ -3164,6 +3181,10 @@ async function generatePlanWithAI() {
   if (activeSlots.breakfast) {
     const pool = recipes.filter(r => hasType(r, 'breakfast'));
     if (pool.length) catalog += `BREAKFAST (ID: name):\n${pool.map(formatR).join('\n')}\n\n`;
+  }
+  if (activeSlots.lunch) {
+    const pool = recipes.filter(r => hasType(r, 'lunch'));
+    if (pool.length) catalog += `LUNCH (ID: name):\n${pool.map(formatR).join('\n')}\n\n`;
   }
   if (activeSlots.dinner) {
     const pool = recipes.filter(r => hasType(r, 'dinner'));
@@ -3185,14 +3206,14 @@ async function generatePlanWithAI() {
 Constraints:
 - User: gluten-free, dairy-free, banana-free
 - Daily targets: ~${targets.kcal} kcal, ${targets.protein}g protein
-- Batch cook day: ${batchDayName} (every dinner recipe is batch-friendly)${cravingNote}
+- Batch cook day: ${startDayName} (every dinner recipe is batch-friendly)${cravingNote}
 - ${bfRule}
+- Lunch: rotate — vary across days; can repeat for leftovers if it makes sense.
 - Dinner: group the SAME dinner ID across 2–4 consecutive days (one batch cook covers multiple days). Do NOT repeat the same dinner in back-to-back batches. Prefer ★ favourites.
 - Snack / Snack 2: vary — avoid the same ID on consecutive days. If both snack slots are on, they should differ on a given day.
-- secondBreakfast: always 0 (protein shake).
 
 Return ONLY valid JSON — no markdown fences, no explanation:
-{"days":[{"breakfast":<id>,"secondBreakfast":0,"dinner":<id>,"snack":<id>,"snack2":<id>}]}
+{"days":[{"breakfast":<id>,"lunch":<id>,"dinner":<id>,"snack":<id>,"snack2":<id>}]}
 Exactly ${days} objects. Use null for slots not being planned.`;
 
   const userMsg = `${catalog}Plan ${days} days starting ${startDayName}.`;
@@ -3273,11 +3294,11 @@ function buildPlanFromAIDays(aiDays, startDate, activeSlots) {
       isBatch: isNewCook, isNewCook,
       dinnerBatchDay, dinnerBatchTotal,
       activeSlots,
-      breakfast:       activeSlots.breakfast       ? find(aiDay.breakfast)                        : null,
-      secondBreakfast: activeSlots.secondBreakfast ? (find(aiDay.secondBreakfast) || SHAKE)       : null,
-      dinner:          activeSlots.dinner           ? find(aiDay.dinner)                           : null,
-      snack:           activeSlots.snack            ? find(aiDay.snack)                            : null,
-      snack2:          activeSlots.snack2           ? find(aiDay.snack2)                           : null,
+      breakfast: activeSlots.breakfast ? find(aiDay.breakfast) : null,
+      lunch:     activeSlots.lunch     ? find(aiDay.lunch)     : null,
+      dinner:    activeSlots.dinner    ? find(aiDay.dinner)    : null,
+      snack:     activeSlots.snack     ? find(aiDay.snack)     : null,
+      snack2:    activeSlots.snack2    ? find(aiDay.snack2)    : null,
     };
   });
 }
@@ -3289,12 +3310,9 @@ function respinDay(dayIndex, slot) {
   if(slot==='breakfast') {
     const pool = recipes.filter(r => hasType(r, 'breakfast') && r.id !== day.breakfast?.id);
     if(pool.length) day.breakfast = pool[Math.floor(Math.random()*pool.length)];
-  } else if(slot==='secondBreakfast') {
-    const pool = recipes.filter(r =>
-      (hasType(r,'breakfast') || hasType(r,'dessert') || hasType(r,'snack')) &&
-      r.id !== day.secondBreakfast?.id
-    );
-    day.secondBreakfast = pool.length ? pool[Math.floor(Math.random()*pool.length)] : SHAKE;
+  } else if(slot==='lunch') {
+    const pool = recipes.filter(r => hasType(r, 'lunch') && r.id !== day.lunch?.id);
+    if(pool.length) day.lunch = pool[Math.floor(Math.random()*pool.length)];
   } else if(slot==='dinner') {
     const pool = recipes.filter(r => hasType(r,'dinner') && matchesPlanFilters(r) && r.id !== day.dinner?.id);
     if(pool.length) day.dinner = pool[Math.floor(Math.random()*pool.length)];
@@ -3337,9 +3355,9 @@ function renderPlanOutput(plan) {
             <div class="cal-meal-slot">🌅 Breakfast</div>
             <div class="cal-meal-name"><button class="cal-meal-pick-btn" onclick="openPicker(${i},'breakfast')">${day.breakfast?.name||'—'}</button> <button class="cal-meal-respin" onclick="respinDay(${i},'breakfast')">↺</button></div>
           </div>` : ''}
-          ${day.activeSlots.secondBreakfast ? `<div class="cal-meal">
-            <div class="cal-meal-slot" style="color:var(--green)">🥣 2nd / snack</div>
-            <div class="cal-meal-name"><button class="cal-meal-pick-btn${day.secondBreakfast?.id===0?' picker-item-shake':''}" onclick="openPicker(${i},'secondBreakfast')">${day.secondBreakfast?.name||'—'}</button> <button class="cal-meal-respin" onclick="respinDay(${i},'secondBreakfast')">↺</button></div>
+          ${day.activeSlots.lunch ? `<div class="cal-meal">
+            <div class="cal-meal-slot">🥗 Lunch</div>
+            <div class="cal-meal-name"><button class="cal-meal-pick-btn" onclick="openPicker(${i},'lunch')">${day.lunch?.name||'—'}</button> <button class="cal-meal-respin" onclick="respinDay(${i},'lunch')">↺</button></div>
           </div>` : ''}
           ${day.activeSlots.dinner ? `<div class="cal-meal">
             <div class="cal-meal-slot">🍽 Dinner${dinLeftover}</div>
@@ -3380,10 +3398,10 @@ function renderPlanOutput(plan) {
             <button class="meal-pick-btn" onclick="openPicker(${i},'breakfast')">${day.breakfast?.name||'—'}</button>
             <button class="plan-meal-respin" onclick="respinDay(${i},'breakfast')">↺</button>
           </div>` : ''}
-          ${day.activeSlots.secondBreakfast ? `<div class="plan-meal plan-meal-second-bf">
-            <div class="plan-meal-slot">🥣 2nd / snack</div>
-            <button class="meal-pick-btn" onclick="openPicker(${i},'secondBreakfast')">${day.secondBreakfast?.name||'—'}</button>
-            <button class="plan-meal-respin" onclick="respinDay(${i},'secondBreakfast')">↺</button>
+          ${day.activeSlots.lunch ? `<div class="plan-meal">
+            <div class="plan-meal-slot">🥗 Lunch</div>
+            <button class="meal-pick-btn" onclick="openPicker(${i},'lunch')">${day.lunch?.name||'—'}</button>
+            <button class="plan-meal-respin" onclick="respinDay(${i},'lunch')">↺</button>
           </div>` : ''}
           ${day.activeSlots.dinner ? `<div class="plan-meal">
             <div class="plan-meal-slot">🍽 Dinner</div>
@@ -3409,7 +3427,7 @@ function renderPlanOutput(plan) {
   // ── Plan cost summary ─────────────────────────────────────────────────────
   {
     const planIds = [...new Set(
-      plan.flatMap(d => [d.breakfast, d.secondBreakfast, d.dinner, d.snack, d.snack2])
+      plan.flatMap(d => [d.breakfast, d.lunch, d.dinner, d.snack, d.snack2])
         .filter(r => r && r.id !== 0).map(r => r.id)
     )];
     let planTotal = 0, planUnpriced = 0, planHasCost = false;
@@ -3445,19 +3463,28 @@ function renderPlanOutput(plan) {
 // Quantities sum across recipes when (canonical key + unit) match.
 // Per-row quantity override: localStorage.ds_grocery_qty[key].
 
-function _formatGroceryQty(qty, unit) {
+// Aisles where ml display matches the bottle/jar label. Everything else
+// (spices, pantry, produce, snacks) gets ml→g 1:1 — at kitchen-spoon scale
+// most dry items are ~1g/ml and that's how their packaging is labelled.
+const _LIQUID_AISLES = new Set(['condiments','beverages','dairy']);
+
+function _formatGroceryQty(qty, unit, aisle) {
   if (qty == null || qty === 0) return '';
-  // Convert base units back to friendly display
   let q = qty, u = unit || '';
-  if (u === 'g' && q >= 1000) { q = q / 1000; u = 'kg'; }
+  if (u === 'each' || u === '') {
+    return `×${Math.max(1, Math.round(q))}`;
+  }
+  // Non-liquid aisles: collapse ml to g (1:1) so the shopping label matches.
+  if (u === 'ml' && !_LIQUID_AISLES.has(aisle)) u = 'g';
+  if (u === 'g'  && q >= 1000) { q = q / 1000; u = 'kg'; }
   else if (u === 'ml' && q >= 1000) { q = q / 1000; u = 'l'; }
   const rounded = q >= 10 ? Math.round(q) : Math.round(q * 10) / 10;
-  return u && u !== 'each' && u !== '' ? `${rounded}${u}` : (u === 'each' ? `×${rounded}` : `${rounded}`);
+  return `${rounded}${u}`;
 }
 
 function _groceryAggregate(plan) {
   // Collect unique recipe IDs from the plan (skip SHAKE id=0)
-  const allRecipes = plan.flatMap(d => [d.breakfast, d.secondBreakfast, d.dinner, d.snack, d.snack2])
+  const allRecipes = plan.flatMap(d => [d.breakfast, d.lunch, d.dinner, d.snack, d.snack2])
     .filter(r => r && r.id !== 0);
   const idCounts = {};
   for (const r of allRecipes) idCounts[r.id] = (idCounts[r.id] || 0) + 1;
@@ -3480,15 +3507,18 @@ function _groceryAggregate(plan) {
         qty = ing.qty; unit = ing.unit || ''; name = ing.name;
       }
       if (!name || !String(name).trim()) continue;
-      const canonKey = canonicalise(name);
+      // Canonicalise on the stripped name so "carrot, cut into small pieces"
+      // and "grated carrots" both key as "carrot".
+      const cleanName = _stripPrep(name);
+      const canonKey = canonicalise(cleanName);
       if (!canonKey) continue;
       const base = qty != null ? _toBase(qty, unit) : null;
       const baseUnit = base ? base.base : (unit || 'each');
       const aggKey = `${canonKey}|${baseUnit}`;
       if (!agg[aggKey]) {
         agg[aggKey] = {
-          canonKey, displayName: name, unit: baseUnit, qty: 0,
-          aisle: classifyAisle(name),
+          canonKey, displayName: _displayName(name), unit: baseUnit, qty: 0,
+          aisle: classifyAisle(cleanName),
           hasQty: false, sources: [], priceCost: 0, priceKnown: false,
         };
       }
@@ -3527,7 +3557,7 @@ function renderGroceryList(plan) {
 
   // Plan cost summary (sum of per-portion across plan slots)
   let planTotal = 0, planHasCost = false, planUnpricedMeals = 0;
-  const allPlanMeals = plan.flatMap(d => [d.breakfast, d.secondBreakfast, d.dinner, d.snack, d.snack2])
+  const allPlanMeals = plan.flatMap(d => [d.breakfast, d.lunch, d.dinner, d.snack, d.snack2])
     .filter(m => m && m.id !== 0);
   for (const meal of allPlanMeals) {
     const cost = computeRecipeCost(meal.id);
@@ -3556,11 +3586,10 @@ function renderGroceryList(plan) {
       const checked = groceryChecked.has(row.key);
       const override = groceryQtyOverrides[row.key];
       const displayQty = override != null ? override : (row.hasQty ? row.qty : null);
-      const qtyLabel = displayQty != null ? _formatGroceryQty(displayQty, row.unit) : '';
+      const qtyLabel = displayQty != null ? _formatGroceryQty(displayQty, row.unit, row.aisle) : '—';
       // Cost for this row
       let priceHint = '';
       if (row.priceKnown && row.priceCost > 0) {
-        // scale priceCost by override / original if override present
         let cost = row.priceCost;
         if (override != null && row.hasQty && row.qty > 0) {
           cost = row.priceCost * (override / row.qty);
@@ -3573,19 +3602,17 @@ function renderGroceryList(plan) {
           priceHint = `<span style="font-size:10px;color:var(--text3);margin-left:5px">£${pb.unitPrice < 0.01 ? pb.unitPrice.toFixed(4) : pb.unitPrice.toFixed(3)}/${pb.unit}</span>`;
         }
       }
-      const sourcesTitle = row.sources.length > 1
-        ? ` title="From: ${row.sources.map(s => s.recipe).join(', ')}"`
-        : ` title="From: ${row.sources[0]?.recipe || ''}"`;
+      const sourcesTitle = ` title="From: ${row.sources.map(s => s.recipe).join(', ').replace(/"/g,'&quot;')}"`;
+      const safeKey = row.key.replace(/'/g,"\\'");
       const qtyInput = `<input type="number" step="any" min="0" value="${displayQty != null ? displayQty : ''}"
         placeholder="${row.hasQty ? row.qty.toFixed(row.qty<10?1:0) : '—'}"
         onclick="event.stopPropagation()"
-        oninput="setGroceryQty('${row.key.replace(/'/g,"\\'")}', this.value)"
+        oninput="setGroceryQty('${safeKey}', this.value)"
         style="width:54px;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:2px 5px;border-radius:5px;font-size:11px;font-family:var(--font);outline:none;margin-right:6px;text-align:right">`;
-      const unitLabel = (row.unit && row.unit !== 'each' && row.unit !== '') ? row.unit : '';
-      return `<li><div class="grocery-item${checked?' checked':''}"${sourcesTitle} onclick="toggleGrocery(this,'${row.key.replace(/'/g,"\\'")}')">
-        <input type="checkbox" ${checked?'checked':''} onclick="event.stopPropagation();toggleGrocery(this.parentElement,'${row.key.replace(/'/g,"\\'")}')">
-        <label style="display:flex;align-items:center;flex-wrap:wrap;gap:2px;flex:1;min-width:0">
-          ${qtyInput}<span style="font-size:10px;color:var(--text3);margin-right:5px">${unitLabel}</span>
+      return `<li><div class="grocery-item${checked?' checked':''}"${sourcesTitle} onclick="toggleGrocery(this,'${safeKey}')">
+        <input type="checkbox" ${checked?'checked':''} onclick="event.stopPropagation();toggleGrocery(this.parentElement,'${safeKey}')">
+        <label style="display:flex;align-items:center;flex-wrap:wrap;gap:4px;flex:1;min-width:0">
+          ${qtyInput}<span style="font-size:11px;color:var(--text2);min-width:34px">${qtyLabel}</span>
           <span style="flex:1;min-width:0">${row.displayName}</span>
           ${priceHint}
         </label>
@@ -4113,21 +4140,21 @@ let pickerContext = null;
 
 const SLOT_LABELS = {
   breakfast: 'Breakfast',
-  secondBreakfast: '2nd Breakfast / Snack',
-  dinner: 'Dinner',
-  snack: 'Snack',
-  snack2: 'Snack 2',
+  lunch:     'Lunch',
+  dinner:    'Dinner',
+  snack:     'Snack',
+  snack2:    'Snack 2',
 };
 
 function getPickerPool(slot) {
   const hasType = (r, t) => (r.mealTypes || []).includes(t);
   switch(slot) {
-    case 'breakfast':       return recipes.filter(r => hasType(r,'breakfast'));
-    case 'secondBreakfast': return [SHAKE, ...recipes.filter(r => hasType(r,'breakfast') || hasType(r,'dessert') || hasType(r,'snack'))];
-    case 'dinner':          return recipes.filter(r => hasType(r,'dinner'));
+    case 'breakfast': return recipes.filter(r => hasType(r,'breakfast'));
+    case 'lunch':     return recipes.filter(r => hasType(r,'lunch'));
+    case 'dinner':    return recipes.filter(r => hasType(r,'dinner'));
     case 'snack':
-    case 'snack2':          return recipes.filter(r => hasType(r,'snack') || hasType(r,'dessert'));
-    default:                return recipes;
+    case 'snack2':    return recipes.filter(r => hasType(r,'snack') || hasType(r,'dessert'));
+    default:          return recipes;
   }
 }
 
@@ -4136,7 +4163,6 @@ function openPicker(dayIndex, slot) {
   pickerContext = { dayIndex, slot };
   document.getElementById('pickerTitle').textContent = `Pick: ${SLOT_LABELS[slot]||slot}`;
   document.getElementById('pickerHint').textContent =
-    slot==='secondBreakfast' ? 'Breakfast, snack, or anything from your library — or keep it as a protein shake' :
     slot==='dinner' ? 'Craving tags still apply — or pick anything directly' :
     'Click a recipe to assign it to this slot';
   document.getElementById('pickerSearch').value = '';
