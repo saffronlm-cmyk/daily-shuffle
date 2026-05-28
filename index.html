@@ -2474,6 +2474,40 @@ const _STOP_ADJ = new Set([
   'a','an','the','of','to','for','your','some',
 ]);
 
+// g per 1 cup (US, 240 ml) for common dry / sticky ingredients. Keys are
+// canonicalise()'d, so e.g. "rolled oats" → "rolled oat", "mashed banana" →
+// "banana" (because "mashed" is stripped as a prep adj). Anything missing
+// falls back to the aisle heuristic in _toBase.
+const _DENSITY_G_PER_CUP = {
+  // Flours & starches
+  'flour': 125, 'plain flour': 125, 'self-raising flour': 125, 'self raising flour': 125,
+  'gluten-free flour': 130, 'gf flour': 130, 'almond flour': 96, 'coconut flour': 110,
+  'cornflour': 130, 'cornstarch': 130, 'rice flour': 158, 'oat flour': 100,
+  // Sugars
+  'sugar': 200, 'caster sugar': 200, 'brown sugar': 220, 'icing sugar': 130,
+  'powdered sugar': 130, 'coconut sugar': 170,
+  // Grains & legumes
+  'rice': 200, 'basmati': 200, 'jasmine rice': 200, 'brown rice': 195, 'wild rice': 160,
+  'quinoa': 170, 'oat': 80, 'rolled oat': 80, 'porridge oat': 80, 'oatmeal': 80,
+  'lentil': 200, 'chickpea': 200, 'bean': 180, 'kidney bean': 180, 'black bean': 180,
+  'couscous': 175, 'bulgur': 150, 'pasta': 100, 'spaghetti': 100, 'macaroni': 110,
+  // Nuts & seeds
+  'almond': 140, 'cashew': 140, 'walnut': 100, 'peanut': 140, 'pecan': 100, 'pistachio': 125,
+  'chia seed': 170, 'flax seed': 140, 'flaxseed': 140, 'milled flaxseed': 130,
+  'sesame seed': 150, 'sunflower seed': 140, 'pumpkin seed': 130,
+  // Sweeteners & sticky / pureed (denser than water)
+  'honey': 340, 'maple syrup': 320, 'peanut butter': 256, 'almond butter': 256, 'tahini': 250,
+  'butternut puree': 245, 'pumpkin puree': 245, 'apple sauce': 245, 'apple puree': 245,
+  'banana': 225, 'mashed potato': 210, 'tomato puree': 240, 'tomato passata': 240, 'tomato sauce': 245,
+  // Other dry
+  'cocoa powder': 100, 'cacao powder': 100, 'protein powder': 100,
+  'desiccated coconut': 80, 'shredded coconut': 80,
+  'breadcrumb': 110, 'panko': 50,
+  'cheese': 100, 'vegan cheese': 100,
+  // Frozen fruit (often called for "by the cup")
+  'blueberry': 190, 'raspberry': 125, 'strawberry': 150, 'berry': 150, 'mixed berry': 150,
+};
+
 // Consume a leading qty + unit pair from `t`. Returns whatever it parsed plus
 // the remaining text. Used by parseQty so it can pick up compound forms like
 // "1/2 cup 1 tbsp butternut puree" and sum them into one quantity.
@@ -2521,8 +2555,10 @@ function parseQty(text) {
   // second qty+unit and sum if both convert to the same base unit.
   const second = _consumeQtyUnit(t);
   if (second.qty != null && second.unit && qty != null && unit) {
-    const aBase = _toBase(qty, unit);
-    const bBase = _toBase(second.qty, second.unit);
+    // `second.rest` holds the rest of the text — usually starts with the
+    // ingredient name, so use it as a hint for cup-density resolution.
+    const aBase = _toBase(qty, unit, second.rest);
+    const bBase = _toBase(second.qty, second.unit, second.rest);
     if (aBase && bBase && aBase.base === bBase.base) {
       qty = aBase.qty + bBase.qty;
       unit = aBase.base;
@@ -2622,14 +2658,28 @@ function lookupPriceBook(key) {
   return null;
 }
 
-function _toBase(qty, unit) {
-  // Normalise qty+unit to {qty, base} where base is 'g', 'ml', or 'each'
+function _toBase(qty, unit, name) {
+  // Normalise qty+unit to {qty, base} where base is 'g', 'ml', or 'each'.
+  // For cup measurements an optional `name` is consulted: dry/sticky items
+  // get a density lookup (→ g), liquids stay as ml.
   if (!qty) return null;
   const u = (unit || '').toLowerCase();
+  if (u === 'cup' || u === 'cups') {
+    if (name) {
+      const canon = canonicalise(name);
+      const gpc = _DENSITY_G_PER_CUP[canon];
+      if (gpc != null) return { qty: qty * gpc, base: 'g' };
+      // Unknown name — if the aisle suggests liquid, stay in ml; else assume
+      // ~240 g/cup (close to water and to most dry-but-non-fluffy ingredients).
+      const aisle = classifyAisle(name);
+      if (!_LIQUID_AISLES.has(aisle)) return { qty: qty * 240, base: 'g' };
+    }
+    return { qty: qty * 240, base: 'ml' };
+  }
   const map = { g:'g', kg:'g', ml:'ml', l:'ml', 'fl oz':'ml', floz:'ml',
-                tbsp:'ml', tsp:'ml', cup:'ml', oz:'g', lb:'g', each:'each', x:'each', '':'g' };
+                tbsp:'ml', tsp:'ml', oz:'g', lb:'g', each:'each', x:'each', '':'g' };
   const mult = { g:1, kg:1000, ml:1, l:1000, 'fl oz':29.574, floz:29.574,
-                 tbsp:15, tsp:5, cup:240, oz:28.35, lb:453.6, each:1, x:1, '':1 };
+                 tbsp:15, tsp:5, oz:28.35, lb:453.6, each:1, x:1, '':1 };
   const base = map[u];
   if (!base) return null;
   return { qty: qty * (mult[u] ?? 1), base };
@@ -2654,7 +2704,7 @@ function computeRecipeCost(recipeId) {
     const key = canonicalise(name);
     const pb = lookupPriceBook(key);
     if (!pb || !pb.unitPrice) { unpriced++; missing.push(name); continue; }
-    const ingBase = _toBase(qty, unit);
+    const ingBase = _toBase(qty, unit, name);
     const pbBase  = _toBase(1, pb.unit);
     if (!ingBase || !pbBase || ingBase.base !== pbBase.base) {
       unpriced++; missing.push(name); continue;
@@ -3541,7 +3591,7 @@ function _groceryAggregate(plan) {
       const cleanName = _stripPrep(name);
       const canonKey = canonicalise(cleanName);
       if (!canonKey) continue;
-      const base = qty != null ? _toBase(qty, unit) : null;
+      const base = qty != null ? _toBase(qty, unit, cleanName) : null;
       const baseUnit = base ? base.base : (unit || 'each');
       const aggKey = `${canonKey}|${baseUnit}`;
       if (!agg[aggKey]) {
@@ -3944,12 +3994,30 @@ function multiplyIngredientText(text, factor) {
   });
 }
 
+// Render a base-unit qty without aisle collapsing — used for the cup
+// conversion hint in the recipe modal.
+function _formatBaseQty(qty, base) {
+  if (qty == null || qty === 0) return '';
+  let q = qty, u = base;
+  if (u === 'g'  && q >= 1000) { q = q / 1000; u = 'kg'; }
+  else if (u === 'ml' && q >= 1000) { q = q / 1000; u = 'l'; }
+  const rounded = q >= 10 ? Math.round(q) : Math.round(q * 10) / 10;
+  return `${rounded}${u}`;
+}
+
 function _ingToText(ing) {
   if (ing.item != null) return ing.item;
   const q = ing.qty != null ? ing.qty + ' ' : '';
   const u = (ing.unit && ing.unit !== 'each') ? ing.unit + ' ' : '';
   const n = ing.note ? ` (${ing.note})` : '';
-  return `${q}${u}${ing.name || ''}${n}`.trim();
+  // Cup-measurement hint: surface the converted weight/volume so cooks who
+  // prefer to weigh can. e.g. "1/2 cup flour (≈63g)".
+  let hint = '';
+  if (ing.qty != null && (ing.unit === 'cup' || ing.unit === 'cups')) {
+    const base = _toBase(ing.qty, ing.unit, ing.name);
+    if (base && base.base !== 'each') hint = ` (≈${_formatBaseQty(base.qty, base.base)})`;
+  }
+  return `${q}${u}${ing.name || ''}${n}${hint}`.trim();
 }
 
 function buildIngredientsHtml(fd, multiplier, toImperial) {
