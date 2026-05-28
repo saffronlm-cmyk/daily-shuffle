@@ -2234,7 +2234,7 @@ function toggleEditorCraving(val, el) {
 // ── Ingredient editor helpers ─────────────────────────────────────────────────
 function renderEditorIngredients() {
   const el = document.getElementById('editor-ingredients-list'); if (!el) return;
-  const unitOpts = ['g','ml','each','kg','l','tbsp','tsp','oz','lb'];
+  const unitOpts = ['g','ml','each','kg','l','cup','tbsp','tsp','oz','lb'];
   el.innerHTML = _editorIngredients.map((row, i) => {
     if (row.type === 'group') {
       return `<div class="edit-list-row">
