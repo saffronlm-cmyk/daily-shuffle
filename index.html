@@ -1044,6 +1044,11 @@ function mapSupabaseToApp(row) {
 
 function flattenIngredientSections(sections) {
   if (!sections) return [];
+  // Some imported recipes have null/blank ingredient items (the item text was
+  // lost on import); skip them so they don't render as a literal "null" line.
+  const isBlank = item => item == null
+    || (typeof item === 'string' && item.trim() === '')
+    || (typeof item === 'object' && !(item.name && String(item.name).trim()));
   const toStructured = item => {
     if (item && typeof item === 'object') return item;
     const p = parseQty(String(item));
@@ -1051,11 +1056,11 @@ function flattenIngredientSections(sections) {
   };
   if (!Array.isArray(sections)) {
     return Object.entries(sections).flatMap(([title, items]) =>
-      (Array.isArray(items) ? items : []).map(item => ({ group: title || undefined, ...toStructured(item) }))
+      (Array.isArray(items) ? items : []).filter(item => !isBlank(item)).map(item => ({ group: title || undefined, ...toStructured(item) }))
     );
   }
   return sections.flatMap(sec =>
-    (sec.ingredients || []).map(item => ({ group: sec.section_title || undefined, ...toStructured(item) }))
+    (sec.ingredients || []).filter(item => !isBlank(item)).map(item => ({ group: sec.section_title || undefined, ...toStructured(item) }))
   );
 }
 
