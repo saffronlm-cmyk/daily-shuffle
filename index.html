@@ -3841,7 +3841,7 @@ async function addRecipe() {
     craving_tags: cravings,
     creator_handle: creatorHandle,
     notes: document.getElementById('f-notes').value.trim() || null,
-    import_status: 'custom',
+    import_status: 'ready',
     ingredient_sections: ingredientSections,
     method_steps: finalMethod.length ? finalMethod : null,
     calories: hasManualNutrition ? (fKcal || 0) : null,
