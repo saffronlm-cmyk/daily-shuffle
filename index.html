@@ -589,6 +589,11 @@
           <input class="pb-input" id="pb-store" placeholder="Store" style="width:68px">
           <button class="btn-save-key" onclick="addPriceBookEntry()" style="font-size:12px;padding:6px 12px">Add</button>
         </div>
+        <p style="font-size:12px;color:var(--text2);margin:12px 0 8px;line-height:1.5">Or bulk-import a price CSV (columns <code>Ingredient, Pack size (qty), Pack unit, Pack price</code>). Rows without a price are skipped.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn-library" onclick="document.getElementById('importPbCsvInput').click()">⬆ Import price CSV</button>
+          <input type="file" id="importPbCsvInput" accept=".csv" style="display:none" onchange="importPriceBookCsv(event)">
+        </div>
       </div>
       <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
         <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:6px">🧾 Log Receipt</div>
@@ -2924,6 +2929,56 @@ function deletePbEntry(key) {
   delete priceBook[key];
   savePriceBook();
   renderPriceBook();
+}
+
+// ─── BULK PRICE BOOK CSV IMPORT ─────────────────────────────────────────────
+// Consumes the "missing ingredient prices" worksheet. Header matching is fuzzy
+// so column order / exact wording (e.g. "Pack size (qty)") doesn't matter.
+function importPriceBookCsv(evt) {
+  const file = evt.target.files[0];
+  evt.target.value = '';
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    let rows;
+    try { rows = _parseCsv(String(e.target.result)); }
+    catch(err) { alert('Could not read CSV: ' + err.message); return; }
+    if (rows.length < 2) { alert('CSV looks empty.'); return; }
+    const head = rows[0].map(h => h.trim().toLowerCase());
+    // Resolve a column by trying each keyword test in turn.
+    const find = (...tests) => { for (const t of tests) { const i = head.findIndex(h => t(h)); if (i >= 0) return i; } return -1; };
+    const iName  = find(h => h === 'ingredient', h => h.includes('ingredient'), h => h.includes('name'));
+    const iQty   = find(h => h.includes('pack size'), h => h.includes('pack qty'), h => h === 'qty', h => h.includes('size'));
+    const iUnit  = find(h => h.includes('pack unit'), h => h.includes('unit'));
+    const iPrice = find(h => h.includes('pack price'), h => h.includes('price') && !h.includes('100'));
+    const iStore = find(h => h.includes('store'));
+    if (iName < 0 || iQty < 0 || iPrice < 0) {
+      alert('CSV needs at least Ingredient, Pack size (qty) and Pack price columns.'); return;
+    }
+    const cell = (r, i) => (i >= 0 ? (r[i] ?? '').trim() : '');
+    let added = 0, skipped = 0;
+    for (const r of rows.slice(1)) {
+      const name = cell(r, iName);
+      const packSize = parseFloat(cell(r, iQty));
+      const packPrice = parseFloat(cell(r, iPrice));
+      if (!name || isNaN(packSize) || packSize <= 0 || isNaN(packPrice) || packPrice <= 0) { skipped++; continue; }
+      const packUnit = (cell(r, iUnit) || 'each').toLowerCase();
+      const key = canonicalise(name);
+      if (!key) { skipped++; continue; }
+      priceBook[key] = {
+        ...(priceBook[key] || { aliases: [] }),
+        unitPrice: packPrice / packSize, unit: packUnit,
+        packSize, packUnit, packPrice,
+        store: cell(r, iStore), updatedAt: new Date().toISOString().slice(0, 10),
+      };
+      added++;
+    }
+    if (!added) { alert('No priced rows found — fill in Pack size (qty) and Pack price first.'); return; }
+    savePriceBook();
+    renderPriceBook();
+    showToast(`Price book: ${added} added/updated${skipped ? `, ${skipped} skipped (no price)` : ''} ✓`);
+  };
+  reader.readAsText(file);
 }
 
 // ── Receipt UI ────────────────────────────────────────────────────────────────
