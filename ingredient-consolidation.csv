@@ -1,0 +1,207 @@
+cluster_id,suggested_canonical,variant,occurrences,in_pricebook,reason,decision,rewrite_recipes
+1,Spring Onion,green onion,25,no,synonym:green onion→spring onion,merge,
+1,Spring Onion,scallion,4,no,synonym:scallion→spring onion,merge,
+1,Spring Onion,spring onion,50,yes,canonical,merge,yes
+2,Soy Sauce,light soy sauce,12,no,qualifier?:light | REVIEW:dark/light,review,
+2,Soy Sauce,dark soy sauce,7,no,qualifier?:dark | REVIEW:dark/light,review,
+2,Soy Sauce,reduced-sodium soy sauce,1,no,qualifier:reduced-sodium,merge,
+2,Soy Sauce,soy sauce,55,no,canonical,merge,no
+3,Olive Oil,light olive oil,0,no,qualifier?:light | REVIEW:dark/light,review,
+3,Olive Oil,olive oil,54,no,canonical,merge,no
+4,Onion,red onion,29,no,colour:red | REVIEW:colour,review,
+4,Onion,yellow onion,4,no,colour:yellow | REVIEW:colour,review,
+4,Onion,white onion,3,no,colour:white | REVIEW:colour,review,
+4,Onion,onion,16,yes,canonical,merge,no
+5,Honey,runny honey,1,no,qualifier:runny,merge,
+5,Honey,honey,42,no,canonical,merge,no
+6,Water,water thin,1,no,qualifier:thin,merge,
+6,Water,water,40,no,canonical,merge,no
+7,Juice Lime,lime juice,13,no,variant,merge,
+7,Juice Lime,juice lime,26,no,canonical,merge,yes
+8,Coriander,cilantro,8,no,synonym:cilantro→coriander,merge,
+8,Coriander,coriander,30,yes,canonical,merge,yes
+9,Greek Yogurt,plain greek yogurt,9,no,qualifier:plain,merge,
+9,Greek Yogurt,greek yoghurt,8,no,synonym:greek yoghurt→greek yogurt,merge,
+9,Greek Yogurt,nonfat plain greek yogurt,1,no,qualifier:nonfat | qualifier:plain,merge,
+9,Greek Yogurt,plain nonfat greek yogurt,1,no,qualifier:plain | qualifier:nonfat,merge,
+9,Greek Yogurt,thick greek yoghurt,1,no,qualifier:thick | synonym:thick greek yoghurt→thick greek yogurt,merge,
+9,Greek Yogurt,full-fat greek yoghurt,0,no,qualifier:full-fat | synonym:full-fat greek yoghurt→full-fat greek yogurt,merge,
+9,Greek Yogurt,greek yogurt,13,no,canonical,merge,no
+10,Sugar,white sugar,7,no,colour:white | REVIEW:colour,review,
+10,Sugar,sugar,23,no,canonical,merge,no
+11,Peanut Butter,smooth peanut butter,4,no,qualifier:smooth,merge,
+11,Peanut Butter,natural peanut butter,1,no,qualifier:natural,merge,
+11,Peanut Butter,peanut butter,23,no,canonical,merge,no
+12,Ginger,piece ginger,1,no,container:piece,merge,
+12,Ginger,ginger,26,yes,canonical,merge,yes
+13,Lemon Juice,juice lemon,18,no,variant,merge,
+13,Lemon Juice,lemon juice,8,no,canonical,merge,yes
+14,Cocoa Powder,dark cocoa powder,1,no,qualifier?:dark | REVIEW:dark/light,review,
+14,Cocoa Powder,cocoa powder,24,yes,canonical,merge,no
+15,Pepper,white pepper,11,no,colour:white | REVIEW:colour,review,
+15,Pepper,red pepper,6,no,colour:red | REVIEW:colour,review,
+15,Pepper,green pepper,2,no,colour:green | REVIEW:colour,review,
+15,Pepper,pepper,3,no,canonical,merge,no
+16,Chocolate,dark chocolate,16,yes,qualifier?:dark | REVIEW:dark/light,review,
+16,Chocolate,white chocolate,1,no,colour:white | REVIEW:colour,review,
+16,Chocolate,chocolate,4,no,canonical,merge,no
+17,Chocolate Chip,dark chocolate chip,13,no,qualifier?:dark | REVIEW:dark/light,review,
+17,Chocolate Chip,chocolate chip,8,no,canonical,merge,no
+18,Milk,milk thin,2,no,qualifier:thin,merge,
+18,Milk,milk,15,no,canonical,merge,no
+19,Coconut Milk,full-fat coconut milk,1,no,qualifier:full-fat,merge,
+19,Coconut Milk,light coconut milk,1,no,qualifier?:light | REVIEW:dark/light,review,
+19,Coconut Milk,coconut milk,13,no,canonical,merge,no
+20,Rice,white rice,3,no,colour:white | REVIEW:colour,review,
+20,Rice,rice,11,no,canonical,merge,no
+21,Yogurt,yoghurt,4,no,synonym:yoghurt→yogurt,merge,
+21,Yogurt,plain yoghurt,2,no,qualifier:plain | synonym:plain yoghurt→plain yogurt,merge,
+21,Yogurt,plain yogurt,2,no,qualifier:plain,merge,
+21,Yogurt,thick yoghurt,1,no,qualifier:thick | synonym:thick yoghurt→thick yogurt,merge,
+21,Yogurt,thick yogurt,1,no,qualifier:thick,merge,
+21,Yogurt,yogurt,3,no,canonical,merge,no
+22,Cabbage,red cabbage,4,no,colour:red | REVIEW:colour,review,
+22,Cabbage,green cabbage,2,no,colour:green | REVIEW:colour,review,
+22,Cabbage,purple cabbage,2,no,colour:purple | REVIEW:colour,review,
+22,Cabbage,white cabbage,2,no,colour:white | REVIEW:colour,review,
+22,Cabbage,cabbage,2,no,canonical,merge,no
+23,Flour,plain flour,6,no,qualifier:plain,merge,
+23,Flour,all purpose flour,1,no,qualifier:plain | synonym:all purpose flour→plain flour,merge,
+23,Flour,flour,5,no,canonical,merge,no
+24,Dijon Mustard,smooth dijon mustard,2,no,qualifier:smooth,merge,
+24,Dijon Mustard,dijon mustard,9,no,canonical,merge,no
+25,Tahini,runny tahini,2,no,qualifier:runny,merge,
+25,Tahini,tahini,8,no,canonical,merge,no
+26,Chilli Flake,red chilli flake,1,no,colour:red | REVIEW:colour,review,
+26,Chilli Flake,chilli flake,8,no,canonical,merge,no
+27,Curry Powder,mild curry powder,1,no,qualifier:mild,merge,
+27,Curry Powder,curry powder,7,no,canonical,merge,no
+28,Honey Or Maple Syrup,maple syrup or honey,4,no,variant,merge,
+28,Honey Or Maple Syrup,honey or maple syrup,4,no,canonical,merge,yes
+29,Miso Paste,white miso paste,3,no,colour:white | REVIEW:colour,review,
+29,Miso Paste,miso paste,5,no,canonical,merge,no
+30,Prawn,shrimp,1,no,synonym:shrimp→prawn,merge,
+30,Prawn,prawn,7,no,canonical,merge,yes
+31,Chilli Powder,red chilli powder,2,no,colour:red | REVIEW:colour,review,
+31,Chilli Powder,mild chilli powder,1,no,qualifier:mild,merge,
+31,Chilli Powder,chilli powder,4,no,canonical,merge,no
+32,Mayo,light mayo,3,no,qualifier?:light | REVIEW:dark/light,review,
+32,Mayo,mayo,4,yes,canonical,merge,no
+33,Tamari,low sodium tamari,2,no,qualifier:low | qualifier:sodium,merge,
+33,Tamari,tamari,5,no,canonical,merge,no
+34,Bell Pepper,red bell pepper,4,no,colour:red,merge,
+34,Bell Pepper,bell pepper,2,no,canonical,merge,no
+35,Chicken Stock,low sodium chicken stock,1,no,qualifier:low | qualifier:sodium,merge,
+35,Chicken Stock,chicken stock,5,no,canonical,merge,no
+36,Cornflour,cornstarch,3,no,synonym:cornstarch→cornflour,merge,
+36,Cornflour,cornflour,3,no,canonical,merge,yes
+37,Sweetener,natural sweetener,2,no,qualifier:natural,merge,
+37,Sweetener,sweetener,4,no,canonical,merge,no
+38,Apple,red apple,1,no,colour:red | REVIEW:colour,review,
+38,Apple,apple,4,yes,canonical,merge,no
+39,Cm Ginger,cm piece ginger,2,no,container:piece,merge,
+39,Cm Ginger,cm ginger,3,no,canonical,merge,yes
+40,Courgette,zucchini,3,no,synonym:zucchini→courgette,merge,
+40,Courgette,courgette,2,no,canonical,merge,yes
+41,Oil,plain oil,1,no,qualifier:plain,merge,
+41,Oil,oil,4,no,canonical,merge,no
+42,Red Wine Vinegar,white wine vinegar,2,no,colour:white | REVIEW:colour,review,
+42,Red Wine Vinegar,red wine vinegar,3,no,canonical,merge,no
+43,Heaped Tbsp Greek Yoghurt,heaped tbsp full-fat greek yoghurt,1,no,container:tbsp | qualifier:full-fat | synonym:heaped tbsp full-fat greek yoghurt→heaped tbsp full-fat greek yogurt,merge,
+43,Heaped Tbsp Greek Yoghurt,heaped tbsp thick greek yoghurt,1,no,container:tbsp | qualifier:thick | synonym:heaped tbsp thick greek yoghurt→heaped tbsp thick greek yogurt,merge,
+43,Heaped Tbsp Greek Yoghurt,heaped tbsp greek yoghurt,2,no,canonical,merge,no
+44,Butter,unsalted butter,1,no,qualifier:unsalted,merge,
+44,Butter,butter,3,no,canonical,merge,no
+45,Coconut Yogurt,coconut yoghurt,3,no,synonym:coconut yoghurt→coconut yogurt,merge,
+45,Coconut Yogurt,coconut yogurt,1,no,canonical,merge,yes
+46,Zest Lemon,lemon zest,2,no,variant,merge,
+46,Zest Lemon,zest lemon,2,no,canonical,merge,yes
+47,Cream Cheese,light cream cheese,1,no,qualifier?:light | REVIEW:dark/light,review,
+47,Cream Cheese,low-fat cream cheese,1,no,qualifier:low-fat,merge,
+47,Cream Cheese,cream cheese,1,no,canonical,merge,no
+48,Chocolate Chip Topping,dark chocolate chip topping,2,no,qualifier?:dark | REVIEW:dark/light,review,
+48,Chocolate Chip Topping,chocolate chip topping,1,no,canonical,merge,no
+49,Heaped Tsp Peanut Butter,heaped tbsp smooth peanut butter,2,no,container:tbsp | qualifier:smooth,merge,
+49,Heaped Tsp Peanut Butter,heaped tsp peanut butter,1,no,canonical,merge,no
+50,Mayonnaise,light mayonnaise,1,no,qualifier?:light | REVIEW:dark/light,review,
+50,Mayonnaise,mayonnaise,2,no,canonical,merge,no
+51,Vanilla Greek Yogurt,vanilla greek yoghurt,1,no,synonym:vanilla greek yoghurt→vanilla greek yogurt,merge,
+51,Vanilla Greek Yogurt,vanilla greek yogurt,2,no,canonical,merge,yes
+52,Wide Rice Noodle,wide rice stick noodle,2,no,container:stick,merge,
+52,Wide Rice Noodle,wide rice noodle,1,no,canonical,merge,yes
+53,Bread,white bread,1,no,colour:white | REVIEW:colour,review,
+53,Bread,bread,1,no,canonical,merge,no
+54,Celery,stalk celery,1,no,container:stalk,merge,
+54,Celery,celery,1,no,canonical,merge,yes
+55,Chilly,red chilly,1,no,colour:red | REVIEW:colour,review,
+55,Chilly,chilly,1,no,canonical,merge,no
+56,Chocolate Chip Or Chunk,dark chocolate chip or chunk,1,no,qualifier?:dark | REVIEW:dark/light,review,
+56,Chocolate Chip Or Chunk,chocolate chip or chunk,1,no,canonical,merge,no
+57,Chocolate Vegan Protein Powder,vegan chocolate protein powder,1,no,variant,merge,
+57,Chocolate Vegan Protein Powder,chocolate vegan protein powder,1,no,canonical,merge,yes
+58,Cilantro Coriander,coriander cilantro,1,no,synonym:coriander cilantro→coriander coriander,merge,
+58,Cilantro Coriander,cilantro coriander,1,no,canonical,merge,yes
+59,Coriander Cilantro Leave,coriander cilantro sprig leave,1,no,container:sprig | synonym:coriander cilantro sprig leave→coriander coriander sprig leave,merge,
+59,Coriander Cilantro Leave,coriander cilantro leave,1,no,canonical,merge,yes
+60,Dairy-free Chocolate,dairy-free dark chocolate,1,no,qualifier?:dark | REVIEW:dark/light,review,
+60,Dairy-free Chocolate,dairy-free chocolate,1,no,canonical,merge,no
+61,Enchilada Sauce,red enchilada sauce,1,no,colour:red | REVIEW:colour,review,
+61,Enchilada Sauce,enchilada sauce,1,no,canonical,merge,no
+62,Espresso Shot,shot espresso,1,no,variant,merge,
+62,Espresso Shot,espresso shot,1,no,canonical,merge,yes
+63,Fat Greek Yogurt Or Protein Yogurt,fat greek yoghurt or protein yoghurt,1,no,synonym:fat greek yoghurt or protein yoghurt→fat greek yogurt or protein yogurt,merge,
+63,Fat Greek Yogurt Or Protein Yogurt,fat greek yogurt or protein yogurt,1,no,canonical,merge,yes
+64,Ginger And Garlic Paste,garlic and ginger paste,1,no,variant,merge,
+64,Ginger And Garlic Paste,ginger and garlic paste,1,no,canonical,merge,yes
+65,Ginger Garlic Paste,garlic ginger paste,1,no,variant,merge,
+65,Ginger Garlic Paste,ginger garlic paste,1,no,canonical,merge,yes
+66,Green Capsicum,red capsicum,1,no,colour:red | REVIEW:colour,review,
+66,Green Capsicum,green capsicum,1,no,canonical,merge,no
+67,Heaped Tbsp Yoghurt,heaped tbsp thick yoghurt,1,no,container:tbsp | qualifier:thick | synonym:heaped tbsp thick yoghurt→heaped tbsp thick yogurt,merge,
+67,Heaped Tbsp Yoghurt,heaped tbsp yoghurt,1,no,canonical,merge,no
+68,Mini Chocolate Chip,mini dark chocolate chip,1,no,qualifier?:dark | REVIEW:dark/light,review,
+68,Mini Chocolate Chip,mini chocolate chip,1,no,canonical,merge,no
+69,Mushroom,punnet mushroom,1,no,container:punnet,merge,
+69,Mushroom,mushroom,1,yes,canonical,merge,yes
+70,Nut Butter,runny nut butter,0,no,qualifier:runny,merge,
+70,Nut Butter,nut butter,2,no,canonical,merge,no
+71,Olive Or Avocado Oil,avocado or olive oil,1,no,variant,merge,
+71,Olive Or Avocado Oil,olive or avocado oil,1,no,canonical,merge,yes
+72,Pesto,green pesto,2,no,colour:green | REVIEW:colour,review,
+72,Pesto,pesto,0,yes,canonical,merge,no
+73,Pickled Onion,pickled red onion,1,no,colour:red | REVIEW:colour,review,
+73,Pickled Onion,pickled onion,1,no,canonical,merge,no
+74,Precooked Brown Rice,brown precooked rice,1,no,variant,merge,
+74,Precooked Brown Rice,precooked brown rice,1,no,canonical,merge,yes
+75,Rice Vermicelli Noodle,vermicelli rice noodle,1,no,variant,merge,
+75,Rice Vermicelli Noodle,rice vermicelli noodle,1,no,canonical,merge,yes
+76,Scallion Or Coriander,green onion or cilantro,1,no,synonym:green onion or cilantro→spring onion or coriander,merge,
+76,Scallion Or Coriander,scallion or coriander,1,no,canonical,merge,yes
+77,Soya Yogurt,plain soya yoghurt,2,no,qualifier:plain | synonym:plain soya yoghurt→plain soya yogurt,merge,
+77,Soya Yogurt,soya yogurt,0,yes,canonical,merge,no
+78,Spring Onion Stem,green onion stem,1,no,synonym:green onion stem→spring onion stem,merge,
+78,Spring Onion Stem,spring onion stem,1,no,canonical,merge,yes
+79,Sugar Or Honey,honey or sugar,1,no,variant,merge,
+79,Sugar Or Honey,sugar or honey,1,no,canonical,merge,yes
+80,Zest And Juice Lime,juice and zest lime,1,no,variant,merge,
+80,Zest And Juice Lime,zest and juice lime,1,no,canonical,merge,yes
+81,Curly Kale,handful curly kale,1,no,container:handful,merge,
+81,Curly Kale,curly kale,0,no,canonical,merge,yes
+82,Fat Greek Yogurt,fat greek yoghurt,0,no,synonym:fat greek yoghurt→fat greek yogurt,merge,
+82,Fat Greek Yogurt,fat greek yogurt,1,no,canonical,merge,yes
+83,Flat Baking Powder,flat tsp baking powder,1,no,container:tsp,merge,
+83,Flat Baking Powder,flat baking powder,0,no,canonical,merge,yes
+84,Flat Rice Noodle,thin flat rice noodle,1,no,qualifier:thin,merge,
+84,Flat Rice Noodle,flat rice noodle,0,no,canonical,merge,no
+85,Heaping Flour,heaping cup flour,1,no,container:cup,merge,
+85,Heaping Flour,heaping flour,0,no,canonical,merge,yes
+86,Lettuce Leaf,green leaf lettuce,1,no,colour:green | REVIEW:colour,review,
+86,Lettuce Leaf,lettuce leaf,0,no,canonical,merge,no
+87,Scant Bicarbonate Soda,scant tsp bicarbonate soda,1,no,container:tsp,merge,
+87,Scant Bicarbonate Soda,scant bicarbonate soda,0,no,canonical,merge,yes
+88,Smoked Firm Tofu,block smoked firm tofu,1,no,container:block,merge,
+88,Smoked Firm Tofu,smoked firm tofu,0,no,canonical,merge,yes
+89,Sour Cream,light sour cream,1,no,qualifier?:light | REVIEW:dark/light,review,
+89,Sour Cream,sour cream,0,no,canonical,merge,no
+90,Strained Yoghurt,thick strained yoghurt,1,no,qualifier:thick | synonym:thick strained yoghurt→thick strained yogurt,merge,
+90,Strained Yoghurt,strained yoghurt,0,no,canonical,merge,no
