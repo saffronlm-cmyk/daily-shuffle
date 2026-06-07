@@ -174,6 +174,7 @@ const SYN_WORD={ cilantro:'coriander', scallion:'spring onion', cornstarch:'corn
 const CONTAINER=new Set(['clove','cloves','head','heads','bulb','bulbs','sprig','sprigs','stalk','stalks','stick','sticks',
  'can','cans','tin','tins','jar','jars','bunch','bunches','handful','handfuls','knob','knobs','piece','pieces','sheet','sheets',
  'rasher','rashers','punnet','block','blocks','packet','packets','pack','packs','bag','bags','tub','tubs','pinch','dash','scoop','scoops','splash','fillet','fillets','slice','slices']);
+const FILLER=new Set(['big','extra','little','plenty','good','nice','couple','few','part','whole','generous']);
 const QUAL_SAFE=new Set(['low','reduced','sodium','plain','thick','thin','nonfat','non-fat','fat-free','low-fat','full-fat',
  'reduced-fat','semi','skimmed','unsalted','salted','smooth','crunchy','mild','runny','natural']);
 const QUAL_REVIEW=new Set(['light','dark']);
@@ -183,7 +184,7 @@ function reduceGeneric(v){
   toks=toks.join(' ').split(' ');
   const joins=[]; const kept=[];
   for(const t of toks){
-    if(CONTAINER.has(t)){ joins.push({t,type:'container'}); continue; }
+    if(CONTAINER.has(t)||FILLER.has(t)){ joins.push({t,type:'container'}); continue; }
     if(QUAL_SAFE.has(t)){ joins.push({t,type:'qualifier'}); continue; }
     if(QUAL_REVIEW.has(t)){ joins.push({t,type:'qual-review'}); continue; }
     kept.push(t);
