@@ -1217,7 +1217,7 @@ cb74fd67-6e8b-4577-bfed-66c3a1185ff5|2|0,Dak Gomtang (Korean Chicken Soup),To Se
 cb74fd67-6e8b-4577-bfed-66c3a1185ff5|2|1,Dak Gomtang (Korean Chicken Soup),To Serve,"Diced spring onion, for garnish",,,Spring Onion,Diced; for garnish,
 e61a8a7e-11ef-4881-ab40-27701b3d309c|0|0,Date Me Greek Yogurt Bowl,Main,200g 0% fat Greek yogurt or protein yogurt,200,g,0% Fat Greek Yogurt,or protein yogurt,note
 e61a8a7e-11ef-4881-ab40-27701b3d309c|0|1,Date Me Greek Yogurt Bowl,Main,2 medjool dates,2,,Medjool Dates,,
-e61a8a7e-11ef-4881-ab40-27701b3d309c|0|2,Date Me Greek Yogurt Bowl,Main,1/2 tsp extra virgin olive oil,0.5,tsp,Virgin Olive Oil,,renamed
+e61a8a7e-11ef-4881-ab40-27701b3d309c|0|2,Date Me Greek Yogurt Bowl,Main,1/2 tsp extra virgin olive oil,0.5,tsp,Olive Oil,,renamed
 e61a8a7e-11ef-4881-ab40-27701b3d309c|0|3,Date Me Greek Yogurt Bowl,Main,Pinch of flaky salt,1,pinch,Flaky Salt,,
 78e63c41-9cd4-4d74-ac78-0632bd2cce5c|0|0,Date Tahini Bites with Sunflower Sesame Crust,Main,2 cups sunflower and sesame seed blend,2,cup,Sunflower And Sesame Seed Blend,,
 78e63c41-9cd4-4d74-ac78-0632bd2cce5c|0|1,Date Tahini Bites with Sunflower Sesame Crust,Main,"12 medjool dates, pitted",12,,Medjool Dates,pitted,
@@ -1850,7 +1850,7 @@ df2cd919-38fb-4856-bb5b-9be3ed38e5e3|1|0,Maple Cinnamon Pumpkin Overnight Oats,T
 59a257fd-0b89-4086-8cb0-8d2cbfc3624c|0|5,Maple Sriracha Tofu Protein Bowl,Main,1.5 cups cooked brown rice,1.5,cup,Brown Rice,,renamed
 59a257fd-0b89-4086-8cb0-8d2cbfc3624c|0|6,Maple Sriracha Tofu Protein Bowl,Main,"1 cup shelled edamame, cooked",1,cup,Shelled Edamame,cooked,
 59a257fd-0b89-4086-8cb0-8d2cbfc3624c|0|7,Maple Sriracha Tofu Protein Bowl,Main,"1 avocado, diced",1,,Avocado,diced,
-59a257fd-0b89-4086-8cb0-8d2cbfc3624c|0|8,Maple Sriracha Tofu Protein Bowl,Main,1 tbsp extra virgin olive oil,1,tbsp,Virgin Olive Oil,,renamed
+59a257fd-0b89-4086-8cb0-8d2cbfc3624c|0|8,Maple Sriracha Tofu Protein Bowl,Main,1 tbsp extra virgin olive oil,1,tbsp,Olive Oil,,renamed
 59a257fd-0b89-4086-8cb0-8d2cbfc3624c|0|9,Maple Sriracha Tofu Protein Bowl,Main,"1/4 red cabbage, thinly sliced",0.25,,Red Cabbage,thinly sliced,
 59a257fd-0b89-4086-8cb0-8d2cbfc3624c|0|10,Maple Sriracha Tofu Protein Bowl,Main,"1 red onion, diced",1,,Red Onion,diced,
 59a257fd-0b89-4086-8cb0-8d2cbfc3624c|0|11,Maple Sriracha Tofu Protein Bowl,Main,"2 cucumbers, thinly sliced",2,,Cucumbers,thinly sliced,
@@ -2004,7 +2004,7 @@ d5550452-8d4d-4289-80c5-7a7872a69c61|0|3,Miso Peanut Ramen Bowl,Crispy Tofu,"1 g
 d5550452-8d4d-4289-80c5-7a7872a69c61|1|0,Miso Peanut Ramen Bowl,Miso Peanut Broth,1 tbsp red curry paste,1,tbsp,Red Curry Paste,,
 d5550452-8d4d-4289-80c5-7a7872a69c61|1|1,Miso Peanut Ramen Bowl,Miso Peanut Broth,1 tbsp white miso paste,1,tbsp,White Miso Paste,,
 d5550452-8d4d-4289-80c5-7a7872a69c61|1|2,Miso Peanut Ramen Bowl,Miso Peanut Broth,1–2 tbsp peanut butter,1,tbsp,Peanut Butter,range,
-d5550452-8d4d-4289-80c5-7a7872a69c61|1|3,Miso Peanut Ramen Bowl,Miso Peanut Broth,2 tbsp reduced-sodium soy sauce,2,tbsp,Reduced-sodium Soy Sauce,,
+d5550452-8d4d-4289-80c5-7a7872a69c61|1|3,Miso Peanut Ramen Bowl,Miso Peanut Broth,2 tbsp reduced-sodium soy sauce,2,tbsp,Soy Sauce,,renamed
 d5550452-8d4d-4289-80c5-7a7872a69c61|1|4,Miso Peanut Ramen Bowl,Miso Peanut Broth,1 tbsp brown sugar,1,tbsp,Brown Sugar,,
 d5550452-8d4d-4289-80c5-7a7872a69c61|1|5,Miso Peanut Ramen Bowl,Miso Peanut Broth,360ml (1½ cups) water + 1½ tsp bouillon (or 360ml stock),360,ml,Water + 1 ½ Tsp Bouillon,1½ cups; or 360ml stock,note
 d5550452-8d4d-4289-80c5-7a7872a69c61|1|6,Miso Peanut Ramen Bowl,Miso Peanut Broth,1 tin (400ml) full-fat coconut milk,1,tin,Coconut Milk,400ml,renamed
@@ -2741,7 +2741,7 @@ f22b4a0b-5edf-4c88-8fe1-93c335802e3e|0|8,Rice Paper Pad See Ew with Shrimp,Main,
 2bbd59fc-f264-4ef6-b073-e6593ca83798|0|3,Roast Chicken Breast,Brine,1 tsp garlic granules,1,tsp,Garlic Granules,,
 2bbd59fc-f264-4ef6-b073-e6593ca83798|0|4,Roast Chicken Breast,Brine,1 sprig fresh thyme (optional),1,sprig,Thyme,optional,renamed
 2bbd59fc-f264-4ef6-b073-e6593ca83798|1|0,Roast Chicken Breast,For Cooking,4 boneless chicken breasts,4,,Boneless Chicken Breasts,,
-2bbd59fc-f264-4ef6-b073-e6593ca83798|1|1,Roast Chicken Breast,For Cooking,Light drizzle of olive oil,,,Light Drizzle Of Olive Oil,,
+2bbd59fc-f264-4ef6-b073-e6593ca83798|1|1,Roast Chicken Breast,For Cooking,Light drizzle of olive oil,,,Olive Oil,,renamed
 2bbd59fc-f264-4ef6-b073-e6593ca83798|1|2,Roast Chicken Breast,For Cooking,½ tsp white pepper,0.5,tsp,White Pepper,,
 2bbd59fc-f264-4ef6-b073-e6593ca83798|1|3,Roast Chicken Breast,For Cooking,½ tsp onion powder,0.5,tsp,Onion Powder,,
 2bbd59fc-f264-4ef6-b073-e6593ca83798|1|4,Roast Chicken Breast,For Cooking,½ tsp garlic powder,0.5,tsp,Garlic Powder,,

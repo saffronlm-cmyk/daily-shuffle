@@ -52,7 +52,7 @@ const TRIVIAL=new Set(['clove','cloves','head','heads','bulb','bulbs','sprig','s
  'fillet','fillets','slice','slices','fresh','freshly','raw','cooked','peeled','deveined','minced','chopped','grated','crushed',
  'sliced','diced','mashed','wild','caught','jumbo','pink','king','tiger','baby','large','small','medium','extra','and','for',
  'frying','serving','room','temperature','thumb','size','cm','inch','root','of','from','half','squeezed','pure','clear',
- 'unsweetened','additional','high','quality','so','or']);
+ 'unsweetened','additional','high','quality','so','or','drizzle','splash']);
 // rule maps only if every token is a defining token (heads), trivial, or in `allow`
 function cleanMap(T, heads, canonical, rewrite, allow, note){
   if(![...heads].some(h=>T.has(h))) return null;
@@ -101,10 +101,22 @@ function classify(v){
     if([...T].filter(x=>x!=='cabbage').length===0) return {canonical:'White Cabbage',rewrite:true};
     return null;
   }
-  // OILS — only neutral/cooking/vegetable/plain/drizzle; named oils distinct
+  // OILS — light olive oil = Olive Oil; named oils distinct; generic -> Vegetable Oil
   if(has(T,'oil')){
-    if(has(T,'olive','sesame','coconut','avocado','chilli','peanut','garlic','canola','sunflower','rapeseed','truffle','spray')) return null;
+    if(has(T,'olive')) return cleanMap(T,new Set(['olive','oil']),'Olive Oil',true,['light','extra','virgin','pure']);
+    if(has(T,'sesame','coconut','avocado','chilli','peanut','garlic','canola','sunflower','rapeseed','truffle','spray')) return null;
     return cleanMap(T,new Set(['oil']),'Vegetable Oil',true,['neutral','cooking','vegetable','veg','plain','drizzle','frying','light']);
+  }
+  // SOY SAUCE — light & dark are distinct products
+  if(hasAll(T,'soy','sauce')){
+    if(has(T,'light')) return cleanMap(T,new Set(['soy','sauce']),'Light Soy Sauce',true,['light']);
+    if(has(T,'dark')) return cleanMap(T,new Set(['soy','sauce']),'Dark Soy Sauce',true,['dark']);
+    return cleanMap(T,new Set(['soy','sauce']),'Soy Sauce',true,['reduced','sodium','low','reduced-sodium','low-sodium']);
+  }
+  // SOUR CREAM — light/reduced-fat distinct from full-fat
+  if(hasAll(T,'sour','cream')){
+    if(has(T,'light','lowfat')||/low fat|low-fat|reduced fat|reduced-fat/.test(n)) return cleanMap(T,new Set(['sour','cream']),'Light Sour Cream',true,['light','reduced','low','fat','lowfat','low-fat','reduced-fat']);
+    return cleanMap(T,new Set(['sour','cream']),'Sour Cream',false,['full','fat','full-fat']);
   }
   // BUTTERS
   if(has(T,'butter')){
@@ -312,5 +324,37 @@ for(const g of clusters){
 }
 fs.writeFileSync('ingredient-consolidation.csv',out.join('\n')+'\n');
 console.log('vocab:',vocab.size,'| clusters:',clusters.length,'| rows:',out.length-1,'| merge:',merge,'| review:',review);
-console.log('\nTop 30 clusters:');
-for(const g of clusters.slice(0,30)) console.log(`  [${g.members.length}] ${g.canonical}${g.rewrite?'*':''}  ←  ${g.members.map(m=>m.v).filter(v=>titleCase(v)!==g.canonical).join(', ')}`);
+
+// ── comprehensive master list: category → product → variant ──
+const AISLE_RULES=[
+ [/\b(frozen|ice cream|sorbet)\b/,'Frozen'],
+ [/\b(passata|chopped tomato|tinned tomato|baked bean|coconut milk|coconut cream|canned|tinned)\b/,'Canned & Jarred'],
+ [/\b(yoghurt|yogurt|cheese|butter|cream|egg|milk|halloumi|feta|paneer|kefir|labneh|custard)\b/,'Dairy & Eggs / Alt'],
+ [/\b(chicken|beef|pork|lamb|turkey|mince|sausage|bacon|ham|prosciutto|chorizo|salmon|tuna|cod|haddock|prawn|shrimp|fish|anchovy|sardine|tofu|tempeh|seitan|mackerel)\b/,'Meat & Seafood / Protein'],
+ [/\b(bread|baguette|roll|bun|pita|tortilla|naan|wrap|brioche|sourdough|crumpet|bagel|rice paper|rice cake)\b/,'Bakery'],
+ [/\b(sauce|vinegar|mayonnaise|ketchup|mustard|soy|tamari|sriracha|hoisin|miso|sesame oil|olive oil|vegetable oil|coconut oil|avocado oil|chilli oil|tahini|pesto|harissa|gochujang|gochugaru|aminos|mirin|oyster|fish sauce|dressing|relish|chutney|brine)\b/,'Condiments & Sauces'],
+ [/\b(salt|pepper|cumin|turmeric|paprika|cinnamon|nutmeg|cardamom|clove|oregano|sumac|chilli flake|chilli powder|garam masala|curry powder|five spice|bay|cayenne|chipotle|star anise|seasoning|stock|broth|bouillon|herb|thyme|rosemary|sage)\b/,'Spices & Herbs'],
+ [/\b(juice|tea|coffee|espresso|soda|sparkling|kombucha|beer|wine|lemonade|cordial|squash|water)\b/,'Beverages'],
+ [/\b(chocolate|cocoa|cacao|candy|crisp|chip|popcorn|cookie|biscuit|brownie|cake|protein bar|wafer|jelly|marshmallow)\b/,'Snacks & Confectionery'],
+ [/\b(rice|pasta|spaghetti|noodle|ramen|vermicelli|oat|quinoa|flour|sugar|cornflour|baking powder|baking soda|bicarbonate|yeast|seed|lentil|bean|chickpea|nut|almond|cashew|walnut|peanut|pecan|chia|flax|honey|maple|polenta|couscous|bulgur|raisin|sultana|coconut|protein powder|sweetener|tamarind|nori|panko|breadcrumb|vanilla|gelatine|agar)\b/,'Pantry / Dry Goods'],
+ [/\b(apple|banana|berry|blueberry|raspberry|strawberry|lettuce|spinach|kale|rocket|romaine|tomato|onion|shallot|garlic|pepper|capsicum|carrot|broccoli|cabbage|cauliflower|courgette|zucchini|aubergine|eggplant|cucumber|squash|butternut|pumpkin|potato|coriander|cilantro|basil|parsley|mint|dill|chive|ginger|lemon|lime|orange|avocado|mushroom|spring onion|chilli|jalapeno|fig|grape|peach|pear|plum|pineapple|kiwi|mango|melon|celery|leek|asparagus|beetroot|radish|fennel|sprout|peas|sweetcorn|corn|edamame|bok choy|pak choi|lemongrass)\b/,'Produce'],
+];
+function classifyAisle(name){const s=' '+String(name).toLowerCase()+' ';for(const [re,a] of AISLE_RULES) if(re.test(s)) return a;return 'Other';}
+
+const bucketCanon={};
+for(const [key,arr] of genericBuckets){
+  const pick=[...arr].sort((a,b)=>b.occ-a.occ||a.canon.length-b.canon.length)[0];
+  bucketCanon[key]=titleCase(pick._g.natural);
+}
+function productOf(x){ const r=classify(x.canon); if(r) return r.canonical; const g=reduceGeneric(x.canon); return bucketCanon[g.key]||titleCase(x.canon); }
+
+const mrows=[...vocab.values()].map(x=>{
+  const product=productOf(x);
+  return {category:classifyAisle(product), product, variant:titleCase(x.canon), occ:x.occ, inPb:x.inPb};
+});
+mrows.sort((a,b)=> a.category.localeCompare(b.category) || a.product.localeCompare(b.product) || (b.occ-a.occ) || a.variant.localeCompare(b.variant));
+const mOut=[['category','product','variant','occurrences','in_pricebook'].join(',')];
+for(const r of mrows) mOut.push([esc(r.category),esc(r.product),esc(r.variant),r.occ,r.inPb?'yes':'no'].join(','));
+fs.writeFileSync('ingredient-master.csv',mOut.join('\n')+'\n');
+const prods=new Set(mrows.map(r=>r.product));
+console.log('master list:',mrows.length,'variants /',prods.size,'products across',new Set(mrows.map(r=>r.category)).size,'categories');
