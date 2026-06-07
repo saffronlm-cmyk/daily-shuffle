@@ -1,6 +1,6 @@
 Ingredient,Pack size (qty),Pack unit (g / ml / each),Pack price (£),Store,Aliases
-Basil,,,,,big handful basil
-Brine From Jalape O,,,,,brine from jalape o jar
+Basil,,,,,basil leave;big handful basil
+Brown Rice,,g,,,brown precooked rice;precooked brown rice
 Butter,,,,,room temperature butter;unsalted butter
 Canned Tuna,,,,,light canned tuna
 Celery,,each,,,celery stalk;stalk celery
@@ -8,28 +8,24 @@ Chicken Stock,,,,,chicken bone broth;chicken broth;chicken stock cube;low sodium
 Chicken Thigh,,,,,chicken thigh fillet
 Chilli Flakes,,g,,,chili flake;korean chilli flake;red chilli flake;red pepper flake
 Chilli Powder,,g,,,chili powder;mild chilli powder;red chilli powder
-Chocolate Chip,,g,,,chocolate chip topping;mini chocolate chip;serving chocolate chip
-Chocolate Chunk,,,,,dark chocolate chunk
+Chocolate Chip,,g,,,chocolate chip topping;dairy-free chocolate chip;mini chocolate chip;mini dairy-free chocolate chip;serving chocolate chip
 Chocolate Vegan Protein Powder,,,,,vegan chocolate protein powder
 Cinnamon,,g,,,cinnamon stick
 Cocoa Powder,,,,,additional cocoa powder;black cocoa powder;dark cocoa powder;unsweetened cocoa powder
-Coconut Milk,,ml,,,full-fat coconut milk
+Coconut Milk,,ml,,,full fat coconut milk;full-fat coconut milk;light coconut milk;low fat coconut milk
 Coconut Sugar Dusting,,g,,,extra coconut sugar dusting
 Coconut Yoghurt,,,,,coconut yogurt
 Cod,,g,,,cod fillet
-Coriander,,,,,cilantro;coriander stalk
+Coriander,,,,,cilantro;coriander leave;coriander stalk
 Cornflour,,g,,,corn flour;cornstarch
 Curly Kale,,each,,,handful curly kale
 Curry Powder,,g,,,mild curry powder
-Dark Chocolate Chip,,,,,dark chocolate chip topping;mini dark chocolate chip
+Dark Chocolate,,,,,dairy-free dark chocolate
+Dark Chocolate Chip,,,,,dark chocolate chip topping;dark chocolate chunk;mini dark chocolate chip
 Dijon Mustard,,ml,,,smooth dijon mustard
-Drizzle Olive Oil,,,,,light drizzle olive oil
 Espresso Shot,,,,,shot espresso
-Fat Coconut Milk,,,,,low fat coconut milk
-Fat Cream Cheese,,,,,reduced fat cream cheese
 Fat Mexican Blend Cheese,,,,,reduced fat mexican blend cheese
-Firm Tofu,,g,,,extra firm tofu
-Flat Rice Noodle,,g,,,thin flat rice noodle
+Firm Tofu,,g,,,block extra firm tofu;extra firm tofu;firm block tofu
 Flora,,,,,flora salted
 Garlic,,each,,,freshly garlic;garlic clove
 Gem Lettuce,,,,,little gem lettuce
@@ -38,28 +34,33 @@ Ginger And Garlic Paste,,,,,garlic and ginger paste
 Ginger Garlic Paste,,,,,garlic ginger paste
 Greek Yoghurt,,,,,fat greek yoghurt;fat greek yogurt;full-fat greek yoghurt;greek yogurt;non fat plain greek yogurt;nonfat plain greek yogurt;plain greek yogurt;plain nonfat greek yogurt;strained yoghurt;thick greek yoghurt;thick greek yogurt;thick strained yoghurt;thick yoghurt;thick yogurt
 Honey,,g,,,runny honey
-Jalape Os From,,,,,jalape os from jar
-Lemon Juice,,ml,,,juice from lemon;juice half lemon;juice lemon
-Lemon Zest,,each,,,zest from lemon;zest lemon
+Jalapeño,,,,,jalapeno;jalapeno from
+Lemon,,each,,,juice from lemon;juice half lemon;juice lemon;lemon juice;lemon zest;zest and juice lemon;zest from lemon;zest lemon
 Lemongras,,each,,,lemongras stalk
 Les Than Nutmeg,,,,,little le than nutmeg
-Light Cream Cheese,,,,,low-fat cream cheese
+Lettuce,,each,,,lettuce leaf;lettuce leave
+Light Cream Cheese,,,,,low-fat cream cheese;reduced fat cream cheese
 Lightly,,,,,lightly salted
-Lime Juice,,,,,freshly squeezed lime juice;juice lime
+Lime,,,,,freshly squeezed lime juice;half lime;juice and zest lime;juice lime;lime juice;lime wedge;lime zest lime;zest and juice lime;zest lime
 Milk,,,,,milk thin
 Milk Pouring Over,,ml,,,extra milk pouring over
 Mini Chicken Breast,,,,,mini chicken breast fillet
+Mint,,g,,,mint leaf;mint leave
 Mushroom,,,,,punnet mushroom
 Nori,,g,,,nori sheet
 Nut Butter,,,,,runny nut butter
+Orange,,,,,juice orange and zest;zest orange
 Pbfit Powder Mixed With Water Form Paste,,,,,pbfit powder mixed with little water form paste
 Peach,,each,,,peach slice
 Peanut,,,,,extra peanut
 Peanut Butter,,,,,chunky peanut butter;creamy peanut butter;natural peanut butter;smooth peanut butter
+Pickled Jalapeño,,,,,jalapeno from jar;pickled jalapeno
+Pickled Jalapeño Brine,,,,,brine from jalapeno;brine from jalapeno jar;jalapeno brine
 Plain Flour,,g,,,all purpose flour;flour
 Plain Yoghurt,,ml,,,low fat yogurt;plain full fat yoghurt;plain yogurt;pot yoghurt choice;yoghurt;yoghurt sour cream;yogurt
 Prawn,,g,,,and deveined shrimp;jumbo wild caught pink shrimp;king prawn;prawn shrimp;prawn tail;shrimp;wild shrimp
-Precooked Brown Rice,,g,,,brown precooked rice
+Rice,,g,,,leftover rice;serving rice;steamed rice
+Rice Noodle,,g,,,flat rice noodle;thin flat rice noodle;wide rice noodle;wide rice stick noodle
 Rice Paper,,each,,,rice paper sheet
 Rice Vermicelli Noodle,,g,,,vermicelli rice noodle
 Salmon,,g,,,salmon fillet
@@ -69,22 +70,18 @@ Self-Raising Flour,,g,,,self raising flour;self rising flour
 Smoked Firm Tofu,,g,,,block smoked firm tofu
 Soy,,,,,dark soy
 Soya Yoghurt,,,,,plain soya yoghurt;soya yogurt
-Spinach Leaf,,,,,big spinach leaf
-Spinach Leave,,,,,big handful spinach leave
+Spinach,,g,,,big handful spinach leave;big spinach leaf
 Spring Onion,,,,,extra green onion;green onion;green onion stem;spring onion green;spring onion stem
 Sugar,,g,,,white sugar
 Sweetener,,g,,,natural sweetener
 Tahini,,ml,,,high quality tahini;high tahini;runny tahini
 Tamari,,ml,,,low sodium tamari
+Thai Basil,,,,,thai basil leave
+Thyme,,each,,,thyme leaf;thyme leave
 Tomato,,each,,,tomato slice
 Vanilla,,,,,big vanilla
-Vegetable Oil,,ml,,,drizzle oil;neutral cooking oil;neutral oil;neutral oil frying;oil;plain oil
+Vegetable Oil,,ml,,,neutral cooking oil;neutral oil;neutral oil frying;oil;plain oil
 Virgin Olive Oil,,,,,extra virgin olive oil
 Water,,ml,,,water thin
 White Cabbage,,,,,cabbage
-Wide Rice Noodle,,g,,,wide rice stick noodle
-X Firm Tofu,,,,,x block extra firm tofu;x firm block tofu
-X Tuna,,,,,x can tuna
-X Tuna In Water,,,,,x can tuna in water
 Yellow Onion,,,,,brown onion;onion;white onion
-Zest And Juice Lime,,,,,juice and zest lime

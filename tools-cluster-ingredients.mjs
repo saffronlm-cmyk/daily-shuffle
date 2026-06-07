@@ -18,17 +18,19 @@ const PB_KEYS = new Set(['chicken mince','egg white','egg','turkey mince','chick
  'peanut butter powder','chocolate peanut butter powder']);
 
 // ── raw cleaning: drop qty/measure/parenthetical, expand abbrevs, take first "A or B" ──
-const _LEAD_MEASURE=/^(cup|cups|tbsp|tbsps|tb|tablespoons?|tsp|tsps|teaspoons?|g|kg|ml|l|litres?|oz|lbs?|grams?|cloves?|pinch|handful|scoops?|cans?|tins?|jars?|slices?|sprigs?|sticks?|knobs?|heads?|bulbs?|bunch|packs?|packets?|bags?|tubs?|dash|splash|each|heaped|heaping|rounded|level|generous|scant)$/;
+const _LEAD_MEASURE=/^(cup|cups|tbsp|tbsps|tb|tablespoons?|tsp|tsps|teaspoons?|g|kg|ml|l|litres?|oz|lbs?|grams?|cloves?|pinch|handful|scoops?|cans?|tins?|jars?|slices?|sprigs?|sticks?|knobs?|heads?|bulbs?|bunch|packs?|packets?|bags?|tubs?|dash|splash|drizzle|each|x|heaped|heaping|rounded|level|generous|scant)$/;
 const ABBREV={ mayo:'mayonnaise', choc:'chocolate', tb:'tbsp' };
 function cleanRaw(raw){
   let s=String(raw||'').toLowerCase();
   s=s.replace(/\([^)]*\)/g,' ');
+  s=s.replace(/jalape[ñn\s]*o?s?/g,'jalapeno');   // normalise jalapeño/jalapenos/"jalape o"
   // take first alternative of "A or B" / "A and/or B" / "A/B"
   s=s.split(/\s+and\/or\s+|\s+or\s+|\//)[0];
   s=s.replace(/[½¼¾⅓⅔⅛⅜⅝⅞]/g,' ');
   s=s.replace(/\b\d+(\.\d+)?\s*[-–]\s*\d+(\.\d+)?\b/g,' ');
   s=s.replace(/\b\d+(\.\d+)?\s*\/\s*\d+\b/g,' ');
   s=s.replace(/\b\d+(\.\d+)?\s*(kg|g|ml|l|oz|lb|tbsp|tsp|cup|cups|cm)\b/g,' ');
+  s=s.replace(/\b\d+\s*x\b/g,' ');                 // "2x" multiplier remnant
   s=s.replace(/\b\d+(\.\d+)?\b/g,' ');
   let toks=s.replace(/[^a-z\s-]/g,' ').split(/\s+/).filter(Boolean);
   while(toks.length>1 && (_LEAD_MEASURE.test(toks[0])||_STOP_ADJ.has(toks[0]))) toks.shift();
@@ -70,11 +72,13 @@ function classify(v){
     if(has(T,'light','lowfat')||/low fat|low-fat/.test(n)) return cleanMap(T,new Set(['mayo','mayonnaise']),'Light Mayonnaise',true,['light','lowfat']);
     return cleanMap(T,new Set(['mayo','mayonnaise']),'Mayonnaise',true,[]);
   }
-  // CREAM CHEESE
+  // CREAM CHEESE — light/low-fat/reduced-fat = Light Cream Cheese; full-fat/plain = Cream Cheese
   if(hasAll(T,'cream','cheese')){
-    if(has(T,'light','lowfat')||/low fat|low-fat/.test(n)) return cleanMap(T,new Set(['cream','cheese']),'Light Cream Cheese',true,['light','lowfat','low-fat']);
+    if(has(T,'light','lowfat')||/low fat|low-fat|reduced fat|reduced-fat/.test(n)) return cleanMap(T,new Set(['cream','cheese']),'Light Cream Cheese',true,['light','lowfat','low-fat','reduced','reduced-fat','fat']);
     return cleanMap(T,new Set(['cream','cheese']),'Cream Cheese',false,['full','fat','full-fat']);
   }
+  // COCONUT MILK — low-fat/full-fat/light all fall under Coconut Milk
+  if(hasAll(T,'coconut','milk')) return cleanMap(T,new Set(['coconut','milk']),'Coconut Milk',true,['light','low','full','fat','low-fat','full-fat','reduced']);
   // YOGHURT family
   if(has(T,'yogurt')){
     if(has(T,'coconut')) return {canonical:'Coconut Yoghurt',rewrite:true};
@@ -129,10 +133,13 @@ function classify(v){
   }
   // HONEY (honey mustard etc. excluded by cleanMap)
   if(has(T,'honey')) return cleanMap(T,new Set(['honey']),'Honey',true,['hot']);
-  // LEMON / LIME juice & zest
-  if(hasAll(T,'lemon','juice')) return cleanMap(T,new Set(['lemon','juice']),'Lemon Juice',true,[]);
-  if(hasAll(T,'lime','juice'))  return cleanMap(T,new Set(['lime','juice']),'Lime Juice',true,[]);
-  if(hasAll(T,'lemon','zest'))  return cleanMap(T,new Set(['lemon','zest']),'Lemon Zest',true,[]);
+  // CITRUS — juice/zest/rind/whole all roll up to the fruit (grocery = buy the fruit; prep kept in note)
+  for(const f of ['lemon','lime','orange']){
+    if(has(T,f)){
+      const r=cleanMap(T,new Set([f]),f[0].toUpperCase()+f.slice(1),true,['juice','zest','rind','squeezed','half','wedge','wedges','slice','slices']);
+      if(r) return r;
+    }
+  }
   // GINGER (fresh root); ground/puree/paste/pickled/sauce/dressing distinct
   if(has(T,'ginger')){
     if(has(T,'powder','puree','paste','pickled','sauce','dressing','ground','garlic','cinnamon')) return null;
@@ -155,11 +162,31 @@ function classify(v){
   if(has(T,'prawn','shrimp')) return cleanMap(T,new Set(['prawn','shrimp']),'Prawn',true,['tail','tails','shell','on','off','argentine','pink']);
   // CHICKEN STOCK
   if(has(T,'chicken') && has(T,'stock','broth')) return cleanMap(T,new Set(['chicken','stock','broth']),'Chicken Stock',true,['cube','cubes','bone','sodium','low']);
-  // CHOCOLATE CHIP (dark/white distinct)
-  if(has(T,'chip') && has(T,'chocolate')){
-    if(has(T,'dark')) return {canonical:'Dark Chocolate Chip',rewrite:false};
+  // CHOCOLATE CHIP / CHUNK (dark/white distinct; chunk = chip)
+  if((has(T,'chip')||has(T,'chunk')) && has(T,'chocolate')){
+    if(has(T,'dark')) return {canonical:'Dark Chocolate Chip',rewrite:true};
     if(has(T,'white')) return {canonical:'White Chocolate Chip',rewrite:false};
-    return cleanMap(T,new Set(['chocolate','chip']),'Chocolate Chip',true,['mini','topping','milk']);
+    return cleanMap(T,new Set(['chocolate','chip','chunk']),'Chocolate Chip',true,['mini','topping','milk','dairy-free']);
+  }
+  // CHOCOLATE bar — dark (+ dairy-free dark) = Dark Chocolate; white = White Chocolate; else Chocolate
+  if(has(T,'chocolate') && !has(T,'powder','cocoa','milk','bar','protein','spread','peanut')){
+    if(has(T,'dark')) return cleanMap(T,new Set(['chocolate']),'Dark Chocolate',true,['dark','dairy-free','vegan','plain']);
+    if(has(T,'white')) return cleanMap(T,new Set(['chocolate']),'White Chocolate',false,['white']);
+    if([...T].filter(x=>x!=='chocolate').length===0) return {canonical:'Chocolate',rewrite:false};
+  }
+  // RICE NOODLE — wide/flat/thin/stick variants merge; vermicelli/glass/ramen/udon distinct
+  if(hasAll(T,'rice','noodle') && !has(T,'vermicelli','glass','ramen','udon','soba')) return cleanMap(T,new Set(['rice','noodle']),'Rice Noodle',true,['wide','flat','thin','stick','sticks','dried']);
+  // RICE — white/brown distinct; jasmine/basmati/sushi/sticky/wild stay their own; cooked/precooked -> note
+  if(has(T,'rice') && !has(T,'noodle','paper','cake','vinegar','wine','flour','pudding','krispie','bran')){
+    if(has(T,'jasmine','basmati','sushi','arborio','wild','sticky','glutinous')) return null; // protected varieties
+    if(has(T,'brown')) return cleanMap(T,new Set(['rice']),'Brown Rice',true,['brown','cooked','precooked','uncooked','leftover','dry','dried']);
+    if(has(T,'white')) return cleanMap(T,new Set(['rice']),'White Rice',true,['white','cooked','precooked','uncooked','leftover','dry','dried']);
+    return cleanMap(T,new Set(['rice']),'Rice',true,['cooked','precooked','uncooked','leftover','dry','dried','steamed']);
+  }
+  // JALAPEÑO — pickled / from a jar = Pickled Jalapeño; fresh = Jalapeño
+  if(has(T,'jalapeno')){
+    if(has(T,'pickled','jar','brine')) return cleanMap(T,new Set(['jalapeno','brine']),has(T,'brine')?'Pickled Jalapeño Brine':'Pickled Jalapeño',true,['pickled','jar','from']);
+    return cleanMap(T,new Set(['jalapeno']),'Jalapeño',true,[]);
   }
   // GARLIC (clove/bulb/fresh) — sauces/pastes/powder excluded
   if(has(T,'garlic')){
@@ -174,14 +201,18 @@ const SYN_WORD={ cilantro:'coriander', scallion:'spring onion', cornstarch:'corn
 const CONTAINER=new Set(['clove','cloves','head','heads','bulb','bulbs','sprig','sprigs','stalk','stalks','stick','sticks',
  'can','cans','tin','tins','jar','jars','bunch','bunches','handful','handfuls','knob','knobs','piece','pieces','sheet','sheets',
  'rasher','rashers','punnet','block','blocks','packet','packets','pack','packs','bag','bags','tub','tubs','pinch','dash','scoop','scoops','splash','fillet','fillets','slice','slices']);
-const FILLER=new Set(['big','extra','little','plenty','good','nice','couple','few','part','whole','generous']);
+const FILLER=new Set(['big','extra','little','plenty','good','nice','couple','few','part','whole','generous','drizzle']);
 const QUAL_SAFE=new Set(['low','reduced','sodium','plain','thick','thin','nonfat','non-fat','fat-free','low-fat','full-fat',
  'reduced-fat','semi','skimmed','unsalted','salted','smooth','crunchy','mild','runny','natural']);
 const QUAL_REVIEW=new Set(['light','dark']);
+// strip trailing "leaf/leaves" for leafy ingredients (spinach leaf->spinach) but NOT where the
+// leaf IS the ingredient (bay/curry/lime/kaffir leaf).
+const LEAF_KEEP=new Set(['bay','curry','lime','kaffir','makrut','vine','gold','kale']);
 function reduceGeneric(v){
   let toks=v.split(' ').map(w=>SYN_WORD[w]||w);
   // multiword scallion->spring onion already; flatten
   toks=toks.join(' ').split(' ');
+  if(toks.length>1 && /^le(af|aves|ave)$/.test(toks[toks.length-1]) && !LEAF_KEEP.has(toks[toks.length-2])) toks.pop();
   const joins=[]; const kept=[];
   for(const t of toks){
     if(CONTAINER.has(t)||FILLER.has(t)){ joins.push({t,type:'container'}); continue; }
