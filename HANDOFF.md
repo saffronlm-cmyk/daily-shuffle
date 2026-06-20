@@ -1,124 +1,83 @@
 # Session Handoff — Recipe Ingredient Normalisation, Consolidation & Price Book
 
-Branch: `claude/recipe-ingredient-prices-RYSob` (all work below is committed here; **not deployed** to the
-live app yet).
+Branch: `claude/recipe-ingredient-prices-RYSob` (committed; **not deployed** to the live app yet).
 
 ---
 
 ## 1. The app & where data lives
 - **Daily Shuffle** PWA — single `index.html` (~250 KB) + `legacy/` modules.
-- **Recipes**: Supabase project `jsxcctrskkkxgdxfaduo` ("saffronlilith's Project"), table `recipes`,
-  column `ingredient_sections` (JSONB; ingredients are **free-text strings** like `"2 garlic cloves, minced"`).
-  Filtered by `import_status='ready'` → **305 recipes / 3,915 ingredient lines** (3,485 real text, **430 null**
-  across **36 recipes** — text was lost on import; needs manual re-entry).
-- **Price book**: browser `localStorage` key `ds_pricebook`; seeded once (~38 entries). Syncs to the user's
-  own Supabase `user_library` row `id='default'` (the `priceBook` field there is currently empty).
-- **Key engine functions in `index.html`**: `canonicalise()`/`_STOP_ADJ`, `parseQty()`, `_toBase()`,
-  `classifyAisle()`/`_AISLE_RULES` (12 aisles), `lookupPriceBook()` (exact → **alias** → substring),
-  `savePriceBook()` (persists + invalidates cached costs + `autoSync`), `_parseCsv()`,
-  `importLibrary()` (JSON restore — **ignores priceBook**).
-- **The consolidation hook**: every `priceBook[key]` carries an `aliases:[]` array that `lookupPriceBook`
-  already checks, but **nothing populates it**. Populating aliases = one logged price covers all variants.
+- **Recipes**: Supabase project `jsxcctrskkkxgdxfaduo`, table `recipes`, column `ingredient_sections`
+  (JSONB; free-text strings). `import_status='ready'` → **305 recipes / 3,915 lines** (3,485 real text,
+  **430 null** across **36 recipes** — lost on import, need manual re-entry).
+- **Price book**: browser `localStorage` `ds_pricebook`; syncs to the user's Supabase `user_library`
+  row `id='default'`. Every entry has an unused `aliases:[]` array that `lookupPriceBook()` checks
+  (exact → alias → substring) — the hook for one-price-covers-variants.
+- **Engine fns** (`index.html`): `canonicalise()`/`_STOP_ADJ`, `parseQty()`, `_toBase()`,
+  `classifyAisle()`, `lookupPriceBook()`, `savePriceBook()`, `_parseCsv()`.
+- **In-app importers already added** (on branch, *not deployed*): **"Import ingredient CSV"**
+  (`importRecipeIngredientsCsv`) and **"Import price CSV"** (`importPriceBookCsv`) in Settings.
 
-## 2. Decisions locked (via Q&A)
-Apply to **both** price book + recipe names · **moderate** grouping · **reviewable CSV first** ·
-`A or B` → first option, remainder to note · sugar: **only `white sugar`→Sugar** · flavoured yoghurts
-**distinct** · bare defaults **onion→Yellow Onion, flour→Plain Flour, butter(dairy)→Butter,
-cabbage→White Cabbage, oil→Vegetable Oil, yog(h)urt→Plain Yoghurt** · **citrus juice/zest/whole → the
-fruit** (Lemon/Lime/Orange) · UK spellings. Final review calls: **light olive oil→Olive Oil**;
-**light & dark soy sauce distinct**; **Light Sour Cream distinct**.
+## 2. The data model (decided with the user)
+Three tiers, non-destructive:
+- **variant = the price unit AND the recipe-facing name** (e.g. *Almond Milk, Light Soy Sauce, Greek
+  Yoghurt*). One price per variant; the raw recipe wordings fold in as its **aliases**.
+- **product = the broad family/grouping only** (e.g. *Milk, Soy sauce, Yoghurt, Oil, Cheese*). NOT a
+  shared price — it's an organisation label, carried into the app to **group the grocery list by
+  product within each aisle**.
+- **category = the 12-aisle bucket.**
+Naming lives in the **master**; quantities (qty/unit/note) live in the **recipe worksheet**. Two clean
+layers: master = *what it's called*, normalisation = *how much*.
 
-## 3. Deliverables produced (committed)
-**Worksheets / data (repo root):**
-- `missing-ingredient-prices.csv` — 615 ingredients with no logged price (Ingredient, Category,
-  Pack size, Pack unit, Pack price, per-100g, Store, examples). The price sheet to fill.
-- `recipe-ingredient-normalisation.csv` — 3,915 rows, `row_key = recipeId|sectionIdx|lineIdx`,
-  pre-parsed qty/unit/ingredient/note + `review` flag (2,760 clean / 725 review / 430 null).
-- `ingredient-consolidation.csv` — review worksheet, **93 clusters, 276 rows, 0 review left**.
-  Columns: cluster_id, suggested_canonical, variant, occurrences, in_pricebook, reason, decision
-  (`merge`/`keep-separate`), rewrite_recipes (`yes`/`no`), notes.
-- `ingredient-master.csv` — comprehensive list, **category → product → variant** (1,025 variants /
-  ~840 products / 12 categories). For sorting/grouping the whole ingredient set.
-- `recipe-ingredient-normalisation.consolidated.csv` — recipe lines reparsed (heaped/cm/"A or B" → note)
-  + canonical renames applied (~556 lines). Import-ready.
-- `pricebook-aliases.csv` — one row per canonical with `;`-joined variant `Aliases`.
+Locked rules: moderate grouping · `A or B` → first + note · sugar only `white sugar`→Sugar · flavoured
+yoghurts distinct · bare defaults (onion→Yellow Onion, flour→Plain Flour, butter→Butter,
+cabbage→White Cabbage, oil→Vegetable Oil, yog(h)urt→Plain Yoghurt) · citrus juice/zest/whole → the
+fruit · light olive oil→Olive Oil · light/dark soy & Light Sour Cream distinct · white pepper distinct ·
+cracked/ground/black pepper→Black Pepper · UK spellings · `dairy free milk` intentional.
 
-**Offline tooling (repo root, run with `node`):**
-- `tools-cluster-ingredients.mjs` — rules engine → regenerates `ingredient-consolidation.csv` +
-  `ingredient-master.csv`. (Edit rules here; ports the app's `canonicalise`.)
-- `tools-apply-consolidation.mjs` — reads the approved worksheet → regenerates the consolidated recipe
-  CSV + `pricebook-aliases.csv`.
+## 3. Live files (current source of truth)
+| file | role |
+|---|---|
+| `ingredient-master.csv` | **Source of truth for naming.** User-curated: `category, product, product change, variant, variant change, occurrences, in_pricebook, Notes`. |
+| `split-plan.csv` | The 28 confirmed ingredient **splits** (one compound line → N) + renames. Input. |
+| `recipe-ingredient-normalisation.csv` | Original per-line parse from Supabase (`row_key, …, original_line, …`). Input (source of `original_line`). |
+| `tools-apply-master.mjs` | **The generator.** Reads the three above → writes the two outputs below. Re-runnable: `node tools-apply-master.mjs`. |
+| `recipe-ingredient-normalisation.final.csv` | **OUTPUT.** Every line: qty/unit/note from the parser + `ingredient` = master `variant change`; splits baked in (`row_key` suffixes `-2/-3`). 3,153/3,483 matched the master. |
+| `pricebook.csv` | **OUTPUT — the fill-in sheet.** One row per **variant** (price unit), sorted by usage: `Ingredient, Product, Category, Pack size, Pack unit, Pack price, Store, Aliases, occurrences`. 987 variants; aliases fold ~3,000 raw wordings down. |
 
-**In-app importers (already in `index.html`, on branch only):**
-- **"Import ingredient CSV"** (Settings → Recipe Library) → `importRecipeIngredientsCsv()`: rebuilds each
-  recipe's lines from a worksheet, updates `RECIPE_FULL_DATA` + overrides + `patchRecipeToLibrary` (cloud).
-- **"Import price CSV"** (Settings → Price Book) → `importPriceBookCsv()`: fuzzy column match,
-  `canonicalise`→key, `unitPrice = packPrice/packSize`, `savePriceBook`.
+Older generations (`ingredient-consolidation.csv`, `missing-ingredient-prices.csv`,
+`pricebook-aliases.csv`, `recipe-…consolidated.csv`, `compound-split-candidates.csv`) and their tools
+(`tools-cluster-ingredients.mjs`, `tools-apply-consolidation.mjs`) were **removed** — they're superseded
+and remain in git history if the baseline/category-derivation logic is ever needed again.
 
 ## 4. Phase map
-- **Phase 0 — Scoping** ✅ (architecture, data, engine functions).
-- **Phase 1 — Offline worksheets** ✅ (all CSVs above; clusterer encodes every user rule; 0 review rows).
-- **In-app importers** ✅ built & pushed — **but the branch is not deployed**, so they aren't in the live app yet.
-- **Phase 2 — Apply (PENDING)**:
-  1. Finish reviewing/editing `ingredient-consolidation.csv` (decision / suggested_canonical / rewrite_recipes).
-  2. **Small app change (~4 lines)**: extend `importPriceBookCsv` to read an optional `Aliases` column and
-     merge into `priceBook[key].aliases` — and allow alias-only rows (no price) to still apply. *(Not done yet.)*
-  3. Re-run `tools-apply-consolidation.mjs` against the final worksheet.
-  4. Deploy the branch (merge / PR) so the importers are live.
-  5. Import `recipe-ingredient-normalisation.consolidated.csv` (renames recipes; patches cloud) and
-     `pricebook-aliases.csv` (sets aliases).
-  6. Re-enter the **430 null lines** (36 recipes) from original sources.
-- **Phase 3 — Pricing (PENDING, the user's main next goal)**:
-  - Fill `missing-ingredient-prices.csv` (pack size + price) → import via "Import price CSV".
-  - Aliases mean each canonical is priced **once** and covers all its variants → recipe cost engine
-    (`computeRecipeCost`) + grocery list show £ automatically.
-  - **API / scraper for prices** — see §5.
-- **Phase 4 — Cost features (already partly in app; verify after pricing)**: per-recipe cost, plan cost,
-  grocery-list totals, "unpriced" badges.
+- **Phase 1 — naming & normalisation** ✅ done. Master curated, recipes normalised, splits applied,
+  price book scaffolded.
+- **NOW — user fills `pricebook.csv`** (top-down; the first ~100 by usage cover most recipes). Tidy any
+  rough Product labels (e.g. `Maple Syrup → "Syrup"`) while there.
+- **Phase 2 — apply to the app** (on the user's go):
+  1. `importPriceBookCsv`: read **Aliases** + **Product** columns; allow alias-only rows (no price).
+  2. Add a `product` field to price-book entries; **group the grocery list by product within aisle**.
+  3. Tighten the greedy `lookupPriceBook` substring fallback (egg↔eggplant) to whole-token now that
+     aliases exist.
+  4. **PR to deploy** the branch (importers + grouping go live).
+  5. Import `recipe-ingredient-normalisation.final.csv` (renames → cloud) and `pricebook.csv`.
+  6. Re-enter the **430 null lines** (36 recipes).
+- **Phase 3 — auto-pricing**: API/scraper keyed on the clean variant vocabulary. No official UK
+  supermarket price APIs → realistic routes are unofficial store endpoints / aggregators (scraping,
+  personal-use, polite). Best home: a **Supabase Edge Function** (server-side fetch → `prices` table)
+  or a **local script** emitting the price CSV. Matching = variant → search term → representative pack;
+  keep a manual-override flag so scraped prices don't clobber edits.
 
-## 5. Price API / scraper (Phase 3 deep-dive)
-Goal: auto-fetch UK grocery prices for each **canonical** ingredient instead of hand-entering.
+## 5. Backlog
+- ~330 recipe lines didn't match the master (parse artifacts / one-offs) — quick cleanup pass.
+- `Garlic Clove` vs `Garlic` still separate variants — set `variant change = Garlic` to merge if wanted.
+- Rough Product labels from the master (casing/family) — tidy in `pricebook.csv`.
+- 430 null lines re-entry.
+- Per-100g price auto-compute on import.
 
-Realities / options:
-- **No official public price APIs** from UK supermarkets (Lidl/Tesco/Sainsbury's/Aldi). Practical routes:
-  - **Aggregators** (e.g. Trolley.co.uk) — no official API; would be scraping.
-  - **Unofficial store endpoints** (Tesco/Sainsbury's product-search JSON) — work but ToS-restricted,
-    rate-limited, and change without notice. Fine for personal use; build politely (cache, backoff).
-  - **Open Food Facts** — good product/nutrition data, **not reliable UK prices**.
-- **Where it can run** (important): this remote sandbox has a **network allowlist** (Supabase was blocked
-  earlier), so a scraper here is constrained. Better homes:
-  - A **Supabase Edge Function** in the user's project (server-side fetch; store results in a `prices` table).
-  - A **small local Node/Python script** the user runs on their machine, outputting the price CSV.
-- **Hard part = matching**: canonical ingredient → store search query → pick a representative pack
-  (size/price). The consolidation + `aliases` already give a clean canonical vocabulary to drive queries;
-  add a per-canonical "search term + preferred pack size" mapping column.
-- **Suggested shape**: `prices` table (ingredient_key, store, pack_size, pack_unit, pack_price, url,
-  fetched_at) → nightly Edge Function → export to the same `Import price CSV` format (or write `priceBook`
-  straight into `user_library`). Keep a manual-override flag so scraped prices don't clobber user edits.
-
-## 6. Backlog / postponed ideas
-- **Tighten `lookupPriceBook` substring fallback** (egg↔eggplant, oat↔oat milk) to whole-token matching —
-  do *after* aliases are populated so behaviour can be verified. (~lines 2757-2760 in index.html.)
-- **430 null recipe lines** — re-enter ingredients for the 36 affected recipes.
-- **"Other" category (143)** in `ingredient-master.csv` — extend `_AISLE_RULES` / hand-categorise.
-- **Variant-label artifacts** ("Fat Greek Yogurt" from "0% fat") — cosmetic; products are correct.
-- **Orange juice** carton vs fruit — currently rolled into `Orange`; split if a recipe means a carton.
-- **`per-100g` price column** — auto-compute on import for easy comparison.
-- **Greek Yoghurt "dairy-free sub OK" note** — decide where to surface (recipe note vs price-book note).
-- **Direct Supabase apply** option for recipe renames (vs CSV import) — faster but edits the shared library;
-  keep a backup of `ingredient_sections` first.
-- **Idempotency / re-runs**: importers merge, so re-importing updated sheets is safe (good for iterating).
-
-## 7. How to regenerate (commands)
+## 6. To regenerate after editing inputs
 ```
 cd /home/user/daily-shuffle
-node tools-cluster-ingredients.mjs     # -> ingredient-consolidation.csv + ingredient-master.csv
-node tools-apply-consolidation.mjs     # -> recipe-...consolidated.csv + pricebook-aliases.csv
+node tools-apply-master.mjs   # ingredient-master.csv + split-plan.csv + recipe-...csv
+                              #   -> recipe-ingredient-normalisation.final.csv + pricebook.csv
 ```
-Recipe source data is pulled from Supabase via MCP (see git history for the exact SQL); the CSVs in the
-repo are the cached outputs.
-
-## 8. Open decisions for next session
-- Approve final `ingredient-consolidation.csv` edits → trigger Phase 2.
-- Greenlight the `importPriceBookCsv` Aliases change + a PR to deploy the importers.
-- Pick the pricing route (manual CSV first vs Edge-Function scraper) and target store(s).

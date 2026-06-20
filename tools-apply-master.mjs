@@ -42,7 +42,7 @@ const AISLE=[[/\b(yoghurt|yogurt|cheese|butter|cream|egg|milk|paneer|kefir|labne
 function aisle(n){const s=' '+n.toLowerCase()+' ';for(const[re,a]of AISLE)if(re.test(s))return a;return 'Other';}
 
 // ===== build maps from the edited master =====
-const M=readCsv('/root/.claude/uploads/72b8adca-9920-514b-bbc4-ebee5e13d8eb/73641bef-ingredientmaster.csv').slice(1).filter(r=>r.length>=6&&r[4]);
+const M=readCsv('ingredient-master.csv').slice(1).filter(r=>r.length>=6&&r[4]);
 const renameMap={};            // canon(variant) -> {variant, product, category}
 const fvGroup={};              // finalVariant -> {product, category, aliases:Set, occ}
 function regFinal(fv,product,category,occ){ if(!fvGroup[fv]) fvGroup[fv]={product,category:category||aisle(fv),aliases:new Set(),occ:0}; const g=fvGroup[fv]; if(product&&!g.product)g.product=product; g.occ+=(occ||0); return g; }
