@@ -1,0 +1,428 @@
+#!/usr/bin/env python3
+"""
+price_pricebook.py  --  Fill the price columns of pricebook.csv using Apify.
+
+WHAT THIS DOES (in plain English)
+---------------------------------
+1. Reads your pricebook.csv (the recipe-ingredient list).
+2. Throws away rows that are not real groceries (water, "cooking", "juice of
+   1 lime", measurement fragments, etc.).
+3. Collapses the remaining rows down to the unique PRODUCTS worth pricing
+   (those that appear at least --min-occ times across your recipes).
+4. For each product it asks three UK supermarket "actors" on Apify
+   (Tesco, Sainsbury's, ASDA) "what does <product> cost?".
+5. Reads each answer, works out the price-per-kg / per-litre / per-item,
+   and keeps the CHEAPEST across the three shops.
+6. Writes that price/size/store back into every row that shares the product,
+   producing a filled CSV plus a short report of anything it could not match.
+
+It only ever READS from Apify -- it never changes anything on your account
+except spending a small pay-per-result fee for the lookups.
+
+QUICK START
+-----------
+  # 1. See what WOULD be queried + a cost estimate, WITHOUT spending anything:
+  python3 scripts/price_pricebook.py --dry-run
+
+  # 2. Check the real shape of an actor's results (one cheap test query):
+  export APIFY_TOKEN=apify_api_xxxxxxxxxxxxxxxxx
+  python3 scripts/price_pricebook.py --probe "chicken breast"
+
+  # 3. Do a small real run (first 10 products) to sanity-check:
+  python3 scripts/price_pricebook.py --sample 10
+
+  # 4. The full run:
+  python3 scripts/price_pricebook.py
+
+Outputs: pricebook.filled.csv  and  price_report.md
+No third-party packages required -- standard library only.
+"""
+
+import argparse
+import csv
+import json
+import os
+import re
+import sys
+import urllib.error
+import urllib.request
+
+# ---------------------------------------------------------------------------
+# CONFIG  --  the bits you are most likely to tweak live here.
+# ---------------------------------------------------------------------------
+
+# The Apify actors we ask. The key is the store label written into the CSV;
+# the value is the actor id in Apify's "username~actor-name" form.
+ACTORS = {
+    "Tesco":       "illehius~tesco-scraper",
+    "Sainsbury's": "illehius~sainsburys-scraper",
+    "ASDA":        "illehius~asda-scraper",
+}
+
+# How we build the INPUT we send to each actor. These actors take a search
+# word. If --probe shows the field is named differently (e.g. "search" or
+# "queries"), change the key below to match.
+def build_actor_input(term, max_items):
+    return {"searchQuery": term, "maxItems": max_items}
+
+# Which fields we read OUT of each result row. If --probe shows different
+# names, edit these to match what the actor actually returns.
+FIELD = {
+    "name":      "name",       # product title
+    "price":     "price",      # pack price, e.g. "£3.50" or 3.5
+    "size":      "size",       # pack size string, e.g. "650g", "6 pack"
+    "unit_price": "unitPrice", # optional pre-computed unit price (fallback)
+    "url":       "url",        # product link (optional)
+}
+
+# A few search-term fixes for misspelled / awkward Product names in the CSV.
+TERM_OVERRIDES = {
+    "cacoa": "cocoa powder",
+    "quinia": "quinoa",
+    "puree": "tomato puree",
+}
+
+# Products that are not really single buyable groceries -- skipped entirely.
+JUNK_PRODUCTS = {
+    "water", "boiling water", "cold water", "reserved pasta water",
+    "reserved noodle water", "cooking", "cooking spray", "fresh", "plain",
+    "red", "fry", "lightly", "gluten-free", "bone-in", "filling choice",
+    "broth choice", "vegetable", "meat", "cooking salt pepper",
+}
+
+# Ingredient/Product names matching any of these are measurement fragments,
+# not products -- skipped.
+JUNK_PATTERNS = [
+    re.compile(r"^\s*(juice|zest)\s+of", re.I),
+    re.compile(r"^\s*\d"),
+    re.compile(r"^\s*[¼½¾]"),          # ¼ ½ ¾
+    re.compile(r"\b(tbsp|tsp|teaspoon|tablespoon)\b", re.I),
+    re.compile(r"^\s*(enough|drizzle|handful|large handful|serving|second|"
+               r"pinch|knob|pound|sheets?\s+of)\b", re.I),
+    re.compile(r"^\s*water\b", re.I),
+]
+
+MATCH_THRESHOLD = 0.5   # minimum name-match score (0..1) to trust a result.
+
+# ---------------------------------------------------------------------------
+# canonicalise()  --  a faithful Python copy of the app's index.html version,
+# so the keys/aliases we generate later line up with how the app matches.
+# ---------------------------------------------------------------------------
+_STOP_ADJ = {
+    "fresh", "organic", "large", "small", "medium", "baby", "whole", "finely",
+    "roughly", "free-range", "boneless", "skinless", "ripe", "raw", "cooked",
+    "dried", "frozen", "chopped", "sliced", "diced", "minced", "ground",
+    "grated", "crushed", "peeled", "cubed", "halved", "quartered", "shredded",
+    "mashed", "beaten", "softened", "melted", "cooled", "toasted", "roasted",
+    "torn", "julienned", "thinly", "thickly", "coarsely", "optional", "approx",
+    "approximately", "about", "around", "a", "an", "the", "of", "to", "for",
+    "your", "some",
+}
+
+def canonicalise(name):
+    s = (name or "").lower()
+    s = re.sub(r"\(.*?\)", "", s)
+    s = re.sub(r"[^a-z0-9\s-]", "", s)
+    s = s.strip()
+    words = [w for w in re.split(r"\s+", s) if w and w not in _STOP_ADJ]
+    s = " ".join(words)
+    s = re.sub(r"ies\b", "y", s)
+    s = re.sub(r"([^aeiou])es\b", r"\1e", s)
+    s = re.sub(r"([^aeiou])s\b", r"\1", s)
+    return s.strip()
+
+# ---------------------------------------------------------------------------
+# Parsing helpers for the scraped data.
+# ---------------------------------------------------------------------------
+def parse_price(raw):
+    """'£3.50' / '3.50' / 3.5  ->  3.5 (float) or None."""
+    if raw is None:
+        return None
+    if isinstance(raw, (int, float)):
+        return float(raw)
+    m = re.search(r"(\d+(?:\.\d+)?)", str(raw).replace(",", ""))
+    return float(m.group(1)) if m else None
+
+def parse_size(raw):
+    """
+    Turn a pack-size string into (qty_in_base_unit, base_unit).
+    base_unit is one of 'g', 'ml', 'each'. Handles kg/l and multipacks
+    like '6 x 125g'. Returns (None, None) if it cannot tell.
+    """
+    if raw is None:
+        return (None, None)
+    s = str(raw).lower().strip()
+
+    # multipack: "6 x 125g" / "4x125ml"
+    m = re.search(r"(\d+)\s*[x×]\s*(\d+(?:\.\d+)?)\s*(kg|g|ml|l|cl)\b", s)
+    if m:
+        count = float(m.group(1)); each = float(m.group(2)); unit = m.group(3)
+        qty = count * each
+        return _to_base(qty, unit)
+
+    # single weight/volume: "650g" / "1.5kg" / "500ml" / "1 litre"
+    m = re.search(r"(\d+(?:\.\d+)?)\s*(kg|g|ml|l|cl|litre|liter)\b", s)
+    if m:
+        return _to_base(float(m.group(1)), m.group(2))
+
+    # count: "6 pack" / "pack of 4" / "each" / "single"
+    m = re.search(r"(\d+)\s*(?:pack|pk|ct|count|s)?\b", s)
+    if "each" in s or "single" in s:
+        return (1.0, "each")
+    if m and ("pack" in s or "pk" in s or "ct" in s or "count" in s):
+        return (float(m.group(1)), "each")
+    return (None, None)
+
+def _to_base(qty, unit):
+    unit = unit.lower()
+    if unit in ("kg",):
+        return (qty * 1000.0, "g")
+    if unit in ("g",):
+        return (qty, "g")
+    if unit in ("l", "litre", "liter"):
+        return (qty * 1000.0, "ml")
+    if unit in ("cl",):
+        return (qty * 10.0, "ml")
+    if unit in ("ml",):
+        return (qty, "ml")
+    return (None, None)
+
+def match_score(product, candidate_name):
+    """Fraction of the product's words that appear in the candidate title."""
+    p_words = set(canonicalise(product).split())
+    if not p_words:
+        return 0.0
+    c_words = set(canonicalise(candidate_name).split())
+    hits = sum(1 for w in p_words if w in c_words)
+    return hits / len(p_words)
+
+# ---------------------------------------------------------------------------
+# Apify call.
+# ---------------------------------------------------------------------------
+def run_actor(actor_id, payload, token, timeout=180):
+    """
+    Calls the 'run-sync-get-dataset-items' endpoint, which starts the actor,
+    waits for it to finish, and returns its result rows in one HTTP call.
+    Returns a list of dicts (possibly empty). Raises on hard failure.
+    """
+    url = (f"https://api.apify.com/v2/acts/{actor_id}"
+           f"/run-sync-get-dataset-items?token={token}&timeout={timeout}")
+    data = json.dumps(payload).encode("utf-8")
+    req = urllib.request.Request(
+        url, data=data, headers={"Content-Type": "application/json"})
+    with urllib.request.urlopen(req, timeout=timeout + 30) as resp:
+        body = resp.read().decode("utf-8")
+    parsed = json.loads(body)
+    return parsed if isinstance(parsed, list) else []
+
+# ---------------------------------------------------------------------------
+# CSV loading + product selection.
+# ---------------------------------------------------------------------------
+COL_ING, COL_PROD = "Ingredient", "Product"
+COL_QTY, COL_UNIT = "Pack size (qty)", "Pack unit (g / ml / each)"
+COL_PRICE, COL_STORE = "Pack price (£)", "Store"
+COL_OCC = "occurrences"
+
+def is_junk(name):
+    c = canonicalise(name)
+    if c in JUNK_PRODUCTS:
+        return True
+    return any(p.search(name or "") for p in JUNK_PATTERNS)
+
+def load_rows(path):
+    with open(path, newline="", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        return reader.fieldnames, list(reader)
+
+def select_products(rows, min_occ):
+    """Group rows by Product, drop junk, keep those with summed occ >= min_occ."""
+    groups = {}
+    for r in rows:
+        product = (r.get(COL_PROD) or "").strip()
+        if not product or is_junk(product):
+            continue
+        try:
+            occ = int(float(r.get(COL_OCC) or 0))
+        except ValueError:
+            occ = 0
+        g = groups.setdefault(product, {"occ": 0})
+        g["occ"] += occ
+    chosen = {p: g for p, g in groups.items() if g["occ"] >= min_occ}
+    return dict(sorted(chosen.items(), key=lambda kv: -kv[1]["occ"]))
+
+def search_term(product):
+    return TERM_OVERRIDES.get(canonicalise(product), product)
+
+# ---------------------------------------------------------------------------
+# Core: price one product across all stores, return the cheapest pick.
+# ---------------------------------------------------------------------------
+def best_result_for_store(results, product):
+    """Pick the best-matching, then cheapest, result from one store."""
+    best = None
+    for item in results:
+        name = item.get(FIELD["name"])
+        if not name:
+            continue
+        score = match_score(product, name)
+        if score < MATCH_THRESHOLD:
+            continue
+        price = parse_price(item.get(FIELD["price"]))
+        qty, base = parse_size(item.get(FIELD["size"]))
+        if price is None or not qty or not base:
+            continue
+        unit_price = price / qty
+        cand = {"name": name, "price": round(price, 2), "qty": qty,
+                "base": base, "unit_price": unit_price, "score": score,
+                "url": item.get(FIELD["url"])}
+        # prefer higher match score, then lower unit price
+        if best is None or (cand["score"], -cand["unit_price"]) > \
+                           (best["score"], -best["unit_price"]):
+            best = cand
+    return best
+
+def cheapest_across(per_store):
+    """Given {store: pick}, return (store, pick) with lowest unit price within
+    the most common base unit. None if nothing usable."""
+    if not per_store:
+        return None
+    # group by base unit; choose the base unit shared by the most stores
+    from collections import Counter
+    bases = Counter(p["base"] for p in per_store.values())
+    target_base = bases.most_common(1)[0][0]
+    candidates = {s: p for s, p in per_store.items() if p["base"] == target_base}
+    store = min(candidates, key=lambda s: candidates[s]["unit_price"])
+    return store, candidates[store]
+
+# ---------------------------------------------------------------------------
+# Main.
+# ---------------------------------------------------------------------------
+def main():
+    ap = argparse.ArgumentParser(description=__doc__,
+                                 formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--in", dest="infile", default="pricebook.csv")
+    ap.add_argument("--out", default="pricebook.filled.csv")
+    ap.add_argument("--report", default="price_report.md")
+    ap.add_argument("--min-occ", type=int, default=3,
+                    help="only price products appearing at least this many times")
+    ap.add_argument("--max-items", type=int, default=5,
+                    help="results to request per store per product")
+    ap.add_argument("--sample", type=int, default=0,
+                    help="only process the first N products (0 = all)")
+    ap.add_argument("--token", default=os.environ.get("APIFY_TOKEN", ""))
+    ap.add_argument("--price-per-1000", type=float, default=0.0,
+                    help="actor's $ per 1000 results, for the cost estimate")
+    ap.add_argument("--dry-run", action="store_true",
+                    help="list what would be queried + cost; call nothing")
+    ap.add_argument("--probe", metavar="TERM",
+                    help="run ONE query for TERM against each store and dump "
+                         "the first raw result, to discover field names")
+    args = ap.parse_args()
+
+    # --- probe mode: discover the real field names cheaply ------------------
+    if args.probe:
+        if not args.token:
+            sys.exit("Set APIFY_TOKEN (or pass --token) to probe.")
+        for store, actor in ACTORS.items():
+            print(f"\n=== {store} ({actor}) ===")
+            try:
+                res = run_actor(actor, build_actor_input(args.probe, 2), args.token)
+                print(json.dumps(res[0] if res else {}, indent=2)[:1500])
+            except Exception as e:  # noqa: BLE001
+                print(f"  ERROR: {e}")
+        return
+
+    fieldnames, rows = load_rows(args.infile)
+    products = select_products(rows, args.min_occ)
+    if args.sample:
+        products = dict(list(products.items())[:args.sample])
+
+    n_products = len(products)
+    n_queries = n_products * len(ACTORS)
+    est_results = n_queries * args.max_items
+    print(f"Products to price : {n_products}")
+    print(f"Stores per product: {len(ACTORS)}  ({', '.join(ACTORS)})")
+    print(f"Total queries     : {n_queries}")
+    print(f"Max results pulled: ~{est_results}")
+    if args.price_per_1000:
+        print(f"Est. cost         : ~${est_results/1000*args.price_per_1000:.2f}"
+              f"  (at ${args.price_per_1000}/1000 results)")
+
+    if args.dry_run:
+        print("\n--dry-run: nothing was called. Sample of the query list:")
+        for p in list(products)[:25]:
+            print(f"  - {p!r}  (search: {search_term(p)!r}, "
+                  f"occ={products[p]['occ']})")
+        return
+
+    if not args.token:
+        sys.exit("\nSet APIFY_TOKEN (or pass --token) for a real run. "
+                 "Use --dry-run to preview without a token.")
+
+    # --- price every product ----------------------------------------------
+    priced = {}      # product -> {"store","qty","base","price",...}
+    no_match = []    # products with nothing usable
+    for i, product in enumerate(products, 1):
+        term = search_term(product)
+        per_store = {}
+        for store, actor in ACTORS.items():
+            try:
+                results = run_actor(actor, build_actor_input(term, args.max_items),
+                                    args.token)
+            except urllib.error.HTTPError as e:
+                print(f"  [{store}] HTTP {e.code} for {term!r}")
+                continue
+            except Exception as e:  # noqa: BLE001
+                print(f"  [{store}] error for {term!r}: {e}")
+                continue
+            pick = best_result_for_store(results, product)
+            if pick:
+                per_store[store] = pick
+        choice = cheapest_across(per_store)
+        if choice:
+            store, pick = choice
+            priced[product] = {"store": store, **pick}
+            print(f"[{i}/{n_products}] {product}: £{pick['price']} "
+                  f"@ {store} ({pick['qty']:g}{pick['base']})")
+        else:
+            no_match.append(product)
+            print(f"[{i}/{n_products}] {product}: no confident match")
+
+    # --- write the filled CSV ---------------------------------------------
+    for r in rows:
+        product = (r.get(COL_PROD) or "").strip()
+        p = priced.get(product)
+        if not p:
+            continue
+        r[COL_QTY] = f"{p['qty']:g}"
+        r[COL_UNIT] = p["base"]
+        r[COL_PRICE] = f"{p['price']:.2f}"
+        r[COL_STORE] = p["store"]
+    with open(args.out, "w", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, fieldnames=fieldnames)
+        w.writeheader()
+        w.writerows(rows)
+
+    # --- write the report --------------------------------------------------
+    low_conf = {p: d for p, d in priced.items() if d["score"] < 0.75}
+    with open(args.report, "w", encoding="utf-8") as f:
+        f.write(f"# Price book fill report\n\n")
+        f.write(f"- Products priced: **{len(priced)}** / {n_products}\n")
+        f.write(f"- No confident match: **{len(no_match)}**\n")
+        f.write(f"- Low-confidence picks (eyeball these): **{len(low_conf)}**\n\n")
+        if low_conf:
+            f.write("## Low-confidence picks\n\n")
+            for p, d in sorted(low_conf.items()):
+                f.write(f"- **{p}** -> matched \"{d['name']}\" "
+                        f"(£{d['price']} @ {d['store']}, score {d['score']:.2f})\n")
+            f.write("\n")
+        if no_match:
+            f.write("## No match found\n\n")
+            for p in sorted(no_match):
+                f.write(f"- {p}\n")
+
+    print(f"\nWrote {args.out} and {args.report}")
+    print(f"Priced {len(priced)}/{n_products} products; "
+          f"{len(no_match)} unmatched; {len(low_conf)} low-confidence.")
+
+if __name__ == "__main__":
+    main()
