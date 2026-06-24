@@ -507,6 +507,74 @@
   .computed-cost { font-size: 13px; color: var(--green); margin-top: 6px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
   .computed-cost strong { color: var(--green); }
   .computed-cost-note { font-size: 11px; color: var(--text3); }
+
+  /* ── TRACKER TAB ─────────────────────────────────────────────────────── */
+  .trk-wrap { max-width: 760px; margin: 0 auto; padding: 4px 0 60px; }
+  .trk-datebar { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:14px; }
+  .trk-datebar .trk-date { font-size:16px; font-weight:700; color:var(--text); }
+  .trk-datebar .trk-date small { display:block; font-size:11px; font-weight:500; color:var(--text3); text-transform:uppercase; letter-spacing:.5px; }
+  .trk-navbtn { background:var(--surface2); border:1px solid var(--border); color:var(--text); border-radius:8px; padding:6px 12px; cursor:pointer; font-size:14px; }
+  .trk-navbtn:hover { border-color:var(--accent); }
+  .trk-toolbtns { display:flex; gap:8px; flex-wrap:wrap; }
+  .trk-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:14px 16px; margin-bottom:14px; }
+  .trk-macros { display:grid; grid-template-columns:repeat(5,1fr); gap:10px; }
+  .trk-macro { text-align:center; }
+  .trk-macro .trk-mval { font-size:15px; font-weight:700; color:var(--text); }
+  .trk-macro .trk-mlbl { font-size:10px; text-transform:uppercase; letter-spacing:.5px; color:var(--text3); margin:2px 0 5px; }
+  .trk-bar { height:6px; border-radius:4px; background:var(--surface2); overflow:hidden; }
+  .trk-bar > span { display:block; height:100%; border-radius:4px; background:var(--accent); transition:width .3s; }
+  .trk-bar.cal > span { background:var(--green); }
+  .trk-macro .trk-mtgt { font-size:9px; color:var(--text3); margin-top:3px; }
+  .trk-diary { display:flex; flex-wrap:wrap; gap:14px; font-size:13px; color:var(--text2); }
+  .trk-diary b { color:var(--text); }
+  .trk-diary .trk-net { color:var(--green); font-weight:700; }
+  .trk-diary .trk-net.over { color:var(--accent); }
+  .trk-meal { margin-bottom:12px; }
+  .trk-meal-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
+  .trk-meal-title { font-size:13px; font-weight:700; text-transform:capitalize; color:var(--text); }
+  .trk-meal-kcal { font-size:11px; color:var(--text3); font-weight:500; }
+  .trk-addbtn { background:none; border:1px dashed var(--border); color:var(--text2); border-radius:8px; padding:5px 10px; cursor:pointer; font-size:12px; }
+  .trk-addbtn:hover { border-color:var(--accent); color:var(--accent); }
+  .trk-entry { display:flex; align-items:center; gap:8px; padding:8px 10px; background:var(--surface2); border-radius:8px; margin-bottom:5px; }
+  .trk-entry .trk-etitle { flex:1; min-width:0; font-size:13px; color:var(--text); }
+  .trk-entry .trk-etitle small { display:block; color:var(--text3); font-size:10px; }
+  .trk-entry .trk-emac { font-size:11px; color:var(--text2); white-space:nowrap; }
+  .trk-entry .trk-del { background:none; border:none; color:var(--text3); cursor:pointer; font-size:15px; line-height:1; padding:2px 4px; }
+  .trk-entry .trk-del:hover { color:var(--accent); }
+  .trk-chip { display:inline-block; font-size:9px; text-transform:uppercase; letter-spacing:.4px; padding:1px 6px; border-radius:6px; background:var(--surface); color:var(--text3); margin-left:4px; }
+  .trk-flag { font-size:11px; color:var(--accent); margin-top:4px; }
+  .trk-empty { font-size:12px; color:var(--text3); padding:6px 2px; }
+  /* tracker modal (reuses overlay aesthetic) */
+  .trk-overlay { position:fixed; inset:0; background:rgba(0,0,0,.5); display:none; align-items:flex-start; justify-content:center; z-index:200; padding:40px 16px; overflow-y:auto; }
+  .trk-overlay.open { display:flex; }
+  .trk-panel { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:20px; width:100%; max-width:520px; position:relative; }
+  .trk-panel h3 { margin:0 0 4px; font-size:16px; color:var(--text); }
+  .trk-panel .trk-sub { font-size:12px; color:var(--text3); margin-bottom:14px; }
+  .trk-close { position:absolute; top:12px; right:14px; background:none; border:none; color:var(--text3); font-size:22px; cursor:pointer; line-height:1; }
+  .trk-field { margin-bottom:10px; }
+  .trk-field label { display:block; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.4px; color:var(--text3); margin-bottom:4px; }
+  .trk-field input, .trk-field select, .trk-field textarea { width:100%; background:var(--surface2); border:1px solid var(--border); color:var(--text); padding:8px 10px; border-radius:8px; font-size:13px; outline:none; font-family:inherit; }
+  .trk-field textarea { min-height:70px; resize:vertical; }
+  .trk-row { display:flex; gap:8px; }
+  .trk-row > * { flex:1; }
+  .trk-btn { background:var(--accent); color:#fff; border:none; border-radius:8px; padding:9px 16px; font-size:13px; font-weight:600; cursor:pointer; }
+  .trk-btn.sec { background:var(--surface2); color:var(--text); border:1px solid var(--border); }
+  .trk-btn:disabled { opacity:.6; cursor:default; }
+  .trk-tiles { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:8px; }
+  .trk-tile { text-align:left; background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:12px; cursor:pointer; }
+  .trk-tile:hover { border-color:var(--accent); }
+  .trk-tile b { display:block; font-size:13px; color:var(--text); margin-bottom:2px; }
+  .trk-tile span { font-size:11px; color:var(--text3); }
+  .trk-staple-row { display:flex; align-items:center; gap:8px; padding:7px 0; border-bottom:1px solid var(--border); font-size:12px; }
+  .trk-staple-row .nm { flex:1; color:var(--text); }
+  .trk-staple-row .mc { color:var(--text3); white-space:nowrap; }
+  .trk-staple-row button { background:none; border:none; cursor:pointer; color:var(--text3); font-size:13px; }
+  .trk-staple-row button:hover { color:var(--accent); }
+  .trk-confirm-item { display:flex; gap:8px; align-items:center; padding:8px; background:var(--surface2); border-radius:8px; margin-bottom:6px; }
+  .trk-confirm-item .ci-title { flex:1; font-size:12px; color:var(--text); }
+  .trk-confirm-item .ci-title small { display:block; color:var(--text3); font-size:10px; }
+  .trk-confirm-item input { width:54px; background:var(--surface); border:1px solid var(--border); color:var(--text); border-radius:6px; padding:4px 6px; font-size:12px; }
+  .trk-confirm-item .ci-mac { font-size:10px; color:var(--text3); white-space:nowrap; }
 </style>
 </head>
 <body>
@@ -517,6 +585,7 @@
       <button class="active" onclick="switchTab('plan',this)">🔀 Shuffle</button>
       <button onclick="switchTab('recipes',this)">🍳 Recipes</button>
       <button onclick="switchTab('grocery',this)" id="nav-grocery">🛒 Grocery List</button>
+      <button onclick="switchTab('tracker',this)" id="nav-tracker">📊 Tracker</button>
       <button onclick="switchTab('add',this)">＋ Add Recipe</button>
     </nav>
     <div class="header-right">
@@ -895,7 +964,31 @@
       </div>
     </div>
 
+    <!-- ── TRACKER TAB ───────────────────────────────────────────────────── -->
+    <div id="tab-tracker" class="tab-content">
+      <div class="trk-wrap" id="trkWrap">
+        <div class="trk-datebar">
+          <button class="trk-navbtn" onclick="trkShiftDay(-1)" title="Previous day">‹</button>
+          <div class="trk-date" id="trkDateLabel" onclick="trkGoToday()" title="Jump to today" style="cursor:pointer;text-align:center">—<small>today</small></div>
+          <button class="trk-navbtn" onclick="trkShiftDay(1)" title="Next day">›</button>
+        </div>
+        <div class="trk-toolbtns" style="justify-content:center;margin-bottom:14px">
+          <button class="trk-addbtn" onclick="trkOpenAddChooser()">＋ Add food</button>
+          <button class="trk-addbtn" onclick="trkOpenStaples()">🥫 Staples</button>
+          <button class="trk-addbtn" onclick="trkOpenTargets()">🎯 Targets</button>
+        </div>
+        <div id="trkBody">
+          <div class="trk-empty" style="text-align:center;padding:40px">Loading tracker…</div>
+        </div>
+      </div>
+    </div>
+
   </main>
+
+  <!-- Tracker modal -->
+  <div class="trk-overlay" id="trkOverlay" onclick="if(event.target===this)trkCloseModal()">
+    <div class="trk-panel" id="trkPanel"></div>
+  </div>
 
   <!-- Recipe Detail Modal -->
   <div class="modal-overlay" id="modalOverlay" onclick="closeModalOnOverlay(event)">
@@ -1496,6 +1589,7 @@ function switchTab(tab, btn) {
   document.getElementById('tab-'+tab).classList.add('active');
   if(btn) btn.classList.add('active');
   if(tab==='recipes') renderRecipes();
+  if(tab==='tracker') trkOnOpen();
 }
 
 // ─── FILTERS ───────────────────────────────────────────────────────────────
@@ -4636,6 +4730,633 @@ function prefillForm(r) {
   window._parsedAiRecipe = r;
 }
 
+</script>
+
+
+<!-- ── TRACKER MODULE ─────────────────────────────────────────────────────── -->
+<script>
+/* Nutrition tracker integrated from daily-shuffle-tracker.
+   Persists to dedicated Supabase tables (food_log, day_meta, staple_products)
+   using the same anon-key REST pattern as the recipe library, with a
+   localStorage mirror for instant/offline render. Reuses the existing
+   supabaseUrl/supabaseKey globals, the Anthropic (claude-haiku) call pattern,
+   and showToast(). */
+
+const TRK_MEALS = ['breakfast','snack','lunch','dinner','dessert'];
+const TRK_TARGET_DEFAULTS = { cal:1800, prot:130, carb:170, fat:58, fib:30 };
+
+let trkDay = trkTodayKey();
+let trkEntries = [];
+let trkMeta = { exercise:[], omegaLogged:false, notes:'' };
+let trkStaples = [];
+let trkStaplesLoaded = false;
+let trkTargets = (function(){
+  try { const s = localStorage.getItem('ds_trk_targets'); if(s) return Object.assign({}, TRK_TARGET_DEFAULTS, JSON.parse(s)); } catch(e){}
+  return Object.assign({}, TRK_TARGET_DEFAULTS);
+})();
+
+// ── helpers ─────────────────────────────────────────────────────────────────
+function trkTodayKey(d){ d = d || new Date(); const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), da=String(d.getDate()).padStart(2,'0'); return `${y}-${m}-${da}`; }
+function trkRound1(n){ return Math.round((Number(n)||0)*10)/10; }
+function trkNum(v){ const n=parseFloat(v); return isFinite(n)?n:0; }
+function trkHasCloud(){ return !!(supabaseUrl && supabaseKey); }
+function trkSbHeaders(write){
+  const h = { 'apikey': supabaseKey, 'Authorization': `Bearer ${supabaseKey}` };
+  if(write){ h['Content-Type']='application/json'; h['Prefer']='resolution=merge-duplicates,return=minimal'; }
+  return h;
+}
+function trkEsc(s){ return String(s==null?'':s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function trkFmtDate(key){
+  const [y,m,d] = key.split('-').map(Number);
+  const dt = new Date(y, m-1, d);
+  const rel = key === trkTodayKey() ? 'today' : (key === trkTodayKey(new Date(Date.now()-864e5)) ? 'yesterday' : (key === trkTodayKey(new Date(Date.now()+864e5)) ? 'tomorrow' : dt.toLocaleDateString(undefined,{weekday:'long'})));
+  return { main: dt.toLocaleDateString(undefined,{day:'numeric',month:'short'}), sub: rel };
+}
+
+function trkMakeEntry(o){
+  const now = new Date().toISOString();
+  return {
+    id: o.id || ('e_'+Date.now()+'_'+Math.round(Math.random()*1e5)),
+    date_key: trkDay,
+    meal_id: o.meal_id,
+    entry_type: o.entry_type || 'manual_food',
+    source_id: o.source_id || null,
+    source_label: o.source_label || null,
+    title: o.title || 'Untitled',
+    serving_qty: o.serving_qty != null ? trkNum(o.serving_qty) : 1,
+    serving_unit: o.serving_unit || 'serving',
+    calories: trkRound1(o.calories),
+    protein_g: trkRound1(o.protein_g),
+    carbs_g: trkRound1(o.carbs_g),
+    fat_g: trkRound1(o.fat_g),
+    fibre_g: trkRound1(o.fibre_g),
+    status: o.status || 'eaten',
+    planned: !!o.planned,
+    nutrition_source: o.nutrition_source || 'manual',
+    recipe_snapshot: o.recipe_snapshot || null,
+    gi_estimate: o.gi_estimate || null,
+    notes: o.notes || '',
+    created_at: now,
+    updated_at: now,
+  };
+}
+
+// ── persistence ───────────────────────────────────────────────────────────
+function trkCacheDay(){
+  try { localStorage.setItem('ds_trk_day_'+trkDay, JSON.stringify({ entries:trkEntries, meta:trkMeta })); } catch(e){}
+}
+function trkLoadCacheDay(){
+  try { const s = localStorage.getItem('ds_trk_day_'+trkDay); if(s){ const o=JSON.parse(s); trkEntries=o.entries||[]; trkMeta=Object.assign({exercise:[],omegaLogged:false,notes:''},o.meta||{}); return true; } } catch(e){}
+  trkEntries = []; trkMeta = { exercise:[], omegaLogged:false, notes:'' };
+  return false;
+}
+async function trkLoadDay(){
+  trkLoadCacheDay();           // instant render from mirror
+  if(!trkHasCloud()) return;
+  try {
+    const [eRes, mRes] = await Promise.all([
+      fetch(`${supabaseUrl}/rest/v1/food_log?date_key=eq.${trkDay}&select=*&order=created_at.asc`, { headers: trkSbHeaders() }),
+      fetch(`${supabaseUrl}/rest/v1/day_meta?date_key=eq.${trkDay}&select=*`, { headers: trkSbHeaders() })
+    ]);
+    if(eRes.ok){ trkEntries = await eRes.json(); }
+    if(mRes.ok){ const rows = await mRes.json(); if(rows.length){ trkMeta = { exercise: rows[0].exercise||[], omegaLogged: !!rows[0].omega_logged, notes: rows[0].notes||'' }; } else { trkMeta = { exercise:[], omegaLogged:false, notes:'' }; } }
+    trkCacheDay();
+  } catch(e){ /* keep cached */ }
+}
+async function trkPushEntry(entry){
+  if(!trkHasCloud()) return;
+  try { await fetch(`${supabaseUrl}/rest/v1/food_log`, { method:'POST', headers: trkSbHeaders(true), body: JSON.stringify(entry) }); }
+  catch(e){ showToast('Saved locally — cloud sync failed'); }
+}
+async function trkPushDeleteEntry(id){
+  if(!trkHasCloud()) return;
+  try { await fetch(`${supabaseUrl}/rest/v1/food_log?id=eq.${encodeURIComponent(id)}`, { method:'DELETE', headers: trkSbHeaders() }); } catch(e){}
+}
+async function trkSaveMeta(){
+  trkCacheDay();
+  if(!trkHasCloud()) return;
+  try { await fetch(`${supabaseUrl}/rest/v1/day_meta`, { method:'POST', headers: trkSbHeaders(true), body: JSON.stringify({ date_key:trkDay, exercise:trkMeta.exercise, omega_logged:trkMeta.omegaLogged, notes:trkMeta.notes, updated_at:new Date().toISOString() }) }); } catch(e){}
+}
+
+async function trkAddEntry(entry){
+  trkEntries.push(entry);
+  trkCacheDay();
+  renderTracker();
+  await trkPushEntry(entry);
+}
+async function trkRemoveEntry(id){
+  trkEntries = trkEntries.filter(e => e.id !== id);
+  trkCacheDay();
+  renderTracker();
+  await trkPushDeleteEntry(id);
+}
+
+// ── staples ─────────────────────────────────────────────────────────────────
+async function trkLoadStaples(force){
+  if(trkStaplesLoaded && !force) return;
+  try { const s = localStorage.getItem('ds_trk_staples'); if(s) trkStaples = JSON.parse(s); } catch(e){}
+  if(trkHasCloud()){
+    try {
+      const res = await fetch(`${supabaseUrl}/rest/v1/staple_products?select=*&order=name.asc`, { headers: trkSbHeaders() });
+      if(res.ok){ trkStaples = await res.json(); localStorage.setItem('ds_trk_staples', JSON.stringify(trkStaples)); }
+    } catch(e){}
+  }
+  trkStaplesLoaded = true;
+}
+async function trkUpsertStaple(s){
+  if(!trkHasCloud()){ showToast('Add Supabase credentials in Settings to save staples'); return false; }
+  try {
+    const res = await fetch(`${supabaseUrl}/rest/v1/staple_products`, { method:'POST', headers: trkSbHeaders(true), body: JSON.stringify(Object.assign({ updated_at:new Date().toISOString() }, s)) });
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    await trkLoadStaples(true); return true;
+  } catch(e){ showToast('Could not save staple: '+e.message); return false; }
+}
+async function trkDeleteStaple(id){
+  if(!trkHasCloud()) return;
+  try { await fetch(`${supabaseUrl}/rest/v1/staple_products?id=eq.${encodeURIComponent(id)}`, { method:'DELETE', headers: trkSbHeaders() }); await trkLoadStaples(true); } catch(e){}
+}
+
+// ── date navigation ───────────────────────────────────────────────────────
+async function trkOnOpen(){
+  await trkLoadStaples();
+  await trkLoadDay();
+  renderTracker();
+}
+async function trkShiftDay(delta){
+  const [y,m,d] = trkDay.split('-').map(Number);
+  const dt = new Date(y, m-1, d); dt.setDate(dt.getDate()+delta);
+  trkDay = trkTodayKey(dt);
+  await trkLoadDay(); renderTracker();
+}
+async function trkGoToday(){ trkDay = trkTodayKey(); await trkLoadDay(); renderTracker(); }
+
+// ── totals ────────────────────────────────────────────────────────────────
+function trkMealEntries(mealId){ return trkEntries.filter(e => e.meal_id === mealId); }
+function trkSum(entries){
+  return entries.reduce((a,e)=>({ cal:a.cal+trkNum(e.calories), prot:a.prot+trkNum(e.protein_g), carb:a.carb+trkNum(e.carbs_g), fat:a.fat+trkNum(e.fat_g), fib:a.fib+trkNum(e.fibre_g) }), {cal:0,prot:0,carb:0,fat:0,fib:0});
+}
+function trkExerciseCals(){ return (trkMeta.exercise||[]).reduce((a,x)=>a+trkNum(x.caloriesBurned),0); }
+
+// ── render ──────────────────────────────────────────────────────────────────
+function renderTracker(){
+  const body = document.getElementById('trkBody');
+  if(!body) return;
+  // date label
+  const fd = trkFmtDate(trkDay);
+  const dl = document.getElementById('trkDateLabel');
+  if(dl) dl.innerHTML = `${trkEsc(fd.main)}<small>${trkEsc(fd.sub)}</small>`;
+
+  const tot = trkSum(trkEntries);
+  const macroDefs = [
+    { k:'cal', lbl:'kcal', val:tot.cal, tgt:trkTargets.cal, cls:'cal' },
+    { k:'prot', lbl:'protein', val:tot.prot, tgt:trkTargets.prot },
+    { k:'carb', lbl:'carbs', val:tot.carb, tgt:trkTargets.carb },
+    { k:'fat', lbl:'fat', val:tot.fat, tgt:trkTargets.fat },
+    { k:'fib', lbl:'fibre', val:tot.fib, tgt:trkTargets.fib },
+  ];
+  const macroHtml = macroDefs.map(m => {
+    const pct = m.tgt > 0 ? Math.min(100, Math.round(m.val/m.tgt*100)) : 0;
+    const v = m.k==='cal' ? Math.round(m.val) : trkRound1(m.val);
+    return `<div class="trk-macro">
+      <div class="trk-mval">${v}</div>
+      <div class="trk-mlbl">${m.lbl}</div>
+      <div class="trk-bar ${m.cls||''}"><span style="width:${pct}%"></span></div>
+      <div class="trk-mtgt">/ ${m.k==='cal'?m.tgt:m.tgt+'g'}</div>
+    </div>`;
+  }).join('');
+
+  // diary line
+  const food = Math.round(tot.cal), ex = Math.round(trkExerciseCals());
+  const remaining = trkTargets.cal - food + ex;
+  const diaryHtml = `<div class="trk-diary">
+    <div>Goal <b>${trkTargets.cal}</b></div>
+    <div>Food <b>${food}</b></div>
+    <div>Exercise <b>${ex}</b></div>
+    <div>Remaining <span class="trk-net ${remaining<0?'over':''}">${remaining}</span></div>
+  </div>`;
+
+  // meals
+  const mealsHtml = TRK_MEALS.map(mealId => {
+    const entries = trkMealEntries(mealId);
+    const mt = trkSum(entries);
+    const rows = entries.length ? entries.map(e => trkEntryRow(e)).join('') : `<div class="trk-empty">— nothing logged —</div>`;
+    const flag = trkMealFlag(entries);
+    return `<div class="trk-meal">
+      <div class="trk-meal-head">
+        <span class="trk-meal-title">${mealId}</span>
+        <span class="trk-meal-kcal">${Math.round(mt.cal)} kcal · ${trkRound1(mt.prot)}g P</span>
+      </div>
+      ${rows}
+      ${flag ? `<div class="trk-flag">⚠ ${trkEsc(flag)}</div>` : ''}
+      <button class="trk-addbtn" style="margin-top:4px" onclick="trkOpenAddChooser('${mealId}')">＋ add to ${mealId}</button>
+    </div>`;
+  }).join('');
+
+  // exercise
+  const exList = (trkMeta.exercise||[]).map((x,i)=>`<div class="trk-entry"><span class="trk-etitle">${trkEsc(x.name)}<small>${x.durationMin?x.durationMin+' min':''}</small></span><span class="trk-emac">${Math.round(trkNum(x.caloriesBurned))} kcal</span><button class="trk-del" onclick="trkDeleteExercise(${i})">×</button></div>`).join('') || `<div class="trk-empty">— none —</div>`;
+  const exerciseHtml = `<div class="trk-card">
+    <div class="trk-meal-head"><span class="trk-meal-title">🏃 Exercise</span><span class="trk-meal-kcal">${ex} kcal burned</span></div>
+    ${exList}
+    <button class="trk-addbtn" style="margin-top:6px" onclick="trkOpenExercise()">＋ add exercise</button>
+  </div>`;
+
+  body.innerHTML = `
+    <div class="trk-card"><div class="trk-macros">${macroHtml}</div></div>
+    <div class="trk-card">${diaryHtml}</div>
+    <div class="trk-card">${mealsHtml}</div>
+    ${exerciseHtml}
+    ${!trkHasCloud() ? `<div class="trk-empty" style="text-align:center">⚠ No Supabase credentials — logging to this browser only. Add them in Settings 🔑 to sync.</div>` : ''}
+  `;
+}
+
+function trkEntryRow(e){
+  const src = e.nutrition_source && e.nutrition_source!=='manual' ? `<span class="trk-chip">${trkEsc(e.nutrition_source)}</span>` : '';
+  const qty = (e.serving_qty && e.serving_unit) ? `<small>${trkRound1(e.serving_qty)} ${trkEsc(e.serving_unit)}</small>` : '';
+  return `<div class="trk-entry">
+    <span class="trk-etitle">${trkEsc(e.title)}${src}${qty}</span>
+    <span class="trk-emac">${Math.round(trkNum(e.calories))} kcal · ${trkRound1(e.protein_g)}P ${trkRound1(e.carbs_g)}C ${trkRound1(e.fat_g)}F</span>
+    <button class="trk-del" onclick="trkRemoveEntry('${e.id}')" title="Remove">×</button>
+  </div>`;
+}
+
+// PCOS-style flag ported from tracker: high-GI + low-protein item
+function trkMealFlag(entries){
+  for(const e of entries){
+    const gi = (e.gi_estimate || (e.recipe_snapshot && e.recipe_snapshot.gi_estimate) || '').toLowerCase();
+    if((gi==='high'||gi==='very high') && trkNum(e.protein_g) < 10){
+      return 'High GI + low protein — consider adding a protein source to balance blood sugar (PCOS)';
+    }
+  }
+  return null;
+}
+
+// ── modal plumbing ─────────────────────────────────────────────────────────
+function trkModal(html){
+  const panel = document.getElementById('trkPanel');
+  panel.innerHTML = `<button class="trk-close" onclick="trkCloseModal()">×</button>` + html;
+  document.getElementById('trkOverlay').classList.add('open');
+}
+function trkCloseModal(){ document.getElementById('trkOverlay').classList.remove('open'); }
+
+function trkMealOptions(sel){ return TRK_MEALS.map(m=>`<option value="${m}" ${m===sel?'selected':''}>${m}</option>`).join(''); }
+
+// ── add chooser ─────────────────────────────────────────────────────────────
+function trkOpenAddChooser(meal){
+  meal = meal || 'breakfast';
+  trkModal(`
+    <h3>Add to log</h3>
+    <div class="trk-sub">Choose how to add food to <b>${meal}</b>.</div>
+    <div class="trk-field"><label>Meal</label><select id="trkChooserMeal">${trkMealOptions(meal)}</select></div>
+    <div class="trk-tiles">
+      <button class="trk-tile" onclick="trkOpenQuickAdd()"><b>✨ Quick add (AI)</b><span>Type a meal in plain English</span></button>
+      <button class="trk-tile" onclick="trkOpenStaplePick()"><b>🥫 From staple</b><span>Your saved products</span></button>
+      <button class="trk-tile" onclick="trkOpenRecipePick()"><b>🍳 From recipe</b><span>Search your Supabase recipes</span></button>
+      <button class="trk-tile" onclick="trkOpenManual()"><b>✏️ Manual macros</b><span>Enter full nutrition</span></button>
+      <button class="trk-tile" onclick="trkOpenQuickCal()"><b>🔢 Quick calories</b><span>Title + calories only</span></button>
+    </div>
+  `);
+}
+function trkChooserMeal(){ const el=document.getElementById('trkChooserMeal'); return el ? el.value : 'breakfast'; }
+
+// ── manual macros ───────────────────────────────────────────────────────────
+function trkOpenManual(){
+  const meal = trkChooserMeal();
+  trkModal(`
+    <h3>Manual food</h3>
+    <div class="trk-field"><label>Meal</label><select id="trkMeal">${trkMealOptions(meal)}</select></div>
+    <div class="trk-field"><label>Name</label><input id="trkmName" placeholder="e.g. Chicken & rice"></div>
+    <div class="trk-row"><div class="trk-field"><label>Qty</label><input id="trkmQty" type="number" step="any" value="1"></div><div class="trk-field"><label>Unit</label><input id="trkmUnit" value="serving"></div></div>
+    <div class="trk-row">
+      <div class="trk-field"><label>kcal</label><input id="trkmCal" type="number" step="any"></div>
+      <div class="trk-field"><label>Protein</label><input id="trkmP" type="number" step="any"></div>
+      <div class="trk-field"><label>Carbs</label><input id="trkmC" type="number" step="any"></div>
+    </div>
+    <div class="trk-row">
+      <div class="trk-field"><label>Fat</label><input id="trkmF" type="number" step="any"></div>
+      <div class="trk-field"><label>Fibre</label><input id="trkmFb" type="number" step="any"></div>
+    </div>
+    <button class="trk-btn" onclick="trkSubmitManual()">Add</button>
+  `);
+}
+async function trkSubmitManual(){
+  const name = document.getElementById('trkmName').value.trim();
+  if(!name){ showToast('Enter a name'); return; }
+  const entry = trkMakeEntry({
+    meal_id: document.getElementById('trkMeal').value, entry_type:'manual_food', title:name,
+    serving_qty: trkNum(document.getElementById('trkmQty').value)||1, serving_unit: document.getElementById('trkmUnit').value||'serving',
+    calories: document.getElementById('trkmCal').value, protein_g: document.getElementById('trkmP').value,
+    carbs_g: document.getElementById('trkmC').value, fat_g: document.getElementById('trkmF').value, fibre_g: document.getElementById('trkmFb').value,
+    nutrition_source:'manual'
+  });
+  trkCloseModal();
+  await trkAddEntry(entry);
+}
+
+// ── quick calories ──────────────────────────────────────────────────────────
+function trkOpenQuickCal(){
+  const meal = trkChooserMeal();
+  trkModal(`
+    <h3>Quick calories</h3>
+    <div class="trk-field"><label>Meal</label><select id="trkMeal">${trkMealOptions(meal)}</select></div>
+    <div class="trk-field"><label>What</label><input id="trkqTitle" placeholder="e.g. flat white"></div>
+    <div class="trk-field"><label>Calories</label><input id="trkqCal" type="number" step="any"></div>
+    <button class="trk-btn" onclick="trkSubmitQuickCal()">Add</button>
+  `);
+}
+async function trkSubmitQuickCal(){
+  const title = document.getElementById('trkqTitle').value.trim() || 'Quick add';
+  const entry = trkMakeEntry({ meal_id: document.getElementById('trkMeal').value, entry_type:'quick_add_calories', title, calories: document.getElementById('trkqCal').value, nutrition_source:'quick_add' });
+  trkCloseModal();
+  await trkAddEntry(entry);
+}
+
+// ── staple picker ───────────────────────────────────────────────────────────
+function trkOpenStaplePick(){
+  const meal = trkChooserMeal();
+  if(!trkStaples.length){ trkModal(`<h3>No staples yet</h3><div class="trk-sub">Add products via the 🥫 Staples button${trkHasCloud()?'':' (after adding Supabase credentials)'}.</div>`); return; }
+  const opts = trkStaples.map(s=>`<option value="${s.id}">${trkEsc(s.name)}</option>`).join('');
+  trkModal(`
+    <h3>Add from staple</h3>
+    <div class="trk-field"><label>Meal</label><select id="trkMeal">${trkMealOptions(meal)}</select></div>
+    <div class="trk-field"><label>Product</label><select id="trkStapleSel" onchange="trkStaplePreview()">${opts}</select></div>
+    <div class="trk-field"><label>Quantity (in the product's own unit)</label><input id="trkStapleQty" type="number" step="any" value="" oninput="trkStaplePreview()" placeholder="how much?"></div>
+    <div class="trk-sub" id="trkStaplePrev"></div>
+    <button class="trk-btn" onclick="trkSubmitStaple()">Add</button>
+  `);
+  trkStaplePreview();
+}
+function trkStapleById(id){ return trkStaples.find(s=>String(s.id)===String(id)); }
+function trkStaplePreview(){
+  const s = trkStapleById(document.getElementById('trkStapleSel').value); if(!s) return;
+  const base = trkNum(s.serving_qty)||1;
+  const qty = trkNum(document.getElementById('trkStapleQty').value);
+  const f = qty>0 ? qty/base : 0;
+  const prev = document.getElementById('trkStaplePrev');
+  const unitNote = `Base: ${trkRound1(s.serving_qty)} ${trkEsc(s.serving_unit)} = ${Math.round(trkNum(s.calories))}kcal · ${trkRound1(s.protein_g)}P ${trkRound1(s.carbs_g)}C ${trkRound1(s.fat_g)}F`;
+  prev.innerHTML = (qty>0)
+    ? `→ <b>${Math.round(trkNum(s.calories)*f)} kcal</b> · ${trkRound1(trkNum(s.protein_g)*f)}P ${trkRound1(trkNum(s.carbs_g)*f)}C ${trkRound1(trkNum(s.fat_g)*f)}F ${trkRound1(trkNum(s.fibre_g)*f)}Fb<br><span style="color:var(--text3)">${unitNote}${s.notes?' · '+trkEsc(s.notes):''}</span>`
+    : `<span style="color:var(--text3)">${unitNote}${s.notes?' · '+trkEsc(s.notes):''}</span>`;
+}
+async function trkSubmitStaple(){
+  const s = trkStapleById(document.getElementById('trkStapleSel').value); if(!s) return;
+  const base = trkNum(s.serving_qty)||1;
+  const qty = trkNum(document.getElementById('trkStapleQty').value);
+  if(qty<=0){ showToast('Enter a quantity'); return; }
+  const f = qty/base;
+  const entry = trkMakeEntry({
+    meal_id: document.getElementById('trkMeal').value, entry_type:'staple', title: s.name,
+    source_id: String(s.id), source_label: s.name,
+    serving_qty: qty, serving_unit: s.serving_unit,
+    calories: trkNum(s.calories)*f, protein_g: trkNum(s.protein_g)*f, carbs_g: trkNum(s.carbs_g)*f, fat_g: trkNum(s.fat_g)*f, fibre_g: trkNum(s.fibre_g)*f,
+    gi_estimate: s.gi_estimate || null, nutrition_source:'staple'
+  });
+  trkCloseModal();
+  await trkAddEntry(entry);
+}
+
+// ── recipe picker (from Supabase recipes table) ────────────────────────────
+let _trkRecipeCache = null;
+async function trkFetchRecipes(){
+  if(_trkRecipeCache) return _trkRecipeCache;
+  if(!trkHasCloud()) return [];
+  try {
+    const res = await fetch(`${supabaseUrl}/rest/v1/recipes?import_status=in.(ready,review,custom)&select=id,name,meal_type,meal_types,calories,protein_g,carbs_g,fat_g,fibre_g,gi_estimate,serves&limit=400`, { headers: trkSbHeaders() });
+    if(res.ok){ _trkRecipeCache = await res.json(); }
+  } catch(e){ _trkRecipeCache = []; }
+  return _trkRecipeCache || [];
+}
+async function trkOpenRecipePick(){
+  const meal = trkChooserMeal();
+  trkModal(`<h3>Add from recipe</h3>
+    <div class="trk-field"><label>Meal</label><select id="trkMeal">${trkMealOptions(meal)}</select></div>
+    <div class="trk-field"><label>Search</label><input id="trkRecipeSearch" placeholder="type a recipe name…" oninput="trkRenderRecipeList()"></div>
+    <div id="trkRecipeList" class="trk-sub">Loading recipes…</div>`);
+  await trkFetchRecipes();
+  trkRenderRecipeList();
+}
+function trkRenderRecipeList(){
+  const q = (document.getElementById('trkRecipeSearch').value||'').toLowerCase().trim();
+  let list = _trkRecipeCache || [];
+  if(q) list = list.filter(r => (r.name||'').toLowerCase().includes(q));
+  list = list.slice(0,40);
+  const el = document.getElementById('trkRecipeList');
+  if(!list.length){ el.innerHTML = '<div class="trk-empty">No matching recipes.</div>'; return; }
+  el.innerHTML = list.map(r => `<div class="trk-staple-row"><span class="nm">${trkEsc(r.name)}</span><span class="mc">${Math.round(trkNum(r.calories))}kcal ${trkRound1(r.protein_g)}P</span><button onclick='trkAddRecipe(${JSON.stringify(r).replace(/'/g,"&#39;")})'>＋</button></div>`).join('');
+}
+async function trkAddRecipe(r){
+  const entry = trkMakeEntry({
+    meal_id: document.getElementById('trkMeal').value, entry_type:'recipe', title: r.name,
+    source_id: String(r.id), source_label: r.name, serving_qty:1, serving_unit:'serving',
+    calories: r.calories, protein_g: r.protein_g, carbs_g: r.carbs_g, fat_g: r.fat_g, fibre_g: r.fibre_g,
+    gi_estimate: r.gi_estimate || null, nutrition_source:'database',
+    recipe_snapshot: { recipeId:r.id, name:r.name, serves:r.serves, gi_estimate:r.gi_estimate }
+  });
+  trkCloseModal();
+  await trkAddEntry(entry);
+}
+
+// ── exercise ────────────────────────────────────────────────────────────────
+function trkOpenExercise(){
+  trkModal(`<h3>Add exercise</h3>
+    <div class="trk-field"><label>Activity</label><input id="trkExName" placeholder="e.g. Run"></div>
+    <div class="trk-row"><div class="trk-field"><label>Calories burned</label><input id="trkExCal" type="number" step="any"></div><div class="trk-field"><label>Minutes (optional)</label><input id="trkExMin" type="number" step="any"></div></div>
+    <button class="trk-btn" onclick="trkSubmitExercise()">Add</button>`);
+}
+async function trkSubmitExercise(){
+  const name = document.getElementById('trkExName').value.trim(); if(!name){ showToast('Enter an activity'); return; }
+  trkMeta.exercise = trkMeta.exercise || [];
+  trkMeta.exercise.push({ id:'x_'+Date.now(), name, caloriesBurned: trkNum(document.getElementById('trkExCal').value), durationMin: trkNum(document.getElementById('trkExMin').value)||null });
+  trkCloseModal(); renderTracker(); await trkSaveMeta();
+}
+async function trkDeleteExercise(i){
+  trkMeta.exercise.splice(i,1); renderTracker(); await trkSaveMeta();
+}
+
+// ── targets ─────────────────────────────────────────────────────────────────
+function trkOpenTargets(){
+  trkModal(`<h3>Daily targets</h3><div class="trk-sub">Used for the rings and remaining-calorie math.</div>
+    <div class="trk-row"><div class="trk-field"><label>Calories</label><input id="trkTgCal" type="number" value="${trkTargets.cal}"></div><div class="trk-field"><label>Protein</label><input id="trkTgProt" type="number" value="${trkTargets.prot}"></div></div>
+    <div class="trk-row"><div class="trk-field"><label>Carbs</label><input id="trkTgCarb" type="number" value="${trkTargets.carb}"></div><div class="trk-field"><label>Fat</label><input id="trkTgFat" type="number" value="${trkTargets.fat}"></div><div class="trk-field"><label>Fibre</label><input id="trkTgFib" type="number" value="${trkTargets.fib}"></div></div>
+    <button class="trk-btn" onclick="trkSaveTargets()">Save</button>`);
+}
+function trkSaveTargets(){
+  trkTargets = { cal:trkNum(document.getElementById('trkTgCal').value)||TRK_TARGET_DEFAULTS.cal, prot:trkNum(document.getElementById('trkTgProt').value), carb:trkNum(document.getElementById('trkTgCarb').value), fat:trkNum(document.getElementById('trkTgFat').value), fib:trkNum(document.getElementById('trkTgFib').value) };
+  try { localStorage.setItem('ds_trk_targets', JSON.stringify(trkTargets)); } catch(e){}
+  trkCloseModal(); renderTracker();
+}
+
+// ── staples manager ─────────────────────────────────────────────────────────
+async function trkOpenStaples(){
+  await trkLoadStaples(true);
+  trkRenderStaplesManager();
+}
+function trkRenderStaplesManager(){
+  const rows = trkStaples.length ? trkStaples.map(s=>`<div class="trk-staple-row">
+    <span class="nm">${trkEsc(s.name)}<br><span style="color:var(--text3);font-size:10px">${trkRound1(s.serving_qty)}${trkEsc(s.serving_unit)} · ${Math.round(trkNum(s.calories))}kcal ${trkRound1(s.protein_g)}P ${trkRound1(s.carbs_g)}C ${trkRound1(s.fat_g)}F</span></span>
+    <button onclick="trkDeleteStaple('${s.id}').then(trkRenderStaplesManager)" title="Delete">🗑</button>
+  </div>`).join('') : '<div class="trk-empty">No staples yet.</div>';
+  trkModal(`<h3>Staple products</h3>
+    <div class="trk-sub">Your most-used products with fixed nutrition. These power the AI quick-add.</div>
+    <div style="max-height:240px;overflow-y:auto;margin-bottom:14px">${rows}</div>
+    <h3 style="font-size:14px">Add a product</h3>
+    <div class="trk-field"><label>Name</label><input id="trkSpName" placeholder="e.g. Lidl soya yoghurt"></div>
+    <div class="trk-row"><div class="trk-field"><label>Per qty</label><input id="trkSpQty" type="number" step="any" value="100"></div><div class="trk-field"><label>Unit</label><input id="trkSpUnit" value="g"></div></div>
+    <div class="trk-row"><div class="trk-field"><label>kcal</label><input id="trkSpCal" type="number" step="any"></div><div class="trk-field"><label>Protein</label><input id="trkSpP" type="number" step="any"></div><div class="trk-field"><label>Carbs</label><input id="trkSpC" type="number" step="any"></div></div>
+    <div class="trk-row"><div class="trk-field"><label>Fat</label><input id="trkSpF" type="number" step="any"></div><div class="trk-field"><label>Fibre</label><input id="trkSpFb" type="number" step="any"></div><div class="trk-field"><label>GI (opt)</label><input id="trkSpGi" placeholder="low/med/high"></div></div>
+    <div class="trk-field"><label>Aliases (comma-separated, optional)</label><input id="trkSpAlias" placeholder="pb, peanut butter"></div>
+    <div class="trk-field"><label>Notes (optional)</label><input id="trkSpNotes" placeholder="e.g. 1 tbsp ≈ 8g"></div>
+    <button class="trk-btn" onclick="trkSubmitStapleProduct()">Save product</button>`);
+}
+async function trkSubmitStapleProduct(){
+  const name = document.getElementById('trkSpName').value.trim(); if(!name){ showToast('Enter a name'); return; }
+  const aliases = (document.getElementById('trkSpAlias').value||'').split(',').map(a=>a.trim()).filter(Boolean);
+  const ok = await trkUpsertStaple({
+    name, aliases, serving_qty: trkNum(document.getElementById('trkSpQty').value)||100, serving_unit: document.getElementById('trkSpUnit').value||'g',
+    calories: trkNum(document.getElementById('trkSpCal').value), protein_g: trkNum(document.getElementById('trkSpP').value), carbs_g: trkNum(document.getElementById('trkSpC').value),
+    fat_g: trkNum(document.getElementById('trkSpF').value), fibre_g: trkNum(document.getElementById('trkSpFb').value),
+    gi_estimate: document.getElementById('trkSpGi').value.trim()||null, notes: document.getElementById('trkSpNotes').value.trim()||null
+  });
+  if(ok){ showToast('Staple saved'); trkRenderStaplesManager(); }
+}
+
+// ── AI quick add ────────────────────────────────────────────────────────────
+function trkOpenQuickAdd(){
+  const meal = trkChooserMeal();
+  const noKey = !localStorage.getItem('ds_api_key');
+  trkModal(`<h3>✨ Quick add with AI</h3>
+    <div class="trk-sub">Type the foods in this meal in plain English. Your staple products are recognised automatically; unknown items are estimated.</div>
+    ${noKey ? `<div class="trk-flag">No Anthropic API key saved — <a onclick="trkCloseModal();openSettings()" style="cursor:pointer;text-decoration:underline">add one in Settings</a> to use AI quick add.</div>` : ''}
+    <div class="trk-field"><label>Meal</label><select id="trkMeal">${trkMealOptions(meal)}</select></div>
+    <div class="trk-field"><label>What did you eat?</label><textarea id="trkQaText" placeholder="e.g. 2 egg white oats, 30g pbfit, 1 banana, big bowl of choc hoops with soya milk"></textarea></div>
+    <button class="trk-btn" id="trkQaBtn" onclick="trkRunQuickAdd()" ${noKey?'disabled':''}>Analyse →</button>
+    <div id="trkQaResult" style="margin-top:12px"></div>`);
+}
+
+function trkBuildStapleContext(){
+  if(!trkStaples.length) return '(none saved)';
+  return trkStaples.map(s=>{
+    const al = (s.aliases&&s.aliases.length)?` [aliases: ${s.aliases.join(', ')}]`:'';
+    const macro = `${Math.round(trkNum(s.calories))}kcal P${trkRound1(s.protein_g)} C${trkRound1(s.carbs_g)} F${trkRound1(s.fat_g)} Fb${trkRound1(s.fibre_g)}`;
+    return `- ${s.name}${al}: per ${trkRound1(s.serving_qty)}${s.serving_unit} = ${macro}${s.gi_estimate?` GI:${s.gi_estimate}`:''}${s.notes?` (${s.notes})`:''}`;
+  }).join('\n');
+}
+async function trkBuildRecipeContext(mealId){
+  const all = await trkFetchRecipes();
+  let list = all.filter(r => {
+    const mt = (r.meal_type||'').toLowerCase();
+    const mts = (r.meal_types||[]).map(x=>String(x).toLowerCase());
+    return mt===mealId || mts.includes(mealId);
+  });
+  if(!list.length) list = all;          // fall back to whole library
+  list = list.slice(0,40);
+  if(!list.length) return '(none)';
+  return list.map(r=>`- ${r.name}: per serving = ${Math.round(trkNum(r.calories))}kcal P${trkRound1(r.protein_g)} C${trkRound1(r.carbs_g)} F${trkRound1(r.fat_g)} Fb${trkRound1(r.fibre_g)}${r.gi_estimate?` GI:${r.gi_estimate}`:''}`).join('\n');
+}
+
+async function trkRunQuickAdd(){
+  const key = localStorage.getItem('ds_api_key');
+  if(!key){ showToast('Add your Anthropic API key in Settings'); return; }
+  const meal = document.getElementById('trkMeal').value;
+  const text = document.getElementById('trkQaText').value.trim();
+  if(!text){ showToast('Type what you ate'); return; }
+  const btn = document.getElementById('trkQaBtn'); btn.disabled = true; btn.textContent = '⏳ Analysing…';
+  const resultEl = document.getElementById('trkQaResult'); resultEl.innerHTML = '';
+
+  const stapleCtx = trkBuildStapleContext();
+  const recipeCtx = await trkBuildRecipeContext(meal);
+
+  const systemPrompt = `You are a nutrition logging assistant for a coeliac (gluten-free) and dairy-free user. Convert a free-text meal description into structured food entries with macros.
+
+You are given the user's STAPLE PRODUCTS (exact, authoritative nutrition — never re-estimate these) and candidate RECIPES from their database. Use them whenever the text refers to them (match on name or alias, case-insensitive, allow fuzzy/abbreviated matches).
+
+STAPLE PRODUCTS (figures are per the stated quantity — scale linearly to the amount eaten):
+${stapleCtx}
+
+CANDIDATE RECIPES (figures are per serving):
+${recipeCtx}
+
+Return ONLY a valid JSON array (no markdown, no prose). One object per distinct food item:
+[{
+  "title": string,                 // human label, e.g. "PBfit (30g)"
+  "qty": number,                   // amount eaten in the unit below
+  "unit": string,                  // e.g. "g", "ml", "serving", "tbsp"
+  "match": "staple" | "recipe" | "estimate",
+  "source_label": string|null,     // the matched staple/recipe name, else null
+  "calories": number,              // TOTAL for the amount eaten (already scaled)
+  "protein_g": number,
+  "carbs_g": number,
+  "fat_g": number,
+  "fibre_g": number,
+  "gi_estimate": "low"|"medium"|"high"|null,
+  "note": string|null              // brief note, e.g. assumption made
+}]
+
+Rules:
+- For staple matches: take the staple's per-quantity figures and scale to the eaten amount. Mark match:"staple". Do not alter the underlying figures.
+- For recipe matches: multiply per-serving figures by servings eaten. Mark match:"recipe".
+- For anything else: give your best estimate (GF/DF assumed). Mark match:"estimate".
+- If quantity is vague ("a bowl", "some"), assume a sensible serving and say so in note.
+- Round macros to 1 decimal, calories to whole numbers.
+- Return ONLY the JSON array.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json', 'x-api-key':key, 'anthropic-version':'2023-06-01', 'anthropic-dangerous-direct-browser-access':'true' },
+      body: JSON.stringify({ model:'claude-haiku-4-5-20251001', max_tokens:1024, system:systemPrompt, messages:[{ role:'user', content:`Meal: ${meal}\n\nEaten:\n${text}` }] })
+    });
+    if(!res.ok){ const e = await res.json().catch(()=>({})); throw new Error(e.error?.message || ('API error '+res.status)); }
+    const data = await res.json();
+    let raw = (data.content?.[0]?.text || '').replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/i,'').trim();
+    const start = raw.indexOf('['), end = raw.lastIndexOf(']');
+    if(start>=0 && end>start) raw = raw.slice(start, end+1);
+    const items = JSON.parse(raw);
+    if(!Array.isArray(items) || !items.length) throw new Error('No items recognised');
+    trkRenderQuickConfirm(meal, items);
+  } catch(err){
+    resultEl.innerHTML = `<div class="trk-flag">✗ ${trkEsc(err.message)}</div>`;
+    btn.disabled = false; btn.textContent = 'Analyse →';
+  }
+}
+
+function trkRenderQuickConfirm(meal, items){
+  // stash per-unit macros so editing qty re-scales
+  window._trkQa = items.map(it => {
+    const qty = trkNum(it.qty)||1;
+    return { it, perUnit: { calories: trkNum(it.calories)/qty, protein_g: trkNum(it.protein_g)/qty, carbs_g: trkNum(it.carbs_g)/qty, fat_g: trkNum(it.fat_g)/qty, fibre_g: trkNum(it.fibre_g)/qty }, qty };
+  });
+  const rowsHtml = window._trkQa.map((r,i)=>{
+    const it = r.it;
+    return `<div class="trk-confirm-item">
+      <span class="ci-title">${trkEsc(it.title)}<small>${trkEsc(it.match)}${it.source_label?' · '+trkEsc(it.source_label):''}${it.note?' · '+trkEsc(it.note):''}</small></span>
+      <input type="number" step="any" value="${trkRound1(r.qty)}" oninput="trkQaRescale(${i}, this.value)"> <span style="font-size:10px;color:var(--text3)">${trkEsc(it.unit||'')}</span>
+      <span class="ci-mac" id="trkQaMac${i}">${trkQaMacStr(r)}</span>
+    </div>`;
+  }).join('');
+  document.getElementById('trkQaResult').innerHTML = `
+    <div class="trk-sub">Review &amp; adjust quantities, then save to <b>${meal}</b>:</div>
+    ${rowsHtml}
+    <button class="trk-btn" style="margin-top:8px" onclick="trkCommitQuickAdd('${meal}')">Save ${items.length} item${items.length>1?'s':''}</button>`;
+  const btn = document.getElementById('trkQaBtn'); if(btn){ btn.disabled=false; btn.textContent='Re-analyse'; }
+}
+function trkQaMacStr(r){ const f=r.qty; return `${Math.round(r.perUnit.calories*f)}kcal ${trkRound1(r.perUnit.protein_g*f)}P ${trkRound1(r.perUnit.carbs_g*f)}C ${trkRound1(r.perUnit.fat_g*f)}F`; }
+function trkQaRescale(i, val){ window._trkQa[i].qty = trkNum(val); const el=document.getElementById('trkQaMac'+i); if(el) el.textContent = trkQaMacStr(window._trkQa[i]); }
+async function trkCommitQuickAdd(meal){
+  const list = window._trkQa || [];
+  for(const r of list){
+    const f = r.qty, it = r.it;
+    const ns = it.match==='staple' ? 'staple' : (it.match==='recipe' ? 'database' : 'estimated');
+    const entry = trkMakeEntry({
+      meal_id: meal, entry_type:'quick_add_ai', title: it.title, source_label: it.source_label||null,
+      serving_qty: r.qty, serving_unit: it.unit||'serving',
+      calories: r.perUnit.calories*f, protein_g: r.perUnit.protein_g*f, carbs_g: r.perUnit.carbs_g*f, fat_g: r.perUnit.fat_g*f, fibre_g: r.perUnit.fibre_g*f,
+      gi_estimate: it.gi_estimate||null, nutrition_source: ns, notes: it.note||''
+    });
+    trkEntries.push(entry); trkPushEntry(entry);
+  }
+  trkCacheDay(); trkCloseModal(); renderTracker();
+  showToast('Logged '+list.length+' item'+(list.length>1?'s':''));
+}
 </script>
 
 
