@@ -5203,6 +5203,7 @@ function trkRenderStaplesManager(){
   trkModal(`<h3>Staple products</h3>
     <div class="trk-sub">Your most-used products with fixed nutrition. These power the AI quick-add.</div>
     <div style="max-height:240px;overflow-y:auto;margin-bottom:14px">${rows}</div>
+    <div style="display:flex;gap:8px;margin-bottom:14px"><button class="trk-btn sec" onclick="trkOpenBulkStaples()">📋 Bulk paste a list</button></div>
     <h3 style="font-size:14px">Add a product</h3>
     <div class="trk-field"><label>Name</label><input id="trkSpName" placeholder="e.g. Lidl soya yoghurt"></div>
     <div class="trk-row"><div class="trk-field"><label>Per qty</label><input id="trkSpQty" type="number" step="any" value="100"></div><div class="trk-field"><label>Unit</label><input id="trkSpUnit" value="g"></div></div>
@@ -5222,6 +5223,103 @@ async function trkSubmitStapleProduct(){
     gi_estimate: document.getElementById('trkSpGi').value.trim()||null, notes: document.getElementById('trkSpNotes').value.trim()||null
   });
   if(ok){ showToast('Staple saved'); trkRenderStaplesManager(); }
+}
+
+// Insert many staples in one request
+async function trkUpsertStaplesBatch(arr){
+  if(!trkHasCloud()){ showToast('No cloud connection for staples'); return false; }
+  const now = new Date().toISOString();
+  const rows = arr.map(s => Object.assign({ updated_at:now }, s));
+  try {
+    const res = await fetch(`${TRK_SB_URL}/rest/v1/staple_products`, { method:'POST', headers: trkSbHeaders(true), body: JSON.stringify(rows) });
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    await trkLoadStaples(true); return true;
+  } catch(e){ showToast('Bulk save failed: '+e.message); return false; }
+}
+
+// ── bulk paste staples (AI-parsed) ──────────────────────────────────────────
+function trkOpenBulkStaples(){
+  const noKey = !localStorage.getItem('ds_api_key');
+  trkModal(`<h3>📋 Bulk add staples</h3>
+    <div class="trk-sub">Paste a list of products with their nutrition (any format — per 100g, per serving, with notes). Claude extracts each one; you review before saving.</div>
+    ${noKey ? `<div class="trk-flag">No Anthropic API key saved — <a onclick="trkCloseModal();openSettings()" style="cursor:pointer;text-decoration:underline">add one in Settings</a> to use bulk paste.</div>` : ''}
+    <div class="trk-field"><label>Paste your list</label><textarea id="trkBulkText" style="min-height:140px" placeholder="e.g.\nSoya yoghurt — Lidl: 46 kcal, 4.2g P, 2.1g C, 2.2g F, 0.7g fibre per 100g\nPBfit powder: 443 kcal, 49g P, 33g C, 13g F, 17g fibre per 100g (1 tbsp ≈ 8g)\n..."></textarea></div>
+    <button class="trk-btn" id="trkBulkBtn" onclick="trkRunBulkStaples()" ${noKey?'disabled':''}>Parse with AI →</button>
+    <div id="trkBulkResult" style="margin-top:12px"></div>`);
+}
+async function trkRunBulkStaples(){
+  const key = localStorage.getItem('ds_api_key');
+  if(!key){ showToast('Add your Anthropic API key in Settings'); return; }
+  const text = document.getElementById('trkBulkText').value.trim();
+  if(!text){ showToast('Paste a list first'); return; }
+  const btn = document.getElementById('trkBulkBtn'); btn.disabled = true; btn.textContent = '⏳ Parsing…';
+  const resultEl = document.getElementById('trkBulkResult'); resultEl.innerHTML = '';
+  const systemPrompt = `You extract staple food products and their nutrition from a pasted list into structured data for a coeliac (gluten-free) and dairy-free user.
+
+Return ONLY a valid JSON array (no markdown, no prose). One object per product:
+[{
+  "name": string,
+  "aliases": string[],              // short alternate names/abbreviations the user might type (e.g. ["pb","peanut butter"]); [] if none
+  "serving_qty": number,            // the quantity the figures are stated per (e.g. 100 for per-100g, 1 for per-serving/per-unit)
+  "serving_unit": string,           // "g", "ml", "serve", "fish cake", etc.
+  "calories": number,
+  "protein_g": number,
+  "carbs_g": number,
+  "fat_g": number,
+  "fibre_g": number,
+  "sugar_g": number|null,
+  "gi_estimate": "low"|"medium"|"high"|null,
+  "notes": string|null              // unit-weight hints, sat-fat/sugar flags, polyol notes, etc.
+}]
+
+Rules:
+- Use the figures exactly as given; do not re-estimate. If stated per 100g, serving_qty=100 & serving_unit="g".
+- If a per-unit weight is given (e.g. "1 tbsp ≈ 8g"), keep the per-100g figures and put the hint in notes.
+- Round macros to 1 decimal, calories to whole numbers.
+- Return ONLY the JSON array.`;
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json', 'x-api-key':key, 'anthropic-version':'2023-06-01', 'anthropic-dangerous-direct-browser-access':'true' },
+      body: JSON.stringify({ model:'claude-haiku-4-5-20251001', max_tokens:4096, system:systemPrompt, messages:[{ role:'user', content:text }] })
+    });
+    if(!res.ok){ const e = await res.json().catch(()=>({})); throw new Error(e.error?.message || ('API error '+res.status)); }
+    const data = await res.json();
+    let raw = (data.content?.[0]?.text || '').replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/i,'').trim();
+    const start = raw.indexOf('['), end = raw.lastIndexOf(']');
+    if(start>=0 && end>start) raw = raw.slice(start, end+1);
+    const items = JSON.parse(raw);
+    if(!Array.isArray(items) || !items.length) throw new Error('No products recognised');
+    trkRenderBulkConfirm(items);
+  } catch(err){
+    resultEl.innerHTML = `<div class="trk-flag">✗ ${trkEsc(err.message)}</div>`;
+    btn.disabled = false; btn.textContent = 'Parse with AI →';
+  }
+}
+function trkRenderBulkConfirm(items){
+  window._trkBulk = items.map(it => ({
+    name: it.name, aliases: Array.isArray(it.aliases)?it.aliases:[],
+    serving_qty: trkNum(it.serving_qty)||100, serving_unit: it.serving_unit||'g',
+    calories: trkRound1(it.calories), protein_g: trkRound1(it.protein_g), carbs_g: trkRound1(it.carbs_g),
+    fat_g: trkRound1(it.fat_g), fibre_g: trkRound1(it.fibre_g),
+    sugar_g: it.sugar_g!=null?trkRound1(it.sugar_g):null, gi_estimate: it.gi_estimate||null, notes: it.notes||null
+  }));
+  const rowsHtml = window._trkBulk.map((s,i)=>`<div class="trk-confirm-item">
+    <span class="ci-title"><input type="text" value="${trkEsc(s.name)}" oninput="window._trkBulk[${i}].name=this.value" style="width:100%"><small>per ${trkRound1(s.serving_qty)}${trkEsc(s.serving_unit)}${s.aliases.length?' · '+trkEsc(s.aliases.join(', ')):''}${s.notes?' · '+trkEsc(s.notes):''}</small></span>
+    <span class="ci-mac">${Math.round(trkNum(s.calories))}kcal ${trkRound1(s.protein_g)}P ${trkRound1(s.carbs_g)}C ${trkRound1(s.fat_g)}F</span>
+    <button class="trk-del" onclick="window._trkBulk.splice(${i},1);trkRenderBulkConfirm(window._trkBulk.map(x=>x))" title="Drop">×</button>
+  </div>`).join('');
+  document.getElementById('trkBulkResult').innerHTML = `
+    <div class="trk-sub">Found <b>${window._trkBulk.length}</b> product(s). Review, then save:</div>
+    ${rowsHtml}
+    <button class="trk-btn" style="margin-top:8px" onclick="trkCommitBulkStaples()">Save ${window._trkBulk.length} product(s)</button>`;
+  const btn = document.getElementById('trkBulkBtn'); if(btn){ btn.disabled=false; btn.textContent='Re-parse'; }
+}
+async function trkCommitBulkStaples(){
+  const list = (window._trkBulk||[]).filter(s => s.name && s.name.trim());
+  if(!list.length){ showToast('Nothing to save'); return; }
+  const ok = await trkUpsertStaplesBatch(list);
+  if(ok){ showToast('Saved '+list.length+' product(s)'); trkRenderStaplesManager(); }
 }
 
 // ── AI quick add ────────────────────────────────────────────────────────────
