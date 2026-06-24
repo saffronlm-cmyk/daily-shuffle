@@ -4747,7 +4747,7 @@ const TRK_TARGET_DEFAULTS = { cal:1800, prot:130, carb:170, fat:58, fib:30 };
 
 let trkDay = trkTodayKey();
 let trkEntries = [];
-let trkMeta = { exercise:[], omegaLogged:false, notes:'' };
+let trkMeta = { exercise:[], omegaLogged:false, notes:'', tdee:null };
 let trkStaples = [];
 let trkStaplesLoaded = false;
 let trkSavedMeals = [];
@@ -4813,8 +4813,8 @@ function trkCacheDay(){
   try { localStorage.setItem('ds_trk_day_'+trkDay, JSON.stringify({ entries:trkEntries, meta:trkMeta })); } catch(e){}
 }
 function trkLoadCacheDay(){
-  try { const s = localStorage.getItem('ds_trk_day_'+trkDay); if(s){ const o=JSON.parse(s); trkEntries=o.entries||[]; trkMeta=Object.assign({exercise:[],omegaLogged:false,notes:''},o.meta||{}); return true; } } catch(e){}
-  trkEntries = []; trkMeta = { exercise:[], omegaLogged:false, notes:'' };
+  try { const s = localStorage.getItem('ds_trk_day_'+trkDay); if(s){ const o=JSON.parse(s); trkEntries=o.entries||[]; trkMeta=Object.assign({exercise:[],omegaLogged:false,notes:'',tdee:null},o.meta||{}); return true; } } catch(e){}
+  trkEntries = []; trkMeta = { exercise:[], omegaLogged:false, notes:'', tdee:null };
   return false;
 }
 async function trkLoadDay(){
@@ -4826,7 +4826,7 @@ async function trkLoadDay(){
       fetch(`${TRK_SB_URL}/rest/v1/day_meta?date_key=eq.${trkDay}&select=*`, { headers: trkSbHeaders() })
     ]);
     if(eRes.ok){ trkEntries = await eRes.json(); }
-    if(mRes.ok){ const rows = await mRes.json(); if(rows.length){ trkMeta = { exercise: rows[0].exercise||[], omegaLogged: !!rows[0].omega_logged, notes: rows[0].notes||'' }; } else { trkMeta = { exercise:[], omegaLogged:false, notes:'' }; } }
+    if(mRes.ok){ const rows = await mRes.json(); if(rows.length){ trkMeta = { exercise: rows[0].exercise||[], omegaLogged: !!rows[0].omega_logged, notes: rows[0].notes||'', tdee: rows[0].tdee!=null ? trkNum(rows[0].tdee) : null }; } else { trkMeta = { exercise:[], omegaLogged:false, notes:'', tdee:null }; } }
     trkCacheDay();
   } catch(e){ /* keep cached */ }
 }
@@ -4848,7 +4848,7 @@ async function trkSaveMeta(){
   trkCacheDay();
   if(!trkHasCloud()) return;
   try {
-    const res = await fetch(`${TRK_SB_URL}/rest/v1/day_meta`, { method:'POST', headers: trkSbHeaders(true), body: JSON.stringify({ date_key:trkDay, exercise:trkMeta.exercise, omega_logged:trkMeta.omegaLogged, notes:trkMeta.notes, updated_at:new Date().toISOString() }) });
+    const res = await fetch(`${TRK_SB_URL}/rest/v1/day_meta`, { method:'POST', headers: trkSbHeaders(true), body: JSON.stringify({ date_key:trkDay, exercise:trkMeta.exercise, omega_logged:trkMeta.omegaLogged, notes:trkMeta.notes, tdee: (trkMeta.tdee!=null && trkMeta.tdee!=='') ? trkNum(trkMeta.tdee) : null, updated_at:new Date().toISOString() }) });
     if(!res.ok) throw new Error('HTTP '+res.status);
   } catch(e){ showToast('⚠ Exercise/notes saved here only — cloud sync failed'); }
 }
@@ -5097,13 +5097,27 @@ function renderTracker(){
 
   // diary line
   const food = Math.round(tot.cal), ex = Math.round(trkExerciseCals());
-  const remaining = trkTargets.cal - food + ex;
-  const diaryHtml = `<div class="trk-diary">
-    <div>Goal <b>${trkTargets.cal}</b></div>
-    <div>Food <b>${food}</b></div>
-    <div>Exercise <b>${ex}</b></div>
-    <div>Remaining <span class="trk-net ${remaining<0?'over':''}">${remaining}</span></div>
-  </div>`;
+  const tdee = (trkMeta.tdee!=null && trkMeta.tdee!=='') ? Math.round(trkNum(trkMeta.tdee)) : null;
+  let diaryHtml;
+  if(tdee!=null){
+    // TDEE logged (e.g. Apple Watch EOD) — true deficit = burn − food. Exercise is already inside TDEE, so it is NOT added.
+    const deficit = tdee - food;
+    const isDef = deficit >= 0;
+    diaryHtml = `<div class="trk-diary">
+      <div>Burned <b>${tdee}</b></div>
+      <div>Food <b>${food}</b></div>
+      <div>${isDef?'Deficit':'Surplus'} <span class="trk-net ${isDef?'':'over'}">${Math.abs(deficit)}</span></div>
+      <div style="opacity:.55">Goal ${trkTargets.cal} · Exercise ${ex} (in TDEE)</div>
+    </div>`;
+  } else {
+    // No TDEE yet — show food vs goal, but no phantom deficit number until the day's burn is entered.
+    diaryHtml = `<div class="trk-diary">
+      <div>Goal <b>${trkTargets.cal}</b></div>
+      <div>Food <b>${food}</b></div>
+      <div>Exercise <b>${ex}</b></div>
+      <div>Deficit <span class="trk-net" style="opacity:.55">— log TDEE</span></div>
+    </div>`;
+  }
 
   // meals
   const mealsHtml = TRK_MEALS.map(mealId => {
@@ -5129,6 +5143,11 @@ function renderTracker(){
     <div class="trk-meal-head"><span class="trk-meal-title">🏃 Exercise</span><span class="trk-meal-kcal">${ex} kcal burned</span></div>
     ${exList}
     <button class="trk-addbtn" style="margin-top:6px" onclick="trkOpenExercise()">＋ add exercise</button>
+    <div class="trk-field" style="margin-top:10px">
+      <label>TDEE — total burned today (Apple Watch EOD)</label>
+      <input id="trkTdeeInput" type="number" step="any" value="${tdee!=null?tdee:''}" placeholder="e.g. 2100" onchange="trkSetTdee(this.value)">
+    </div>
+    ${tdee!=null ? `<div class="trk-sub" style="margin-top:4px;opacity:.7">Deficit is measured against TDEE. Exercise above is already included in this figure, so it isn't added separately.</div>` : `<div class="trk-sub" style="margin-top:4px;opacity:.7">Enter your end-of-day total burn to see today's true deficit (TDEE − food).</div>`}
   </div>`;
 
   body.innerHTML = `
@@ -5343,6 +5362,11 @@ async function trkSubmitExercise(){
 }
 async function trkDeleteExercise(i){
   trkMeta.exercise.splice(i,1); renderTracker(); await trkSaveMeta();
+}
+async function trkSetTdee(v){
+  const n = trkNum(v);
+  trkMeta.tdee = (v==='' || v==null || !(n>0)) ? null : n;
+  renderTracker(); await trkSaveMeta();
 }
 
 // ── targets ─────────────────────────────────────────────────────────────────
