@@ -53,26 +53,32 @@ import urllib.request
 
 # The Apify actors we ask. The key is the store label written into the CSV;
 # the value is the actor id in Apify's "username~actor-name" form.
+#
+# NOTE: As of testing, the free illehius Tesco and Sainsbury's actors are
+# blocked by those sites' anti-bot (403 / dead proxy) and return nothing.
+# Only ASDA gets through, so we run ASDA-only. To add true price comparison
+# later, drop in actor ids that route through residential proxies and the
+# "cheapest wins" logic below will use them automatically.
 ACTORS = {
-    "Tesco":       "illehius~tesco-scraper",
-    "Sainsbury's": "illehius~sainsburys-scraper",
-    "ASDA":        "illehius~asda-scraper",
+    "ASDA": "illehius~asda-scraper",
+    # "Tesco":       "illehius~tesco-scraper",      # blocked: HTTP 403
+    # "Sainsbury's": "illehius~sainsburys-scraper",  # blocked: proxy 403
 }
 
-# How we build the INPUT we send to each actor. These actors take a search
-# word. If --probe shows the field is named differently (e.g. "search" or
-# "queries"), change the key below to match.
+# How we build the INPUT we send to each actor. The illehius actors take a
+# list of search words in `queries` and cap results with `maxResultsPerQuery`.
 def build_actor_input(term, max_items):
-    return {"searchQuery": term, "maxItems": max_items}
+    return {"queries": [term], "maxResultsPerQuery": max_items}
 
-# Which fields we read OUT of each result row. If --probe shows different
-# names, edit these to match what the actor actually returns.
+# Which fields we read OUT of each result row, mapped to the illehius actors'
+# real output. If you swap actors, edit these to match (use --probe to see).
 FIELD = {
-    "name":      "name",       # product title
-    "price":     "price",      # pack price, e.g. "£3.50" or 3.5
-    "size":      "size",       # pack size string, e.g. "650g", "6 pack"
-    "unit_price": "unitPrice", # optional pre-computed unit price (fallback)
-    "url":       "url",        # product link (optional)
+    "name":       "name",              # product title
+    "price":      "price",             # numeric pack price, e.g. 1.65
+    "size":       "unitSize",          # pack size string, e.g. "4 PINT", "650g"
+    "unit_price": "unitPrice",         # numeric, price per `measure`
+    "measure":    "unitPriceMeasure",  # e.g. "per lt", "per kg", "per each"
+    "url":        "productUrl",        # product link (optional)
 }
 
 # A few search-term fixes for misspelled / awkward Product names in the CSV.
@@ -160,8 +166,8 @@ def parse_size(raw):
         qty = count * each
         return _to_base(qty, unit)
 
-    # single weight/volume: "650g" / "1.5kg" / "500ml" / "1 litre"
-    m = re.search(r"(\d+(?:\.\d+)?)\s*(kg|g|ml|l|cl|litre|liter)\b", s)
+    # single weight/volume: "650g" / "1.5kg" / "500ml" / "1 litre" / "4 pint"
+    m = re.search(r"(\d+(?:\.\d+)?)\s*(kg|g|ml|l|cl|litre|liter|pint|pt)\b", s)
     if m:
         return _to_base(float(m.group(1)), m.group(2))
 
@@ -185,7 +191,30 @@ def _to_base(qty, unit):
         return (qty * 10.0, "ml")
     if unit in ("ml",):
         return (qty, "ml")
+    if unit in ("pint", "pt"):
+        return (qty * 568.261, "ml")
     return (None, None)
+
+def parse_measure(measure):
+    """
+    Turn a unit-price measure like 'per lt' / 'per 100g' / 'per each' into
+    (qty_in_base_unit, base_unit). Used as a fallback when the pack-size
+    string can't be parsed but the actor gave a per-unit price.
+    """
+    if not measure:
+        return (None, None)
+    s = str(measure).lower().replace("per", " ")
+    m = re.search(r"(\d+(?:\.\d+)?)?\s*(kg|g|lt|litre|liter|l|ml|cl|pint|pt|"
+                  r"each|ea|unit|sheet|wash|roll)\b", s)
+    if not m:
+        return (None, None)
+    qty = float(m.group(1)) if m.group(1) else 1.0
+    unit = m.group(2)
+    if unit in ("lt",):
+        return (qty * 1000.0, "ml")
+    if unit in ("each", "ea", "unit", "sheet", "wash", "roll"):
+        return (qty, "each")
+    return _to_base(qty, unit)
 
 def match_score(product, candidate_name):
     """Fraction of the product's words that appear in the candidate title."""
@@ -268,11 +297,21 @@ def best_result_for_store(results, product):
             continue
         price = parse_price(item.get(FIELD["price"]))
         qty, base = parse_size(item.get(FIELD["size"]))
-        if price is None or not qty or not base:
-            continue
-        unit_price = price / qty
-        cand = {"name": name, "price": round(price, 2), "qty": qty,
-                "base": base, "unit_price": unit_price, "score": score,
+        if price is not None and qty and base:
+            # We parsed the real pack ("650g" @ £3.50) -> store it as-is.
+            pack_price, pack_qty, pack_base = round(price, 2), qty, base
+            unit_price = price / qty
+        else:
+            # Fall back to the actor's pre-computed unit price + measure
+            # ("£0.73 per lt"), normalised to a 1-unit "pack".
+            mqty, mbase = parse_measure(item.get(FIELD["measure"]))
+            upval = parse_price(item.get(FIELD["unit_price"]))
+            if not (upval and mqty and mbase):
+                continue
+            pack_price, pack_qty, pack_base = round(upval, 3), mqty, mbase
+            unit_price = upval / mqty
+        cand = {"name": name, "price": pack_price, "qty": pack_qty,
+                "base": pack_base, "unit_price": unit_price, "score": score,
                 "url": item.get(FIELD["url"])}
         # prefer higher match score, then lower unit price
         if best is None or (cand["score"], -cand["unit_price"]) > \
@@ -325,8 +364,11 @@ def main():
         for store, actor in ACTORS.items():
             print(f"\n=== {store} ({actor}) ===")
             try:
-                res = run_actor(actor, build_actor_input(args.probe, 2), args.token)
+                res = run_actor(actor, build_actor_input(args.probe, 3), args.token)
+                print(f"  items returned: {len(res)}")
                 print(json.dumps(res[0] if res else {}, indent=2)[:1500])
+            except urllib.error.HTTPError as e:
+                print(f"  HTTP {e.code}: {e.read().decode('utf-8', 'replace')[:400]}")
             except Exception as e:  # noqa: BLE001
                 print(f"  ERROR: {e}")
         return
@@ -369,7 +411,8 @@ def main():
                 results = run_actor(actor, build_actor_input(term, args.max_items),
                                     args.token)
             except urllib.error.HTTPError as e:
-                print(f"  [{store}] HTTP {e.code} for {term!r}")
+                body = e.read().decode("utf-8", "replace")[:200]
+                print(f"  [{store}] HTTP {e.code} for {term!r}: {body}")
                 continue
             except Exception as e:  # noqa: BLE001
                 print(f"  [{store}] error for {term!r}: {e}")
