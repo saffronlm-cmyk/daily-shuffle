@@ -82,11 +82,87 @@ FIELD = {
 }
 
 # A few search-term fixes for misspelled / awkward Product names in the CSV.
+# Keyed by canonicalise(Product). Makes ambiguous one-word products specific
+# so the supermarket search returns the right form.
 TERM_OVERRIDES = {
     "cacoa": "cocoa powder",
     "quinia": "quinoa",
     "puree": "tomato puree",
+    "vanilla": "vanilla extract",     # bare "vanilla" matched a 2L drink
+    "cayenne pepper": "ground cayenne pepper",
+    "hazelnut": "hazelnuts",          # matched hazelnut milk otherwise
+    "lime": "limes",                  # matched lime juice otherwise
+    "lemon": "lemons",
+    "clove": "cloves",
+    "baking soda": "bicarbonate of soda",
 }
+
+# ---------------------------------------------------------------------------
+# Category / unit awareness.
+#
+# The supermarket search for a one-word product often returns a different
+# FORM of it (a spice search returns hot sauce; a nut search returns nut
+# milk). We use the CSV's Category plus the product name to decide which
+# base units (g / ml / each) are acceptable, and reject results whose name
+# is clearly the wrong form. If nothing acceptable is left, the product is
+# left unpriced (per the chosen "reject -> leave blank" policy).
+# ---------------------------------------------------------------------------
+
+# Words in a product/category name that signal it really IS a liquid, so we
+# must NOT force grams on it (oil, sauce, extract, etc.).
+_LIQUID_WORDS = {
+    "oil", "sauce", "vinegar", "milk", "juice", "syrup", "extract", "essence",
+    "wine", "aminos", "mirin", "sriracha", "tamari", "ketchup", "stock",
+    "broth", "cream", "yoghurt", "yogurt", "drink", "passata", "water",
+    "honey", "ponzu", "mayonnaise", "mayo",
+}
+# Words that signal a dry/solid good -> grams, never ml.
+_SOLID_WORDS = {
+    "powder", "granule", "granules", "seed", "seeds", "flour", "sugar",
+    "rice", "oat", "oats", "flake", "flakes", "nut", "nuts", "spice", "pepper",
+    "paprika", "cumin", "cinnamon", "cayenne", "turmeric", "nutmeg", "masala",
+    "bicarbonate", "soda", "cocoa", "cacao", "starch", "cornstarch",
+}
+# Result-name words that mean "wrong form" for a solid/produce product.
+_BAD_FORM_WORDS = {
+    "sauce", "drink", "juice", "squash", "cordial", "milkshake", "latte",
+    "milk", "syrup", "smoothie", "water", "soda",
+}
+_SOLID_CATS = {"Spices & Herbs", "Nuts & Seeds", "Grains"}
+_PRODUCE_CATS = {"Produce", "Vegetables"}
+
+# Per-product hard overrides of allowed units, keyed by canonicalise(Product).
+# Use for items the heuristics get wrong (often due to a bad CSV Category).
+UNIT_OVERRIDES = {
+    "baking soda": {"g"},
+    "baking powder": {"g"},
+}
+
+def allowed_units(category, product):
+    """
+    Return (allowed_bases:set, reject_words:set) for a product.
+    allowed_bases is which of {'g','ml','each'} a result may use; reject_words
+    are words whose presence in a result name disqualifies it.
+    """
+    key = canonicalise(product)
+    if key in UNIT_OVERRIDES:
+        return set(UNIT_OVERRIDES[key]), _BAD_FORM_WORDS
+    cat = (category or "").strip()
+    words = set(key.split()) | set(canonicalise(cat).split())
+    is_liquid = bool(words & _LIQUID_WORDS)
+    is_solid = bool(set(key.split()) & _SOLID_WORDS)
+    if cat == "Beverages":
+        return {"ml"}, set()
+    if is_liquid:
+        return {"g", "ml", "each"}, set()       # genuinely a liquid; allow all
+    if cat in _SOLID_CATS or is_solid:
+        return {"g"}, _BAD_FORM_WORDS            # dry good -> grams only
+    if cat in _PRODUCE_CATS:
+        return {"each", "g"}, {"juice", "drink", "squash", "cordial", "sauce"}
+    # default: allow all units but still reject obvious drink forms
+    return {"g", "ml", "each"}, {"drink", "squash", "cordial", "milkshake",
+                                 "smoothie", "latte"}
+
 
 # Products that are not really single buyable groceries -- skipped entirely.
 JUNK_PRODUCTS = {
@@ -248,6 +324,7 @@ def run_actor(actor_id, payload, token, timeout=180):
 # CSV loading + product selection.
 # ---------------------------------------------------------------------------
 COL_ING, COL_PROD = "Ingredient", "Product"
+COL_CAT = "Category"
 COL_QTY, COL_UNIT = "Pack size (qty)", "Pack unit (g / ml / each)"
 COL_PRICE, COL_STORE = "Pack price (£)", "Store"
 COL_OCC = "occurrences"
@@ -264,7 +341,8 @@ def load_rows(path):
         return reader.fieldnames, list(reader)
 
 def select_products(rows, min_occ):
-    """Group rows by Product, drop junk, keep those with summed occ >= min_occ."""
+    """Group rows by Product, drop junk, keep those with summed occ >= min_occ.
+    Records each product's Category (first non-empty seen)."""
     groups = {}
     for r in rows:
         product = (r.get(COL_PROD) or "").strip()
@@ -274,8 +352,10 @@ def select_products(rows, min_occ):
             occ = int(float(r.get(COL_OCC) or 0))
         except ValueError:
             occ = 0
-        g = groups.setdefault(product, {"occ": 0})
+        g = groups.setdefault(product, {"occ": 0, "category": ""})
         g["occ"] += occ
+        if not g["category"]:
+            g["category"] = (r.get(COL_CAT) or "").strip()
     chosen = {p: g for p, g in groups.items() if g["occ"] >= min_occ}
     return dict(sorted(chosen.items(), key=lambda kv: -kv[1]["occ"]))
 
@@ -285,8 +365,13 @@ def search_term(product):
 # ---------------------------------------------------------------------------
 # Core: price one product across all stores, return the cheapest pick.
 # ---------------------------------------------------------------------------
-def best_result_for_store(results, product):
-    """Pick the best-matching, then cheapest, result from one store."""
+def best_result_for_store(results, product, category=""):
+    """Pick the best-matching, then cheapest, result from one store, after
+    rejecting results whose unit/form is wrong for the product's category."""
+    allowed, reject_words = allowed_units(category, product)
+    # Don't reject a result for containing the product's OWN words
+    # (e.g. "Bicarbonate of Soda" must not trip the "soda" bad-form word).
+    reject_words = reject_words - set(canonicalise(product).split())
     best = None
     for item in results:
         name = item.get(FIELD["name"])
@@ -294,6 +379,10 @@ def best_result_for_store(results, product):
             continue
         score = match_score(product, name)
         if score < MATCH_THRESHOLD:
+            continue
+        # Reject wrong forms (e.g. a spice result named "...sauce"/"...drink").
+        nwords = set(canonicalise(name).split())
+        if nwords & reject_words:
             continue
         price = parse_price(item.get(FIELD["price"]))
         qty, base = parse_size(item.get(FIELD["size"]))
@@ -310,6 +399,8 @@ def best_result_for_store(results, product):
                 continue
             pack_price, pack_qty, pack_base = round(upval, 3), mqty, mbase
             unit_price = upval / mqty
+        if pack_base not in allowed:        # wrong unit for this category
+            continue
         cand = {"name": name, "price": pack_price, "qty": pack_qty,
                 "base": pack_base, "unit_price": unit_price, "score": score,
                 "url": item.get(FIELD["url"])}
@@ -405,6 +496,7 @@ def main():
     no_match = []    # products with nothing usable
     for i, product in enumerate(products, 1):
         term = search_term(product)
+        category = products[product].get("category", "")
         per_store = {}
         for store, actor in ACTORS.items():
             try:
@@ -417,7 +509,7 @@ def main():
             except Exception as e:  # noqa: BLE001
                 print(f"  [{store}] error for {term!r}: {e}")
                 continue
-            pick = best_result_for_store(results, product)
+            pick = best_result_for_store(results, product, category)
             if pick:
                 per_store[store] = pick
         choice = cheapest_across(per_store)
