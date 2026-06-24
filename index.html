@@ -4759,9 +4759,14 @@ let trkTargets = (function(){
 function trkTodayKey(d){ d = d || new Date(); const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), da=String(d.getDate()).padStart(2,'0'); return `${y}-${m}-${da}`; }
 function trkRound1(n){ return Math.round((Number(n)||0)*10)/10; }
 function trkNum(v){ const n=parseFloat(v); return isFinite(n)?n:0; }
-function trkHasCloud(){ return !!(supabaseUrl && supabaseKey); }
+// Tracker tables live in the bundled recipe-library Supabase project, so talk
+// to those hardcoded creds (always present) — NOT the user's optional personal
+// sync creds (supabaseUrl/supabaseKey), which most users never set.
+const TRK_SB_URL = (typeof RECIPE_LIB_URL !== 'undefined' && RECIPE_LIB_URL) ? RECIPE_LIB_URL : (typeof supabaseUrl !== 'undefined' ? (supabaseUrl||'') : '');
+const TRK_SB_KEY = (typeof RECIPE_LIB_KEY !== 'undefined' && RECIPE_LIB_KEY) ? RECIPE_LIB_KEY : (typeof supabaseKey !== 'undefined' ? (supabaseKey||'') : '');
+function trkHasCloud(){ return !!(TRK_SB_URL && TRK_SB_KEY); }
 function trkSbHeaders(write){
-  const h = { 'apikey': supabaseKey, 'Authorization': `Bearer ${supabaseKey}` };
+  const h = { 'apikey': TRK_SB_KEY, 'Authorization': `Bearer ${TRK_SB_KEY}` };
   if(write){ h['Content-Type']='application/json'; h['Prefer']='resolution=merge-duplicates,return=minimal'; }
   return h;
 }
@@ -4815,8 +4820,8 @@ async function trkLoadDay(){
   if(!trkHasCloud()) return;
   try {
     const [eRes, mRes] = await Promise.all([
-      fetch(`${supabaseUrl}/rest/v1/food_log?date_key=eq.${trkDay}&select=*&order=created_at.asc`, { headers: trkSbHeaders() }),
-      fetch(`${supabaseUrl}/rest/v1/day_meta?date_key=eq.${trkDay}&select=*`, { headers: trkSbHeaders() })
+      fetch(`${TRK_SB_URL}/rest/v1/food_log?date_key=eq.${trkDay}&select=*&order=created_at.asc`, { headers: trkSbHeaders() }),
+      fetch(`${TRK_SB_URL}/rest/v1/day_meta?date_key=eq.${trkDay}&select=*`, { headers: trkSbHeaders() })
     ]);
     if(eRes.ok){ trkEntries = await eRes.json(); }
     if(mRes.ok){ const rows = await mRes.json(); if(rows.length){ trkMeta = { exercise: rows[0].exercise||[], omegaLogged: !!rows[0].omega_logged, notes: rows[0].notes||'' }; } else { trkMeta = { exercise:[], omegaLogged:false, notes:'' }; } }
@@ -4825,17 +4830,17 @@ async function trkLoadDay(){
 }
 async function trkPushEntry(entry){
   if(!trkHasCloud()) return;
-  try { await fetch(`${supabaseUrl}/rest/v1/food_log`, { method:'POST', headers: trkSbHeaders(true), body: JSON.stringify(entry) }); }
+  try { await fetch(`${TRK_SB_URL}/rest/v1/food_log`, { method:'POST', headers: trkSbHeaders(true), body: JSON.stringify(entry) }); }
   catch(e){ showToast('Saved locally — cloud sync failed'); }
 }
 async function trkPushDeleteEntry(id){
   if(!trkHasCloud()) return;
-  try { await fetch(`${supabaseUrl}/rest/v1/food_log?id=eq.${encodeURIComponent(id)}`, { method:'DELETE', headers: trkSbHeaders() }); } catch(e){}
+  try { await fetch(`${TRK_SB_URL}/rest/v1/food_log?id=eq.${encodeURIComponent(id)}`, { method:'DELETE', headers: trkSbHeaders() }); } catch(e){}
 }
 async function trkSaveMeta(){
   trkCacheDay();
   if(!trkHasCloud()) return;
-  try { await fetch(`${supabaseUrl}/rest/v1/day_meta`, { method:'POST', headers: trkSbHeaders(true), body: JSON.stringify({ date_key:trkDay, exercise:trkMeta.exercise, omega_logged:trkMeta.omegaLogged, notes:trkMeta.notes, updated_at:new Date().toISOString() }) }); } catch(e){}
+  try { await fetch(`${TRK_SB_URL}/rest/v1/day_meta`, { method:'POST', headers: trkSbHeaders(true), body: JSON.stringify({ date_key:trkDay, exercise:trkMeta.exercise, omega_logged:trkMeta.omegaLogged, notes:trkMeta.notes, updated_at:new Date().toISOString() }) }); } catch(e){}
 }
 
 async function trkAddEntry(entry){
@@ -4857,7 +4862,7 @@ async function trkLoadStaples(force){
   try { const s = localStorage.getItem('ds_trk_staples'); if(s) trkStaples = JSON.parse(s); } catch(e){}
   if(trkHasCloud()){
     try {
-      const res = await fetch(`${supabaseUrl}/rest/v1/staple_products?select=*&order=name.asc`, { headers: trkSbHeaders() });
+      const res = await fetch(`${TRK_SB_URL}/rest/v1/staple_products?select=*&order=name.asc`, { headers: trkSbHeaders() });
       if(res.ok){ trkStaples = await res.json(); localStorage.setItem('ds_trk_staples', JSON.stringify(trkStaples)); }
     } catch(e){}
   }
@@ -4866,14 +4871,14 @@ async function trkLoadStaples(force){
 async function trkUpsertStaple(s){
   if(!trkHasCloud()){ showToast('Add Supabase credentials in Settings to save staples'); return false; }
   try {
-    const res = await fetch(`${supabaseUrl}/rest/v1/staple_products`, { method:'POST', headers: trkSbHeaders(true), body: JSON.stringify(Object.assign({ updated_at:new Date().toISOString() }, s)) });
+    const res = await fetch(`${TRK_SB_URL}/rest/v1/staple_products`, { method:'POST', headers: trkSbHeaders(true), body: JSON.stringify(Object.assign({ updated_at:new Date().toISOString() }, s)) });
     if(!res.ok) throw new Error('HTTP '+res.status);
     await trkLoadStaples(true); return true;
   } catch(e){ showToast('Could not save staple: '+e.message); return false; }
 }
 async function trkDeleteStaple(id){
   if(!trkHasCloud()) return;
-  try { await fetch(`${supabaseUrl}/rest/v1/staple_products?id=eq.${encodeURIComponent(id)}`, { method:'DELETE', headers: trkSbHeaders() }); await trkLoadStaples(true); } catch(e){}
+  try { await fetch(`${TRK_SB_URL}/rest/v1/staple_products?id=eq.${encodeURIComponent(id)}`, { method:'DELETE', headers: trkSbHeaders() }); await trkLoadStaples(true); } catch(e){}
 }
 
 // ── date navigation ───────────────────────────────────────────────────────
@@ -5120,7 +5125,7 @@ async function trkFetchRecipes(){
   if(_trkRecipeCache) return _trkRecipeCache;
   if(!trkHasCloud()) return [];
   try {
-    const res = await fetch(`${supabaseUrl}/rest/v1/recipes?import_status=in.(ready,review,custom)&select=id,name,meal_type,meal_types,calories,protein_g,carbs_g,fat_g,fibre_g,gi_estimate,serves&limit=400`, { headers: trkSbHeaders() });
+    const res = await fetch(`${TRK_SB_URL}/rest/v1/recipes?import_status=in.(ready,review,custom)&select=id,name,meal_type,meal_types,calories,protein_g,carbs_g,fat_g,fibre_g,gi_estimate,serves&limit=400`, { headers: trkSbHeaders() });
     if(res.ok){ _trkRecipeCache = await res.json(); }
   } catch(e){ _trkRecipeCache = []; }
   return _trkRecipeCache || [];
