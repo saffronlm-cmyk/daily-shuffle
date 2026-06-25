@@ -4,6 +4,156 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# Apify price-book pipeline — build, fix, and merge
+**Date:** 2026-06-25
+**Project:** Daily Shuffle
+**Mode:** Rolling Log + GitHub Push
+**Status:** In Progress (pipeline code merged; actual price fill still pending on Saffron's machine)
+
+---
+
+## Project Context
+Daily Shuffle is a static, single-file PWA (`index.html`) — a GF/DF nutrition
+planner with a macro tracker, AI meal generation, recipe discovery, and a
+localStorage-backed **price book** (`ds_pricebook`) used to cost recipes. This
+session built the tooling to populate that price book with real UK supermarket
+prices instead of hand-entered guesses. First entry in this log — no prior
+entries to cross-reference.
+
+## Session Goal
+Build (not run) two dependency-free Python scripts: one to fill `pricebook.csv`
+with real UK prices via an Apify scraper, and one to regenerate the app's
+`seedPriceBook()` from the filled CSV. Saffron runs the actual scrape herself on
+her Mac with her own Apify token (the cloud sandbox cannot reach
+`api.apify.com`). Mid-session the goal expanded to fixing systematic mismatches
+where spices/nuts were being priced as liquids.
+
+## State Before This Session
+The original pipeline (PR #7) had already been merged to `main` on 2026-06-24 at
+commit `9b26458`, but it had three problems discovered in real test runs:
+1. Wrong Apify actor input schema (guessed `searchQuery`/`maxItems`).
+2. Tesco/Sainsbury's actors blocked by anti-bot; only ASDA worked.
+3. Matching ignored the CSV's Category/Product/variant structure, so a one-word
+   product search (e.g. "cayenne") matched the wrong *form* (hot sauce).
+
+## What Was Done
+- **Fixed the Apify integration** (commit `a69c376`): corrected actor input to
+  `{"queries":[term], "maxResultsPerQuery":N}`; mapped the real ASDA output
+  fields; reduced to **ASDA-only** after confirming Tesco/Sainsbury's free
+  `illehius` actors return 403/dead-proxy. Cheapest-across-stores logic was kept
+  intact so working actors can be dropped in later with no code change.
+- **Made matching category- and unit-aware** (commit `1990aff`) after the first
+  full run (189/208 priced) showed mismatches: Cayenne→hot sauce 354ml,
+  Hazelnut→nut milk 1000ml, Lime→lime juice, Vanilla→2L drink, Baking
+  Soda→liquid 75ml. Added `allowed_units(category, product)` which restricts the
+  acceptable base units `{g, ml, each}` and rejects wrong-form result names,
+  driven by the CSV `Category` plus word heuristics (`_SOLID_CATS`,
+  `_PRODUCE_CATS`, `_LIQUID_WORDS`, `_SOLID_WORDS`, `_BAD_FORM_WORDS`), plus
+  `UNIT_OVERRIDES` and an expanded `TERM_OVERRIDES`. Validated every known bad
+  case flips correct while legit liquids (soy sauce, milk) still pass.
+- **Fixed an own-words rejection bug**: "Bicarbonate of **Soda**" was tripping
+  the "soda" bad-form word. Fix: `reject_words -= set(canonicalise(product).split())`.
+- **Wrote `handoff.md`** (commit `ba0852d`) capturing full pipeline state.
+- **Opened draft PR #13**, Saffron marked it ready, and it **merged to `main`**.
+  (PR #7's branch had advanced past its merge point, so the post-merge fixes
+  needed their own PR — #13.)
+- Helped Saffron debug runtime issues on her machine: literal placeholder token
+  → 401; running from the wrong directory → `fatal: not a git repository` (must
+  `cd` into the repo first); token not persisting → re-`export` each session.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|-----------|--------|----------|
+| scripts/price_pricebook.py | Fill pipeline; ASDA-only + v2 category-aware matching | Modified | repo root /scripts/ |
+| scripts/csv_to_seed.py | Regenerates app's `seedPriceBook()` from filled CSV | Unchanged this session | /scripts/ |
+| scripts/README.md | Novice run guide | Created earlier (PR #7) | /scripts/ |
+| handoff.md | Pipeline resumption notes | Created | repo root |
+| logs/daily-shuffle_log.md | This conversation log | Created | repo root /logs/ |
+| pricebook.csv | Source ingredient list (input) | Unchanged | repo root |
+| .gitignore | Ignores generated outputs | Modified earlier | repo root |
+
+## Skills Used
+
+| Skill | What it contributed |
+|-------|-------------------|
+| save-conversation | This log entry (Rolling Log + GitHub Push mode) |
+
+## Decisions & Reasoning
+- **ASDA-only, not three-store comparison**: Tesco and Sainsbury's free
+  `illehius` actors are blocked by anti-bot (HTTP 403 / dead proxy) and return
+  nothing. ASDA is the only one that gets through. Kept the cheapest-across-
+  stores code so working actors can be added later with zero refactor.
+- **Reject mismatches → leave blank (no caching)**: Better an unpriced product
+  than a confidently-wrong, wrong-form price. Consequence: the unmatched count
+  may *rise* vs the naive v1 run; those land in `price_report.md`. No caching, so
+  each run re-scrapes (acceptable at this scale/cost).
+- **Build-only, Saffron runs it**: the cloud sandbox's egress allowlist blocks
+  `api.apify.com`, and the scrape spends real pay-per-result money on her token.
+  So the scripts are designed to run on her Mac; nothing is executed from here.
+- **Scope = products with occurrences ≥ 3** (~208): pricing one-off ingredients
+  isn't worth the query cost.
+- **Category-aware filtering over a bigger match threshold**: the real failures
+  were wrong *form* (right words, wrong product type), which a score threshold
+  can't catch — only unit/category constraints can.
+- **Separate PR (#13) for post-merge fixes**: PR #7 was already merged at an
+  older commit; reopening it wasn't possible, so the fixes got a clean new PR.
+
+## Current State (end of session)
+PR #13 is **merged into `main`**. `main` now contains: the ASDA-only Apify
+integration, v2 category-aware matching, and `handoff.md`. CI: none configured
+on this repo. **Critically, the app's prices are unchanged** — `pricebook.csv`
+is still unfilled and `index.html`'s `seedPriceBook()` is untouched. The
+pipeline is *ready to run* but has not been run end-to-end against live data.
+
+## Next Steps
+1. On Saffron's Mac: `cd` into the repo (where `pricebook.csv` lives — verify
+   `git status` works), then `git pull`.
+2. `export APIFY_TOKEN=apify_api_...` (real token from console.apify.com →
+   Settings → Integrations; must re-export each terminal session).
+3. `python3 scripts/price_pricebook.py` (full run). Paste back the summary line
+   (`Priced X/208 …`) and `cat price_report.md`.
+4. Verify the previously-mismatched items (Vanilla, Cayenne, Hazelnut, Lime,
+   Baking Soda) are now correctly priced or cleanly blank — and watch for
+   over-rejection (a genuinely liquid pantry item forced to grams by a bad CSV
+   Category). Add `TERM_OVERRIDES`/`UNIT_OVERRIDES` entries for any stragglers.
+5. Once the fill looks clean: `python3 scripts/csv_to_seed.py --in
+   pricebook.filled.csv` (preview), then `--apply` to patch `index.html`
+   (writes `index.html.bak`). Review the diff before committing.
+
+## Open Questions / Blockers
+- **Blocker (external):** the full scrape can only run on Saffron's machine with
+  her token — sandbox egress blocks `api.apify.com`. Nothing else proceeds until
+  she runs it and shares the output.
+- **Open:** will v2 over-reject any legitimate liquids whose CSV Category is
+  wrong? Only the post-run `price_report.md` will reveal this.
+
+## Environment & Config Notes
+- Repo: `saffronlm-cmyk/daily-shuffle`. Dev branch this session:
+  `claude/gifted-mendel-2cq60n`. Base: `main`.
+- Apify endpoint: `run-sync-get-dataset-items`. Actor: `illehius~asda-scraper`.
+  Input `{"queries":[term],"maxResultsPerQuery":N}`. ASDA output fields:
+  `name`, `price`, `unitSize`, `unitPrice`, `unitPriceMeasure`, `productUrl`.
+- Secret (name only): `APIFY_TOKEN` — never persisted, re-exported per session.
+- Python: stdlib only (urllib, csv, json, argparse, re). No `pip install`.
+- App seed flag bumps `ds_pb_seeded_v2` → `ds_pb_seeded_v3` so new prices load.
+- Cloud sandbox is ephemeral: anything not committed/pushed is lost.
+
+## Notes & Gotchas
+- `canonicalise()` is duplicated in `price_pricebook.py`, `csv_to_seed.py`, AND
+  `index.html` — all three MUST stay in sync or keys/aliases won't match.
+- The own-words rejection bug (product rejected for containing its own name,
+  e.g. "soda") is subtle — any new bad-form word that overlaps a real product
+  name will resurface it. Fix pattern: subtract the product's own words.
+- `maxResultsPerQuery` MUST be set or the actor returns `[]`.
+- Use `--probe TERM` to confirm actor field names before a big run; use
+  `--dry-run` to preview the query list and cost with no token/spend.
+- Generated files (`pricebook.filled.csv`, `price_report.md`,
+  `scripts/seed_snippet.js`, `index.html.bak`) are git-ignored.
+- `handoff.md` at repo root is the quick-start companion to this log.
+
+---
+
 # Tracker: cross-device sync fix, saved meals, TDEE/deficit, skill install
 **Date:** 2026-06-25
 **Project:** Daily Shuffle
