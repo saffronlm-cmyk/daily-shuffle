@@ -1,3 +1,41 @@
+# Daily Shuffle
+
+A personal meal-planning PWA (Progressive Web App) — shuffle a meal plan, manage recipes, build a grocery list, and track food/macros. Ships as a static site with **no build step**.
+
+## Architecture
+
+- **`index.html`** — the entire app. All markup, `<style>` CSS, and `<script>` JS live in this one file (~5,500 lines). There is no bundler/transpiler; edit it directly.
+- **`sw.js`** — service worker, cache-first strategy. **Bump the `CACHE` constant (currently `daily-shuffle-v23`) on every shippable change** or installed PWAs keep serving stale HTML. Users must reload/hard-refresh (sometimes twice) after a deploy for the new cache to take effect — this is the #1 cause of "my fix isn't showing."
+- **`manifest.json`** — PWA manifest (icons, theme, standalone display).
+- **`legacy/`** — verbatim-lifted tabs/features stashed during a foundations restructure (Track/Food Log, Pantry, Discover/Edamam search, Wellness/Supplements, Macro Calculator). Not loaded by the live app. See `legacy/README.md` for source line references and the re-grafting checklist before reviving any of these.
+- **`scripts/`** — standalone Python 3 price-book pipeline (stdlib only, no `pip install`): `price_pricebook.py` (CSV → Apify scrape → filled CSV) → `csv_to_seed.py` (filled CSV → patches `seedPriceBook()` in `index.html`). See `scripts/README.md` for usage and `handoff.md` for the detailed pipeline state/decisions. This is a build-only tool — it is never run from an agent sandbox (egress to `api.apify.com` is blocked); the user runs it locally and pastes results back.
+- **`pricebook.csv`** — committed input to the pipeline above.
+
+## Tabs (current, in `index.html`)
+
+`tab-recipes`, `tab-plan` (Shuffle), `tab-grocery`, `tab-add` (Add Recipe), `tab-tracker` (Tracker — food/macro log). Tabs removed during the foundations restructure live in `legacy/`.
+
+## Data & sync
+
+- **Local persistence**: most state lives in `localStorage` under `ds_*` keys (e.g. `ds_pricebook`, `ds_custom_recipes`, `ds_hidden_recipes`, `ds_grocery`, `ds_favourites`, `ds_trk_*` for the tracker). Check existing key names before adding new state.
+- **Bundled Supabase project** (`jsxcctrskkkxgdxfaduo`, hardcoded as `RECIPE_LIB_URL`/`RECIPE_LIB_KEY` near `index.html:1102`): backs the recipe library **and** the Tracker (`recipes`, `staple_products`, `food_log`, `day_meta`, `saved_meals` tables, all PK-keyed with open `anon ALL` RLS, upserted via `Prefer: resolution=merge-duplicates`). The Tracker's `TRK_SB_URL`/`TRK_SB_KEY` (~`index.html:4765`) prefer this bundled project and fall back to the user's personal Supabase creds.
+- **Personal Supabase creds** (`ds_supabase_url`/`ds_supabase_key`, set via Settings → Cloud Sync): optional, used by the separate `user_library` cross-device sync path for custom recipes/overrides/nutrition/etc. Most users never set these — don't assume they're populated.
+- **No per-user auth** — it's a personal single-user app; all writes use a shared anon key keyed by date/id, not scoped by `user_id`. Multi-user/privacy is a deferred design question (see log).
+- **Write helpers must check `res.ok`** and surface a ⚠ toast on failure — a past bug silently dropped tracker writes because failures were ignored, making sync look broken with no signal. Don't regress this.
+
+## AI features
+
+In-browser calls direct to `https://api.anthropic.com/v1/messages` using the user's own key (`ds_api_key` in `localStorage`, set via Settings), model `claude-haiku-4-5-20251001`, header `anthropic-dangerous-direct-browser-access: true`. Used for: pantry item parsing, recipe quick-add, bulk staple paste import, tracker AI quick-add.
+
+## Dev workflow
+
+- No CI, no required checks — PRs merge freely once opened.
+- Validate JS changes by checking each `<script>` block parses (e.g. `new Function(...)` over the extracted block) since there's no bundler/linter step enforcing this.
+- `canonicalise()` exists in **three places** (the app in `index.html`, and both pipeline scripts) — keep all three in sync or price-book keys/aliases stop matching.
+- Generated/local-only files are gitignored: `pricebook.filled.csv`, `price_report.md`, `scripts/seed_snippet.js`, `index.html.bak`.
+
+---
+
 ## Session Logging (always on)
 
 Project: Daily Shuffle
