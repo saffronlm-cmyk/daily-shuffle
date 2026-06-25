@@ -3,6 +3,22 @@ import fs from 'fs';
 const _STOP=new Set(['fresh','organic','large','small','medium','baby','whole','finely','roughly','free-range','boneless','skinless','ripe','raw','cooked','dried','frozen','chopped','sliced','diced','minced','ground','grated','crushed','peeled','cubed','halved','quartered','shredded','mashed','beaten','softened','melted','cooled','toasted','roasted','torn','julienned','thinly','thickly','coarsely','optional','approx','approximately','about','around','a','an','the','of','to','for','your','some']);
 function canon(n){return (n||'').toLowerCase().replace(/\(.*?\)/g,'').replace(/[^a-z0-9\s-]/g,'').trim().split(/\s+/).filter(w=>!_STOP.has(w)).join(' ').replace(/ies\b/g,'y').replace(/([^aeiou])es\b/g,'$1e').replace(/([^aeiou])s\b/g,'$1').trim();}
 function title(s){return s.split(/\s+/).filter(Boolean).map(w=>w[0].toUpperCase()+w.slice(1)).join(' ');}
+// cleanRaw: the same cleaning the master keys were built with, so the match key aligns.
+const _LEAD_MEASURE=/^(cup|cups|tbsp|tbsps|tb|tablespoons?|tsp|tsps|teaspoons?|g|kg|ml|l|litres?|oz|lbs?|grams?|cloves?|pinch|handful|scoops?|cans?|tins?|jars?|slices?|sheets?|sprigs?|sticks?|stalks?|knobs?|heads?|bulbs?|bunch|pounds?|rashers?|fillets?|punnet|ribbon|weight|packs?|packets?|bags?|tubs?|dash|splash|drizzle|each|x|heaped|heaping|rounded|level|generous|scant)$/;
+const ABBR2={mayo:'mayonnaise',choc:'chocolate',tb:'tbsp'};
+function cleanRaw(raw){
+  let s=String(raw||'').toLowerCase();
+  s=s.replace(/\([^)]*\)/g,' ').replace(/jalape[ñn\s]*o?s?/g,'jalapeno');
+  s=s.split(/\s+and\/or\s+|\s+or\s+|\//)[0];
+  s=s.replace(/[½¼¾⅓⅔⅛⅜⅝⅞]/g,' ');
+  s=s.replace(/\b\d+(\.\d+)?\s*[-–]\s*\d+(\.\d+)?\b/g,' ').replace(/\b\d+(\.\d+)?\s*\/\s*\d+\b/g,' ');
+  s=s.replace(/\b\d+(\.\d+)?\s*(kg|g|ml|l|oz|lb|tbsp|tsp|cup|cups|cm)\b/g,' ').replace(/\b\d+\s*x\b/g,' ').replace(/\b\d+(\.\d+)?\b/g,' ');
+  let toks=s.replace(/[^a-z\s-]/g,' ').split(/\s+/).filter(Boolean);
+  while(toks.length>1 && (_LEAD_MEASURE.test(toks[0])||_STOP.has(toks[0]))) toks.shift();
+  return toks.map(t=>ABBR2[t]||t).join(' ');
+}
+const normSpell=s=>s.replace(/yoghurt/g,'yogurt').replace(/chili\b/g,'chilli');
+const ckey=n=>canon(normSpell(cleanRaw(n)));
 function esc(s){s=String(s??'');return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}
 function readCsv(p){const t=fs.readFileSync(p,'utf8');const rows=[];let f='',row=[],q=false;for(let i=0;i<t.length;i++){const c=t[i];if(q){if(c==='"'){if(t[i+1]==='"'){f+='"';i++;}else q=false;}else f+=c;}else{if(c==='"')q=true;else if(c===','){row.push(f);f='';}else if(c==='\n'){row.push(f);rows.push(row);row=[];f='';}else if(c!=='\r')f+=c;}}if(f!==''||row.length){row.push(f);rows.push(row);}return rows;}
 // ===== recipe line parser (heaped/cm/"A or B"/abbrev) =====
@@ -49,10 +65,10 @@ function regFinal(fv,product,category,occ){ if(!fvGroup[fv]) fvGroup[fv]={produc
 for(const r of M){
   const category=r[1], product=(r[3]||r[2]||'').trim(), variant=r[4], vch=(r[5]||'').trim(), occ=+(r[6]||0);
   const fv=title((vch||variant).trim());
-  const k=canon(variant);
-  renameMap[k]={variant:fv,product,category};
+  const k=ckey(variant);
+  if(!renameMap[k]) renameMap[k]={variant:fv,product,category};
   const g=regFinal(fv,product,category,occ);
-  const ka=canon(variant); if(ka && ka!==canon(fv)) g.aliases.add(ka);
+  const ka=ckey(variant); if(ka && ka!==ckey(fv)) g.aliases.add(ka);
 }
 // ===== splits =====
 const SP=readCsv('split-plan.csv').slice(1).filter(r=>r[0]); const sh={action:0,variant:1,proposed_result:2};
@@ -61,11 +77,12 @@ for(const r of SP){const act=r[0],v=r[1],res=r[2];const k=canon(v);if(act==='SPL
 function pepper(name){const n=canon(name);if(/\bpepper\b/.test(n)&&/(black|cracked|coarse|ground)/.test(n)&&!/(white|bell|red|green|cayenne|chilli|chili|chipotle|aleppo|lemon)/.test(n))return 'Black Pepper';return null;}
 // resolve a single ingredient name -> finalVariant (+register price entry)
 function resolve(name){
-  const k=canon(name);
+  const k=ckey(name), c=canon(name);
   if(renameMap[k]) return renameMap[k].variant;
-  if(renameSimple[k]) { const fv=title(renameSimple[k]); regFinal(fv,'', aisle(fv),0); return fv; }
+  if(renameMap[c]) return renameMap[c].variant;
+  if(renameSimple[c]||renameSimple[k]) { const fv=title(renameSimple[c]||renameSimple[k]); regFinal(fv,'', aisle(fv),0); return fv; }
   const p=pepper(name); if(p){ regFinal(p,'Pepper',aisle(p),0); return p; }
-  const fv=title(name); regFinal(fv,'',aisle(fv),0); return fv;
+  const fv=title(cleanRaw(name)||name); regFinal(fv,'',aisle(fv),0); return fv;
 }
 
 // ===== regenerate recipe worksheet =====
@@ -87,8 +104,8 @@ for(const r of R.slice(1)){
     });
     continue;
   }
-  const fv=resolve(p.name); if(renameMap[sk])matched++; const g=fvGroup[fv]; if(g)g.occ++;
-  out.push([esc(rk),esc(rec),esc(sec),esc(orig),esc(p.qty),esc(p.unit),esc(fv),esc(p.note),''].join(','));
+  const fv=resolve(p.name); if(renameMap[ckey(p.name)]||renameMap[sk])matched++; const g=fvGroup[fv]; if(g)g.occ++;
+  out.push([esc(rk),esc(rec),esc(sec),esc(orig),esc(p.qty),esc(p.unit),esc(fv),esc(p.note),renameMap[ckey(p.name)]||renameMap[sk]?'':'unmatched'].join(','));
 }
 fs.writeFileSync('recipe-ingredient-normalisation.final.csv',out.join('\n')+'\n');
 

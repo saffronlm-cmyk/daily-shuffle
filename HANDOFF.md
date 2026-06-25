@@ -42,17 +42,21 @@ occurrence), NAME changes done 1→1 via the master.
 | `ingredient-master.csv` | **Naming source of truth** (user-curated): `category, product, product change, variant, variant change, occurrences, in_pricebook, Notes` |
 | `split-plan.csv` | 28 confirmed compound **splits** + renames (input) |
 | `recipe-ingredient-normalisation.csv` | original per-line parse from Supabase (`row_key,…,original_line,…`) (input) |
-| `tools-apply-master.mjs` | **Generator** — `node tools-apply-master.mjs` → the two outputs |
-| `recipe-ingredient-normalisation.final.csv` | **OUTPUT** — lines with parser qty/unit/note + `ingredient` = master `variant change`; splits baked in (`row_key` suffixes `-2/-3`); 3,153/3,483 matched |
-| `pricebook.csv` | **OUTPUT / fill-in sheet** — one row per variant, usage-sorted: `Ingredient, Product, Category, Pack size, Pack unit, Pack price, Store, Aliases, occurrences` (987 variants) |
+| `tools-apply-master.mjs` | **Generator** — `node tools-apply-master.mjs` → the outputs. Match key = `canon(cleanRaw(name))` with UK/US spelling normalise (yoghurt↔yogurt) so recipe wordings align to the master's clean variant keys. |
+| `recipe-ingredient-normalisation.final.csv` | **OUTPUT (the ingredient normalisation)** — every line: parser qty/unit/note + `ingredient` = master `variant change`; splits baked in (`row_key` suffixes `-2/-3`); **~99% of lines mapped to the master** (`review='unmatched'` flags the rest) |
+| `pricebook.csv` | **OUTPUT / fill-in sheet** — one row per variant, usage-sorted: `Ingredient, Product, Category, Pack size, Pack unit, Pack price, Store, Aliases, occurrences` (~811 variants) |
+| `unmatched-ingredients.csv` | The **~32 residual** recipe wordings not yet covered by the master, with occ + example + recipe, and a blank column to assign a `variant change` (fold back into `ingredient-master.csv`). |
 
 Superseded generations + their tools were removed (in git history if needed).
 Regenerate: `cd /home/user/daily-shuffle && node tools-apply-master.mjs`.
 
 ## 4. Phases
 - **Phase 0 — Discovery** ✅ (architecture, data, engine fns, the `aliases` hook).
-- **Phase 1 — Naming normalisation & consolidation** ✅ *(this session)*. Master curated; recipes
-  normalised; 28 splits applied; price book scaffolded at variant grain with product/category/aliases.
+- **Phase 1 — Naming normalisation & consolidation** ✅ *(this session)*. Master curated; **recipe
+  ingredient names normalised in `recipe-ingredient-normalisation.final.csv` (~99% mapped to the master)
+  — this is computed in the CSV, NOT yet written to the live recipes (that's Phase 2 step 5)**; 28 splits
+  applied; price book scaffolded at variant grain with product/category/aliases. Residual ~32 wordings in
+  `unmatched-ingredients.csv` to fold into the master.
 - **Phase 1.5 — USER (now)**: fill `pricebook.csv` top-down (first ~100 by usage cover most recipes);
   tidy rough Product labels (e.g. `Maple Syrup → "Syrup"`).
 - **Phase 2 — Apply to the app** *(next session, on go)*:
@@ -88,7 +92,9 @@ Once variants are priced, the existing engine lights up — this is the payoff a
   (`legacy/macro-calc.*`, `legacy/track.*`).
 
 ## 6. Backlog / loose ends
-- ~330 recipe lines didn't match the master (parse artifacts / one-offs) — cleanup pass.
+- ~50 recipe lines (32 distinct) still unmatched — see `unmatched-ingredients.csv`: `Neutral Oil`/`Oil`
+  → Vegetable Oil (master folded them as aliases without a row), a few `600g / 1.2 lb` dual-unit parser
+  artifacts, and broken `Fresh`/`-` parses. Fold into master or extend the parser.
 - `Garlic Clove` vs `Garlic` still separate variants — set `variant change = Garlic` to merge if wanted.
 - Rough Product labels from the master (casing/family) — tidy in `pricebook.csv`.
 - 430 null lines re-entry (36 recipes).
