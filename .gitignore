@@ -14,5 +14,6 @@ price_report.md
 scripts/seed_snippet.js
 index.html.bak
 
-# Generated deliverable (regenerable view of ingredient-master.csv)
+# Generated deliverables (regenerable views of ingredient-master.csv)
 ingredient-master.xlsx
+ingredient-master.normalised.csv
