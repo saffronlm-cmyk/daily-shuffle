@@ -1,7 +1,7 @@
 Ingredient,Product,Category,Pack size (qty),Pack unit (g / ml / each),Pack price (£),Store,Aliases,occurrences
 Salt,Salt,Spices & Herbs,,,,,big salt;cooking salt kosher salt;pinche salt,231
 Maple Syrup,Syrup,Pantry / Dry Goods,,,,,- maple syrup;maple;pure maple syrup;sugar maple syrup,152
-Egg,Egg,Dairy & Eggs / Alt,,,,,,114
+Egg,Egg,Dairy & Eggs / Alt,6,each,2.49,Lidl,,114
 Olive Oil,Oil,Condiments & Sauces,,,,,light drizzle olive oil;light olive oil,114
 Soy Sauce,Soy Sauce,Condiments & Sauces,,,,,,112
 Garlic Clove,Garlic,Produce,,,,,,110
@@ -14,20 +14,20 @@ Greek Yoghurt,Yoghurt,Dairy & Eggs / Alt,,,,,fat greek yogurt;full-fat greek yog
 Water,Water,Beverages,,,,,water thin,82
 Garlic Granules,Garlic granules,Spices & Herbs,,,,,garlic powder,80
 Cinnamon,Cinnamon,Spices & Herbs,,,,,cinnamon and,78
-Ginger,Ginger,Produce,,,,,cm ginger;cm piece ginger;freshly ginger;ginger root;inch piece ginger;piece ginger;thumb size knob ginger,77
+Ginger,Ginger,Produce,1,each,0.92,Lidl,cm ginger;cm piece ginger;freshly ginger;ginger root;inch piece ginger;piece ginger;thumb size knob ginger,77
 Lime Juice,Lime,Produce,,,,,freshly squeezed lime juice;juice lime,76
 Garlic,Garlic,Produce,,,,,,74
 Cucumber,Cucumber,Produce,,,,,,73
 Sesame Oil,Oil,Condiments & Sauces,,,,,,72
 Black Pepper,Black Pepper,Spices & Herbs,,,,,crack black pepper;cracked pepper;freshly cracked black pepper;freshly pepper;lot black pepper,67
 Rice Vinegar,Vinegar,Condiments & Sauces,,,,,rice wine vinegar,66
-Avocado,Avocado,Produce,,,,,avocados;half avocado;topping avocado,64
+Avocado,Avocado,Produce,1,each,1.39,Lidl,avocados;half avocado;topping avocado,64
 Coconut Oil,Oil,Condiments & Sauces,,,,,refined coconut oil,62
 Baking Soda,Baking Soda,Beverages,,,,,bicarb soda;bicarbonate soda,60
 Red Onion,Onion,Produce,,,,,,58
 Green Onion,Onion,Produce,,,,,extra green onion;green onion stem,56
 Carrot,Carrot,Produce,,,,,,54
-Cocoa Powder,Cocoa Powder,Pantry / Dry Goods,,,,,additional cocoa powder;cocoa,54
+Cocoa Powder,Cocoa Powder,Pantry / Dry Goods,1,each,2.89,Lidl,additional cocoa powder;cocoa,54
 Lemon Juice,Lemon,Produce,,,,,juice from lemon;juice half lemon;juice lemon,54
 Sesame Seeds,Sesame seeds,Nuts & Seeds,,,,,sesame seed coat,52
 Peanut Butter,Nut butter,Condiments & Sauces,,,,,,50
@@ -36,7 +36,7 @@ Chicken Thigh,Chicken Thigh,Meat & Seafood / Protein,,,,,,46
 Chia Seed,Chia Seed,Nuts & Seeds,,,,,,45
 Oats,Oats,Grains,,,,,jumbo oat,44
 Milk Choice,Milk Choice,Dairy & Eggs / Alt,,,,,,42
-Sriracha,Sriracha,Condiments & Sauces,,,,,,41
+Sriracha,Sriracha,Condiments & Sauces,1,each,1.99,Lidl,,41
 Fish Sauce,Fish Sauce,Meat & Seafood / Protein,,,,,,40
 Milk,Milk,Dairy & Eggs / Alt,,,,,milk thin;warm milk,40
 Vegetable Oil,Oil,Condiments & Sauces,,,,,,40
@@ -47,7 +47,7 @@ Vanilla,Vanilla,Pantry / Dry Goods,,,,,,36
 Coconut Sugar,Sugar,Pantry / Dry Goods,,,,,brown coconut sugar;coconut sugar dusting;extra coconut sugar dusting,34
 Oat Flour,Flour,Pantry / Dry Goods,,,,,,34
 Smoked Paprika,Paprika,Spices & Herbs,,,,,,34
-Dark Chocolate,Chocolate,Snacks & Confectionery,,,,,,32
+Dark Chocolate,Chocolate,Snacks & Confectionery,1,each,1.69,Lidl,,32
 Medjool Date,Medjool Date,Other,,,,,,30
 Pumpkin Puree,Pumpkin,Produce,,,,,pumpkin pur e,30
 Rolled Oats,Oats,Grains,,,,,rolled oat quinoa flake,30
@@ -89,7 +89,7 @@ Chilli Oil,Oil,Condiments & Sauces,,,,,thai chilli oil,18
 Cornstarch,Cornstarch,Pantry / Dry Goods,,,,,corn flour;cornflour,18
 Dark Soy Sauce,Soy sauce,Condiments & Sauces,,,,,dark soy,18
 Edamame,Edamame,Produce,,,,,,18
-Lime,Lime,Produce,,,,,half lime,18
+Lime,Lime,Produce,1,each,0.48,Lidl,half lime,18
 Oyster Sauce,Oyster Sauce,Condiments & Sauces,,,,,,18
 Pumpkin Pie Spice,Pumpkin Pie Spice,Spices & Herbs,,,,,,18
 Pecans,Pecans,Nuts & Seeds,,,,,pecan topping,17
@@ -105,7 +105,7 @@ Nutritional Yeast,Nutritional Yeast,Pantry / Dry Goods,,,,,,16
 Onion Powder,Onion Powder,Spices & Herbs,,,,,,16
 Shallot,Onion,Produce,,,,,scallion shallot,16
 Smooth Peanut Butter,Nut butter,Condiments & Sauces,,,,,creamy peanut butter;natural peanut butter,16
-Sweet Potato,Potatoes,Produce,,,,,,16
+Sweet Potato,Potatoes,Produce,1,each,1.18,Lidl,,16
 Tuna,Tuna,Meat & Seafood / Protein,,,,,,16
 Vermicelli Rice Noodles,Noodles,Pantry / Dry Goods,,,,,rice vermicelli noodle;serving instant vermicelli rice noodle;thin flat rice noodle;vermicelli noodle,16
 Raspberry,Berries,Produce,,,,,,15
@@ -155,7 +155,7 @@ Butter,Butter,Dairy & Eggs / Alt,,,,,room temperature butter,9
 Apple,Apple,Produce,,,,,,8
 Arrowroot Starch,Arrowroot Starch,Pantry / Dry Goods,,,,,arrowroot;arrowroot flour;water teaspoon arrowroot starch,8
 Bananas,Bananas,Produce,,,,,,8
-Broccoli,Broccoli,Produce,,,,,,8
+Broccoli,Broccoli,Produce,1,each,1.88,Lidl,,8
 Brown Rice,Rice,Grains,,,,,brown precooked rice;precooked brown rice,8
 Cashew Butter,Nut butter,Condiments & Sauces,,,,,,8
 Chocolate,Chocolate,Snacks & Confectionery,,,,,,8
@@ -175,7 +175,7 @@ Hoisin Sauce,Hoisin sauce,Condiments & Sauces,,,,,hoisin,8
 Juice,Juice,Beverages,,,,,,8
 Lemon Zest,Lemon,Produce,,,,,zest from lemon;zest lemon,8
 Lettuce,Salad,Produce,,,,,lettuce choice;lettuce leaf;lettuce leave,8
-Light Mayonnaise,Mayonnaise,Condiments & Sauces,,,,,,8
+Light Mayonnaise,Mayonnaise,Condiments & Sauces,1,each,2.49,Lidl,,8
 Lime Wedge,Lime,Produce,,,,,,8
 Milled Flaxseed,Flaxseed,Nuts & Seeds,,,,,flax meal;flaxseed,8
 Neutral Oil,,Condiments & Sauces,,,,,,8
@@ -203,7 +203,7 @@ Almond,Almond,Nuts & Seeds,,,,,,6
 Bok Choy,Bok Choy,Produce,,,,,,6
 Bone-in Skin-on Chicken Thigh,Bone-in Skin-on Chicken Thigh,Meat & Seafood / Protein,,,,,,6
 Chicken Bone Broth,Chicken Stock,Meat & Seafood / Protein,,,,,,6
-Chicken Mince,Chicken Mince,Meat & Seafood / Protein,,,,,,6
+Chicken Mince,Chicken Mince,Meat & Seafood / Protein,500,g,2.49,Lidl,,6
 Chicken Stock Cube,Chicken Stock,Meat & Seafood / Protein,,,,,,6
 Chickpeas,Chickpeas,Canned & Jarred,,,,,,6
 Chile Lime Seasoning,Chile Lime Seasoning,Spices & Herbs,,,,,,6
@@ -225,7 +225,7 @@ Nori,Nori,Pantry / Dry Goods,,,,,nori sheet,6
 Oat Milk,Milk,Dairy & Eggs / Alt,,,,,,6
 Olive,Olive,Vegetables,,,,,,6
 Pak Choi,Pak Choi,Produce,,,,,,6
-Peanut Butter Powder,Peanut Butter Powder,Pantry / Dry Goods,,,,,pbfit powder;pbfit powder mixed with little water form paste;powdered peanut butter,6
+Peanut Butter Powder,Peanut Butter Powder,Pantry / Dry Goods,1,each,14.35,Lidl,pbfit powder;pbfit powder mixed with little water form paste;powdered peanut butter,6
 Pepper,Pepper,Spices & Herbs,,,,,,6
 Pickle Juice,Pickles,Canned & Jarred,,,,,,6
 Powdered Sugar,Sugar,Pantry / Dry Goods,,,,,,6
@@ -258,7 +258,7 @@ Alpro High-protein Soya Milk,Milk,Dairy & Eggs / Alt,,,,,,4
 Apple Sauce,Apple Sauce,Condiments & Sauces,,,,,,4
 Applesauce,Applesauce,Condiments & Sauces,,,,,,4
 Argentine Red Shrimp,Argentine Red Shrimp,Meat & Seafood / Protein,,,,,,4
-Basil Pesto,Pesto,Condiments & Sauces,,,,,green pesto;pesto,4
+Basil Pesto,Pesto,Condiments & Sauces,1,each,1.79,Lidl,green pesto;pesto,4
 Beetroot,Beetroot,Produce,,,,,,4
 Bell Pepper,Peppers,Produce,,,,,,4
 Bird Eye Chilli,Chillies,Vegetables,,,,,bird eye chilly;bird eye red chily,4
@@ -270,7 +270,7 @@ Broccoli Floret,Broccoli,Produce,,,,,,4
 Broccolini,Broccoli,Vegetables,,,,,,4
 Brown Potatoes,Potatoes,Vegetables,,,,,potatoes,4
 Brown Sugar Substitute,Sugar,Pantry / Dry Goods,,,,,,4
-Butternut Squash,Butternut Squash,Vegetables,,,,,,4
+Butternut Squash,Butternut Squash,Vegetables,1,each,1.45,Lidl,,4
 Cashew,Cashew,Nuts & Seeds,,,,,,4
 Caster Sugar,Sugar,Pantry / Dry Goods,,,,,,4
 Chicken Broth,Chicken Stock,Meat & Seafood / Protein,,,,,,4
@@ -334,7 +334,7 @@ Rocket,Salad,Produce,,,,,,4
 Salad Tomatoes,Tomatoes,Vegetables,,,,,,4
 Shelled Edamame,Edamame,Produce,,,,,,4
 Shiitake Mushroom,Mushroom,Produce,,,,,,4
-Soya Yoghurt,Yoghurt,Dairy & Eggs / Alt,,,,,plain soya yogurt,4
+Soya Yoghurt,Yoghurt,Dairy & Eggs / Alt,1,each,0.99,Lidl,plain soya yogurt,4
 Sprouted Oat,Oats,Grains,,,,,,4
 Stock,Stock,Spices & Herbs,,,,,stock cube,4
 Sugar Free Maple Syrup,Maple Syrup,Pantry / Dry Goods,,,,,sugar-free maple syrup,4
@@ -512,7 +512,7 @@ Jumbo Wild Caught Pink Shrimp,Prawn,Meat & Seafood / Protein,,,,,,2
 Kaffir Lime Leave,Kaffir Lime Leave,Produce,,,,,,2
 Kaizen Rice,Kaizen Rice,Grains,,,,,,2
 Kefir Yogurt,Yoghurt,Dairy & Eggs / Alt,,,,,,2
-Ketchup,Ketchup,Condiments & Sauces,,,,,tomato sauce,2
+Ketchup,Ketchup,Condiments & Sauces,1,each,3.99,Lidl,tomato sauce,2
 Kimchi,Kimchi,Canned & Jarred,,,,,,2
 Korean Chilli Flake,Chilli Flakes,Spices & Herbs,,,,,,2
 Laksa Paste,Laksa Paste,Spices & Herbs,,,,,,2
@@ -651,7 +651,7 @@ Soy Sauce Fish Sauce,Soy Sauce Fish Sauce,Meat & Seafood / Protein,,,,,,2
 Soy Sauce Rice Vinegar Season,Soy Sauce Rice Vinegar Season,Condiments & Sauces,,,,,,2
 Soy Skyr,Soy Skyr,Condiments & Sauces,,,,,,2
 "Soya Milk, Unsweetened",Milk,Dairy & Eggs / Alt,,,,,unsweetened soya milk,2
-Spaghetti,Pasta,Pantry / Dry Goods,,,,,,2
+Spaghetti,Pasta,Pantry / Dry Goods,1,each,1.99,Lidl,,2
 Spring Onion Sesame Seed,Spring Onion Sesame Seed,Pantry / Dry Goods,,,,,,2
 Sriracha Kewpie Mayonnaise,Sriracha Kewpie Mayonnaise,Condiments & Sauces,,,,,,2
 Sriracha Mayonnaise,Sriracha Mayonnaise,Condiments & Sauces,,,,,,2
@@ -798,7 +798,7 @@ Milk Pouring Over,Milk Pouring Over,Dairy & Eggs / Alt,,,,,,0
 Olif,Olif,Other,,,,,,0
 Pint Cherry Tomato,Tomatoes,Produce,,,,,,0
 Pistachio,Pistachio,Other,,,,,,0
-Potato,Potato,Produce,,,,,,0
+Potato,Potato,Produce,1,each,0.48,Lidl,,0
 Prawn Shrimp,Prawn,Meat & Seafood / Protein,,,,,,0
 Salad Tomato,Tomatoes,Produce,,,,,,0
 Self-raising Flour,Flour,Pantry / Dry Goods,,,,,,0
@@ -806,7 +806,7 @@ Smoked Firm Tofu,Smoked Firm Tofu,Meat & Seafood / Protein,,,,,,0
 Soft Tofu Silken Tofu,Soft Tofu Silken Tofu,Meat & Seafood / Protein,,,,,,0
 Sundried Tomatoes In Oil,Sundried tomatoes,Canned & Jarred,,,,,sundried tomato in oil,0
 Thai Chilli,Chillies,Produce,,,,,,0
-Turkey Mince,Turkey Mince,Meat & Seafood / Protein,,,,,,0
+Turkey Mince,Turkey Mince,Meat & Seafood / Protein,500,g,2.99,Lidl,,0
 Unsalted Butter,Butter,Dairy & Eggs / Alt,,,,,,0
-Vegan Cheese,Cheese,Dairy & Eggs / Alt,,,,,,0
+Vegan Cheese,Cheese,Dairy & Eggs / Alt,1,each,1.95,Lidl,,0
 Vine Tomato,Tomatoes,Produce,,,,,,0
