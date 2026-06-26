@@ -114,7 +114,10 @@ const ph=['Ingredient','Product','Category','Pack size (qty)','Pack unit (g / ml
 const pout=[ph.join(',')];
 const fvs=Object.keys(fvGroup).sort((a,b)=>fvGroup[b].occ-fvGroup[a].occ||a.localeCompare(b));
 for(const fv of fvs){const g=fvGroup[fv];pout.push([esc(fv),esc(g.product||''),esc(g.category||''),'','','','',esc([...g.aliases].sort().join(';')),g.occ].join(','));}
-fs.writeFileSync('pricebook.csv',pout.join('\n')+'\n');
+// NOTE: output is `pricebook.variants.csv` (one row per normalised variant), NOT
+// `pricebook.csv` — the latter belongs to the separate Apify scraper stream and
+// must not be clobbered. The variant sheet is the canonical app-facing price book.
+fs.writeFileSync('pricebook.variants.csv',pout.join('\n')+'\n');
 
 console.log('recipe lines:',nLines,'| splits:',nSplit,'| null:',nNull,'| matched-to-master:',matched);
 console.log('price book variants:',fvs.length);

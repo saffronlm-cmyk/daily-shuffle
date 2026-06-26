@@ -626,6 +626,11 @@
           <button class="btn-library" onclick="document.getElementById('importFileInput').click()">⬆ Import library</button>
           <input type="file" id="importFileInput" accept=".json" style="display:none" onchange="importLibrary(event)">
         </div>
+        <p style="font-size:12px;color:var(--text2);margin:12px 0 8px;line-height:1.5">Bulk-normalise recipe ingredients: import a CSV with columns <code>row_key, qty, unit, ingredient, note</code>. Each filled row rebuilds a recipe's ingredient line (qty unit ingredient + prep note). Updates locally and patches your cloud library. Blank/untouched rows are skipped.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn-library" onclick="document.getElementById('importIngCsvInput').click()">⬆ Import ingredient CSV</button>
+          <input type="file" id="importIngCsvInput" accept=".csv" style="display:none" onchange="importRecipeIngredientsCsv(event)">
+        </div>
       </div>
       <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
         <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:6px">Deleted Recipes</div>
@@ -652,6 +657,11 @@
           <input class="pb-input" id="pb-pack-price" placeholder="£/pk" type="number" step="any" style="width:68px" title="Price for the whole pack">
           <input class="pb-input" id="pb-store" placeholder="Store" style="width:68px">
           <button class="btn-save-key" onclick="addPriceBookEntry()" style="font-size:12px;padding:6px 12px">Add</button>
+        </div>
+        <p style="font-size:12px;color:var(--text2);margin:12px 0 8px;line-height:1.5">Or bulk-import a price CSV (columns <code>Ingredient, Product, Category, Pack size (qty), Pack unit, Pack price, Store, Aliases</code>). Priced rows update the book; alias-only rows seed matching before a price exists.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn-library" onclick="document.getElementById('importPbCsvInput').click()">⬆ Import price CSV</button>
+          <input type="file" id="importPbCsvInput" accept=".csv" style="display:none" onchange="importPriceBookCsv(event)">
         </div>
       </div>
       <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
@@ -2545,6 +2555,170 @@ function saveNutrition() {
   } catch(e) {}
 }
 
+// ─── CSV IMPORT (ingredient normalisation + bulk price book) ──────────────────
+// Minimal RFC-4180-ish CSV parser (handles quoted fields, commas, newlines).
+function _parseCsv(text) {
+  const rows = []; let f = '', row = [], q = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (q) {
+      if (c === '"') { if (text[i+1] === '"') { f += '"'; i++; } else q = false; }
+      else f += c;
+    } else {
+      if (c === '"') q = true;
+      else if (c === ',') { row.push(f); f = ''; }
+      else if (c === '\n') { row.push(f); rows.push(row); row = []; f = ''; }
+      else if (c !== '\r') f += c;
+    }
+  }
+  if (f !== '' || row.length) { row.push(f); rows.push(row); }
+  return rows;
+}
+
+// Pretty-print a worksheet quantity: keep ranges/fractions, render decimals as
+// unicode fractions where close enough, else trim trailing zeros.
+function _prettyImportQty(q) {
+  q = String(q ?? '').trim();
+  if (!q) return '';
+  const n = parseFloat(q);
+  if (isNaN(n) || /[-–/]/.test(q)) return q; // ranges ("3-4"), pre-written fractions: keep
+  const whole = Math.floor(n + 1e-9), frac = n - whole;
+  const map = [[0.5,'½'],[0.25,'¼'],[0.75,'¾'],[1/3,'⅓'],[2/3,'⅔'],[0.125,'⅛'],[0.375,'⅜'],[0.625,'⅝'],[0.875,'⅞']];
+  for (const [v, g] of map) if (Math.abs(frac - v) < 0.02) return (whole ? whole + ' ' : '') + g;
+  return String(Math.round(n * 1000) / 1000);
+}
+
+// Rebuild a single ingredient line string from worksheet fields.
+function _csvRowToItem(row) {
+  const q = _prettyImportQty(row.qty);
+  const qs = q ? q + ' ' : '';
+  const us = (row.unit && row.unit !== 'each') ? row.unit + ' ' : '';
+  const ns = row.note ? ` (${row.note})` : '';
+  return `${qs}${us}${row.name}${ns}`.trim();
+}
+
+// Bulk-normalise recipe ingredients from a worksheet CSV
+// (columns: row_key, qty, unit, ingredient, note). Each filled row rebuilds a
+// recipe's ingredient line; updates locally and patches the cloud library.
+async function importRecipeIngredientsCsv(evt) {
+  const file = evt.target.files[0];
+  evt.target.value = '';
+  if (!file) return;
+  let text;
+  try { text = await file.text(); } catch(e) { alert('Could not read file: ' + e.message); return; }
+  const rows = _parseCsv(text);
+  if (rows.length < 2) { alert('CSV looks empty.'); return; }
+  const head = rows[0].map(h => h.trim());
+  const idx = {}; head.forEach((h, i) => idx[h] = i);
+  if (idx.row_key == null || idx.ingredient == null) {
+    alert('CSV must include at least "row_key" and "ingredient" columns.'); return;
+  }
+  const cell = (r, k) => (idx[k] != null ? (r[idx[k]] ?? '').trim() : '');
+
+  // Group filled rows by recipe id, preserving section/line order via row_key.
+  const byRecipe = {};
+  for (const r of rows.slice(1)) {
+    const key = cell(r, 'row_key'); if (!key) continue;
+    const parts = key.split('|'); if (parts.length !== 3) continue;
+    const name = cell(r, 'ingredient'); if (!name) continue; // skip untouched/blank lines
+    const [rid, sidx, lidx] = parts;
+    (byRecipe[rid] ||= []).push({
+      sidx: +sidx, lidx: +lidx, section: cell(r, 'section'),
+      qty: cell(r, 'qty'), unit: cell(r, 'unit'), name, note: cell(r, 'note'),
+    });
+  }
+
+  const allIds = Object.keys(byRecipe);
+  const known = allIds.filter(id => recipes.some(r => r.id === id));
+  const unknown = allIds.length - known.length;
+  if (!known.length) { alert('No recipes in this file match your library (check the row_key column).'); return; }
+  if (!confirm(
+    `Apply normalised ingredients to ${known.length} recipe(s)?` +
+    (unknown ? `\n${unknown} unrecognised recipe id(s) will be skipped.` : '') +
+    `\n\nThis replaces those recipes' ingredient lists locally and patches your cloud library.`
+  )) return;
+
+  let cloudOK = 0;
+  for (const id of known) {
+    const items = byRecipe[id].sort((a, b) => a.sidx - b.sidx || a.lidx - b.lidx)
+      .map(it => ({ group: it.section || undefined, item: _csvRowToItem(it) }));
+    if (!RECIPE_FULL_DATA[id]) RECIPE_FULL_DATA[id] = {};
+    RECIPE_FULL_DATA[id].ingredients = items;
+  }
+  saveOverrides();                       // persist locally + sync to your personal cloud
+  for (const id of known) {              // patch the shared recipe library
+    if (cloudRecipeIds.has(id)) { try { await patchRecipeToLibrary(id); cloudOK++; } catch(e){} }
+  }
+  renderRecipes();
+  showToast(`Imported ${known.length} recipe(s) · ${cloudOK} patched to library ✓`);
+}
+
+// Bulk-import a variant-level price CSV
+// (Ingredient, Product, Category, Pack size (qty), Pack unit, Pack price, Store,
+// Aliases, occurrences). Priced rows update the price book; alias-only rows seed
+// the matching vocabulary even before a price exists.
+function importPriceBookCsv(evt) {
+  const file = evt.target.files[0];
+  evt.target.value = '';
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    let rows;
+    try { rows = _parseCsv(String(e.target.result)); }
+    catch(err) { alert('Could not read CSV: ' + err.message); return; }
+    if (rows.length < 2) { alert('CSV looks empty.'); return; }
+    const head = rows[0].map(h => h.trim().toLowerCase());
+    // Resolve a column by trying each keyword test in turn.
+    const find = (...tests) => { for (const t of tests) { const i = head.findIndex(h => t(h)); if (i >= 0) return i; } return -1; };
+    const iName  = find(h => h === 'ingredient', h => h.includes('ingredient'), h => h.includes('name'));
+    const iProd  = find(h => h === 'product', h => h.includes('product'));
+    const iCat   = find(h => h === 'category', h => h.includes('category'), h => h.includes('aisle'));
+    const iQty   = find(h => h.includes('pack size'), h => h.includes('pack qty'), h => h === 'qty', h => h.includes('size'));
+    const iUnit  = find(h => h.includes('pack unit'), h => h.includes('unit'));
+    const iPrice = find(h => h.includes('pack price'), h => h.includes('price') && !h.includes('100'));
+    const iStore = find(h => h.includes('store'));
+    const iAlias = find(h => h.includes('alias'));
+    if (iName < 0) { alert('CSV needs at least an Ingredient column.'); return; }
+    const cell = (r, i) => (i >= 0 ? (r[i] ?? '').trim() : '');
+    let priced = 0, aliasOnly = 0, skipped = 0;
+    for (const r of rows.slice(1)) {
+      const name = cell(r, iName);
+      const key = name ? canonicalise(name) : '';
+      if (!key) { skipped++; continue; }
+      const packSize = parseFloat(cell(r, iQty));
+      const packPrice = parseFloat(cell(r, iPrice));
+      const hasPrice = !isNaN(packSize) && packSize > 0 && !isNaN(packPrice) && packPrice > 0;
+      // Aliases: split on ; or , then canonicalise; drop blanks and the key itself.
+      const aliases = cell(r, iAlias).split(/[;,]/).map(a => canonicalise(a)).filter(a => a && a !== key);
+      const prior = priceBook[key] || { aliases: [] };
+      const mergedAliases = Array.from(new Set([...(prior.aliases || []), ...aliases]));
+      const product = cell(r, iProd) || prior.product || '';
+      const category = cell(r, iCat) || prior.category || '';
+      if (hasPrice) {
+        const packUnit = (cell(r, iUnit) || 'each').toLowerCase();
+        priceBook[key] = {
+          ...prior, aliases: mergedAliases, product, category,
+          unitPrice: packPrice / packSize, unit: packUnit,
+          packSize, packUnit, packPrice,
+          store: cell(r, iStore), updatedAt: new Date().toISOString().slice(0, 10),
+        };
+        priced++;
+      } else if (mergedAliases.length || product || category) {
+        // No price yet — still seed aliases/product/category for matching + grouping.
+        priceBook[key] = { ...prior, aliases: mergedAliases, product, category };
+        aliasOnly++;
+      } else {
+        skipped++;
+      }
+    }
+    if (!priced && !aliasOnly) { alert('Nothing to import — fill in Pack size (qty) + Pack price, or Aliases/Product.'); return; }
+    savePriceBook();
+    renderPriceBook();
+    showToast(`Price book: ${priced} priced` + (aliasOnly ? `, ${aliasOnly} alias-only` : '') + (skipped ? `, ${skipped} skipped` : '') + ' ✓');
+  };
+  reader.readAsText(file);
+}
+
 // ─── PRICE BOOK & COST ENGINE ─────────────────────────────────────────────────
 function savePriceBook() {
   try { localStorage.setItem('ds_pricebook', JSON.stringify(priceBook)); } catch(e) {}
@@ -2745,11 +2919,21 @@ function lookupPriceBook(key) {
   for (const [k, v] of Object.entries(priceBook)) {
     if ((v.aliases || []).includes(key)) return v;
   }
-  // Partial match: key contains a PB entry or vice-versa
+  // Whole-token containment: one name's words are a subset of the other's.
+  // Avoids the old substring trap (raw includes() matched "egg"→"eggplant",
+  // "oat"→"oatmeal"). Now that aliases cover the real synonym cases, require
+  // whole-word overlap and prefer the most specific (longest) entry.
+  const kw = new Set(key.split(/\s+/).filter(Boolean));
+  let best = null, bestLen = 0;
   for (const [k, v] of Object.entries(priceBook)) {
-    if (k.length >= 3 && (key.includes(k) || k.includes(key))) return v;
+    const ew = k.split(/\s+/).filter(Boolean);
+    if (!ew.length) continue;
+    const ews = new Set(ew);
+    const entryInKey = ew.every(w => kw.has(w));       // "olive oil" entry ⊆ "extra virgin olive oil"
+    const keyInEntry = [...kw].every(w => ews.has(w)); // "olive oil" key ⊆ "light olive oil" entry
+    if ((entryInKey || keyInEntry) && ew.length > bestLen) { best = v; bestLen = ew.length; }
   }
-  return null;
+  return best;
 }
 
 function _toBase(qty, unit, name) {
@@ -3689,9 +3873,12 @@ function _groceryAggregate(plan) {
       const baseUnit = base ? base.base : (unit || 'each');
       const aggKey = `${canonKey}|${baseUnit}`;
       if (!agg[aggKey]) {
+        // Product family (from the price book) lets the grocery list cluster
+        // variants of the same product together within an aisle.
+        const pbEntry = lookupPriceBook(canonKey);
         agg[aggKey] = {
           canonKey, displayName: _displayName(name), unit: baseUnit, qty: 0,
-          aisle: classifyAisle(cleanName),
+          aisle: classifyAisle(cleanName), product: (pbEntry && pbEntry.product) || '',
           hasQty: false, sources: [], priceCost: 0, priceKnown: false,
         };
       }
@@ -3725,8 +3912,10 @@ function renderGroceryList(plan) {
   for (const [key, row] of Object.entries(agg)) {
     (byAisle[row.aisle] || byAisle.other).push({ key, ...row });
   }
-  // Sort items within aisle: alpha by displayName
-  for (const ais of AISLE_ORDER) byAisle[ais].sort((a, b) => a.displayName.localeCompare(b.displayName));
+  // Sort items within aisle: cluster by product family first (items with a
+  // product group together, unfamilied items fall to the end), then alpha.
+  for (const ais of AISLE_ORDER) byAisle[ais].sort((a, b) =>
+    (a.product || '~').localeCompare(b.product || '~') || a.displayName.localeCompare(b.displayName));
 
   // Plan cost summary (sum of per-portion across plan slots)
   let planTotal = 0, planHasCost = false, planUnpricedMeals = 0;
