@@ -1,6 +1,6 @@
 import fs from 'fs';
 // ===== canonicalise (app-verbatim) =====
-const _STOP=new Set(['fresh','organic','large','small','medium','baby','whole','finely','roughly','free-range','boneless','skinless','ripe','raw','cooked','dried','frozen','chopped','sliced','diced','minced','ground','grated','crushed','peeled','cubed','halved','quartered','shredded','mashed','beaten','softened','melted','cooled','toasted','roasted','torn','julienned','thinly','thickly','coarsely','optional','approx','approximately','about','around','a','an','the','of','to','for','your','some']);
+const _STOP=new Set(['fresh','organic','large','small','medium','baby','mini','leaf','leaves','whole','finely','roughly','free-range','boneless','skinless','ripe','raw','cooked','dried','frozen','chopped','sliced','diced','minced','ground','grated','crushed','peeled','cubed','halved','quartered','shredded','mashed','beaten','softened','melted','cooled','toasted','roasted','torn','julienned','thinly','thickly','coarsely','optional','approx','approximately','about','around','a','an','the','of','to','for','your','some']);
 function canon(n){return (n||'').toLowerCase().replace(/\(.*?\)/g,'').replace(/[^a-z0-9\s-]/g,'').trim().split(/\s+/).filter(w=>!_STOP.has(w)).join(' ').replace(/ies\b/g,'y').replace(/([^aeiou])es\b/g,'$1e').replace(/([^aeiou])s\b/g,'$1').trim();}
 function title(s){return s.split(/\s+/).filter(Boolean).map(w=>w[0].toUpperCase()+w.slice(1)).join(' ');}
 // cleanRaw: the same cleaning the master keys were built with, so the match key aligns.
@@ -13,7 +13,7 @@ function cleanRaw(raw){
   s=s.replace(/[½¼¾⅓⅔⅛⅜⅝⅞]/g,' ');
   s=s.replace(/\b\d+(\.\d+)?\s*[-–]\s*\d+(\.\d+)?\b/g,' ').replace(/\b\d+(\.\d+)?\s*\/\s*\d+\b/g,' ');
   s=s.replace(/\b\d+(\.\d+)?\s*(kg|g|ml|l|oz|lb|tbsp|tsp|cup|cups|cm)\b/g,' ').replace(/\b\d+\s*x\b/g,' ').replace(/\b\d+(\.\d+)?\b/g,' ');
-  let toks=s.replace(/[^a-z\s-]/g,' ').split(/\s+/).filter(Boolean);
+  let toks=s.replace(/[^a-z\s]/g,' ').split(/\s+/).filter(Boolean);
   while(toks.length>1 && (_LEAD_MEASURE.test(toks[0])||_STOP.has(toks[0]))) toks.shift();
   return toks.map(t=>ABBR2[t]||t).join(' ');
 }
@@ -24,9 +24,10 @@ function readCsv(p){const t=fs.readFileSync(p,'utf8');const rows=[];let f='',row
 // ===== recipe line parser (heaped/cm/"A or B"/abbrev) =====
 const FRAC={'½':0.5,'¼':0.25,'¾':0.75,'⅓':1/3,'⅔':2/3,'⅛':0.125,'⅜':0.375,'⅝':0.625,'⅞':0.875};
 const UNITS={g:'g',gram:'g',grams:'g',kg:'kg',ml:'ml',l:'l',litre:'l',litres:'l',liter:'l',oz:'oz',lb:'lb',lbs:'lb',tbsp:'tbsp',tbsps:'tbsp',tbs:'tbsp',tb:'tbsp',tablespoon:'tbsp',tablespoons:'tbsp',tsp:'tsp',tsps:'tsp',teaspoon:'tsp',teaspoons:'tsp',cup:'cup',cups:'cup',clove:'clove',cloves:'clove',handful:'handful',pinch:'pinch',dash:'dash',scoop:'scoop',scoops:'scoop',can:'can',cans:'can',tin:'tin',slice:'slice',slices:'slice',stick:'stick',sprig:'sprig',head:'head',bunch:'bunch',knob:'knob',fillet:'fillet'};
-const LEAD_FILLER=new Set(['about','approx','approximately','around','roughly','a','an','little','less','than','good','nice','big','optional','optionally','maybe','some','couple','few','full','of']);
+Object.assign(UNITS,{handfuls:'handful',punnet:'punnet',punnets:'punnet',block:'block',blocks:'block',piece:'piece',pieces:'piece',knobs:'knob',sticks:'stick',sprig:'sprig',sprigs:'sprig',bag:'bag',bags:'bag',pack:'pack',packs:'pack',packet:'packet',packets:'packet',tub:'tub',tubs:'tub',bunches:'bunch',heads:'head',slices:'slice',sheet:'sheet',sheets:'sheet',scoops:'scoop',tins:'tin',jar:'jar',jars:'jar',fillets:'fillet',rasher:'rasher',rashers:'rasher',cans:'can'});
+const LEAD_FILLER=new Set(['about','approx','approximately','around','roughly','a','an','little','less','than','good','nice','big','optional','optionally','maybe','some','couple','few','full','of','very','extra']);
 const BARE_UNIT=new Set(['pinch','handful','dash','splash','knob']);
-const PREP=new Set(['minced','chopped','diced','sliced','grated','crushed','peeled','cubed','halved','quartered','shredded','mashed','beaten','softened','melted','cooled','toasted','roasted','torn','julienned','finely','roughly','thinly','thickly','coarsely','cut','into','pieces','drained','rinsed','deseeded','trimmed','divided','plus','more','crumbled','to','taste','serve','garnish','for','serving']);
+const PREP=new Set(['minced','chopped','diced','sliced','grated','crushed','peeled','cubed','halved','quartered','shredded','mashed','beaten','softened','melted','cooled','toasted','roasted','torn','julienned','finely','roughly','thinly','thickly','coarsely','cut','into','piece','pieces','fillet','fillets','drained','rinsed','deseeded','trimmed','divided','plus','more','crumbled','to','taste','serve','garnish','for','serving']);
 const LEAD_PREP=new Set(['grated','chopped','diced','sliced','minced','crushed','mashed','shredded','finely','roughly','thinly','thickly','coarsely','peeled','cubed','crumbled','beaten','melted','toasted']);
 const ABBREV={mayo:'mayonnaise',choc:'chocolate'};
 function num(t){t=t.trim();let m;if(m=t.match(/^(\d+)\s+(\d+)\/(\d+)$/))return +m[1]+(+m[2])/(+m[3]);if(m=t.match(/^(\d+)\/(\d+)$/))return (+m[1])/(+m[2]);if(FRAC[t]!=null)return FRAC[t];if(/^\d+(\.\d+)?$/.test(t))return parseFloat(t);return null;}
@@ -37,18 +38,29 @@ function parseLine(raw){
   s=s.replace(/\b(heaped|heaping|rounded|level|generous|scant)\b/ig,(w)=>{notes.unshift(w.toLowerCase());return ' ';});
   s=s.replace(/\b(\d+(?:\.\d+)?)\s*cm\b/ig,(_,n)=>{notes.push(n+'cm piece');return ' ';});
   s=s.replace(/(\d)([½¼¾⅓⅔⅛⅜⅝⅞])/g,'$1 $2').replace(/\s+/g,' ').trim();
+  // collapse a numeric range ("1/4-1/3", "2-3", "1/4 to 1/2", "16-20") to its first value
+  s=s.replace(/(\d+\s*\/\s*\d+|\d+(?:\.\d+)?)(?:\s*[-–]\s*|\s+to\s+)(\d+\s*\/\s*\d+|\d+(?:\.\d+)?)\b/i,(_,a)=>{notes.push('range');return a+' ';}).replace(/\s+/g,' ').trim();
   let words=s.split(' '); while(words.length&&LEAD_FILLER.has(words[0].toLowerCase().replace(/[^a-z]/g,'')))words.shift(); s=words.join(' ');
   let qty='',unit='',m;
   if(m=s.match(/^(\d+(?:\.\d+)?)\s*[-–]\s*(\d+(?:\.\d+)?)/)){qty=parseFloat(m[1]);s=s.slice(m[0].length).trim();notes.push('range');}
   else if(m=s.match(/^(\d+\s+\d+\/\d+|\d+\/\d+|\d+(?:\.\d+)?|[½¼¾⅓⅔⅛⅜⅝⅞])/)){qty=num(m[1]);s=s.slice(m[0].length).trim();}
+  if(qty!==''&&qty!=null) s=s.replace(/^(big|large|small|medium|heaped|heaping|generous|good|nice|level|rounded|scant)\s+/i,'').trim();
   if(qty!==''&&qty!=null){if(m=s.match(/^([a-zA-Z]+)\b\.?/)){const u=UNITS[m[1].toLowerCase()];if(u){unit=u;s=s.slice(m[0].length).trim();}}}
   else{if(m=s.match(/^([a-zA-Z]+)\b/)){const w=m[1].toLowerCase();if(BARE_UNIT.has(w)){unit=UNITS[w];qty=1;s=s.slice(m[0].length).trim();}}}
+  // strip an alternate measurement after a slash: "3 tbsp / 65ml oil", "600g / 1.2 lb chicken", '1.5cm / 1/2" ginger'
+  s=s.replace(/^\/\s*\d+(?:\s*[.\/]\s*\d+)?\s*(?:["a-zA-Z]+\.?)?\s*/,'').trim();
   s=s.replace(/^of\s+/i,'').trim();
   let name=s,prep=null;
   if(s.includes(',')){const p=s.split(',');name=p[0].trim();prep=p.slice(1).join(', ').trim()||null;}
   {let lw=name.split(' ');const lead=[];while(lw.length>1&&LEAD_PREP.has(lw[0].toLowerCase().replace(/[^a-z]/g,'')))lead.push(lw.shift());if(lead.length){const t=lead.join(' ');prep=prep?`${t}; ${prep}`:t;name=lw.join(' ');}}
   {let nw=name.split(' ');const tail=[];while(nw.length>1&&PREP.has(nw[nw.length-1].toLowerCase().replace(/[^a-z]/g,'')))tail.unshift(nw.pop());if(tail.length){const t=tail.join(' ');prep=prep?`${t}; ${prep}`:t;name=nw.join(' ');}}
   if(prep)notes.push(prep);
+  // Recover the noun when the name is adjective-only ("fresh", "boneless", "large"):
+  // the real ingredient got pushed into a prep clause or an "or …" alternative note.
+  if(!canon(name)){
+    const cands=[...(prep?prep.split(';'):[]), ...notes.map(x=>x.replace(/^or\s+/i,'').replace(/^(frozen|fresh|big|small|large)\s+/i,''))];
+    for(const cand of cands){ const cr=cleanRaw(cand); if(cr && !_LEAD_MEASURE.test(cr) && canon(cr)){ name=cand.trim(); break; } }
+  }
   name=name.split(/\s+/).map(w=>ABBREV[w.toLowerCase()]||w).join(' ').replace(/\s+/g,' ').trim();
   if(qty!==''&&qty!=null)qty=Math.round(qty*1000)/1000;
   return {qty,unit,name,note:[...new Set(notes.filter(Boolean))].join('; ')};
@@ -112,8 +124,17 @@ fs.writeFileSync('recipe-ingredient-normalisation.final.csv',out.join('\n')+'\n'
 // ===== price book CSV (one row per final variant) =====
 const ph=['Ingredient','Product','Category','Pack size (qty)','Pack unit (g / ml / each)','Pack price (£)','Store','Aliases','occurrences'];
 const pout=[ph.join(',')];
+// Preserve any already-filled prices (Pack size/unit/price/Store) from a prior
+// pricebook.variants.csv so regenerating never wipes manual fills. Keyed by Ingredient.
+const priorPrice={};
+if(fs.existsSync('pricebook.variants.csv')){
+  const pv=readCsv('pricebook.variants.csv'); const hi=Object.fromEntries((pv[0]||[]).map((h,i)=>[h.trim(),i]));
+  for(const r of pv.slice(1)){ const ing=r[hi['Ingredient']]; if(ing&&(r[hi['Pack price (£)']]||r[hi['Pack size (qty)']])) priorPrice[ing]={size:r[hi['Pack size (qty)']]||'',unit:r[hi['Pack unit (g / ml / each)']]||'',price:r[hi['Pack price (£)']]||'',store:r[hi['Store']]||''}; }
+}
 const fvs=Object.keys(fvGroup).sort((a,b)=>fvGroup[b].occ-fvGroup[a].occ||a.localeCompare(b));
-for(const fv of fvs){const g=fvGroup[fv];pout.push([esc(fv),esc(g.product||''),esc(g.category||''),'','','','',esc([...g.aliases].sort().join(';')),g.occ].join(','));}
+let carried=0;
+for(const fv of fvs){const g=fvGroup[fv];const pp=priorPrice[fv]||{size:'',unit:'',price:'',store:''};if(pp.price)carried++;pout.push([esc(fv),esc(g.product||''),esc(g.category||''),esc(pp.size),esc(pp.unit),esc(pp.price),esc(pp.store),esc([...g.aliases].sort().join(';')),g.occ].join(','));}
+console.log('carried-over prices:',carried);
 // NOTE: output is `pricebook.variants.csv` (one row per normalised variant), NOT
 // `pricebook.csv` — the latter belongs to the separate Apify scraper stream and
 // must not be clobbered. The variant sheet is the canonical app-facing price book.

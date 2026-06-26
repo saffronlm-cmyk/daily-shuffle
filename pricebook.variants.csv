@@ -1,6 +1,6 @@
 Ingredient,Product,Category,Pack size (qty),Pack unit (g / ml / each),Pack price (£),Store,Aliases,occurrences
 Salt,Salt,Spices & Herbs,,,,,big salt;cooking salt kosher salt;pinche salt,231
-Maple Syrup,Syrup,Pantry / Dry Goods,,,,,- maple syrup;maple;pure maple syrup;sugar maple syrup,152
+Maple Syrup,Syrup,Pantry / Dry Goods,,,,,maple;pure maple syrup;sugar maple syrup,152
 Egg,Egg,Dairy & Eggs / Alt,6,each,2.49,Lidl,,114
 Olive Oil,Oil,Condiments & Sauces,,,,,light drizzle olive oil;light olive oil,114
 Soy Sauce,Soy Sauce,Condiments & Sauces,,,,,,112
@@ -8,16 +8,16 @@ Garlic Clove,Garlic,Produce,,,,,,110
 Honey,Honey,Condiments & Sauces,,,,,runny honey,110
 Spring Onion,Onion,Produce,,,,,spring onion green;spring onion stem,104
 Baking Powder,Baking Powder,Pantry / Dry Goods,,,,,flat baking powder;flat tsp baking powder,90
-Coriander,Coriander,Spices & Herbs,,,,,cilantro,86
+Coriander,Coriander,Spices & Herbs,,,,,cilantro,90
 Vanilla Extract,Vanilla Extract,Pantry / Dry Goods,,,,,,84
-Greek Yoghurt,Yoghurt,Dairy & Eggs / Alt,,,,,fat greek yogurt;full-fat greek yogurt;plain greek yogurt;strained yogurt;thick greek yogurt;thick strained yogurt;thick yogurt,83
+Greek Yoghurt,Yoghurt,Dairy & Eggs / Alt,,,,,fat greek yogurt;full fat greek yogurt;plain greek yogurt;strained yogurt;thick greek yogurt;thick strained yogurt;thick yogurt,83
 Water,Water,Beverages,,,,,water thin,82
 Garlic Granules,Garlic granules,Spices & Herbs,,,,,garlic powder,80
 Cinnamon,Cinnamon,Spices & Herbs,,,,,cinnamon and,78
-Ginger,Ginger,Produce,1,each,0.92,Lidl,cm ginger;cm piece ginger;freshly ginger;ginger root;inch piece ginger;piece ginger;thumb size knob ginger,77
+Ginger,Ginger,Produce,1,each,0.92,Lidl,cm ginger;cm piece ginger;freshly ginger;ginger root;inch piece ginger;piece ginger;thumb size knob ginger,78
 Lime Juice,Lime,Produce,,,,,freshly squeezed lime juice;juice lime,76
+Cucumber,Cucumber,Produce,,,,,,75
 Garlic,Garlic,Produce,,,,,,74
-Cucumber,Cucumber,Produce,,,,,,73
 Sesame Oil,Oil,Condiments & Sauces,,,,,,72
 Black Pepper,Black Pepper,Spices & Herbs,,,,,crack black pepper;cracked pepper;freshly cracked black pepper;freshly pepper;lot black pepper,67
 Rice Vinegar,Vinegar,Condiments & Sauces,,,,,rice wine vinegar,66
@@ -30,19 +30,19 @@ Carrot,Carrot,Produce,,,,,,54
 Cocoa Powder,Cocoa Powder,Pantry / Dry Goods,1,each,2.89,Lidl,additional cocoa powder;cocoa,54
 Lemon Juice,Lemon,Produce,,,,,juice from lemon;juice half lemon;juice lemon,54
 Sesame Seeds,Sesame seeds,Nuts & Seeds,,,,,sesame seed coat,52
+Chicken Thigh,Chicken Thigh,Meat & Seafood / Protein,,,,,,50
 Peanut Butter,Nut butter,Condiments & Sauces,,,,,,50
 Sugar,Sugar,Pantry / Dry Goods,,,,,,50
-Chicken Thigh,Chicken Thigh,Meat & Seafood / Protein,,,,,,46
 Chia Seed,Chia Seed,Nuts & Seeds,,,,,,45
 Oats,Oats,Grains,,,,,jumbo oat,44
 Milk Choice,Milk Choice,Dairy & Eggs / Alt,,,,,,42
 Sriracha,Sriracha,Condiments & Sauces,1,each,1.99,Lidl,,41
+Vegetable Oil,Oil,Condiments & Sauces,,,,,,41
+Yellow Onion,Onion,Produce,,,,,onion,41
 Fish Sauce,Fish Sauce,Meat & Seafood / Protein,,,,,,40
 Milk,Milk,Dairy & Eggs / Alt,,,,,milk thin;warm milk,40
-Vegetable Oil,Oil,Condiments & Sauces,,,,,,40
-Yellow Onion,Onion,Produce,,,,,onion,40
-Chicken Breast,Chicken Breast,Meat & Seafood / Protein,,,,,,38
-Rice,Rice,Grains,,,,,- rice;rice choice;serving rice;steamed rice,36
+Chicken Breast,Chicken Breast,Meat & Seafood / Protein,,,,,,39
+Rice,Rice,Grains,,,,,rice choice;serving rice;steamed rice,36
 Vanilla,Vanilla,Pantry / Dry Goods,,,,,,36
 Coconut Sugar,Sugar,Pantry / Dry Goods,,,,,brown coconut sugar;coconut sugar dusting;extra coconut sugar dusting,34
 Oat Flour,Flour,Pantry / Dry Goods,,,,,,34
@@ -51,8 +51,8 @@ Dark Chocolate,Chocolate,Snacks & Confectionery,1,each,1.69,Lidl,,32
 Medjool Date,Medjool Date,Other,,,,,,30
 Pumpkin Puree,Pumpkin,Produce,,,,,pumpkin pur e,30
 Rolled Oats,Oats,Grains,,,,,rolled oat quinoa flake,30
+Dark Chocolate Chip,Chocolate,Snacks & Confectionery,,,,,,29
 Cumin,Cumin,Spices & Herbs,,,,,,28
-Dark Chocolate Chip,Chocolate,Snacks & Confectionery,,,,,,28
 Plain Yoghurt,Yoghurt,Dairy & Eggs / Alt,,,,,pot yogurt choice;yogurt,28
 Sea Salt,Salt,Spices & Herbs,,,,,,28
 Vanilla Protein Powder,Protein Powder,Pantry / Dry Goods,,,,,,28
@@ -72,9 +72,9 @@ Oregano,Oregano,Spices & Herbs,,,,,,22
 Parsley,Parsley,Spices & Herbs,,,,,,22
 Red Bell Pepper,Peppers,Produce,,,,,red capsicum bell pepper;red pepper,22
 White Pepper,White Pepper,Spices & Herbs,,,,,,22
+Chocolate Chip,Chocolate,Snacks & Confectionery,,,,,serving chocolate chip,21
 Protein Powder,Protein Powder,Pantry / Dry Goods,,,,,,21
 Almond Butter,Almond Butter,Condiments & Sauces,,,,,,20
-Chocolate Chip,Chocolate,Snacks & Confectionery,,,,,serving chocolate chip,20
 Chocolate Protein Powder,Protein Powder,Pantry / Dry Goods,,,,,,20
 Paprika,Paprika,Spices & Herbs,,,,,,20
 Persian Cucumber,Cucumber,Produce,,,,,,20
@@ -90,9 +90,13 @@ Cornstarch,Cornstarch,Pantry / Dry Goods,,,,,corn flour;cornflour,18
 Dark Soy Sauce,Soy sauce,Condiments & Sauces,,,,,dark soy,18
 Edamame,Edamame,Produce,,,,,,18
 Lime,Lime,Produce,1,each,0.48,Lidl,half lime,18
+Mint,Mint,Produce,,,,,,18
 Oyster Sauce,Oyster Sauce,Condiments & Sauces,,,,,,18
 Pumpkin Pie Spice,Pumpkin Pie Spice,Spices & Herbs,,,,,,18
 Pecans,Pecans,Nuts & Seeds,,,,,pecan topping,17
+Raspberry,Berries,Produce,,,,,,17
+Spinach,Salad,Produce,,,,,big handful spinach leave;big spinach,17
+Vermicelli Rice Noodles,Noodles,Pantry / Dry Goods,,,,,rice vermicelli noodle;serving instant vermicelli rice noodle;thin flat rice noodle;vermicelli noodle,17
 Cherry Tomatoes,Tomatoes,Produce,,,,,cherry tomato;pint cherry tomatoes,16
 Coconut Aminos,Coconut Aminos,Condiments & Sauces,,,,,coconut amino,16
 Curry Powder,Curry Powder,Spices & Herbs,,,,,,16
@@ -100,44 +104,42 @@ Dill,Dill,Spices & Herbs,,,,,,16
 Jasmine Rice,Rice,Grains,,,,,dry jasmine rice;precooked jasmine,16
 Liquid Egg White,Egg,Dairy & Eggs / Alt,,,,,egg white,16
 Mayonnaise,Mayonnaise,Condiments & Sauces,,,,,egg mayonnaise,16
-Mint,Mint,Produce,,,,,,16
 Nutritional Yeast,Nutritional Yeast,Pantry / Dry Goods,,,,,,16
+Oil,Oil,Condiments & Sauces,,,,,neutral cooking oil;neutral oil;neutral oil frying;plain oil,16
 Onion Powder,Onion Powder,Spices & Herbs,,,,,,16
 Shallot,Onion,Produce,,,,,scallion shallot,16
 Smooth Peanut Butter,Nut butter,Condiments & Sauces,,,,,creamy peanut butter;natural peanut butter,16
 Sweet Potato,Potatoes,Produce,1,each,1.18,Lidl,,16
 Tuna,Tuna,Meat & Seafood / Protein,,,,,,16
-Vermicelli Rice Noodles,Noodles,Pantry / Dry Goods,,,,,rice vermicelli noodle;serving instant vermicelli rice noodle;thin flat rice noodle;vermicelli noodle,16
-Raspberry,Berries,Produce,,,,,,15
+Prawn,Prawn,Meat & Seafood / Protein,,,,,,15
 Almond Milk,Milk,Dairy & Eggs / Alt,,,,,protein almond milk,14
+Bean Sprout,Bean Sprout,Vegetables,,,,,very heaped cup each bean sprout spinach,14
+Chicken Stock,Chicken Stock,Meat & Seafood / Protein,,,,,so chicken stock,14
 Chives,Onion,Produce,,,,,more chive,14
 Feta,Cheese,Dairy & Eggs / Alt,,,,,feta cheese,14
 Kosher Salt,Salt,Spices & Herbs,,,,,,14
-Prawn,Prawn,Meat & Seafood / Protein,,,,,,14
 Salt Pepper,Salt Pepper,Spices & Herbs,,,,,,14
-Spinach,Salad,Produce,,,,,big handful spinach leave;big spinach leaf,14
 Vanilla Bean Paste,Vanilla Bean Paste,Pantry / Dry Goods,,,,,vanilla paste,14
 White Sugar,Sugar,Pantry / Dry Goods,,,,,,14
-Alternative Milk,Milk,Dairy & Eggs / Alt,,,,,nut milk;plant milk;plant-based milk,12
+Basil,Basil,Spices & Herbs,,,,,basil leave,13
+Scallion,Onion,Produce,,,,,,13
+Alternative Milk,Milk,Dairy & Eggs / Alt,,,,,nut milk;plant based milk;plant milk,12
 Apple Cider Vinegar,Vinegar,Condiments & Sauces,,,,,,12
-Basil,Basil,Spices & Herbs,,,,,basil leave,12
-Bean Sprout,Bean Sprout,Vegetables,,,,,,12
 Cayenne Pepper,Cayenne Pepper,Spices & Herbs,,,,,cayenne;cayenne powder,12
-Chicken Stock,Chicken Stock,Meat & Seafood / Protein,,,,,,12
 Chipotle Powder,Chipotle Powder,Spices & Herbs,,,,,,12
 Nutmeg,Nutmeg,Spices & Herbs,,,,,little le than nutmeg,12
 Peach,Peach,Produce,,,,,peache,12
 Purple Cabbage,Cabbage,Produce,,,,,red cabbage,12
 Rice Noodles,Noodles,Pantry / Dry Goods,,,,,dry rice noodle;ramen noodle use gf rice noodle,12
-Scallion,Onion,Produce,,,,,,12
 Thai Red Curry Paste,Thai Red Curry Paste,Condiments & Sauces,,,,,,12
-Thyme,Thyme,Spices & Herbs,,,,,thyme leaf;thyme leave,12
+Thyme,Thyme,Spices & Herbs,,,,,thyme leave,12
 Tomato,Tomato,Produce,,,,,tomato slice,12
 Tomatoes,Tomatoes,Vegetables,,,,,,12
 White Miso Paste,Miso,Condiments & Sauces,,,,,white miso,12
 Chilli Powder,Chilli Powder,Spices & Herbs,,,,,,11
 Banana,Banana,Produce,,,,,topping banana,10
 Banana Shallot,Onion,Produce,,,,,,10
+Blueberry,Berries,Produce,,,,,,10
 Boiling Water,Water,Beverages,,,,,,10
 Coconut Yoghurt,Yoghurt,Dairy & Eggs / Alt,,,,,,10
 Flakey Salt,Salt,Spices & Herbs,,,,,flaky salt,10
@@ -150,8 +152,9 @@ Pickled Jalapeño,Pickles,Canned & Jarred,,,,,jalapeno from jar,10
 Pinche Salt Pepper,Pinche Salt Pepper,Spices & Herbs,,,,,,10
 Tamari,Tamari,Condiments & Sauces,,,,,,10
 Tomato Paste,Tomatoes,Canned & Jarred,,,,,,10
-Blueberry,Berries,Produce,,,,,,9
 Butter,Butter,Dairy & Eggs / Alt,,,,,room temperature butter,9
+Lettuce,Salad,Produce,,,,,cos;lettuce choice;lettuce leave,9
+Walnut,Walnut,Nuts & Seeds,,,,,,9
 Apple,Apple,Produce,,,,,,8
 Arrowroot Starch,Arrowroot Starch,Pantry / Dry Goods,,,,,arrowroot;arrowroot flour;water teaspoon arrowroot starch,8
 Bananas,Bananas,Produce,,,,,,8
@@ -163,27 +166,23 @@ Clove,Clove,Spices & Herbs,,,,,,8
 Coconut Cream,Coconut Cream,Canned & Jarred,,,,,,8
 Coconut Flour,Flour,Pantry / Dry Goods,,,,,,8
 Cooking,Cooking,Other,,,,,,8
-Coriander Leave,Coriander,Spices & Herbs,,,,,,8
 Desiccated Coconut,Desiccated coconut,Pantry / Dry Goods,,,,,coconut shred,8
 Firm Tofu,Firm Tofu,Meat & Seafood / Protein,,,,,,8
 Flakey Sea Salt,Salt,Spices & Herbs,,,,,flakey sea salt topping;flaky sea salt;flaky sea salt topping,8
 Garam Masala,Garam Masala,Spices & Herbs,,,,,,8
 Gluten-free Plain Flour,Flour,Pantry / Dry Goods,,,,,gluten all purpose flour substitute;gluten free all purpose flour;gluten free all purpose flour substitute,8
-Gluten-free Soy Sauce,Soy sauce,Condiments & Sauces,,,,,gf soy sauce;gluten free soy sauce;gluten soy sauce,8
+Gluten-free Soy Sauce,Soy sauce,Condiments & Sauces,,,,,gf soy sauce;gluten soy sauce,8
 Gochugaru,Gochugaru,Condiments & Sauces,,,,,,8
 Hoisin Sauce,Hoisin sauce,Condiments & Sauces,,,,,hoisin,8
 Juice,Juice,Beverages,,,,,,8
 Lemon Zest,Lemon,Produce,,,,,zest from lemon;zest lemon,8
-Lettuce,Salad,Produce,,,,,lettuce choice;lettuce leaf;lettuce leave,8
 Light Mayonnaise,Mayonnaise,Condiments & Sauces,1,each,2.49,Lidl,,8
 Lime Wedge,Lime,Produce,,,,,,8
 Milled Flaxseed,Flaxseed,Nuts & Seeds,,,,,flax meal;flaxseed,8
-Neutral Oil,,Condiments & Sauces,,,,,,8
 Nut Butter,Nut butter,Condiments & Sauces,,,,,nut butter choice;runny nut butter,8
 Parmesan,Cheese,Dairy & Eggs / Alt,,,,,,8
 Pumpkin Seeds,Pumpkin seeds,Nuts & Seeds,,,,,pumpkin seed topping,8
 Rice Cake,Rice Cake,Bakery,,,,,,8
-Salmon Fillet,Salmon,Meat & Seafood / Protein,,,,,,8
 Soya Milk,Milk,Dairy & Eggs / Alt,,,,,soy milk,8
 Star Anise,Star Anise,Spices & Herbs,,,,,star anise pod,8
 Sumac,Sumac,Spices & Herbs,,,,,sumac sprinkle,8
@@ -195,7 +194,6 @@ Tamarind Paste,Tamarind Paste,Condiments & Sauces,,,,,tamarind pur e;tamarind pu
 Thai Basil,Basil,Produce,,,,,thai basil leave,8
 Vanilla Essence,Vanilla Essence,Pantry / Dry Goods,,,,,,8
 Vegetable Stock,Stock,Spices & Herbs,,,,,veg stock,8
-Walnut,Walnut,Nuts & Seeds,,,,,,8
 White Cabbage,Cabbage,Produce,,,,,cabbage,8
 Chili Powder,Chilli Powder,Spices & Herbs,,,,,red chilli powder,7
 Ginger And Garlic Paste,Ginger And Garlic Paste,Produce,,,,,garlic and ginger paste;garlic ginger paste;ginger garlic paste,7
@@ -230,12 +228,13 @@ Pepper,Pepper,Spices & Herbs,,,,,,6
 Pickle Juice,Pickles,Canned & Jarred,,,,,,6
 Powdered Sugar,Sugar,Pantry / Dry Goods,,,,,,6
 Quinoa,Quinoa,Grains,,,,,,6
+Radish,Radish,Vegetables,,,,,radishe,6
 Red Wine Vinegar,Vinegar,Condiments & Sauces,,,,,,6
 Romaine Lettuce,Salad,Produce,,,,,romaine,6
-Self-Raising Flour,Flour,Pantry / Dry Goods,,,,,self raising flour;self rising flour,6
+Salmon,Salmon,Meat & Seafood / Protein,,,,,,6
 Sticky Rice,Rice,Grains,,,,,,6
 Strawberry,Berries,Produce,,,,,,6
-Sun-dried Tomatoes,Sun-dried Tomatoes,Canned & Jarred,,,,,sun tomatoes;sundried tomatoes in oil,6
+Sun-dried Tomatoes,Sun-dried Tomatoes,Canned & Jarred,,,,,sundried tomatoes in oil,6
 Sushi Rice,Rice,Grains,,,,,,6
 Sweet Chilli Sauce,Sweet Chilli Sauce,Condiments & Sauces,,,,,,6
 Taco Seasoning,Taco Seasoning,Spices & Herbs,,,,,,6
@@ -248,8 +247,8 @@ Zucchini,Zucchini,Produce,,,,,,6
 Celery,Celery,Produce,,,,,celery stalk,5
 Coffee,Coffee,Beverages,,,,,,5
 Fat Greek Yoghurt,Yoghurt,Dairy & Eggs / Alt,,,,,,5
-Fresh,,Other,,,,,,5
-Oil,,Condiments & Sauces,,,,,,5
+Mushroom,Mushroom,Produce,,,,,enoki mushroom,5
+Self-Raising Flour,Flour,Pantry / Dry Goods,,,,,self rising flour,5
 Agave Syrup,Agave Syrup,Condiments & Sauces,,,,,agave,4
 Aleppo Pepper,Aleppo Pepper,Spices & Herbs,,,,,,4
 Almond Extract,Almond Extract,Pantry / Dry Goods,,,,,,4
@@ -264,7 +263,7 @@ Bell Pepper,Peppers,Produce,,,,,,4
 Bird Eye Chilli,Chillies,Vegetables,,,,,bird eye chilly;bird eye red chily,4
 Black Bean,Black Bean,Canned & Jarred,,,,,,4
 Black Sesame Seed,Black Sesame Seed,Nuts & Seeds,,,,,,4
-Boiled Egg,Egg,Dairy & Eggs / Alt,,,,,soft-boiled egg,4
+Boiled Egg,Egg,Dairy & Eggs / Alt,,,,,soft boiled egg,4
 Bread,Bread,Bakery,,,,,bread choice,4
 Broccoli Floret,Broccoli,Produce,,,,,,4
 Broccolini,Broccoli,Vegetables,,,,,,4
@@ -275,14 +274,13 @@ Cashew,Cashew,Nuts & Seeds,,,,,,4
 Caster Sugar,Sugar,Pantry / Dry Goods,,,,,,4
 Chicken Broth,Chicken Stock,Meat & Seafood / Protein,,,,,,4
 Chicken Leg,Chicken Leg,Meat & Seafood / Protein,,,,,,4
-Chicken Thigh Fillet,Chicken Thigh,Meat & Seafood / Protein,,,,,,4
 Chickpea Flour,Flour,Pantry / Dry Goods,,,,,,4
 Chili Crunch,Chili Crunch,Condiments & Sauces,,,,,,4
 Chinese Cooking Wine,Wine,Beverages,,,,,,4
 Chinese Five Spice,Chinese Five Spice,Spices & Herbs,,,,,,4
 Coconut,Coconut,Pantry / Dry Goods,,,,,,4
-Cod Fillet,Cod,Meat & Seafood / Protein,,,,,,4
 Cooking Oil Spray,Cooking Oil Spray,Other,,,,,,4
+Coriander Leave,Coriander,Spices & Herbs,,,,,,4
 Coriander Seed,Coriander Seed,Spices & Herbs,,,,,,4
 Corn,Corn,Produce,,,,,,4
 Cottage Cheese,Cheese,Dairy & Eggs / Alt,,,,,,4
@@ -295,9 +293,9 @@ Dark Chocolate Chip Topping,Chocolate,Snacks & Confectionery,,,,,,4
 Dill Pickle,Pickles,Canned & Jarred,,,,,,4
 Extra Virgin Olive Oil,Oil,Condiments & Sauces,,,,,,4
 Fried Shallot,Onion,Produce,,,,,,4
-Full-fat Coconut Milk,Coconut Milk,Canned & Jarred,,,,,full fat coconut milk,4
+Full-fat Coconut Milk,Coconut Milk,Canned & Jarred,,,,,,4
 Ginger Puree,Ginger Puree,Produce,,,,,,4
-Gluten-free Hoisin Sauce,Hoisin sauce,Condiments & Sauces,,,,,gluten free hoisin sauce;gluten hoisin sauce,4
+Gluten-free Hoisin Sauce,Hoisin sauce,Condiments & Sauces,,,,,gluten hoisin sauce,4
 Gluten-free Oyster Sauce,Oyster sauce,Condiments & Sauces,,,,,gf oyster sauce,4
 Glutinous Rice Flour,Flour,Pantry / Dry Goods,,,,,,4
 Gras-fed Collagen,Gras-fed Collagen,Other,,,,,,4
@@ -309,22 +307,20 @@ Hazelnut,Hazelnut,Other,,,,,,4
 Hot Sauce,Hot Sauce,Condiments & Sauces,,,,,,4
 King Prawn,Prawn,Meat & Seafood / Protein,,,,,,4
 Lean Turkey,Lean Turkey,Meat & Seafood / Protein,,,,,,4
-Low-sodium Tamari,Tamari,Condiments & Sauces,,,,,low sodium tamari,4
+Low-sodium Tamari,Tamari,Condiments & Sauces,,,,,,4
 Mango,Mango,Produce,,,,,,4
 Mango Chutney,Chutney,Condiments & Sauces,,,,,,4
-Mint Leaf,Mint,Produce,,,,,mint leave,4
 Mixed Herb,Mixed Herb,Spices & Herbs,,,,,more herb,4
 Msg,Msg,Spices & Herbs,,,,,,4
 Natural Sweetener,Sugar,Pantry / Dry Goods,,,,,,4
 Nuts,Nuts,Nuts & Seeds,,,,,,4
 Palm Sugar,Sugar,Pantry / Dry Goods,,,,,,4
-Pasta,Pasta,Pantry / Dry Goods,,,,,dry-weight pasta,4
+Pasta,Pasta,Pantry / Dry Goods,,,,,dry weight pasta,4
 Pickled Jalapeño Brine,Pickles,Canned & Jarred,,,,,brine from jalapeno;brine from jalapeno jar;jalapeno brine,4
 Pitted Medjool Date,Pitted Medjool Date,Other,,,,,,4
 Plain,Plain,Other,,,,,,4
 Potato Starch,Potato Starch,Pantry / Dry Goods,,,,,,4
 Powdered Monkfruit Sweetener,Sugar,Pantry / Dry Goods,,,,,powdered monk fruit sweetener,4
-Radish,Radish,Vegetables,,,,,,4
 Raisin,Raisin,Nuts & Seeds,,,,,,4
 Ramen Noodles,Noodles,Pantry / Dry Goods,,,,,,4
 Red Capsicum,Peppers,Produce,,,,,,4
@@ -332,12 +328,13 @@ Red Curry Paste,Red Curry Paste,Other,,,,,,4
 Red Pepper Flake,Chilli Flakes,Spices & Herbs,,,,,,4
 Rocket,Salad,Produce,,,,,,4
 Salad Tomatoes,Tomatoes,Vegetables,,,,,,4
+Salmon Fillet,Salmon,Meat & Seafood / Protein,,,,,,4
 Shelled Edamame,Edamame,Produce,,,,,,4
 Shiitake Mushroom,Mushroom,Produce,,,,,,4
 Soya Yoghurt,Yoghurt,Dairy & Eggs / Alt,1,each,0.99,Lidl,plain soya yogurt,4
 Sprouted Oat,Oats,Grains,,,,,,4
 Stock,Stock,Spices & Herbs,,,,,stock cube,4
-Sugar Free Maple Syrup,Maple Syrup,Pantry / Dry Goods,,,,,sugar-free maple syrup,4
+Sugar Free Maple Syrup,Maple Syrup,Pantry / Dry Goods,,,,,,4
 Thai Chillie,Chillies,Vegetables,,,,,thai chilly,4
 Tofu,Tofu,Meat & Seafood / Protein,,,,,,4
 Tomato Passata,Puree,Canned & Jarred,,,,,passata,4
@@ -352,7 +349,10 @@ Vegetable,Vegetable,Other,,,,,,4
 White Wine,Wine,Beverages,,,,,,4
 White Wine Vinegar,Vinegar,Condiments & Sauces,,,,,,4
 Wholemeal Pita,Pitta,Bakery,,,,,wholemeal pita bread,4
--,,Other,,,,,,3
+Berry,Berries,Produce,,,,,,3
+Dairy-free Chocolate Chip,Chocolate,Snacks & Confectionery,,,,,,3
+Extra-firm Tofu,Extra-firm Tofu,Meat & Seafood / Protein,,,,,,3
+Mint Coriander,Mint Coriander,Produce,,,,,,3
 Pickled Onion,Pickles,Canned & Jarred,,,,,,3
 Adobo Sauce,Adobo Sauce,Condiments & Sauces,,,,,,2
 Adobo Seasoning Salt,Adobo Seasoning Salt,Spices & Herbs,,,,,,2
@@ -364,15 +364,13 @@ Asparagus,Asparagus,Produce,,,,,,2
 Baking Cacoa,Cacoa,Pantry / Dry Goods,,,,,baking cacao topping,2
 Bamboo Shoot,Bamboo Shoot,Canned & Jarred,,,,,,2
 Basil And Parsley,Basil And Parsley,Spices & Herbs,,,,,,2
-Bay Leaves,Bay Leaves,Spices & Herbs,,,,,bay leaf,2
+Bay Leaves,Bay Leaves,Spices & Herbs,,,,,bay leave,2
 Beansprout,Sprouts,Vegetables,,,,,,2
 Bee Pollen,Bee Pollen,Other,,,,,,2
 Beef,Beef,Meat & Seafood / Protein,,,,,,2
 Beef Mince,Beef Mince,Meat & Seafood / Protein,,,,,,2
 Beef Stock Cube,Beef Stock Cube,Meat & Seafood / Protein,,,,,,2
 Bella Mushroom,Mushroom,Produce,,,,,,2
-Berry,Berries,Produce,,,,,,2
-Big Handful Basil,Basil,Spices & Herbs,,,,,,2
 Bird Eye Red Chilli,Chillies,Produce,,,,,,2
 Biscoff,Biscoff,Condiments & Sauces,,,,,,2
 Black And White Sesame Seed Coating,Black And White Sesame Seed Coating,Nuts & Seeds,,,,,,2
@@ -402,6 +400,7 @@ Chicken Bouillon Powder,Chicken Bouillon Powder,Meat & Seafood / Protein,,,,,,2
 Chicken Jus,Chicken Jus,Meat & Seafood / Protein,,,,,,2
 Chicken Powder,Chicken Powder,Meat & Seafood / Protein,,,,,,2
 Chicken Seasoning Paprika,Chicken Seasoning Paprika,Meat & Seafood / Protein,,,,,,2
+Chicken Thigh Fillet,Chicken Thigh,Meat & Seafood / Protein,,,,,,2
 Chili Garlic Sauce,Chili Garlic Sauce,Condiments & Sauces,,,,,,2
 Chilled Espresso,Espresso,Beverages,,,,,shot chilled espresso,2
 Chilli Garlic Paste,Chilli Garlic Paste,Produce,,,,,,2
@@ -422,6 +421,8 @@ Chocolate Shaving,Chocolate,Snacks & Confectionery,,,,,,2
 Chorizo,Chorizo,Meat & Seafood / Protein,,,,,,2
 Chunky Peanut Butter,Nut butter,Condiments & Sauces,,,,,,2
 Coconut Flake,Coconut Flake,Pantry / Dry Goods,,,,,,2
+Cod,Cod,Meat & Seafood / Protein,,,,,,2
+Cod Fillet,Cod,Meat & Seafood / Protein,,,,,,2
 Cooking Spray,Cooking Spray,Other,,,,,,2
 Coriander Root,Coriander,Spices & Herbs,,,,,,2
 Coriander Stalk,Coriander,Spices & Herbs,,,,,,2
@@ -435,9 +436,9 @@ Crispy Onion,Crispy Onion,Produce,,,,,,2
 Cube Chocolate,Chocolate,Snacks & Confectionery,,,,,,2
 Cumin Seed,Cumin,Spices & Herbs,,,,,,2
 Cured Ham,Cured Ham,Meat & Seafood / Protein,,,,,,2
+Curly Kale,Salad,Produce,,,,,,2
 Dairy Free Milk Choice,Milk,Dairy & Eggs / Alt,,,,,dairy milk choice,2
 Dairy-free Chocolate,Chocolate,Snacks & Confectionery,,,,,,2
-Dairy-free Chocolate Chip,Chocolate,Snacks & Confectionery,,,,,,2
 Dairy-free Chocolate Chip Coconut Oil,Dairy-free Chocolate Chip Coconut Oil,Condiments & Sauces,,,,,,2
 Dairy-free Dark Chocolate,Chocolate,Snacks & Confectionery,,,,,,2
 Dairy-free Yoghurt,Yoghurt,Dairy & Eggs / Alt,,,,,,2
@@ -458,8 +459,6 @@ Enough Water Cover Chicken,Enough Water Cover Chicken,Meat & Seafood / Protein,,
 Espresso Shot,Coffee,Beverages,,,,,,2
 European Cucumber,Cucumber,Produce,,,,,,2
 Everything Bagel Seasoning,Everything Bagel Seasoning,Spices & Herbs,,,,,,2
-Extra Firm Tofu,Firm Tofu,Meat & Seafood / Protein,,,,,,2
-Extra Milk Pouring Over,Milk,Dairy & Eggs / Alt,,,,,,2
 Fennel Seed,Fennel Seed,Spices & Herbs,,,,,,2
 Filling Choice,Filling Choice,Other,,,,,,2
 Fine Sea Salt,Salt,Spices & Herbs,,,,,,2
@@ -485,7 +484,7 @@ Gluten-free,Gluten-free,Other,,,,,,2
 Gluten-free Bread,Bread,Bakery,,,,,gf bread,2
 Gluten-free Bread Flour,Gluten-free bread flour,Pantry / Dry Goods,,,,,king arthur gluten bread flour;king arthur gluten free bread flour,2
 Gluten-free Flour,Flour,Pantry / Dry Goods,,,,,gf flour,2
-Gluten-free Self-raising Flour,Flour,Pantry / Dry Goods,,,,,gluten-free self-raising,2
+Gluten-free Self-raising Flour,Flour,Pantry / Dry Goods,,,,,gluten free self raising,2
 Gluten-free Wrap,Wrap,Bakery,,,,,gf wrap,2
 Gnocchi,Pasta,Pantry / Dry Goods,,,,,,2
 Gochugaru Flake,Gochugaru,Condiments & Sauces,,,,,,2
@@ -509,8 +508,8 @@ Japanese Sweet Potato,Potatoes,Produce,,,,,,2
 Juice And Zest Lime,Lime,Produce,,,,,,2
 Juice Orange And Zest,Orange,Produce,,,,,,2
 Jumbo Wild Caught Pink Shrimp,Prawn,Meat & Seafood / Protein,,,,,,2
-Kaffir Lime Leave,Kaffir Lime Leave,Produce,,,,,,2
 Kaizen Rice,Kaizen Rice,Grains,,,,,,2
+Kale,Salad,Produce,,,,,,2
 Kefir Yogurt,Yoghurt,Dairy & Eggs / Alt,,,,,,2
 Ketchup,Ketchup,Condiments & Sauces,1,each,3.99,Lidl,tomato sauce,2
 Kimchi,Kimchi,Canned & Jarred,,,,,,2
@@ -532,7 +531,7 @@ Long Red Chilli,Chillies,Produce,,,,,,2
 Low Fat Coconut Milk,Coconut Milk,Canned & Jarred,,,,,,2
 Low Sodium Chicken Stock,Chicken Stock,Meat & Seafood / Protein,,,,,,2
 Low-carb Cinnamon Cracker,Low-carb Cinnamon Cracker,Snacks & Confectionery,,,,,,2
-Low-carb Tortilla,Tortilla,Bakery,,,,,low-carb tortillas,2
+Low-carb Tortilla,Tortilla,Bakery,,,,,low carb tortillas,2
 Low-fat Coconut Milk,Coconut Milk,Canned & Jarred,,,,,light coconut milk,2
 Low-fat Plain Yoghurt,Plain Yoghurt,Dairy & Eggs / Alt,,,,,low fat yogurt,2
 Low-sugar Tomato Ketchup,Ketchup,Condiments & Sauces,,,,,,2
@@ -545,21 +544,15 @@ Mexican Cheese Blend,Cheese,Dairy & Eggs / Alt,,,,,,2
 Microwave Rice,Rice,Grains,,,,,,2
 Mild Chilli Powder,Chilli Powder,Spices & Herbs,,,,,,2
 Mild Curry Powder,Curry Powder,Spices & Herbs,,,,,,2
-Mini Chicken Breast Fillet,Mini Chicken Breast,Meat & Seafood / Protein,,,,,,2
-Mini Chocolate Chip,Chocolate,Snacks & Confectionery,,,,,,2
-Mini Cucumber,Cucumber,Produce,,,,,,2
-Mini Dairy-free Chocolate Chip,Chocolate,Snacks & Confectionery,,,,,,2
-Mini Dark Chocolate Chip,Chocolate,Snacks & Confectionery,,,,,,2
 Mint And Coriander,Mint And Coriander,Produce,,,,,,2
-Mint Coriander,Mint Coriander,Produce,,,,,,2
-Mint Leave Coriander,Mint Leave Coriander,Produce,,,,,,2
+Mint Leaf,Mint,Produce,,,,,mint leave,2
 Miracle Whip,Miracle Whip,Other,,,,,,2
 Miso Soup,Miso Soup,Condiments & Sauces,,,,,,2
 Mixed Nuts,Mixed Nuts,Nuts & Seeds,,,,,,2
 Mixed Seeds,Mixed Seeds,Nuts & Seeds,,,,,,2
 Mixed Spice,Mixed Spice,Spices & Herbs,,,,,,2
 More Hazelnut,More Hazelnut,Other,,,,,,2
-Mushroom,Mushroom,Produce,,,,,,2
+Nandos Garlic Sauce,Nando Garlic Sauce,Condiments & Sauces,,,,,nando  garlic sauce;nando garlic sauce,2
 Non-dairy Milk,Milk,Dairy & Eggs / Alt,,,,,,2
 Nush Protein Yoghurt,Yoghurt,Dairy & Eggs / Alt,,,,,,2
 Orange Zest,Orange,Produce,,,,,zest orange,2
@@ -598,7 +591,6 @@ Psyllium Husk,Psyllium Husk,Nuts & Seeds,,,,,,2
 Pumpkin Spice Granola,Pumpkin Spice Granola,Pantry / Dry Goods,,,,,,2
 Pure Vanilla Extract,Vanilla Extract,Pantry / Dry Goods,,,,,,2
 Quinoa Flake,Quinoa,Grains,,,,,,2
-Radishes,,Other,,,,,,2
 Raspberries,Berries,Produce,,,,,box raspberry,2
 Red,Red,Other,,,,,,2
 Red Apple,Apple,Produce,,,,,,2
@@ -616,7 +608,6 @@ Roast Chicken Breast,Roast Chicken Breast,Meat & Seafood / Protein,,,,,,2
 Rock Salt,Salt,Spices & Herbs,,,,,,2
 Rosemary,Rosemary,Spices & Herbs,,,,,,2
 Rotisserie Chicken,Rotisserie Chicken,Meat & Seafood / Protein,,,,,,2
-Salmon,Salmon,Meat & Seafood / Protein,,,,,,2
 Salsa,Salsa,Other,,,,,,2
 Salt And Black Pepper,Salt And Black Pepper,Spices & Herbs,,,,,,2
 Salt And Cracked Pepper,Salt And Cracked Pepper,Spices & Herbs,,,,,,2
@@ -662,7 +653,7 @@ Streaky Bacon,Streaky Bacon,Meat & Seafood / Protein,,,,,,2
 Sugar Snap Peas,Peas,Vegetables,,,,,sugar snap pea,2
 Sugar-free Ketchup,Ketchup,Condiments & Sauces,,,,,,2
 Sunbutter,Sunbutter,Condiments & Sauces,,,,,,2
-Sundried Tomato Paste,Sundried tomatoes,Canned & Jarred,,,,,sun-dried tomato paste,2
+Sundried Tomato Paste,Sundried tomatoes,Canned & Jarred,,,,,sun tomato paste,2
 Sundried Tomatoes,Sundried tomatoes,Canned & Jarred,,,,,sun tomato;sundried tomato;sundried tomato pur e;sundried tomato puree,2
 Sunflower And Sesame Seed Blend,Sunflower And Sesame Seed Blend,Nuts & Seeds,,,,,,2
 Sunflower Seeds,,Other,,,,,,2
@@ -679,6 +670,7 @@ Tuna In Spring Water,Tuna In Spring Water,Meat & Seafood / Protein,,,,,,2
 Tuna In Water,Tuna In Water,Meat & Seafood / Protein,,,,,,2
 Tuna Steak,Tuna Steak,Meat & Seafood / Protein,,,,,,2
 Turkey,Turkey,Meat & Seafood / Protein,,,,,,2
+Unsalted Butter,Butter,Dairy & Eggs / Alt,,,,,extra unsalted butter,2
 Unsweetened Apple Sauce,Applesauce,Condiments & Sauces,,,,,,2
 Unsweetened Applesauce,Applesauce,Condiments & Sauces,,,,,,2
 Unsweetened Cocoa Powder,Cocoa Powder,Pantry / Dry Goods,,,,,,2
@@ -717,60 +709,45 @@ Worcestershire Sauce,Worcestershire Sauce,Condiments & Sauces,,,,,,2
 Zest,Citrus,Produce,,,,,,2
 Zest And Juice Lemon,Lemon,Produce,,,,,,2
 Zest And Juice Lime,Lime,Produce,,,,,,2
-/ 1.2 Lb Chicken Thigh,,Meat & Seafood / Protein,,,,,,1
-"/ 1/2"" Ginger Piece",,Produce,,,,,,1
-/ 10oz Peeled Whole Cooked Prawns/shrimp,,Meat & Seafood / Protein,,,,,,1
-/ 2 Tbsp Unsalted Butter,,Dairy & Eggs / Alt,,,,,,1
-/ 2.5oz Dried Vermicelli Noodles,,Other,,,,,,1
-/ 2.5oz Enoki Mushrooms,,Other,,,,,,1
-/ 3 Tbsp Extra Unsalted Butter,,Dairy & Eggs / Alt,,,,,,1
-/ 4 Cups Chicken Stock/broth,,Meat & Seafood / Protein,,,,,,1
-/ 5oz Instant Noodles,,Other,,,,,,1
-/ 600g Firm White Fish Fillets,,Meat & Seafood / Protein,,,,,,1
-/ 65ml Vegetable Oil,,Condiments & Sauces,,,,,,1
 Batch Quick Pickled Carrot And Daikon,Batch Quick Pickled Carrot And Daikon,Produce,,,,,,1
-Block Extra-firm Tofu,,Meat & Seafood / Protein,,,,,,1
-Boneless,,Other,,,,,,1
+Big Handful Basil,Basil,Spices & Herbs,,,,,,1
+Breadcrumbs,Breadcrumbs,Bakery,,,,,panko breadcrumb,1
 Butter Coffee Protein Powder,Butter Coffee Protein Powder,Dairy & Eggs / Alt,,,,,,1
 Chili Flake,Chilli Flakes,Spices & Herbs,,,,,,1
+Chilli,Chilli,Produce,,,,,red chilly,1
 Cinnamon And Ginger,Cinnamon And Ginger,Spices & Herbs,,,,,,1
 Cm,Cm,Other,,,,,,1
 Cucumber And Carrot,Cucumber And Carrot,Produce,,,,,,1
 Daikon,,Produce,,,,,,1
-Extra-firm Tofu,Extra-firm Tofu,Meat & Seafood / Protein,,,,,,1
+Extra Firm Tofu,Firm Tofu,Meat & Seafood / Protein,,,,,,1
+Extra Milk Pouring Over,Milk,Dairy & Eggs / Alt,,,,,,1
+Firm White Fish,Firm White Fish,Meat & Seafood / Protein,,,,,,1
 Garlic Paste And Ginger Paste,Garlic Paste And Ginger Paste,Produce,,,,,,1
-Handful Curly Kale,Salad,Produce,,,,,,1
-Handfuls Baby Spinach,,Produce,,,,,,1
-Handfuls Curly Kale,,Produce,,,,,,1
-Handfuls Fresh Spinach,,Produce,,,,,,1
-Handfuls Kale,,Produce,,,,,,1
-Kale,Salad,Produce,,,,,,1
-Large,,Other,,,,,,1
+Instant Noodles,Noodles,Pantry / Dry Goods,,,,,,1
+Kaffir Lime Leave,Kaffir Lime Leave,Produce,,,,,,1
+Kaffir Lime Leaves,Lime Leaf,Spices & Herbs,,,,,,1
 Lime And Peanut,Lime And Peanut,Pantry / Dry Goods,,,,,,1
+Milk Pouring Over,Milk Pouring Over,Dairy & Eggs / Alt,,,,,,1
+Mini Chicken Breast Fillet,Mini Chicken Breast,Meat & Seafood / Protein,,,,,,1
+Mini Chocolate Chip,Chocolate,Snacks & Confectionery,,,,,,1
+Mini Cucumber,Cucumber,Produce,,,,,,1
+Mini Dairy-free Chocolate Chip,Chocolate,Snacks & Confectionery,,,,,,1
+Mini Dark Chocolate Chip,Chocolate,Snacks & Confectionery,,,,,,1
+Mint Leave Coriander,Mint Leave Coriander,Produce,,,,,,1
 Mix Chia Seed And Pumpkin Seed,Mix Chia Seed And Pumpkin Seed,Nuts & Seeds,,,,,,1
-Nando Garlic Sauce,Nando Garlic Sauce,Condiments & Sauces,,,,,,1
-Nando S Garlic Sauce,,Condiments & Sauces,,,,,,1
-Neutral Cooking Oil,,Condiments & Sauces,,,,,,1
-Neutral Oil For Frying,,Condiments & Sauces,,,,,,1
 Or So Chicken Stock,Chicken Stock,Meat & Seafood / Protein,,,,,,1
 Pecan And Pumpkin Seed,Pecan And Pumpkin Seed,Nuts & Seeds,,,,,,1
 Pickled Carrot,,Produce,,,,,,1
 Pickled Cucumber,,Produce,,,,,,1
 Pickled Onion And Lime,Pickles,Canned & Jarred,,,,,,1
 Pinche Flaky Sea Salt And Black Pepper,Pinche Flaky Sea Salt And Black Pepper,Spices & Herbs,,,,,,1
-Plain Oil,,Condiments & Sauces,,,,,,1
-Punnet Mushroom,Mushroom,Produce,,,,,,1
-Punnets Baby Mushrooms,,Other,,,,,,1
 Quick Pickled Ribbon Cucumber And Carrot,Salad,Produce,,,,,,1
 Raspberry And Blueberry,Berries,Produce,,,,,,1
-Red Chillies,,Other,,,,,,1
 Salt And Cinnamon,Salt And Cinnamon,Spices & Herbs,,,,,,1
 Salt And Pepper Season,Salt And Pepper Season,Spices & Herbs,,,,,,1
 Salt And Sriracha,Salt And Sriracha,Condiments & Sauces,,,,,,1
+Self-raising Flour,Flour,Pantry / Dry Goods,,,,,,1
 Stalk Celery,Celery,Produce,,,,,,1
-To,,Other,,,,,,1
-Very Cup Each Bean Sprouts Baby Spinach,,Pantry / Dry Goods,,,,,,1
-Very Heaped Cup Each Bean Sprout Spinach,Very Heaped Cup Each Bean Sprout Spinach,Pantry / Dry Goods,,,,,,1
 Baking Cacao,Cacoa,Pantry / Dry Goods,,,,,,0
 Beef Stock,Beef Stock,Meat & Seafood / Protein,,,,,,0
 Berries,Berries,Produce,,,,,warmed berry,0
@@ -781,32 +758,25 @@ Chickpea,Chickpea,Canned & Jarred,,,,,,0
 Chif,Chif,Other,,,,,,0
 Chilli Sauce,Chilli Sauce,Condiments & Sauces,,,,,,0
 Chipotle Taco Seasoning,Chipotle Taco Seasoning,Spices & Herbs,,,,,,0
-Cod,Cod,Meat & Seafood / Protein,,,,,,0
-Curly Kale,Salad,Produce,,,,,,0
 Dill Parsley,Dill Parsley,Produce,,,,,,0
 Espresso,Coffee,Beverages,,,,,,0
-Firm White Fish,Firm White Fish,Meat & Seafood / Protein,,,,,,0
 Flaky Sea Salt And Black Pepper,Flaky Sea Salt And Black Pepper,Spices & Herbs,,,,,,0
 Herb,Herb,Spices & Herbs,,,,,,0
 High Lean Beef Mince,High Lean Beef Mince,Meat & Seafood / Protein,,,,,,0
 Instant Coffee Dissolved In Water,Coffee,Beverages,,,,,,0
-Instant Noodles,Noodles,Pantry / Dry Goods,,,,,,0
 Instant Vermicelli Rice Noodles,Noodles,Pantry / Dry Goods,,,,,,0
 Jalapeno From,Jalapeño,Vegetables,,,,,,0
 Macadamia,Macadamia,Other,,,,,,0
-Milk Pouring Over,Milk Pouring Over,Dairy & Eggs / Alt,,,,,,0
 Olif,Olif,Other,,,,,,0
 Pint Cherry Tomato,Tomatoes,Produce,,,,,,0
 Pistachio,Pistachio,Other,,,,,,0
 Potato,Potato,Produce,1,each,0.48,Lidl,,0
 Prawn Shrimp,Prawn,Meat & Seafood / Protein,,,,,,0
 Salad Tomato,Tomatoes,Produce,,,,,,0
-Self-raising Flour,Flour,Pantry / Dry Goods,,,,,,0
 Smoked Firm Tofu,Smoked Firm Tofu,Meat & Seafood / Protein,,,,,,0
 Soft Tofu Silken Tofu,Soft Tofu Silken Tofu,Meat & Seafood / Protein,,,,,,0
 Sundried Tomatoes In Oil,Sundried tomatoes,Canned & Jarred,,,,,sundried tomato in oil,0
 Thai Chilli,Chillies,Produce,,,,,,0
 Turkey Mince,Turkey Mince,Meat & Seafood / Protein,500,g,2.99,Lidl,,0
-Unsalted Butter,Butter,Dairy & Eggs / Alt,,,,,,0
 Vegan Cheese,Cheese,Dairy & Eggs / Alt,1,each,1.95,Lidl,,0
 Vine Tomato,Tomatoes,Produce,,,,,,0

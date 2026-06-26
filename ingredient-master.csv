@@ -175,7 +175,7 @@ Condiments & Sauces,,,,,,,,
 ,Condiments & Sauces,Mirin,,Mirin,,3,no,
 ,Condiments & Sauces,Miso Paste,,Miso Paste,,5,no,
 ,Condiments & Sauces,Miso Soup,,Miso Soup,,1,no,
-,Condiments & Sauces,Nando Garlic Sauce,,Nando Garlic Sauce,,1,no,
+,Condiments & Sauces,Nando Garlic Sauce,,Nando Garlic Sauce,Nandos Garlic Sauce,1,no,
 ,Condiments & Sauces,Olive Oil,Oil,Olive Oil,,56,no,
 ,Condiments & Sauces,Olive Oil,Oil,Extra Virgin Olive Oil,,2,no,
 ,Condiments & Sauces,Olive Oil,Oil,Light Drizzle Olive Oil,Olive oil,1,no,
@@ -672,7 +672,7 @@ Pantry / Dry Goods,,,,,,,,
 ,Pantry / Dry Goods,Vegan Vanilla Protein Powder,Protein Powder,Vegan Vanilla Protein Powder,,1,no,
 ,Pantry / Dry Goods,Vermicelli,Pasta,Vermicelli,,1,no,
 ,Pantry / Dry Goods,Vermicelli Noodles,Noodles,Vermicelli Noodles,Vermicelli Rice Noodles,4,no,
-,Pantry / Dry Goods,Very Heaped Cup Each Bean Sprout Spinach,,Very Heaped Cup Each Bean Sprout Spinach,,1,no,"“Very Heaped Cup” = qty.
+,Pantry / Dry Goods,Very Heaped Cup Each Bean Sprout Spinach,,Very Heaped Cup Each Bean Sprout Spinach,Bean Sprout,1,no,"“Very Heaped Cup” = qty.
 2 products -  Bean Sprout & Spinach"
 ,Pantry / Dry Goods,Wheat Flour,Flour,Wheat Flour,,1,no,
 ,Pantry / Dry Goods,Wholemeal Flour,Flour,Wholemeal Flour,,1,no,
@@ -741,7 +741,7 @@ Produce,,,,,,,,
 ,Produce,Crispy Onion,,Crispy Onion,,1,no,
 ,Produce,Cucumber,,Cucumber,,36,no,
 ,Produce,Cucumber And Carrot,,Cucumber And Carrot,,1,no,
-,Produce,Curly Kale,Salad,Handful Curly Kale,,1,no,“handful” = qty
+,Produce,Curly Kale,Salad,Handful Curly Kale,Curly Kale,1,no,“handful” = qty
 ,Produce,Curly Kale,Salad,Curly Kale,,0,no,
 ,Produce,Dill Parsley,,Dill Parsley,,0,no,2 products: Dill & parasoley
 ,Produce,Edamame,,Edamame,,9,no,
@@ -816,7 +816,7 @@ Produce,,,,,,,,
 ,Produce,Mint Leave Coriander,,Mint Leave Coriander,,1,no,2 products: “mint” & “coriander”
 ,Produce,More Chive,Onion,More Chive,Chives,1,no,
 ,Produce,Mushroom,,Mushroom,,1,yes,
-,Produce,Mushroom,,Punnet Mushroom,,1,no,“punnet” = qty
+,Produce,Mushroom,,Punnet Mushroom,Mushroom,1,no,“punnet” = qty
 ,Produce,Orange,,Juice Orange And Zest,,1,no,2 different product variants but come from the same product = “zest” “juice”
 ,Produce,Orange,,Zest Orange,Orange zest,1,no,
 ,Produce,Pak Choi,,Pak Choi,,3,no,
@@ -1043,3 +1043,19 @@ Spices & Herbs,,,,,,,,
 ,Spices & Herbs,Water Bouillon,,Water Bouillon,,1,no,
 ,Spices & Herbs,White Pepper,,White Pepper,,11,no,
 ,Spices & Herbs,White Sugar Salt Dissolved In Boiling Water,,White Sugar Salt Dissolved In Boiling Water,,1,no,"2 products: ""White Sugar”; “Salt”. Preparation method = Dissolved In Boiling Water"
+,Condiments & Sauces,Oil,,Neutral Oil,Oil,0,,
+,Condiments & Sauces,Oil,,Oil,Oil,0,,
+,Condiments & Sauces,Oil,,Neutral Cooking Oil,Oil,0,,
+,Condiments & Sauces,Oil,,Neutral Oil For Frying,Oil,0,,
+,Condiments & Sauces,Oil,,Plain Oil,Oil,0,,
+,Produce,Radish,,Radishes,Radish,0,,
+,Dairy & Eggs / Alt,Butter,,Extra Unsalted Butter,Unsalted Butter,0,,
+,Dairy & Eggs / Alt,Butter,,Unsalted Butter,Unsalted Butter,0,,
+,Bakery,Breadcrumbs,,Panko Breadcrumbs,Breadcrumbs,0,,
+,Other,Stock,,So Chicken Stock,Chicken Stock,0,,
+,Condiments & Sauces,Sauce,,Nando S Garlic Sauce,Nandos Garlic Sauce,0,,
+,Produce,Chilli,,Red Chillies,Chilli,0,,
+,Vegetables,Mushroom,,Enoki Mushrooms,Mushroom,0,,
+,Produce,Salad,,Watercress,Watercress,0,,
+,Produce,Lettuce,,Cos,Lettuce,0,,
+,Spices & Herbs,Lime Leaf,,Kaffir Lime Leaves,Kaffir Lime Leaves,0,,
