@@ -4,6 +4,102 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# Recipe Parser Overhaul + Persistent Locked Plan + Drink Tracking
+**Date:** 2026-06-29
+**Project:** Daily Shuffle — recipe/meal-planning PWA
+**Status:** Complete — implemented, verified, pushed; draft PR #24 open (no CI in this repo)
+
+---
+
+## Project Context
+Single-file PWA (`index.html`, ~5,900 lines, no build step) — see the 2026-06-25 entry for the
+broader normalisation/price-book stream and architecture. This session is a separate UX/parsing
+pass driven by a `/goal` task across three tabs (Shuffle, Tracker, Add Recipe).
+
+## Session Goal
+Three asks: (1) make the shuffled meal plan persist + lockable ("set in stone"); (2) add drinks/coffee
+tracking to the Tracker; (3) overhaul Add Recipe AI parsing — separate qty/ingredient/prep, parse macros
+in the same call, and resolve the "Key ingredients to buy" field's role vs the grocery list.
+
+## State Before This Session
+- `currentPlan` was in-memory only (lost on reload). Calendar already rendered in `renderPlanOutput`.
+- Tracker `TRK_MEALS = [breakfast,snack,lunch,dinner,dessert]`; no drinks bucket.
+- Recipe parser (`parseWithAI`) returned ingredients as `{group, item}` (one mashed string incl. qty+prep).
+  No macros in the parse — separate `estimateNutritionWithAI` second step. `prefillForm` dumped flattened
+  items into `f-ingredients` ("Key ingredients to buy") and left the real Ingredients textarea EMPTY.
+- **Key finding:** `groceryItems` / the `f-ingredients` field is STORED BUT NEVER READ. The grocery list
+  (`_groceryAggregate`) is built entirely from `RECIPE_FULL_DATA[id].ingredients` (full list, summed).
+  So the user's hypothesis was exactly right — the field was vestigial and only risked confusing costs.
+
+## What Was Done
+- **Parser (`parseWithAI`)**: ingredient schema → `{group, qty, unit, item, prep}` with explicit split rules
+  + examples; added `nutrition {kcal,protein,carbs,fat}` (per-serving estimate). `prefillForm` now rebuilds
+  readable grouped lines ("qty unit item, prep") into `f-ingredients-full` (the real source of truth) and
+  fills method/tips/storage/macros. Stopped concatenating tips/storage into Notes (they have own fields now).
+- **Removed the "Key ingredients to buy" field** (`#f-ingredients`) from the form; dropped its refs in
+  `addRecipe` (groceryItems now `{}`), `prefillForm`, `clearForm`. Relabelled Ingredients textarea to say it
+  builds the grocery list. Fixed a latent bug in `estimateNutritionWithAI` (`i.item` map) to handle the
+  structured `{qty,unit,name}` shape.
+- **Plan persistence + lock**: added `savePlan()`/`revivePlan()` (ds_current_plan; ISO dates + recipe id/name
+  snapshots, rehydrated to live recipe refs or a stub), `planLocked` (ds_plan_locked) + `togglePlanLock()`,
+  a lock bar in `renderPlanOutput`, guards in `respinDay`/`openPicker`, reshuffle disabled while locked,
+  lock reset on fresh generate (both manual + AI), `revivePlan()` wired into DOMContentLoaded. CSS for the bar.
+- **Tracker drinks**: added `'drinks'` to `TRK_MEALS` + a "🥤 Drinks & coffee" chooser tile with one-tap
+  presets (`TRK_DRINK_PRESETS`) and a custom-drink form (`trkOpenDrinks`/`trkAddDrinkPreset`/`trkSubmitDrink`).
+- Bumped `sw.js` CACHE v24 → v25.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| index.html | All three features | Modified | /home/user/daily-shuffle/ |
+| sw.js | Cache bump v24→v25 | Modified | /home/user/daily-shuffle/ |
+| logs/daily-shuffle_log.md | This entry | Modified | /home/user/daily-shuffle/logs/ |
+
+## Decisions & Reasoning
+- **Removed the key-ingredients field rather than keeping it**: it was provably dead code (never read), and
+  the grocery list is already the sum of full ingredients — keeping it only invited the confusion the user
+  flagged. Single source of truth = the Ingredients textarea.
+- **AI splits fields, but save path still re-parses the rebuilt textarea**: keeps ONE storage code path
+  (manual `parseQty` → `{qty,unit,name,note}`) instead of forking on AI-vs-manual. parseQty + `_stripPrep`
+  already separate qty and strip prep for the grocery key, so "200g chicken thighs, sliced" → grocery key
+  "chicken thighs". Lower risk than rewriting `addRecipe`'s storage.
+- **Lock via handler guards, not per-button markup**: the calendar generates respin/pick buttons in many
+  places; guarding `respinDay`/`openPicker` (+ disabling reshuffle) is far less invasive than conditionalising
+  every button, and can't be bypassed.
+- **revivePlan stores name snapshots**: so a deleted / not-yet-synced recipe still shows a label instead of
+  "—"; live recipe is preferred when present.
+
+## Current State (end of session)
+All implemented, committed (branch `claude/recipe-parsing-ingredients-1ta5nr`), pushed. Draft PR #24 open.
+Verified clean on the first pass — see Next Steps for the verification method. Subscribed to PR #24 activity;
+no CI in this repo (`get_status` total_count 0); one-shot self check-in scheduled ~1h out.
+
+## Next Steps
+1. User reviews PR #24; merge when happy (repo merges freely, no CI).
+2. After deploy, hard-refresh twice for the v25 cache to take (known PWA gotcha).
+3. Optional follow-ups: parser could store qty/unit/prep structurally end-to-end (skip the textarea re-parse);
+   drinks presets could be user-editable; consider a "water total" summary in the tracker.
+
+## Open Questions / Blockers
+N/A — all asks implemented with documented defaults. The user phrased some asks as questions; decisions above
+are reversible if they disagree.
+
+## Environment & Config Notes
+Branch `claude/recipe-parsing-ingredients-1ta5nr`, cwd /home/user/daily-shuffle. No CI. Verify method:
+`new Function()` over each `<script>` block (3 blocks, 0 failures) + headless Playwright smoke
+(executablePath /opt/pw-browsers/chromium). Supabase recipe-library fetch fails in sandbox (network blocked) —
+pre-existing, unrelated.
+
+## Notes & Gotchas
+- `groceryItems` on recipe objects is now always `{}` for new recipes; old recipes keep theirs but it's still
+  never read — safe.
+- Adding to `TRK_MEALS` is the supported way to add a tracker bucket; it drives both rendering and the meal
+  `<option>` lists. No schema change needed (food_log keys by meal_id string).
+- Bump `sw.js` CACHE on any further change or the PWA serves stale HTML.
+
+---
+
 # Ingredient Normalisation, Consolidation & Variant-Level Price Book
 **Date:** 2026-06-25 (session spanned 2026-06-06 → 2026-06-25)
 **Project:** Daily Shuffle — recipe/meal-planning PWA
