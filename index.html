@@ -949,7 +949,7 @@
               <input type="text" id="f-storage" placeholder="e.g. Fridge 3 days, freezer 1 month" />
             </div>
             <div class="form-group full">
-              <label>Nutrition per serving <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text3)">(optional — leave blank if unknown)</span></label>
+              <label>Nutrition per serving <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text3)">(auto-calculated from your ingredients on save — edit ingredients first, then add)</span></label>
               <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px">
                 <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text3);margin-bottom:4px">Calories</div><input type="number" id="f-kcal" placeholder="kcal" style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:6px;font-size:13px;outline:none"></div>
                 <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text3);margin-bottom:4px">Protein (g)</div><input type="number" id="f-protein-g" placeholder="g" style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:6px;font-size:13px;outline:none"></div>
@@ -3192,6 +3192,58 @@ function renderReceiptHistory() {
       }).join('');
 }
 
+// Estimate per-serving macros from an ingredient list via Claude. Returns
+// {kcal,protein,carbs,fat} or null on any failure (no key, network, bad JSON).
+// Shared by the in-modal "Re-estimate" button and the Add-Recipe submit flow.
+async function fetchMacroEstimate(name, servings, ingredientLines) {
+  const key = localStorage.getItem('ds_api_key');
+  const lines = Array.isArray(ingredientLines) ? ingredientLines.filter(Boolean) : [];
+  if(!key || !lines.length) return null;
+
+  const systemPrompt = `You are a nutrition estimator. Given a recipe's ingredient list, return ONLY a valid JSON object — no markdown, no explanation — with these exact fields:
+{
+  "kcal": number,
+  "protein": number,
+  "carbs": number,
+  "fat": number
+}
+
+Rules:
+- All values are PER SERVING (total recipe divided by the servings count provided).
+- kcal, protein (g), carbs (g), fat (g): round to the nearest whole number.
+- Return ONLY the JSON object. No other text.`;
+  const userText = `Recipe: ${name || 'this recipe'}\nServings: ${servings || 1}\n\nIngredients:\n${lines.join('\n')}`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 256,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userText }]
+      })
+    });
+    if(!res.ok) return null;
+    const data = await res.json();
+    const raw = data.content?.[0]?.text || '';
+    const cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+    const parsed = JSON.parse(cleaned);
+    return {
+      kcal: parsed.kcal ?? null,
+      protein: parsed.protein ?? null,
+      carbs: parsed.carbs ?? null,
+      fat: parsed.fat ?? null
+    };
+  } catch(e) { return null; }
+}
+
 async function estimateNutritionWithAI(id) {
   const key = localStorage.getItem('ds_api_key');
   if(!key) { showToast('Add your Anthropic API key in Settings first'); openSettings(); return; }
@@ -3212,51 +3264,13 @@ async function estimateNutritionWithAI(id) {
   const recipe = recipes.find(r => r.id === id);
   const name = recipe ? recipe.name : 'this recipe';
   const servings = recipe ? (recipe.servings || 1) : 1;
-  const ingredientList = fd.ingredients.map(i =>
+  const ingredientLines = fd.ingredients.map(i =>
     i.item != null ? i.item : [i.qty, i.unit, i.name, i.note ? `(${i.note})` : null].filter(Boolean).join(' ')
-  ).join('\n');
-
-  const systemPrompt = `You are a nutrition estimator. Given a recipe's ingredient list, return ONLY a valid JSON object — no markdown, no explanation — with these exact fields:
-{
-  "kcal": number,
-  "protein": number,
-  "carbs": number,
-  "fat": number
-}
-
-Rules:
-- All values are PER SERVING (total recipe divided by the servings count provided).
-- kcal, protein (g), carbs (g), fat (g): round to the nearest whole number.
-- Return ONLY the JSON object. No other text.`;
-
-  const userText = `Recipe: ${name}\nServings: ${servings}\n\nIngredients:\n${ingredientList}`;
+  );
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': key,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 256,
-        system: systemPrompt,
-        messages: [{ role: 'user', content: userText }]
-      })
-    });
-
-    if(!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.error?.message || `API error ${res.status}`);
-    }
-
-    const data = await res.json();
-    const raw = data.content?.[0]?.text || '';
-    const cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
-    const parsed = JSON.parse(cleaned);
+    const parsed = await fetchMacroEstimate(name, servings, ingredientLines);
+    if(!parsed) throw new Error('Could not estimate macros — check your API key and connection');
 
     // Merge into RECIPE_FULL_DATA
     if(!RECIPE_FULL_DATA[id]) RECIPE_FULL_DATA[id] = {};
@@ -4176,6 +4190,34 @@ async function addRecipe() {
   const finalTips = manualTips || (ai?.tips || null);
   const finalStorage = manualStorage || (ai?.storage || null);
 
+  // ── Macro calculation step ────────────────────────────────────────────────
+  // Recalculate macros from the FINAL (possibly hand-adjusted) ingredient list
+  // at submission time, so the saved nutrition always matches what's actually in
+  // the recipe — not a stale estimate from when the screenshot was parsed.
+  let finalNutrition = hasManualNutrition
+    ? { kcal: fKcal || 0, protein: fProtG || 0, carbs: fCarbG || 0, fat: fFatG || 0 }
+    : null;
+  const macroLines = finalIngredients.map(i =>
+    i.item != null ? i.item : [i.qty, i.unit, i.name, i.note ? `(${i.note})` : null].filter(Boolean).join(' ')
+  );
+  if (macroLines.length && localStorage.getItem('ds_api_key')) {
+    const addBtn = document.querySelector('#tab-add .btn-add');
+    const origLabel = addBtn ? addBtn.textContent : '';
+    if (addBtn) { addBtn.disabled = true; addBtn.textContent = '✨ Calculating macros…'; }
+    const serves = parseInt(document.getElementById('f-servings').value) || 1;
+    const est = await fetchMacroEstimate(name, serves, macroLines);
+    if (addBtn) { addBtn.disabled = false; addBtn.textContent = origLabel; }
+    if (est) {
+      finalNutrition = { kcal: est.kcal || 0, protein: est.protein || 0, carbs: est.carbs || 0, fat: est.fat || 0 };
+      // Reflect into the form fields (briefly visible before the form clears).
+      const sv = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
+      sv('f-kcal', finalNutrition.kcal); sv('f-protein-g', finalNutrition.protein);
+      sv('f-carbs-g', finalNutrition.carbs); sv('f-fat-g', finalNutrition.fat);
+    } else {
+      showToast('⚠ Couldn’t auto-calculate macros — saving with the values entered');
+    }
+  }
+
   // Build Supabase ingredient_sections from finalIngredients
   let ingredientSections = null;
   if (finalIngredients.length) {
@@ -4211,10 +4253,10 @@ async function addRecipe() {
     import_status: 'ready',
     ingredient_sections: ingredientSections,
     method_steps: finalMethod.length ? finalMethod : null,
-    calories: hasManualNutrition ? (fKcal || 0) : null,
-    protein_g: hasManualNutrition ? (fProtG || 0) : null,
-    carbs_g: hasManualNutrition ? (fCarbG || 0) : null,
-    fat_g: hasManualNutrition ? (fFatG || 0) : null,
+    calories: finalNutrition ? finalNutrition.kcal : null,
+    protein_g: finalNutrition ? finalNutrition.protein : null,
+    carbs_g: finalNutrition ? finalNutrition.carbs : null,
+    fat_g: finalNutrition ? finalNutrition.fat : null,
   };
 
   // POST to Supabase and get back the UUID
@@ -4252,13 +4294,13 @@ async function addRecipe() {
   recipes.push(r);
 
   // Store full recipe detail in RECIPE_FULL_DATA for immediate modal rendering
-  if (finalIngredients.length || finalMethod.length || hasManualNutrition) {
+  if (finalIngredients.length || finalMethod.length || finalNutrition) {
     RECIPE_FULL_DATA[r.id] = {
       ingredients: finalIngredients,
       method: finalMethod,
       tips: finalTips,
       storage: finalStorage,
-      nutrition: hasManualNutrition ? { kcal: fKcal || 0, protein: fProtG || 0, carbs: fCarbG || 0, fat: fFatG || 0 } : null,
+      nutrition: finalNutrition,
       costPerPortion: null,
     };
   }
