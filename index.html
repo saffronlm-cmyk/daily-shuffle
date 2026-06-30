@@ -5851,21 +5851,19 @@ async function trkRunBulkStaples(){
   const resultEl = document.getElementById('trkBulkResult'); resultEl.innerHTML = '';
   const systemPrompt = `You extract staple food products and their nutrition from a pasted list into structured data for a coeliac (gluten-free) and dairy-free user.
 
-Return ONLY a valid JSON array (no markdown, no prose). One object per product:
-[{
-  "name": string,
-  "aliases": string[],              // short alternate names/abbreviations the user might type (e.g. ["pb","peanut butter"]); [] if none
-  "serving_qty": number,            // the quantity the figures are stated per (e.g. 100 for per-100g, 1 for per-serving/per-unit)
-  "serving_unit": string,           // "g", "ml", "serve", "fish cake", etc.
-  "calories": number,
-  "protein_g": number,
-  "carbs_g": number,
-  "fat_g": number,
-  "fibre_g": number,
-  "sugar_g": number|null,
-  "gi_estimate": "low"|"medium"|"high"|null,
-  "notes": string|null              // unit-weight hints, sat-fat/sugar flags, polyol notes, etc.
-}]
+Return ONLY a valid JSON array (no markdown, no prose, no comments). One object per product, with exactly these keys:
+- "name": string
+- "aliases": array of strings — short alternate names/abbreviations the user might type (e.g. ["pb","peanut butter"]); [] if none
+- "serving_qty": number — the quantity the figures are stated per (e.g. 100 for per-100g, 1 for per-serving/per-unit)
+- "serving_unit": string — "g", "ml", "serve", "fish cake", etc.
+- "calories": number
+- "protein_g": number
+- "carbs_g": number
+- "fat_g": number
+- "fibre_g": number
+- "sugar_g": number or null
+- "gi_estimate": one of "low", "medium", "high", or null
+- "notes": string or null — unit-weight hints, sat-fat/sugar flags, polyol notes, etc.
 
 Rules:
 - Use the figures exactly as given; do not re-estimate. If stated per 100g, serving_qty=100 & serving_unit="g".
@@ -5883,7 +5881,7 @@ Rules:
     let raw = (data.content?.[0]?.text || '').replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/i,'').trim();
     const start = raw.indexOf('['), end = raw.lastIndexOf(']');
     if(start>=0 && end>start) raw = raw.slice(start, end+1);
-    const items = JSON.parse(raw);
+    const items = trkParseJsonLoose(raw);
     if(!Array.isArray(items) || !items.length) throw new Error('No products recognised');
     trkRenderBulkConfirm(items);
   } catch(err){
@@ -5918,6 +5916,18 @@ async function trkCommitBulkStaples(){
 }
 
 // ── AI quick add ────────────────────────────────────────────────────────────
+// Parse JSON that an LLM may have lightly malformed: strip JS-style comments
+// (the model sometimes echoes the `// field` annotations from our prompt) and
+// trailing commas before commas/closing brackets. Both are the usual cause of
+// "Property name must be a string literal" from JSON.parse on WebKit/iOS.
+function trkParseJsonLoose(raw){
+  try { return JSON.parse(raw); } catch(_){}
+  const cleaned = raw
+    .replace(/\/\*[\s\S]*?\*\//g, '')      // /* block comments */
+    .replace(/(^|[^:"'])\/\/[^\n\r]*/g, '$1') // // line comments (skip http://)
+    .replace(/,(\s*[}\]])/g, '$1');        // trailing commas
+  return JSON.parse(cleaned);
+}
 function trkOpenQuickAdd(){
   const meal = trkChooserMeal();
   const noKey = !localStorage.getItem('ds_api_key');
@@ -5973,21 +5983,19 @@ ${stapleCtx}
 CANDIDATE RECIPES (figures are per serving):
 ${recipeCtx}
 
-Return ONLY a valid JSON array (no markdown, no prose). One object per distinct food item:
-[{
-  "title": string,                 // human label, e.g. "PBfit (30g)"
-  "qty": number,                   // amount eaten in the unit below
-  "unit": string,                  // e.g. "g", "ml", "serving", "tbsp"
-  "match": "staple" | "recipe" | "estimate",
-  "source_label": string|null,     // the matched staple/recipe name, else null
-  "calories": number,              // TOTAL for the amount eaten (already scaled)
-  "protein_g": number,
-  "carbs_g": number,
-  "fat_g": number,
-  "fibre_g": number,
-  "gi_estimate": "low"|"medium"|"high"|null,
-  "note": string|null              // brief note, e.g. assumption made
-}]
+Return ONLY a valid JSON array (no markdown, no prose, no comments). One object per distinct food item, with exactly these keys:
+- "title": string — human label, e.g. "PBfit (30g)"
+- "qty": number — amount eaten in the unit below
+- "unit": string — e.g. "g", "ml", "serving", "tbsp"
+- "match": one of "staple", "recipe", "estimate"
+- "source_label": string or null — the matched staple/recipe name, else null
+- "calories": number — TOTAL for the amount eaten (already scaled)
+- "protein_g": number
+- "carbs_g": number
+- "fat_g": number
+- "fibre_g": number
+- "gi_estimate": one of "low", "medium", "high", or null
+- "note": string or null — brief note, e.g. assumption made
 
 Rules:
 - For staple matches: take the staple's per-quantity figures and scale to the eaten amount. Mark match:"staple". Do not alter the underlying figures.
@@ -6008,7 +6016,7 @@ Rules:
     let raw = (data.content?.[0]?.text || '').replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/i,'').trim();
     const start = raw.indexOf('['), end = raw.lastIndexOf(']');
     if(start>=0 && end>start) raw = raw.slice(start, end+1);
-    const items = JSON.parse(raw);
+    const items = trkParseJsonLoose(raw);
     if(!Array.isArray(items) || !items.length) throw new Error('No items recognised');
     trkRenderQuickConfirm(meal, items);
   } catch(err){
