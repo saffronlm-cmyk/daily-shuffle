@@ -1,7 +1,9 @@
 // Daily Shuffle — Service Worker
-// Cache-first strategy: app loads instantly offline after first visit.
+// Network-first for the HTML document (so a new deploy shows up on the next
+// open, no double hard-refresh needed), cache-first for static assets so the
+// app still loads instantly and works offline.
 
-const CACHE = 'daily-shuffle-v27';
+const CACHE = 'daily-shuffle-v28';
 const ASSETS = [
   './index.html',
   './manifest.json',
@@ -27,25 +29,40 @@ self.addEventListener('activate', event => {
   self.clients.claim();
 });
 
-// Fetch: serve from cache, fall back to network
-// API calls (Anthropic) always go to network — never cache those
 self.addEventListener('fetch', event => {
-  const url = event.request.url;
+  const req = event.request;
+  const url = req.url;
 
   // Always network for API calls (never cache dynamic data)
   if (url.includes('api.anthropic.com') || url.includes('supabase.co') || url.includes('edamam.com')) {
-    event.respondWith(fetch(event.request));
+    event.respondWith(fetch(req));
     return;
   }
 
-  event.respondWith(
-    caches.match(event.request).then(cached => {
-      if (cached) return cached;
-      return fetch(event.request).then(response => {
-        // Cache successful GET responses for our own assets
-        if (event.request.method === 'GET' && response.status === 200) {
+  // Network-first for the HTML document. When online the freshest index.html
+  // wins (so deploys appear on the next open); when offline we fall back to the
+  // cached copy. This is the fix for stale-HTML-after-deploy.
+  if (req.mode === 'navigate' || req.destination === 'document') {
+    event.respondWith(
+      fetch(req).then(response => {
+        if (response && response.status === 200) {
           const clone = response.clone();
-          caches.open(CACHE).then(cache => cache.put(event.request, clone));
+          caches.open(CACHE).then(cache => cache.put(req, clone));
+        }
+        return response;
+      }).catch(() => caches.match(req).then(c => c || caches.match('./index.html')))
+    );
+    return;
+  }
+
+  // Cache-first for everything else (icons, manifest) — instant + offline.
+  event.respondWith(
+    caches.match(req).then(cached => {
+      if (cached) return cached;
+      return fetch(req).then(response => {
+        if (req.method === 'GET' && response.status === 200) {
+          const clone = response.clone();
+          caches.open(CACHE).then(cache => cache.put(req, clone));
         }
         return response;
       });
