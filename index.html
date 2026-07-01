@@ -1984,7 +1984,10 @@ function renderCostHtml(cost, scale=1) {
 }
 
 function openModal(id) {
-  const r = recipes.find(x=>x.id===id); if(!r) return;
+  // Cards pass the id as a string; Supabase ids are string UUIDs but a
+  // locally-saved recipe (e.g. cloud write failed) has a numeric Date.now() id,
+  // so compare loosely by string to avoid a silent no-op on click.
+  const r = recipes.find(x => String(x.id) === String(id)); if(!r) return;
   const fd = RECIPE_FULL_DATA[r.id] || null;
   modalMultiplier = 1;
 
@@ -4261,6 +4264,7 @@ async function addRecipe() {
 
   // POST to Supabase and get back the UUID
   let newId = null;
+  let cloudError = null;
   try {
     const res = await fetch(`${RECIPE_LIB_URL}/rest/v1/recipes`, {
       method: 'POST',
@@ -4270,9 +4274,15 @@ async function addRecipe() {
     if (res.ok) {
       const [created] = await res.json();
       newId = created?.id || null;
+    } else {
+      // Never swallow a write failure — surface why (e.g. RLS/permission).
+      const body = await res.text().catch(() => '');
+      cloudError = `HTTP ${res.status}${body ? ' — ' + body.slice(0, 160) : ''}`;
+      console.warn('[Daily Shuffle] Recipe POST rejected:', cloudError);
     }
   } catch(err) {
-    console.warn('[Daily Shuffle] Failed to POST recipe to Supabase:', err.message);
+    cloudError = err.message || 'network error';
+    console.warn('[Daily Shuffle] Failed to POST recipe to Supabase:', cloudError);
   }
 
   // Fall back to timestamp ID if Supabase POST failed
@@ -4315,7 +4325,11 @@ async function addRecipe() {
   const fi = document.getElementById('aiImageInput'); if(fi) fi.value='';
   const ti = document.getElementById('aiTextInput'); if(ti) ti.value='';
   document.getElementById('aiParseStatus').textContent = '';
-  showToast(`"${name}" added to your library!`);
+  if (cloudError) {
+    showToast(`⚠ "${name}" saved to this device only — cloud sync failed (${cloudError})`);
+  } else {
+    showToast(`"${name}" added to your library!`);
+  }
 }
 
 function clearForm() {
