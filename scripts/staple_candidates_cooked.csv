@@ -1,0 +1,6 @@
+name,category,recipe_count,source,merged_from
+rice,Grains & Starches,14,organic,rice;cooked rice;jasmine rice
+pasta,Grains & Starches,0,force-include,
+chickpeas,Protein,5,organic,chickpeas
+lentils,Protein,0,force-include,
+black beans,Protein,0,force-include,

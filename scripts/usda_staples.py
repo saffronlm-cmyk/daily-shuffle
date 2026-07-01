@@ -95,8 +95,9 @@ TERM_OVERRIDES = {
     "plain flour": "wheat flour white all-purpose enriched",  # was matching pretzels
     "cornflour": "cornstarch",                        # UK cornflour == US cornstarch
     # --- Grains & Starches ---
-    "oats": "cereals oats dry",                       # was matching "Oil, oat"
-    "rice": "rice white long-grain regular raw",      # was matching "Rice crackers"
+    "oats": "cereals oats dry",                       # dry: recipes measure oats dry
+    "rice": "rice white long-grain regular cooked",   # cooked: recipes mean cooked rice
+    "pasta": "pasta cooked enriched",                 # cooked: recipes mean cooked pasta
     "potato": "potatoes flesh and skin raw",          # was matching "Bread, potato"
     # --- Produce ---
     "avocado": "avocados raw",                        # was matching "Oil, avocado"
@@ -120,6 +121,9 @@ TERM_OVERRIDES = {
     "beef mince": "beef ground 15 fat raw",           # was matching "Pie, mince"
     "bean sprouts": "mung beans mature seeds sprouted raw",
     "protein powder": "whey protein powder",
+    "chickpeas": "chickpeas mature seeds cooked boiled",   # cooked, not dry (~340 kcal)
+    "lentils": "lentils mature seeds cooked boiled",       # cooked, not dry
+    "black beans": "beans black mature seeds cooked boiled",  # cooked, not raw
     # --- Nut & Seed Butters ---
     "desiccated coconut": "nuts coconut meat dried desiccated not sweetened",
     # --- Sauces & Vinegars ---
