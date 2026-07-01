@@ -1471,7 +1471,7 @@ function saveOverrides() {
 
 // ─── DELETE / RESTORE RECIPES ────────────────────────────────────────────────
 async function deleteRecipe(id) {
-  const r = recipes.find(x => x.id === id); if (!r) return;
+  const r = getRecipeById(id); if (!r) return;
   const isCloudRecipe = cloudRecipeIds.has(id);
   if (!confirm(`Delete "${r.name}"?${isCloudRecipe ? '\n\nThis is a library recipe — it will be hidden. You can restore it from Settings.' : ''}`)) return;
   if (isCloudRecipe) {
@@ -1983,11 +1983,16 @@ function renderCostHtml(cost, scale=1) {
   return `<div class="cost-breakdown">${storesHtml}</div>${noteHtml}`;
 }
 
+// Recipes loaded from Supabase have string UUID ids, but a locally-saved recipe
+// (e.g. a cloud write that failed) has a numeric Date.now() id. onclick handlers
+// always pass ids as strings, so look up loosely by string — otherwise edit /
+// delete / estimate silently no-op on those recipes.
+function getRecipeById(id) {
+  return recipes.find(x => String(x.id) === String(id)) || null;
+}
+
 function openModal(id) {
-  // Cards pass the id as a string; Supabase ids are string UUIDs but a
-  // locally-saved recipe (e.g. cloud write failed) has a numeric Date.now() id,
-  // so compare loosely by string to avoid a silent no-op on click.
-  const r = recipes.find(x => String(x.id) === String(id)); if(!r) return;
+  const r = getRecipeById(id); if(!r) return;
   const fd = RECIPE_FULL_DATA[r.id] || null;
   modalMultiplier = 1;
 
@@ -2159,7 +2164,7 @@ let _editorIngredients = []; // [{type:'group'|'item', text:''}]
 let _editorMethod = [];      // ['step text', ...]
 
 function openTagEditor(id) {
-  const r = recipes.find(x => x.id === id); if (!r) return;
+  const r = getRecipeById(id); if (!r) return;
   const fd = RECIPE_FULL_DATA[r.id] || {};
 
   // Initialise editor state
@@ -2413,7 +2418,7 @@ function removeEditorStep(idx) {
 }
 
 function saveRecipeEdits(id) {
-  const r = recipes.find(x => x.id === id); if (!r) return;
+  const r = getRecipeById(id); if (!r) return;
 
   // Read all fields from editor inputs
   const name        = document.getElementById('edit-name')?.value.trim() || r.name;
@@ -2501,7 +2506,7 @@ function saveRecipeEdits(id) {
 
 // ─── PATCH RECIPE TO SUPABASE LIBRARY ───────────────────────────────────────
 async function patchRecipeToLibrary(id) {
-  const r = recipes.find(x => x.id === id);
+  const r = getRecipeById(id);
   if (!r || !cloudRecipeIds.has(id)) return; // only patch cloud recipes
   const fd = RECIPE_FULL_DATA[id] || {};
 
@@ -3202,8 +3207,11 @@ async function fetchMacroEstimate(name, servings, ingredientLines) {
   const key = localStorage.getItem('ds_api_key');
   const lines = Array.isArray(ingredientLines) ? ingredientLines.filter(Boolean) : [];
   if(!key || !lines.length) return null;
+  // Divide by servings ourselves rather than trusting the model to — otherwise
+  // it often returns whole-recipe totals despite being asked for per-serving.
+  const n = Number(servings) > 0 ? Number(servings) : 1;
 
-  const systemPrompt = `You are a nutrition estimator. Given a recipe's ingredient list, return ONLY a valid JSON object — no markdown, no explanation — with these exact fields:
+  const systemPrompt = `You are a nutrition estimator. Given a recipe's FULL ingredient list (the whole recipe / entire batch), estimate the TOTAL nutrition for the whole recipe combined. Return ONLY a valid JSON object — no markdown, no explanation — with these exact fields:
 {
   "kcal": number,
   "protein": number,
@@ -3212,10 +3220,10 @@ async function fetchMacroEstimate(name, servings, ingredientLines) {
 }
 
 Rules:
-- All values are PER SERVING (total recipe divided by the servings count provided).
-- kcal, protein (g), carbs (g), fat (g): round to the nearest whole number.
+- Values are the TOTAL for the entire recipe as written (the sum of ALL ingredients). Do NOT divide by the number of servings — that is done separately.
+- kcal, protein (g), carbs (g), fat (g): numbers only.
 - Return ONLY the JSON object. No other text.`;
-  const userText = `Recipe: ${name || 'this recipe'}\nServings: ${servings || 1}\n\nIngredients:\n${lines.join('\n')}`;
+  const userText = `Recipe: ${name || 'this recipe'}\n\nFull ingredient list for the whole recipe:\n${lines.join('\n')}`;
 
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
@@ -3238,11 +3246,12 @@ Rules:
     const raw = data.content?.[0]?.text || '';
     const cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
     const parsed = JSON.parse(cleaned);
+    const perServing = v => (v == null || isNaN(Number(v))) ? null : Math.round(Number(v) / n);
     return {
-      kcal: parsed.kcal ?? null,
-      protein: parsed.protein ?? null,
-      carbs: parsed.carbs ?? null,
-      fat: parsed.fat ?? null
+      kcal: perServing(parsed.kcal),
+      protein: perServing(parsed.protein),
+      carbs: perServing(parsed.carbs),
+      fat: perServing(parsed.fat)
     };
   } catch(e) { return null; }
 }
@@ -3264,7 +3273,7 @@ async function estimateNutritionWithAI(id) {
     return;
   }
 
-  const recipe = recipes.find(r => r.id === id);
+  const recipe = getRecipeById(id);
   const name = recipe ? recipe.name : 'this recipe';
   const servings = recipe ? (recipe.servings || 1) : 1;
   const ingredientLines = fd.ingredients.map(i =>
