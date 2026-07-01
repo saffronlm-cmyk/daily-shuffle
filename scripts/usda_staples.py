@@ -80,7 +80,11 @@ TERM_OVERRIDES = {
     "chipotle powder": "spices chili powder",         # proxy: no USDA chipotle
     "chilli powder": "spices chili powder",
     "cinnamon": "spices cinnamon ground",             # was matching "Bread, cinnamon"
+    "red pepper flakes": "spices pepper red or cayenne",  # dried chilli, not fresh bell pepper
     # --- Dairy & Eggs ---
+    "egg": "egg whole raw fresh",
+    "egg whites": "egg white raw fresh",
+    "cheddar cheese": "cheese cheddar",
     "milk": "milk whole 3.25 milkfat",                # was matching "Crackers, milk"
     "almond milk": "almond milk unsweetened shelf stable",
     "coconut milk": "nuts coconut milk canned",       # recipes mean canned, not carton
@@ -105,7 +109,9 @@ TERM_OVERRIDES = {
     "carrot": "carrots raw",                          # was matching dehydrated (341 kcal!)
     "tomato": "tomatoes red ripe raw",                # was matching "Tomato powder"
     "cherry tomatoes": "tomatoes red ripe raw",
-    "sweet potato": "sweet potato raw unprepared",    # was matching "Sweet potato leaves"
+    "sweet potato": "sweet potatoes raw unprepared",  # was matching "Sweet Potato puffs, frozen"
+    "sweetcorn": "corn sweet yellow canned",          # tinned sweetcorn; was no_match
+    "dill": "dill weed fresh",
     "spring onion": "onions spring scallions raw",
     "red chilli": "peppers hot chili red raw",        # was matching "Cabbage, red"
     "mint": "spearmint fresh",                        # was matching "Candies, AFTER EIGHT"
@@ -383,37 +389,60 @@ def main():
     matched = 0
     for i, cand in enumerate(candidates, 1):
         name = cand["name"]
+
+        # --- search ---
         try:
             foods = search_food(name, args.api_key, args.page_size)
-            food, score = best_match(name, foods)
-            if not food:
-                rows.append(_row(cand, match_score=f"{score:.2f}",
-                                 confidence_flag="no_match"))
-                print(f"[{i}/{len(candidates)}] {name}: no confident match "
-                      f"(best score {score:.2f})")
-            else:
-                detail = food_detail(food["fdcId"], args.api_key)
-                nutrients = extract_nutrients(detail)
-                flag = confidence_flag(score, nutrients)
-                rows.append(_row(
-                    cand,
-                    matched_description=food.get("description", ""),
-                    fdc_id=food.get("fdcId", ""),
-                    data_type=food.get("dataType", ""),
-                    match_score=f"{score:.2f}",
-                    confidence_flag=flag,
-                    **nutrients,
-                ))
-                matched += 1
-                print(f"[{i}/{len(candidates)}] {name}: matched "
-                      f"{food.get('description')!r} (score {score:.2f}, {flag})")
         except urllib.error.HTTPError as e:
-            body = e.read().decode("utf-8", "replace")[:200]
-            rows.append(_row(cand, confidence_flag=f"error:HTTP {e.code}"))
-            print(f"[{i}/{len(candidates)}] {name}: HTTP {e.code}: {body}")
+            rows.append(_row(cand, confidence_flag=f"error:search HTTP {e.code}"))
+            print(f"[{i}/{len(candidates)}] {name}: search HTTP {e.code}")
+            time.sleep(REQUEST_DELAY)
+            continue
         except Exception as e:  # noqa: BLE001
-            rows.append(_row(cand, confidence_flag=f"error:{type(e).__name__}"))
-            print(f"[{i}/{len(candidates)}] {name}: error: {e}")
+            rows.append(_row(cand, confidence_flag=f"error:search {type(e).__name__}"))
+            print(f"[{i}/{len(candidates)}] {name}: search error: {e}")
+            time.sleep(REQUEST_DELAY)
+            continue
+
+        food, score = best_match(name, foods)
+        if not food:
+            rows.append(_row(cand, match_score=f"{score:.2f}",
+                             confidence_flag="no_match"))
+            print(f"[{i}/{len(candidates)}] {name}: no confident match "
+                  f"(best score {score:.2f})")
+            time.sleep(REQUEST_DELAY)
+            continue
+
+        # Nutrients are already embedded in the /foods/search result, so start
+        # from those; then enrich/override from the full /food/{fdcId} detail
+        # record when it's reachable. The detail endpoint 404s on some foods
+        # (samples/withdrawn ids) -- treat that as non-fatal so we keep the
+        # search-result nutrients instead of dropping the whole candidate.
+        nutrients = extract_nutrients(food)
+        detail_note = ""
+        try:
+            detail = food_detail(food["fdcId"], args.api_key)
+            for k, v in extract_nutrients(detail).items():
+                if v is not None:
+                    nutrients[k] = v
+        except urllib.error.HTTPError as e:
+            detail_note = f" [detail HTTP {e.code}; used search-result nutrients]"
+        except Exception as e:  # noqa: BLE001
+            detail_note = f" [detail {type(e).__name__}; used search-result nutrients]"
+
+        flag = confidence_flag(score, nutrients)
+        rows.append(_row(
+            cand,
+            matched_description=food.get("description", ""),
+            fdc_id=food.get("fdcId", ""),
+            data_type=food.get("dataType", ""),
+            match_score=f"{score:.2f}",
+            confidence_flag=flag,
+            **nutrients,
+        ))
+        matched += 1
+        print(f"[{i}/{len(candidates)}] {name}: matched "
+              f"{food.get('description')!r} (score {score:.2f}, {flag}){detail_note}")
         time.sleep(REQUEST_DELAY)
 
     with open(args.out, "w", newline="", encoding="utf-8") as f:

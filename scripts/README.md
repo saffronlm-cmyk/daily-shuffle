@@ -145,6 +145,15 @@ are expected to come back `no_match` or poor — fill these by hand after
 review: **nutritional yeast, coconut aminos, gochujang, chilli crisp, thai red
 curry paste, rice paper, vanilla paste** (proxied to vanilla extract).
 
+The `/food/{fdcId}` detail endpoint 404s on some entries (samples/withdrawn
+ids); the script treats that as non-fatal and falls back to the nutrients
+embedded in the `/foods/search` result, noting `[detail HTTP 404; used
+search-result nutrients]` in the console. If a whole candidate needs
+re-looking-up (fixed override, transient error), drop it into a small subset
+CSV and re-run just those with `--in`/`--out` — e.g. `staple_candidates_cooked.csv`
+(beans/grains → cooked forms) and `staple_candidates_retry.csv` (detail-404
+recoveries + wrong-form override fixes) were built exactly that way.
+
 **This is a build-only script, run locally, never from a Claude Code
 sandbox** — `api.nal.usda.gov` is blocked at the sandbox's own egress gateway
 (confirmed via both `curl` and WebFetch returning a 403 `connect_rejected`
