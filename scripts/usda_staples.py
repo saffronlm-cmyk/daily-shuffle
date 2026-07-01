@@ -171,6 +171,13 @@ MACRO_KEYS = ["calories", "protein_g", "carbs_g", "fat_g", "fibre_g", "sugar_g"]
 
 MATCH_THRESHOLD = 0.4   # minimum name-match score (0..1) to trust a result.
 
+# Descriptions containing any of these are a processed form no staple wants;
+# skip them in best_match so a whole/raw entry that scores identically on the
+# shared words isn't beaten to first place (e.g. "Sweet Potato puffs, frozen"
+# out-ranking "Sweet potato, raw" for a "sweet potato" query). Keep this list
+# narrow -- only forms none of the candidates legitimately map to.
+REJECT_SUBSTRINGS = ("puff", "fries", "tots", "tater")
+
 REQUEST_DELAY = 0.2     # seconds between calls, polite even at 1000 req/hr.
 
 
@@ -235,6 +242,8 @@ def best_match(name, foods):
     best, best_score = None, 0.0
     for food in foods:
         desc = food.get("description", "")
+        if any(rs in desc.lower() for rs in REJECT_SUBSTRINGS):
+            continue
         score = match_score(name, term, desc)
         if score > best_score:
             best, best_score = food, score
