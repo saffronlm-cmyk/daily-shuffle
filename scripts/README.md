@@ -78,3 +78,63 @@ ingredient variant as an alias so recipes match. It bumps the seed flag to
   check those in `price_report.md`.
 - Generated files (`pricebook.filled.csv`, `price_report.md`,
   `scripts/seed_snippet.js`, `index.html.bak`) are git-ignored.
+
+## Nutrition-estimation pipeline (`usda_staples.py`)
+
+A separate, unrelated pipeline that expands the app's `staple_products` table
+(used to ground AI macro estimates) with generic ingredient macros from USDA
+FoodData Central. See `logs/daily-shuffle_log.md` ("Nutrition Estimation
+Feasibility — Research & Planning", 2026-07-01) for the full background and
+the 3-step sequence this is step 1 of.
+
+```
+staple_candidates.csv  ──(usda_staples.py + USDA FDC)──>  staple_report.csv
+```
+
+- `staple_candidates.csv` — **committed input**: ~135 canonical staple
+  ingredient names, hand-deduped from an ingredient-frequency scan of the
+  recipe library (raw scan found 209 names appearing in ≥4 recipes; many
+  were regex artifacts, singular/plural variants, or near-synonyms — see the
+  log entry for the full list of merges and intentional drops like bare
+  `"water"`/`"oil"`). Columns: `name, category, recipe_count, source,
+  merged_from`. `source` is `organic` (surfaced by the frequency scan) or
+  `force-include` (core protein/carb/dairy items added manually even though
+  they fell under the ≥4-recipe cutoff, e.g. `potato`, `butter`, `beef mince`).
+
+```bash
+# Free signup (name + email only): fdc.nal.usda.gov/api-key-signup
+export USDA_FDC_API_KEY=your_key_here
+
+# Preview only — what would be looked up. Spends nothing, needs no key:
+python3 scripts/usda_staples.py --dry-run
+
+# Check the real shape of one result (useful for debugging a bad match):
+python3 scripts/usda_staples.py --probe "garlic"
+
+# Small real run first (first 10 names) to sanity-check:
+python3 scripts/usda_staples.py --sample 10
+
+# Full run:
+python3 scripts/usda_staples.py
+```
+
+Output: `scripts/staple_report.csv` (git-ignored) — `name, category,
+recipe_count, source, matched_description, fdc_id, data_type, match_score,
+calories, protein_g, carbs_g, fat_g, fibre_g, sugar_g, confidence_flag`, all
+macros per 100g. Review this before it's applied anywhere: check
+`confidence_flag` values other than `ok` (`review_match`, `low_confidence_match`,
+`missing:...`, `no_match`) for wrong-form matches, same lesson as the
+price-book pipeline's `price_report.md`. Nothing is written to Supabase by
+this script — a later Claude Code session applies the reviewed rows to the
+`staple_products` table directly via the Supabase MCP tools.
+
+Prefers USDA's `Foundation`/`SR Legacy` (generic/unbranded) data over branded
+entries, for the same reason `price_pricebook.py` avoids bare one-word
+searches on branded catalogs — it avoids "right words, wrong product form"
+mismatches (a spice search returning a branded hot sauce, etc.).
+
+**This is a build-only script, run locally, never from a Claude Code
+sandbox** — `api.nal.usda.gov` is blocked at the sandbox's own egress gateway
+(confirmed via both `curl` and WebFetch returning a 403 `connect_rejected`
+before ever reaching USDA), the same restriction that already applies to
+`api.apify.com` above.
