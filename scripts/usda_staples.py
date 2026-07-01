@@ -88,6 +88,7 @@ TERM_OVERRIDES = {
     "milk": "milk whole 3.25 milkfat",                # was matching "Crackers, milk"
     "almond milk": "almond milk unsweetened shelf stable",
     "coconut milk": "nuts coconut milk canned",       # recipes mean canned, not carton
+    "coconut cream": "nuts coconut cream raw",         # unsweetened, not the canned sweetened entry
     "greek yoghurt": "yogurt greek plain whole milk",
     "yoghurt": "yogurt plain whole milk",             # UK spelling scored 0 before
     "natural yoghurt": "yogurt plain whole milk",
@@ -110,7 +111,7 @@ TERM_OVERRIDES = {
     "tomato": "tomatoes red ripe raw",                # was matching "Tomato powder"
     "cherry tomatoes": "tomatoes red ripe raw",
     "sweet potato": "sweet potatoes raw unprepared",  # was matching "Sweet Potato puffs, frozen"
-    "sweetcorn": "corn sweet yellow canned",          # tinned sweetcorn; was no_match
+    "sweetcorn": "corn sweet yellow canned whole kernel drained",  # whole kernel, not cream style
     "dill": "dill weed fresh",
     "spring onion": "onions spring scallions raw",
     "red chilli": "peppers hot chili red raw",        # was matching "Cabbage, red"
@@ -199,21 +200,26 @@ def search_term(name):
     return TERM_OVERRIDES.get(name, name)
 
 
-def match_score(name, term, description):
-    """Fraction of the query's words that appear in the FDC description,
-    scored against BOTH the original candidate name and the (possibly
-    overridden) search term -- take the higher. This is what lets an override
-    that renames the target (e.g. cornflour -> cornstarch) still score well:
-    the original name shares no words with "Cornstarch", but the term does."""
+def _word_fraction(query, description):
+    """Fraction of the query's words that appear in the FDC description."""
+    q_words = set(canonicalise(query).split())
+    if not q_words:
+        return 0.0
     d_words = set(canonicalise(description).split())
+    return sum(1 for w in q_words if w in d_words) / len(q_words)
 
-    def frac(query):
-        q_words = set(canonicalise(query).split())
-        if not q_words:
-            return 0.0
-        return sum(1 for w in q_words if w in d_words) / len(q_words)
 
-    return max(frac(name), frac(term))
+def match_score(name, term, description):
+    """Score a description against the query. When the candidate has an
+    explicit override, score against the (deliberately specific) override
+    term ALONE -- otherwise a bare name that fully matches several forms
+    saturates at 1.0 and can't distinguish them (e.g. "coconut cream" matches
+    both the sweetened and raw entries, so only the term "...raw" separates
+    them). With no override, score against the name, falling back to the term
+    so a rename-style match still works (cornflour -> "Cornstarch")."""
+    if name in TERM_OVERRIDES:
+        return _word_fraction(term, description)
+    return max(_word_fraction(name, description), _word_fraction(term, description))
 
 
 def api_get(path, params, api_key, timeout=30):
