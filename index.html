@@ -4612,6 +4612,93 @@ function saveSupabaseCredentials() {
   if (el) { el.textContent = '✓ Credentials saved'; el.style.color = 'var(--green)'; }
 }
 
+// ─── LOCAL → CLOUD BACK-FILL ────────────────────────────────────────────────
+// Recipes saved while the cloud write was blocked (e.g. the old missing-RLS bug)
+// got a numeric Date.now() id and live only in this browser. Rebuild the row
+// from the recipe + its full data so a stranded local recipe can be pushed up.
+function buildRecipeRow(r) {
+  const fd = RECIPE_FULL_DATA[r.id] || {};
+  let ingredientSections = null;
+  const ings = fd.ingredients || [];
+  if (ings.length) {
+    const groups = {};
+    for (const ing of ings) {
+      const key = ing.group || '__default__';
+      (groups[key] = groups[key] || []).push(ing.item || ing);
+    }
+    ingredientSections = Object.entries(groups).map(([k, items]) => ({
+      section_title: k === '__default__' ? null : k, ingredients: items
+    }));
+  }
+  const nut = fd.nutrition || null;
+  return {
+    name: r.name,
+    meal_type: (r.mealTypes && r.mealTypes[0]) || 'dinner',
+    meal_types: (r.mealTypes && r.mealTypes.length) ? r.mealTypes : null,
+    protein_source: r.proteinSource || null,
+    cuisine: r.cuisine || 'comfort',
+    carb_type: r.carbType || 'none',
+    cost_tier: r.costTier ? String(r.costTier) : '1',
+    serves: parseInt(r.servings) || 1,
+    prep_cook_time: r.prepTime || null,
+    subtitle: r.description || '',
+    craving_tags: r.cravings || [],
+    creator_handle: r.instagramUrl || null,
+    notes: r.notes || null,
+    import_status: 'ready',
+    ingredient_sections: ingredientSections,
+    method_steps: (fd.method && fd.method.length) ? fd.method : null,
+    calories: nut ? nut.kcal : null,
+    protein_g: nut ? nut.protein : null,
+    carbs_g: nut ? nut.carbs : null,
+    fat_g: nut ? nut.fat : null,
+  };
+}
+
+// Re-key a recipe from its numeric local id to the UUID Supabase assigned, and
+// migrate everything keyed by id so nothing is orphaned. Marking it as a cloud
+// id also drops it from the local custom store (no duplicate on next load).
+function promoteLocalRecipe(r, newId) {
+  const oldId = r.id;
+  if (RECIPE_FULL_DATA[oldId]) { RECIPE_FULL_DATA[newId] = RECIPE_FULL_DATA[oldId]; delete RECIPE_FULL_DATA[oldId]; }
+  if (favourites.has(oldId)) { favourites.delete(oldId); favourites.add(newId); }
+  if (servingOverrides[oldId] != null) { servingOverrides[newId] = servingOverrides[oldId]; delete servingOverrides[oldId]; }
+  if (hiddenRecipes.has(oldId)) { hiddenRecipes.delete(oldId); hiddenRecipes.add(newId); }
+  r.id = newId;
+  cloudRecipeIds.add(newId);
+}
+
+let _syncingLocal = false;
+async function syncLocalRecipes() {
+  if (_syncingLocal) return;
+  // Local-only = numeric id (Date.now fallback) not yet known to the cloud.
+  const locals = recipes.filter(r => r && typeof r.id === 'number' && r.id !== 0 && !cloudRecipeIds.has(r.id));
+  if (!locals.length) return;
+  _syncingLocal = true;
+  let synced = 0;
+  for (const r of locals) {
+    try {
+      const res = await fetch(`${RECIPE_LIB_URL}/rest/v1/recipes`, {
+        method: 'POST',
+        headers: { ...RECIPE_LIB_HEADERS, 'Prefer': 'return=representation' },
+        body: JSON.stringify(buildRecipeRow(r))
+      });
+      if (!res.ok) continue;
+      const [created] = await res.json();
+      if (!created || !created.id) continue;
+      promoteLocalRecipe(r, created.id);
+      synced++;
+    } catch(e) { /* leave it local — try again next load */ }
+  }
+  _syncingLocal = false;
+  if (synced) {
+    saveCustom(); saveNutrition(); saveFavourites(); saveOverrides();
+    if (typeof currentPlan !== 'undefined' && currentPlan) savePlan();
+    renderRecipes();
+    showToast(`☁️ Synced ${synced} recipe${synced > 1 ? 's' : ''} to your library`);
+  }
+}
+
 // ─── CLOUD RECIPE BACKGROUND REFRESH ────────────────────────────────────────
 // Runs silently after app load; refreshes recipe list if cache is stale (>30 min)
 (async () => {
@@ -4619,28 +4706,24 @@ function saveSupabaseCredentials() {
   const cacheAt = localStorage.getItem('ds_recipe_cache_at');
   const cacheAge = cacheAt ? Date.now() - new Date(cacheAt).getTime() : Infinity;
   const cacheEmpty = recipes.length === 0;
-  if (cacheAge < CACHE_TTL && !cacheEmpty) return;
-
-  const fresh = await fetchCloudRecipes();
-
-  if (!fresh || !fresh.length) {
-    // Only show error if there's nothing cached to display
-    if (recipes.length === 0) {
+  if (cacheAge >= CACHE_TTL || cacheEmpty) {
+    const fresh = await fetchCloudRecipes();
+    if (fresh && fresh.length) {
+      // Rebuild cloudRecipeIds from fresh data
+      cloudRecipeIds.clear();
+      for (const r of fresh) cloudRecipeIds.add(r.id);
+      // Rebuild recipes: fresh cloud + any existing custom recipes
+      const custom = recipes.filter(r => !cloudRecipeIds.has(r.id));
+      recipes = [...fresh, ...custom];
+      renderRecipes();
+      showToast(`Library updated — ${fresh.length} recipes loaded ✓`);
+    } else if (recipes.length === 0) {
+      // Only show error if there's nothing cached to display
       showRecipeLoadError('Could not load recipes. Check your connection and try again.');
     }
-    return;
   }
-
-  // Rebuild cloudRecipeIds from fresh data
-  cloudRecipeIds.clear();
-  for (const r of fresh) cloudRecipeIds.add(r.id);
-
-  // Rebuild recipes: fresh cloud + any existing custom recipes
-  const custom = recipes.filter(r => !cloudRecipeIds.has(r.id));
-  recipes = [...fresh, ...custom];
-
-  renderRecipes();
-  showToast(`Library updated — ${fresh.length} recipes loaded ✓`);
+  // Back-fill any recipes that never reached the cloud (once cloudRecipeIds is current).
+  syncLocalRecipes();
 })();
 
 // ─── PICKER ──────────────────────────────────────────────────────────────────
