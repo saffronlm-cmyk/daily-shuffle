@@ -4,6 +4,129 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# Nutrition Estimation Feasibility — Research & Planning
+**Date:** 2026-07-01
+**Project:** Daily Shuffle — recipe/meal-planning PWA
+**Mode:** Rolling Log + GitHub Push
+**Status:** In Progress — planning complete, nothing implemented yet; next session executes step 1 of a 3-step sequence
+
+---
+
+## Project Context
+See 2026-06-25 ("Ingredient Normalisation…") and 2026-06-29 ("Recipe Parser Overhaul…") entries for architecture background. This session opened a new work stream: whether/how to calculate and persist accurate nutritional info (calories/macros) for the recipe library, and how to raise the accuracy of AI-estimated nutrition generally. Purely research + planning — no code was written or executed this session.
+
+## Session Goal
+Assess feasibility and realistic accuracy of estimating recipe nutrition and saving it to the bundled Supabase project, then turn that into a concrete, sequenced implementation plan Saffron can execute across sessions.
+
+## State Before This Session
+Unknown to Saffron going in (surfaced this session): the `recipes` table already has `calories`/`protein_g`/`carbs_g`/`fat_g`/`fibre_g`/`sugar_g`/`gi_estimate` columns, ~97% populated — but a live query showed many of those existing values are themselves flagged `review_flags` like `nutrition_not_stated`, `nutrition_incomplete`, `calories_approximate`, meaning a lot of "existing" data is already a prior estimate, not verified truth. An in-app AI estimator already exists (see below) but has a persistence gap nobody had noticed.
+
+## What Was Done
+1. **Live Supabase investigation** (project `jsxcctrskkkxgdxfaduo`, via Supabase MCP — this channel is NOT blocked by the sandbox egress policy, unlike raw internet calls, see Environment notes): confirmed schema, counted 335 total recipes / 327 non-deleted, 327 with `calories` set, only 8 with zero nutrition (2 of those have no ingredients at all). Sampled `review_flags` distribution — ~90+ recipes carry a nutrition-uncertainty flag despite having numbers.
+2. **Code investigation** (via a research subagent, not exploration I duplicated): found the existing in-app estimator — `fetchMacroEstimate()` / `estimateNutritionWithAI()` in `index.html` (~lines 3206–3337). It calls Claude Haiku (`claude-haiku-4-5-20251001`), grounds the prompt against the user's `staple_products` table (exact macros preferred over guesses), divides by servings client-side. **Gap found: it only saves to `localStorage` (`ds_nutrition` via `saveNutrition()`) and never PATCHes back to the Supabase `recipes` row** — `patchRecipeToLibrary()` (the function that does write to Supabase) doesn't touch the macro columns at all. So AI estimates don't survive a cache rebuild or sync across devices.
+3. **Diagnosed why Haiku's estimates are weak**: prompt (`index.html:3224-3236`) demands raw JSON immediately with `max_tokens: 256` — no chain-of-thought/per-ingredient breakdown before the final number, which is the single biggest accuracy lever missing. Only 45 `staple_products` rows exist to ground against. `ingredient_sections` (jsonb) mixes two shapes — legacy plain-text strings (`"2 whole chickens"`) and newer structured objects (`{qty, unit, name, note, group}`, only present in recipes added after the 2026-06-29 parser overhaul) — and many structured `qty` fields are explicitly `null` for "to taste"/no-amount items, so even a perfect ingredient-macro lookup can't fix an unknown quantity.
+4. **Checked git/session-log history** to answer "did the ingredient normalisation work already cover quantities?" — No. The 2026-06-25 entry's `ingredient-master.csv` pipeline normalised ingredient *naming* for price-matching only (e.g. "garlic clove(s)" variants → one canonical name); it explicitly left 430 lines across 36 recipes null rather than inventing quantities. The 2026-06-29 parser split *already-stated* qty/unit/name apart for new recipes going forward, but never retroactively applied to the existing 327, and never fills in a quantity when the recipe never gave one. Quantity normalisation (vague units like "1 tbsp"/"to taste" → gram-weight estimates) has never been attempted — confirmed as a genuinely open gap, not a re-run of prior work.
+5. **Ran an ingredient-frequency analysis** across all 4,104 ingredient lines (SQL below) to scope a staple-expansion target: 209 unique ingredient names appear in ≥4 recipes (covering ~59% of all lines); 457 names at ≥2 recipes (~73%); 1,080 names are singleton (appear in exactly 1 recipe, long tail not worth systematic pre-loading). Cross-checked against the current 45 `staple_products` rows — they're almost entirely Saffron's specific branded products (Legend almond butter, Pip & Nut peanut butter, etc.), not one generic pantry basic (salt, olive oil, garlic, oats, honey, eggs, milk…) is covered despite those being the highest-frequency ingredients in the library.
+6. **Investigated existing Edamam integration** (`legacy/discover.js`) as a possible ready-made nutrition source: it only calls Edamam's Recipe Search API v2, which returns nutrition for *existing public recipes matched by search* — it can't compute nutrition for arbitrary custom ingredient text, so it's the wrong product for this need. Edamam's separate Nutrition Analysis API (feed in a title + ingredient lines, get computed nutrition) is the right shape but is a different product needing separate registration; free tier is only 400 requests/month. Not pursued further once USDA was chosen.
+7. **Chose and vetted USDA FoodData Central** as the nutrition-data source for generic/commodity ingredients: free signup (`fdc.nal.usda.gov/api-key-signup`, name+email only), 1,000 req/hr once registered. Saffron signed up and holds a key locally (not shared with or stored by Claude Code).
+8. **Ruled out both alternative delivery paths, empirically, not by assumption**:
+   - *Live in-app feature*: Saffron tested `fetch('https://api.nal.usda.gov/...')` directly from her own browser console — it throws a CORS error. Confirmed non-viable without a backend proxy, which this app doesn't have.
+   - *Calling USDA directly from this Claude Code session*: attempted via both `curl` and the WebFetch tool — both got a **403 from the sandbox's own egress gateway** before ever reaching USDA (`connect_rejected`, "policy denial" per `$HTTPS_PROXY/__agentproxy/status`), i.e. the exact same restriction that already blocks `api.apify.com` for the price-book pipeline (see 2026-06-25 Apify entry). So USDA calls can only happen from a script Saffron runs locally — mirroring the existing `price_pricebook.py`/`csv_to_seed.py` pattern exactly.
+9. **Landed on a 3-step sequence** (Saffron's own framing, confirmed this session): (1) expand `staple_products` via a local USDA lookup script; (2) a separate future session to normalise ingredient quantities; (3) a Claude-Code bulk pass to (re)populate recipe nutrition using both of the above as inputs. Confirmed the *order* matters: the bulk pass's accuracy ceiling is capped by unknown quantities regardless of ingredient-level macro quality, so quantity normalisation should land before the bulk pass, not after or in parallel.
+
+## Artifacts Produced / Modified
+None. This was a pure research/planning session — no files in the repo were created or changed except this log entry. The ingredient-frequency query and its output (below) exist only in this log; no CSV or script was saved.
+
+**Reusable SQL** (ingredient-frequency scan, run against Supabase project `jsxcctrskkkxgdxfaduo` via the Supabase MCP `execute_sql` tool) — re-run this rather than re-deriving it by hand:
+```sql
+with sections as (
+  select r.id, jsonb_array_elements(r.ingredient_sections) as sect
+  from public.recipes r
+  where r.import_status <> 'deleted' and r.ingredient_sections is not null
+),
+items as (
+  select id, jsonb_array_elements(sect->'ingredients') as item
+  from sections
+),
+raw as (
+  select id,
+    case when jsonb_typeof(item) = 'string' then trim(both '"' from item::text)
+         else item->>'name' end as raw_name
+  from items
+),
+clean1 as (
+  select id, regexp_replace(raw_name, '\(.*?\)', '', 'g') as t
+  from raw where raw_name is not null
+),
+clean2 as (
+  select id,
+    lower(trim(regexp_replace(t,
+      '^[0-9¼½¾⅓⅔⅛/.\s–-]*\s*(g|kg|ml|l|tsp|tbsp|tbsps|teaspoons?|tablespoons?|cups?|oz|lb|lbs|cloves?|whole|large|medium|small|slices?|sprigs?|handfuls?|pinch(es)?|bunch(es)?|packs?|cans?|tins?)?\s*',
+      '', 'i'))) as t2
+  from clean1
+),
+clean3 as (
+  select id, split_part(t2, ',', 1) as name
+  from clean2
+)
+select name, count(*) as n, count(distinct id) as recipe_count
+from clean3
+where name is not null and length(name) > 2
+group by name
+order by n desc;
+```
+Top hits (partial, illustrative — see Notes & Gotchas for known regex artifacts): salt (67 recipes), olive oil (57), maple syrup (58), soy sauce (48), baking powder (54), honey (38), garlic cloves (~50 combined across mangled variants), eggs (36), cinnamon (33), vanilla extract (36), spring onions (30), cucumber (31), baking soda (30), coconut oil (27), cocoa powder (26), avocado (26), red onion (25), sesame oil/seeds (~49 combined), chia seeds (24), oats/oat flour (~56 combined), milk/"milk of choice" (~36 combined).
+
+## Skills Used
+
+| Skill | What it contributed |
+|-------|-------------------|
+| save-conversation | This log entry (Rolling Log + GitHub Push mode) |
+
+## Decisions & Reasoning
+- **Prioritise grounding-data expansion (staple_products) before touching the in-app prompt/model.** Expanding staples removes guessing entirely for the ingredients it covers — a strictly-better, no-downside win — whereas prompt/model changes only make the *guessing* better. Sequenced first.
+- **USDA FoodData Central over Edamam Nutrition Analysis API for the staple expansion.** Edamam's matching product is the right shape (NLP ingredient-line → nutrition) but free tier caps at 400 req/month and needs separate app registration under Saffron's account (unconfirmed whether she already has access). USDA is free, instant signup, higher rate limit, and better suited to *generic per-ingredient* lookups (which is what staple expansion actually needs) rather than whole-recipe NLP parsing.
+- **Local build-only script, not an in-app feature, for the USDA calls** — decided only after empirically ruling out the alternative twice: Saffron confirmed CORS failure from her own browser, and I confirmed this Claude Code sandbox is gateway-blocked from `api.nal.usda.gov` (same as `api.apify.com`). Not an assumption — both were tested. Mirrors the exact `price_pricebook.py` pattern already established and proven for Apify.
+- **Target the ≥4-recipe-occurrence ingredient tier (~209 names, ~59% line coverage) for the staple expansion, not the full long tail.** USDA lookups are free/cheap so cost isn't the constraint — the constraint is review effort (each match needs a sanity check, per the Apify pipeline's "wrong form" lesson e.g. cayenne→hot sauce) and diminishing returns (1,080 singleton-recipe ingredients each only help one recipe). Agreed to also force-include core protein/carb/dairy items (chicken breast, rice, potatoes, etc.) even if just under the frequency cutoff, since they swing calorie totals far more than a correctly-priced spice does.
+- **Prefer USDA `dataType=Foundation,SR Legacy` over branded entries when the script is built** — generic/unbranded reference data avoids the same class of "right words, wrong product form" mismatch that bit the Apify price matcher.
+- **Reviewable CSV output before writing to `staple_products`, not auto-apply** — consistent with the project's established convention (`pricebook.csv`/`price_report.md`) of never letting an automated match write directly to live data unreviewed.
+- **Quantity normalisation sequenced BEFORE the bulk nutrition pass, and parked as its own separate session** rather than folded into this stream. Reasoning: it's a large enough problem (deciding gram-weight defaults for every vague/"to taste" ingredient line across the whole corpus) to deserve its own planning session, and doing it first means the bulk pass only needs to run once at full quality rather than twice.
+- **The eventual bulk pass will be Claude Code reasoning directly, not a nested Anthropic API call.** Because a future session has direct Supabase read/write access (proven this session), it can match against `staple_products` itself, apply chain-of-thought per recipe, run a self-consistency double-check (re-derive, flag >20% disagreement), and write `review_flags` for low-confidence recipes — capabilities the in-app Haiku call structurally can't have (single constrained JSON-only prompt, no multi-pass, no direct DB access).
+
+## Current State (end of session)
+No implementation. `staple_products` still has 45 rows (all branded, no generic staples). `recipes` nutrition columns unchanged (327/335 populated, many flagged as prior estimates). Ingredient quantities unchanged (still `null` for "to taste"/no-amount lines). Saffron holds a USDA FDC API key locally — not committed or referenced anywhere in the repo. No new branch was created this session (pure investigation, no code changes to stage).
+
+## Next Steps
+1. **New session — build `scripts/usda_staples.py`** (stdlib-only Python, build-only like `price_pricebook.py`): input the ~209-ingredient-name list (regenerate via the SQL above, plus the agreed core-protein/carb/dairy additions — no frozen file exists yet, see Open Questions). For each name, call FDC `/foods/search?dataType=Foundation,SR%20Legacy` then `/food/{fdcId}` for the best match; output a review CSV (`name, matched_description, fdc_id, calories, protein_g, carbs_g, fat_g, fibre_g, sugar_g per 100g, confidence_flag`).
+2. Saffron runs it locally: `export USDA_FDC_API_KEY=...` then `python3 scripts/usda_staples.py` (same run pattern as the Apify script — re-export each terminal session, never persisted to a file).
+3. Saffron reviews/corrects the output CSV (catch wrong-form matches per the Apify lesson) and shares it back.
+4. A Claude Code session applies the confirmed rows into `staple_products` directly via the Supabase MCP `execute_sql`/insert tools (project `jsxcctrskkkxgdxfaduo`) — no second script needed, this channel isn't blocked by the sandbox egress policy.
+5. **Separate future session: plan + execute ingredient quantity normalisation** — design gram-weight defaults/conversion rules for vague units ("1 tbsp", "1 medium avocado") and a policy for genuinely-unquantifiable "to taste" items, then apply across `ingredient_sections` for all 327 recipes (both the legacy plain-string shape and the newer structured shape — see Notes & Gotchas).
+6. **Then: bulk Claude Code pass** over all 327 recipes using the expanded `staple_products` + normalised quantities to (re)populate `calories/protein_g/carbs_g/fat_g/fibre_g/sugar_g`, with per-recipe chain-of-thought reasoning and a self-consistency double-check, writing `review_flags` (reuse existing vocabulary — see Notes & Gotchas) for low-confidence recipes.
+7. **Lower priority / optional**: apply the same chain-of-thought + model-upgrade (Haiku → Sonnet) improvements to the in-app `fetchMacroEstimate`/`estimateNutritionWithAI` (`index.html:3206-3337`), and fix the persistence gap (add a Supabase PATCH of the macro columns, mirroring `patchRecipeToLibrary`) so future in-app "Re-estimate" clicks stop being localStorage-only.
+
+## Open Questions / Blockers
+- **No frozen ingredient list yet** — the ≥4-recipe-occurrence threshold (~209 names) plus "add core protein/carb/dairy items" guidance was agreed verbally/in this log, but nobody has written the literal final list to a file. The next session should either re-run the SQL above or explicitly confirm the categorical additions with Saffron before running the USDA script, to avoid scope drift.
+- Whether Saffron's existing Edamam account (`ds_edamam_id`/`ds_edamam_key`) has separate access to the Edamam Nutrition Analysis API was never checked — moot now that USDA was chosen, but worth knowing if USDA coverage turns out to have gaps (e.g. some prepared/composite foods USDA doesn't model well).
+- Carried over from 2026-06-25, still unresolved and unrelated to this stream: orange juice→"Orange" rollup correctness, and whether `Garlic Clove`/`Garlic` should merge to one variant.
+
+## Environment & Config Notes
+- Repo: `saffronlm-cmyk/daily-shuffle`, no feature branch created this session (investigation only).
+- Supabase project `jsxcctrskkkxgdxfaduo` ("saffronlilith's Project"). Tables relevant to this stream: `recipes` (335 rows; `calories/protein_g/carbs_g/fat_g/fibre_g/sugar_g/gi_estimate` columns already exist, no migration needed) and `staple_products` (45 rows: `name, aliases[], serving_qty, serving_unit, calories, protein_g, carbs_g, fat_g, fibre_g, sugar_g, gi_estimate, flags[], notes`).
+- **This cloud/remote Claude Code environment cannot reach `api.nal.usda.gov` or `api.apify.com`** — both confirmed via gateway-level 403 (`connect_rejected`, policy denial) at `$HTTPS_PROXY/__agentproxy/status`, before the request ever leaves the sandbox. Any script hitting either of these APIs must be built here but run on Saffron's own machine. Supabase access via the MCP tools is a separate channel and is NOT subject to this restriction — confirmed working throughout this session (schema reads, frequency queries, all succeeded).
+- USDA FoodData Central: free signup at `fdc.nal.usda.gov/api-key-signup`; 1,000 req/hr with a registered key (30/hr, 50/day on the public `DEMO_KEY`). Saffron has a key; it is not stored in this repo or shared with Claude Code.
+- Edamam credentials (`ds_edamam_id`/`ds_edamam_key`, used by the legacy Discover tab) are for the Recipe Search API v2 only — confirmed via `legacy/discover.js` — not usable for arbitrary-ingredient nutrition analysis without separate registration for the Nutrition Analysis API product.
+
+## Notes & Gotchas
+- **The ingredient-frequency regex has known artifacts**: it sometimes eats a leading "g" from words starting with g when preceded by a number, because it pattern-matches "g" as a unit abbreviation (e.g. "3 garlic cloves" → "arlic cloves", "green onions" → "reen onions"). True unique-ingredient counts are somewhat lower than the raw 209/457 figures once these are manually merged — dedupe by eye when building the final candidate list, don't trust the raw grouped names verbatim.
+- **`ingredient_sections` jsonb has two shapes in the wild**: legacy plain strings (`"2 whole chickens"`) and newer structured objects (`{qty, unit, name, note, group}` — only present in recipes added after the 2026-06-29 parser overhaul). Any script/query touching this must branch on `jsonb_typeof(item)`.
+- **`qty: null` in the structured shape is not a data bug** — it reflects recipes that genuinely never specified an amount ("salt, to taste", bare "olive oil"). This is exactly the quantity-normalisation gap; don't treat it as something to "fix" by re-parsing, it needs new logic (gram-weight defaults/conversion rules).
+- **`review_flags` already has an informal vocabulary in use**: `nutrition_not_stated`, `nutrition_incomplete`, `calories_approximate`, `serves_estimated`, `method_inferred`, etc. Reuse or closely match these when the bulk pass flags low-confidence recipes rather than inventing a new taxonomy.
+- **The in-app estimator already reads live from `staple_products`** (`fetchMacroEstimate`, `index.html:3206`, alias-aware match) — expanding that table benefits the in-app "Re-estimate" button immediately with zero code changes, since no new wiring is needed for it to pick up new staples.
+- This session made heavy, correct use of the Supabase MCP tools directly (not raw `curl`/`fetch`) for all live-data investigation — continue that pattern; it's the only channel proven to reach this project's Supabase instance from this sandbox.
+
+---
+
 # Recipe Parser Overhaul + Persistent Locked Plan + Drink Tracking
 **Date:** 2026-06-29
 **Project:** Daily Shuffle — recipe/meal-planning PWA
