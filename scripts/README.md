@@ -131,7 +131,19 @@ this script — a later Claude Code session applies the reviewed rows to the
 Prefers USDA's `Foundation`/`SR Legacy` (generic/unbranded) data over branded
 entries, for the same reason `price_pricebook.py` avoids bare one-word
 searches on branded catalogs — it avoids "right words, wrong product form"
-mismatches (a spice search returning a branded hot sauce, etc.).
+mismatches (a spice search returning a branded hot sauce, etc.). Because the
+match score is just word-overlap, a wrong *form* can still score highly (e.g.
+"avocado" → "Oil, avocado"), so a `TERM_OVERRIDES` table at the top of the
+script steers ~40 known-tricky names toward the right entry (whole/raw foods,
+or a documented proxy where USDA has no generic — UK `cornflour` → US
+`cornstarch`, `coconut sugar` ~ brown sugar, `rice vinegar` ~ distilled
+vinegar, etc.). Scoring compares the description against both the original
+name and the override term, so a rename-style override still scores.
+
+A handful of ingredients have no usable USDA Foundation/SR Legacy generic and
+are expected to come back `no_match` or poor — fill these by hand after
+review: **nutritional yeast, coconut aminos, gochujang, chilli crisp, thai red
+curry paste, rice paper, vanilla paste** (proxied to vanilla extract).
 
 **This is a build-only script, run locally, never from a Claude Code
 sandbox** — `api.nal.usda.gov` is blocked at the sandbox's own egress gateway
