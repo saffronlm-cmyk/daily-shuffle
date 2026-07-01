@@ -1,0 +1,136 @@
+name,category,recipe_count,source,merged_from
+salt,Salt & Seasoning,104,organic,salt;of salt;kosher salt
+sea salt,Salt & Seasoning,15,organic,sea salt;of sea salt
+black pepper,Salt & Seasoning,20,organic,black pepper;pepper
+white pepper,Salt & Seasoning,10,organic,white pepper
+garlic powder,Salt & Seasoning,35,organic,garlic powder
+garlic granules,Salt & Seasoning,11,organic,garlic granules
+onion powder,Salt & Seasoning,11,organic,onion powder
+paprika,Salt & Seasoning,18,organic,paprika;sweet paprika
+smoked paprika,Salt & Seasoning,23,organic,smoked paprika
+chipotle powder,Salt & Seasoning,6,organic,chipotle powder
+chilli powder,Salt & Seasoning,5,organic,chilli powder
+curry powder,Salt & Seasoning,5,organic,curry powder
+cumin,Salt & Seasoning,9,organic,cumin
+turmeric,Salt & Seasoning,6,organic,turmeric
+ground ginger,Salt & Seasoning,5,organic,ground ginger
+cinnamon,Salt & Seasoning,38,organic,cinnamon;ground cinnamon
+dried oregano,Salt & Seasoning,12,organic,dried oregano;oregano
+pumpkin pie spice,Salt & Seasoning,9,organic,pumpkin pie spice
+red pepper flakes,Salt & Seasoning,10,organic,red pepper flakes;chilli flakes
+nutritional yeast,Salt & Seasoning,8,organic,nutritional yeast
+olive oil,Oils & Fats,57,organic,olive oil
+coconut oil,Oils & Fats,27,organic,coconut oil
+sesame oil,Oils & Fats,36,organic,sesame oil;toasted sesame oil
+vegetable oil,Oils & Fats,10,organic,vegetable oil
+avocado oil,Oils & Fats,9,organic,avocado oil
+coconut cream,Oils & Fats,4,organic,coconut cream
+butter,Oils & Fats,0,force-include,
+egg,Dairy & Eggs,62,organic,eggs;egg
+egg whites,Dairy & Eggs,7,organic,egg whites
+milk,Dairy & Eggs,36,organic,milk;milk of choice
+almond milk,Dairy & Eggs,5,organic,almond milk
+coconut milk,Dairy & Eggs,13,organic,coconut milk
+greek yoghurt,Dairy & Eggs,32,organic,greek yogurt;greek yoghurt;plain greek yogurt;reek yoghurt
+yoghurt,Dairy & Eggs,7,organic,yoghurt
+feta,Dairy & Eggs,5,organic,feta
+parmesan,Dairy & Eggs,4,organic,grated parmesan
+cheddar cheese,Dairy & Eggs,0,force-include,
+natural yoghurt,Dairy & Eggs,0,force-include,
+maple syrup,Sweeteners,62,organic,maple syrup;pure maple syrup
+honey,Sweeteners,38,organic,honey
+sugar,Sweeteners,27,organic,sugar;white sugar
+brown sugar,Sweeteners,10,organic,brown sugar
+coconut sugar,Sweeteners,18,organic,coconut sugar
+powdered sugar,Sweeteners,4,organic,powdered sugar
+medjool dates,Sweeteners,13,organic,medjool dates;dates
+baking powder,Baking,54,organic,baking powder
+baking soda,Baking,30,organic,baking soda
+cocoa powder,Baking,37,organic,cocoa powder;cacao powder
+vanilla extract,Baking,52,organic,vanilla extract;vanilla
+vanilla paste,Baking,8,organic,vanilla paste
+plain flour,Baking,11,organic,plain flour;flour
+cornflour,Baking,4,organic,cornflour
+almond flour,Baking,10,organic,almond flour
+oat flour,Baking,19,organic,oat flour
+dark chocolate,Baking,18,organic,dark chocolate;dark chocolate (trailing-space dup);melted dark chocolate;chocolate
+dark chocolate chips,Baking,22,organic,dark chocolate chips;chocolate chips
+oats,Grains & Starches,37,organic,oats;rolled oats
+rice,Grains & Starches,14,organic,rice;cooked rice;jasmine rice
+rice cakes,Grains & Starches,4,organic,rice cakes
+rice paper,Grains & Starches,4,organic,sheets rice paper
+pasta,Grains & Starches,0,force-include,
+bread,Grains & Starches,0,force-include,
+potato,Produce,0,force-include,
+garlic,Produce,84,organic,garlic;arlic cloves;arlic clove;minced garlic
+spring onion,Produce,73,organic,spring onions;spring onion;reen onions;reen onion;green onions;scallions
+onion,Produce,23,organic,onion;yellow onion;white onion
+red onion,Produce,29,organic,red onion;finely diced red onion
+shallot,Produce,10,organic,shallot;banana shallot
+cucumber,Produce,42,organic,cucumber;cucumbers;persian cucumbers
+avocado,Produce,30,organic,avocado;avocado (trailing-space dup)
+lemon,Produce,41,organic,emon;juice of 1 lemon;juice of 1/2 lemon (unicode);juice of 1 large lemon;juice of 1/2 lemon;lemon juice
+lime,Produce,39,organic,ime;juice of 1 lime;juice of 1/2 lime (unicode);juice of 1 large lime;zest of 1 lime;ime wedges;ime juice;lime juice
+ginger,Produce,17,organic,ginger;fresh ginger;minced ginger
+red chilli,Produce,10,organic,red chilli
+jalapeno,Produce,8,organic,jalapeño
+carrot,Produce,19,organic,carrot;carrots
+cherry tomatoes,Produce,8,organic,cherry tomatoes
+tomato,Produce,4,organic,tomato
+sweet potato,Produce,7,organic,sweet potato
+butternut squash,Produce,4,organic,butternut squash
+sweetcorn,Produce,4,organic,sweetcorn
+red cabbage,Produce,4,organic,red cabbage
+blueberries,Produce,4,organic,blueberries
+raspberries,Produce,4,organic,frozen raspberries
+coriander,Produce,23,organic,fresh coriander;coriander
+parsley,Produce,5,organic,fresh parsley
+mint,Produce,4,organic,fresh mint
+dill,Produce,4,organic,dill
+chives,Produce,4,organic,chives
+lettuce,Produce,4,organic,ettuce
+red bell pepper,Produce,10,organic,red bell pepper;red pepper
+green bell pepper,Produce,4,organic,reen pepper
+chicken breast,Protein,16,organic,chicken breast;chicken breasts
+chicken thighs,Protein,25,organic,chicken thighs;boneless skinless chicken thighs;skinless boneless chicken thighs;boneless chicken thighs
+salmon,Protein,4,organic,salmon fillets
+tuna,Protein,5,organic,tuna
+tofu,Protein,4,organic,firm tofu
+chickpeas,Protein,5,organic,chickpeas
+edamame,Protein,5,organic,edamame
+bean sprouts,Protein,7,organic,bean sprouts
+protein powder,Protein,29,organic,protein powder;chocolate protein powder;vanilla protein powder;scoop vanilla protein powder;scoop chocolate protein powder;scoops protein powder
+roasted peanuts,Protein,5,organic,roasted peanuts
+walnuts,Protein,4,organic,walnuts
+beef mince,Protein,0,force-include,
+lentils,Protein,0,force-include,
+black beans,Protein,0,force-include,
+peanut butter,Nut & Seed Butters,30,organic,peanut butter;smooth peanut butter
+almond butter,Nut & Seed Butters,10,organic,almond butter
+cashew butter,Nut & Seed Butters,4,organic,cashew butter
+tahini,Nut & Seed Butters,8,organic,tahini
+sesame seeds,Nut & Seed Butters,26,organic,sesame seeds
+chia seeds,Nut & Seed Butters,24,organic,chia seeds
+desiccated coconut,Nut & Seed Butters,5,organic,desiccated coconut
+soy sauce,Sauces & Vinegars,59,organic,soy sauce;light soy sauce
+dark soy sauce,Sauces & Vinegars,5,organic,dark soy sauce
+rice vinegar,Sauces & Vinegars,33,organic,rice vinegar;rice wine vinegar
+apple cider vinegar,Sauces & Vinegars,7,organic,apple cider vinegar
+fish sauce,Sauces & Vinegars,21,organic,fish sauce
+sriracha,Sauces & Vinegars,19,organic,sriracha
+oyster sauce,Sauces & Vinegars,9,organic,oyster sauce
+hoisin sauce,Sauces & Vinegars,5,organic,hoisin sauce
+tamari,Sauces & Vinegars,6,organic,tamari
+coconut aminos,Sauces & Vinegars,6,organic,coconut aminos
+miso paste,Sauces & Vinegars,6,organic,miso paste
+gochujang,Sauces & Vinegars,4,organic,gochujang
+gochugaru,Sauces & Vinegars,4,organic,gochugaru
+chilli oil,Sauces & Vinegars,9,organic,chilli oil
+chilli crisp,Sauces & Vinegars,4,organic,chilli crisp
+thai red curry paste,Sauces & Vinegars,5,organic,thai red curry paste
+dijon mustard,Sauces & Vinegars,9,organic,dijon mustard
+mayonnaise,Sauces & Vinegars,5,organic,mayo
+tomato paste,Sauces & Vinegars,6,organic,tomato paste
+pumpkin puree,Sauces & Vinegars,15,organic,pumpkin puree;pumpkin puree (accented dup)
+chicken stock,Sauces & Vinegars,10,organic,chicken stock;chicken stock cube
+chicken bone broth,Sauces & Vinegars,5,organic,chicken bone broth

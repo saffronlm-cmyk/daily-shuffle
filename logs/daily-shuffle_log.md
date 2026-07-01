@@ -4,6 +4,80 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# USDA Staple Lookup Built + 122 Generic Staples Loaded to Supabase
+**Date:** 2026-07-01
+**Project:** Daily Shuffle — recipe/meal-planning PWA
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete — step 1 of the 3-step nutrition plan done end-to-end (script built, run by Saffron locally, reviewed, applied to `staple_products`). Steps 2 (quantity normalisation) and 3 (bulk recipe nutrition pass) still pending.
+
+---
+
+## Project Context
+Direct continuation of the 2026-07-01 "Nutrition Estimation Feasibility — Research & Planning" entry (immediately below). That session produced a 3-step plan: (1) expand `staple_products` via a local USDA lookup script; (2) normalise ingredient quantities; (3) bulk-repopulate recipe nutrition. This session executed step 1 in full.
+
+## Session Goal
+Build `scripts/usda_staples.py` (Next Steps #1 from the prior entry), have Saffron run it locally against USDA FoodData Central, review/fix matches over several iterations, and apply the confirmed generic-staple macros into the bundled Supabase `staple_products` table.
+
+## State Before This Session
+Planning done, nothing built. `staple_products` had 45 rows, all Saffron's branded/specific products (plus a few she'd since added as "(generic)" — see Gotchas), no generic pantry basics like salt/oil/garlic. Saffron held a USDA FDC API key locally.
+
+## What Was Done
+1. **Regenerated the candidate list**: re-ran the ingredient-frequency SQL (in the prior entry) via Supabase MCP → 209 names ≥4 recipes. Hand-deduped to **`scripts/staple_candidates.csv`** (~135 canonical names): merged regex artifacts / plurals / near-synonyms (e.g. `arlic cloves`→garlic), dropped junk (`water`, `oil`, `of salt`), and added `force-include` core items (potato, butter, cheddar, beef mince, lentils, black beans, bread, pasta, natural yoghurt). Columns: `name,category,recipe_count,source,merged_from`.
+2. **Built `scripts/usda_staples.py`** (stdlib-only, build-only, mirrors `price_pricebook.py`): searches FDC `Foundation,SR Legacy`, extracts per-100g cal/protein/carbs/fat/fibre/sugar, writes a reviewable CSV with match score + confidence flag. Modes: `--dry-run`, `--probe`, `--sample`, `--in/--out`.
+3. **Iterated over ~5 rounds of Saffron running it locally** (sandbox is gateway-blocked from `api.nal.usda.gov`, so she runs it and pastes results back — same pattern as Apify). Fixes made in response to real output:
+   - **Foundation energy bug**: Foundation foods store Energy under nutrient number **957/958** (Atwater), not 208 → calories came back blank for ~20 items. Fixed `extract_nutrients` to resolve 208/957/958 (KCAL only, priority-ordered).
+   - **Wrong-form matches**: word-overlap scoring rubber-stamped wrong forms (avocado→"Oil, avocado", carrot→dehydrated, milk→"Crackers, milk", etc.). Added ~45 `TERM_OVERRIDES` steering to the right whole/raw/cooked entry or a documented proxy.
+   - **Override scoring**: `match_score` now scores against the override term (not `max(name,term)`) when a name has an override — a bare name that fully matches several forms saturated at 1.0 and couldn't distinguish them (coconut cream sweetened vs raw).
+   - **Detail-endpoint 404s**: FDC `/food/{fdcId}` 404s on some entries (egg, milk, cheddar, tuna, dill, dijon) — now non-fatal, falls back to nutrients embedded in the `/foods/search` payload.
+   - **`REJECT_SUBSTRINGS`** (puff/fries/tots/tater) so raw sweet potato beats "Sweet Potato puffs".
+   - Per Saffron's calls: beans/grains → **cooked** forms (rice/pasta/chickpeas/lentils/black beans); sweetcorn → whole kernel; coconut cream → unsweetened/raw; oats stay dry.
+4. **Applied to Supabase** (this channel is NOT sandbox-blocked): assembled final rows from the three report CSVs (main + `staple_report_cooked.csv` + `staple_report_retry.csv`, retry/cooked winning), via a local builder (`scratchpad/build_staples_sql.py`). Inserted **122 rows** into `staple_products` (serving 100 g, aliases from cleaned `merged_from`, `flags={usda_seed}`, provenance in `notes`). Table now 45→**167 rows**, all seeded rows have calories.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| scripts/usda_staples.py | USDA FDC lookup script | Created | /home/user/daily-shuffle/scripts/ |
+| scripts/staple_candidates.csv | ~135 deduped candidate names (committed input) | Created | /home/user/daily-shuffle/scripts/ |
+| scripts/staple_candidates_cooked.csv | 5-row subset (beans/grains → cooked) | Created | /home/user/daily-shuffle/scripts/ |
+| scripts/staple_candidates_retry.csv | 11-row subset (404 recoveries + wrong-form fixes) | Created | /home/user/daily-shuffle/scripts/ |
+| scripts/README.md | Docs for the new pipeline | Modified | /home/user/daily-shuffle/scripts/ |
+| .gitignore | Ignore `scripts/staple_report*.csv` | Modified | /home/user/daily-shuffle/ |
+| `staple_products` (Supabase) | +122 generic-staple rows, tagged `usda_seed` | Modified | project jsxcctrskkkxgdxfaduo |
+
+Report CSVs (`staple_report*.csv`) are git-ignored and live only on Saffron's machine; the data was pasted into this session and is captured in the applied rows.
+
+## Decisions & Reasoning
+- **Skipped 7 items Saffron already has as generics** (fish sauce, sriracha, mayonnaise, egg, blueberries, raspberries, almond milk) rather than duplicate — avoids matcher ambiguity, doesn't overwrite her curated values. Where she only had a *branded* version (almond butter/Legend, dark chocolate/Lidl, peanut butter/Pip&Nut, protein powder/Free Soul, tinned salmon), kept the generic as **additive** so bare recipe terms are grounded.
+- **Skipped 6 no-USDA-generic items for hand-fill**: nutritional yeast, coconut aminos, gochujang, chilli crisp, thai red curry paste, rice paper.
+- **serving 100 g for all** (USDA basis), including liquids — reference macros for grounding, not a serving suggestion.
+- **`flags={usda_seed}` + FDC id in `notes`** so the whole batch is identifiable and reversible (`delete ... where 'usda_seed' = any(flags)`).
+- **Proxies documented in-code** where USDA lacks a generic: coconut sugar→brown sugar, rice vinegar→distilled vinegar, gochugaru→cayenne, chilli oil→sesame oil, vanilla paste→vanilla extract, dark chocolate→"SPECIAL DARK bar".
+
+## Current State (end of session)
+Step 1 complete. `staple_products` = 167 rows (45 original + 122 seeded). The in-app `fetchMacroEstimate` reads this table live and alias-aware, so it benefits immediately with zero code changes. Branch `claude/focused-darwin-enipb5`, draft PR #33 open (scripts + docs; the DB change is not in git). No app code (`index.html`/`sw.js`) touched — no cache bump needed.
+
+## Next Steps
+1. **Hand-fill the 6 skipped items** + blank `missing:` cells (milk sugar ≈5g lactose; cheddar/tuna/dijon sugar ≈0; some Foundation produce missing fibre/sugar) in `staple_products` whenever convenient — Saffron said she'll do this as needed.
+2. **Step 2 (separate session): ingredient quantity normalisation** — gram-weight defaults for vague units ("1 tbsp", "1 medium avocado") and a policy for "to taste"; apply across `ingredient_sections` for all 327 recipes (branch on `jsonb_typeof` — legacy string vs structured object shapes).
+3. **Step 3: bulk Claude Code pass** over all 327 recipes using the expanded `staple_products` + normalised quantities to (re)populate nutrition columns, with chain-of-thought + self-consistency + `review_flags`.
+4. Merge PR #33 when happy (no CI in this repo).
+
+## Open Questions / Blockers
+- Whether the in-app matcher prefers the new generic over an existing branded row for a bare term (e.g. "peanut butter") wasn't verified against `fetchMacroEstimate`'s exact logic — expected to be fine (closest-canonical match), but worth confirming if estimates look off.
+- Carried over, unresolved: chicken thighs/tomato-paste-style Foundation rows have `fibre_g`/`sugar_g` null (legitimately ~0 for meat; left null not 0).
+
+## Environment & Config Notes
+- Supabase project `jsxcctrskkkxgdxfaduo`; table `staple_products` (PK on `id` uuid — **no unique constraint on `name`**, so dedupe is manual). Seeded rows tagged `flags @> {usda_seed}`.
+- `api.nal.usda.gov` blocked at the sandbox egress gateway (same as `api.apify.com`) — `usda_staples.py` must run on Saffron's machine with `USDA_FDC_API_KEY` exported per shell. Supabase MCP is NOT blocked.
+- USDA quirks encoded in the script: Foundation energy = nutrient 957/958; `/food/{fdcId}` 404s on some entries; search payload carries nutrients as a fallback.
+
+## Notes & Gotchas
+- **`staple_products` already had a few generics** beyond the "all branded" snapshot in the prior entry (Fish sauce/Sriracha/Mayonnaise/Eggs/Blueberries/Raspberries "(generic)", Unsweetened almond milk, Chilli crisp oil) — those were the 7 skipped. Re-check existing rows before any future bulk staple insert; don't trust the older "no generics" claim.
+- **Aliases were cleaned** from `merged_from` (dropped regex artifacts, my annotation parentheticals, and "juice of…" fragments; fixed `arlic→garlic`, `reen→green`, etc.). The raw `merged_from` column still contains the artifacts — don't load it verbatim.
+- **`canonicalise` singular/plural quirk**: words ending vowel+"es"/"s" (e.g. "potatoes", "tomatoes") don't reduce to singular, so plural search terms can dock a point off the match score (cosmetic — sweet potato flagged `review_match` at 0.75 despite a correct 86-kcal match). Prefer singular in overrides.
+- To roll back this batch: `delete from public.staple_products where 'usda_seed' = any(flags);`
+
 # Nutrition Estimation Feasibility — Research & Planning
 **Date:** 2026-07-01
 **Project:** Daily Shuffle — recipe/meal-planning PWA
