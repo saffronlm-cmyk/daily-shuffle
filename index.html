@@ -3211,6 +3211,16 @@ async function fetchMacroEstimate(name, servings, ingredientLines) {
   // it often returns whole-recipe totals despite being asked for per-serving.
   const n = Number(servings) > 0 ? Number(servings) : 1;
 
+  // Ground the estimate in the user's own staple products so their verified
+  // nutrition wins, with generic estimates only for ingredients not stapled.
+  if (typeof trkLoadStaples === 'function') { try { await trkLoadStaples(); } catch(e){} }
+  const staplesRef = (typeof trkStaples !== 'undefined' && Array.isArray(trkStaples) ? trkStaples : [])
+    .filter(s => s && s.name)
+    .map(s => {
+      const al = (Array.isArray(s.aliases) && s.aliases.length) ? ` [aka ${s.aliases.join(', ')}]` : '';
+      return `- ${s.name}${al}: per ${s.serving_qty ?? 100}${s.serving_unit || 'g'} = ${Math.round(Number(s.calories)||0)}kcal, ${Number(s.protein_g)||0}g protein, ${Number(s.carbs_g)||0}g carbs, ${Number(s.fat_g)||0}g fat`;
+    }).join('\n');
+
   const systemPrompt = `You are a nutrition estimator. Given a recipe's FULL ingredient list (the whole recipe / entire batch), estimate the TOTAL nutrition for the whole recipe combined. Return ONLY a valid JSON object — no markdown, no explanation — with these exact fields:
 {
   "kcal": number,
@@ -3221,9 +3231,11 @@ async function fetchMacroEstimate(name, servings, ingredientLines) {
 
 Rules:
 - Values are the TOTAL for the entire recipe as written (the sum of ALL ingredients). Do NOT divide by the number of servings — that is done separately.
+- STAPLE PRODUCTS: if a list of the user's staple products with their exact nutrition is provided, then for any recipe ingredient that matches a staple (by name or alias), use THAT product's nutrition, scaled to the quantity used in the recipe. Only fall back to generic/typical nutrition for ingredients that don't match any staple.
 - kcal, protein (g), carbs (g), fat (g): numbers only.
 - Return ONLY the JSON object. No other text.`;
-  const userText = `Recipe: ${name || 'this recipe'}\n\nFull ingredient list for the whole recipe:\n${lines.join('\n')}`;
+  const userText = `Recipe: ${name || 'this recipe'}\n\nFull ingredient list for the whole recipe:\n${lines.join('\n')}`
+    + (staplesRef ? `\n\nThe user's staple products — prefer these exact values (scaled by the quantity used); use generic estimates only for ingredients not listed here:\n${staplesRef}` : '');
 
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
