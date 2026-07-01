@@ -4,6 +4,67 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# Quantity Normalisation — Ruleset Applied to 317 Recipes (step 2 apply; review CSV out, DB write pending)
+**Date:** 2026-07-01
+**Project:** Daily Shuffle — recipe/meal-planning PWA
+**Mode:** Rolling Log + GitHub Push
+**Status:** In Progress — normalisation script built + run over all 317 recipes; review CSV delivered to Saffron; **Supabase write is HELD pending her CSV spot-check** (she chose "review CSV first, then write"). Step 3 not started.
+
+---
+
+## Project Context
+Executes the apply-step of nutrition step 2, using the ruleset locked in the two entries below (`quantity-normalisation-plan.md`, §6 decisions signed off). Step 1 (USDA staples, 167 rows) done. This session built the applier, ran it, and produced the pre-write review artifact.
+
+## Session Goal
+Build `scripts/normalise_quantities.py` encoding the plan's §3 ruleset, run it against the live `recipes` corpus, tune against real output, and produce the reviewable per-line CSV — then get sign-off before writing the new `ingredient_grams` column.
+
+## What Was Done
+1. **Measured the data**: 4050 ingredient items (4049 legacy strings / 56 structured objects / 53 nulls across the full set); 325 non-deleted recipes with ingredients, 317 with `serves` (8 skipped per §6), total `ingredient_sections` ≈ 144 KB. Section objects use key `section_title` (not `title`); structured items are `{qty,unit,name,note,group}`.
+2. **Data staging trick**: `execute_sql` results >token-limit are auto-saved by the harness to `~/.claude/.../tool-results/*.txt` (MCP envelope with `<untrusted-data-…>` boundaries). Pulled the 317 recipes as `json_agg` in 2 batches (offset 0/160), extracted with a regex anchored on `\n(\[\{"data":.*\}\])\n` (the boundary tag ALSO appears in the preamble sentence — don't `find` the first one), merged to `scratchpad/recipes_dump.json`. **Python can't reach Supabase from the sandbox** (REST blocked, same as USDA) — MCP is the only channel; this file-staging is how you get bulk data to a local script.
+3. **Built `scripts/normalise_quantities.py`** (stdlib, no network): flattens each item to a raw string (objects too, so parser-miss objects like `{qty:null,name:"70g …"}` get re-scanned), then §3 rules in precedence order — unicode/ascii/mixed fractions, ranges→midpoint, dual-unit metric override, imperial, `juice/zest of N fruit`, `Ncm/inch piece`, tin/can, density-class volume→g, per-piece count→g, vague defaults, then the unquantified policy (to_taste/garnish/estimated-bare-main/unresolved). Word-boundary prefix keyword matching (`\b`+term).
+4. **Tuned over 5 passes** against real output, fixing concrete bugs: cherry tomato 1200→170 g; `3cm piece of ginger` 300→18 g; **`oil` matching inside "b*oil*ing"** (→ switched all keyword matching to `\b` boundaries); green/spring onion 150→15 g; `juice of ½ lemon` (embedded, not leading, number); pumpkin purée 156→250 g; tin/can sizing; `handfuls`/`Dashes` (trailing-s prefix match); `1 tb`→tbsp; berries/nuts (`pea·nuts` boundary miss) as counts/servings; black/white pepper→spice. Expanded density classes, count table, and bare-serving fallbacks accordingly.
+5. **Final distribution** (3997 lines): stated 591, converted 2660, defaulted 209, to_taste 103, garnish 58, estimated 366, unresolved 10; **174/317 recipes flagged `quantities_estimated`**. The 10 unresolved are genuinely un-guessable near-zero-cal items (water-to-cover, "of choice", chicken jus).
+6. **Delivered the review CSV** to Saffron and asked go/no-go. She chose **"review CSV first, then write"** → DB write held. Committed the script + README + gitignore; draft PR #36 opened.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| scripts/normalise_quantities.py | The §3 ruleset applier | Created | /home/user/daily-shuffle/scripts/ |
+| scripts/README.md | Docs for the new script | Modified | /home/user/daily-shuffle/scripts/ |
+| .gitignore | Ignore its generated CSV/JSON | Modified | /home/user/daily-shuffle/ |
+| quantity_review.csv / ingredient_grams_updates.json | Per-line review CSV + per-recipe updates (git-ignored) | Created | session scratchpad only |
+
+No Supabase data written. No `index.html`/`sw.js` change.
+
+## Decisions & Reasoning
+- **Script, not in-context per-line reasoning**: 3997 lines is too many to hand-reason reliably; a tested deterministic script with tuned lookup tables is reproducible and reviewable (and re-runnable after corrections). The "judgement" in the plan is encoded as keyword→class/count/serving tables.
+- **Word-boundary keyword matching** after the `oil`-in-`boiling` bug — substring matching is too fragile for a 300+ keyword vocabulary. `\b`+term keeps prefix matches (`strawberr`→strawberries) while killing false hits inside longer words.
+- **Held the DB write for CSV review** — Saffron's explicit choice and the plan's review-first convention; the write is reversible but review-before-live is the established pattern (pricebook/staples).
+
+## Current State (end of session)
+Script done + committed (branch `claude/daily-shuffle-qty-normalisation-d8su8h`, draft PR #36). Review CSV in Saffron's hands. `recipes` table UNCHANGED — no `ingredient_grams` column yet. Subscribed to PR #36.
+
+## Next Steps
+1. **Saffron reviews `quantity_review.csv`** (filter `qty_source=estimated` for the judgement calls; eyeball some `converted` cup/tbsp lines) and returns corrections or a green light.
+2. On green light: re-run script if rules changed → `apply_migration` add `ingredient_grams` jsonb → write the 317 recipes' arrays + `review_flags += quantities_estimated` (174 recipes) → set `serves_missing` on the 8 skipped. Do it in batches; the updates JSON is the source.
+3. **Then step 3** (bulk nutrition) using expanded `staple_products` + `ingredient_grams`.
+
+## Open Questions / Blockers
+- **Blocker (soft)**: awaiting Saffron's CSV spot-check before the live write. Not a technical blocker.
+- The `estimated` bucket (366) is legitimately low-confidence (bare mains, ambiguous units like pack/box/shot/serve) — expected, flagged, not a bug to chase further.
+
+## Environment & Config Notes
+- Supabase `jsxcctrskkkxgdxfaduo`. Planned new column: `recipes.ingredient_grams jsonb`. `serves` present on 317/325; skip the 8.
+- **Bulk-data staging pattern (reusable)**: big `execute_sql` results auto-save to `~/.claude/projects/<proj>/<session>/tool-results/*.txt`; extract the array with regex `\n(\[\{"data":.*\}\])\n` (the untrusted-data tag also appears in the preamble — anchor on the data literal, not the tag). Python has no direct Supabase access in-sandbox.
+
+## Notes & Gotchas
+- Section objects key section title as **`section_title`**, not `title`. Items are strings OR `{qty,unit,name,note,group}`; some structured items have the gram stuck in `name` with `qty:null` — the flattener re-scans the name so these still resolve.
+- Gram tables live at the top of `normalise_quantities.py` and are the tuning surface — adjust there, re-run, re-diff the CSV. Don't trust substring matching if adding keywords; the matcher is `\b`-prefix.
+- Rollback plan for when the write happens: `alter table recipes drop column ingredient_grams;` and strip `quantities_estimated`/`serves_missing` from `review_flags`.
+
+---
+
 # Quantity Normalisation — §6 Decisions Signed Off (step 2, ruleset locked)
 **Date:** 2026-07-01
 **Project:** Daily Shuffle — recipe/meal-planning PWA
