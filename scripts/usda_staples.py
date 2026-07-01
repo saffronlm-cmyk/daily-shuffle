@@ -110,7 +110,7 @@ TERM_OVERRIDES = {
     "carrot": "carrots raw",                          # was matching dehydrated (341 kcal!)
     "tomato": "tomatoes red ripe raw",                # was matching "Tomato powder"
     "cherry tomatoes": "tomatoes red ripe raw",
-    "sweet potato": "sweet potatoes raw unprepared",  # was matching "Sweet Potato puffs, frozen"
+    "sweet potato": "sweet potato raw unprepared",    # was matching "Sweet Potato puffs, frozen"
     "sweetcorn": "corn sweet yellow canned whole kernel drained",  # whole kernel, not cream style
     "dill": "dill weed fresh",
     "spring onion": "onions spring scallions raw",
