@@ -4,6 +4,69 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# Ingredient Quantity Normalisation — Ruleset & Source-of-Truth Proposal (step 2, planning)
+**Date:** 2026-07-01
+**Project:** Daily Shuffle — recipe/meal-planning PWA
+**Mode:** Rolling Log + GitHub Push
+**Status:** In Progress — proposal written for review; **no recipe data touched.** Awaiting Saffron's sign-off on 5 open questions before any live write.
+
+---
+
+## Project Context
+Step 2 of the 3-step nutrition-estimation plan. See the two 2026-07-01 entries below: "USDA Staple Lookup Built…" (step 1, complete — `staple_products` now 167 rows) and "Nutrition Estimation Feasibility…" (the 3-step plan + full background). Step 3 (bulk recipe nutrition pass) is deliberately still pending and must not run until quantities are normalised and this proposal is approved.
+
+## Session Goal
+Propose the ingredient-quantity normalisation ruleset (gram-weight defaults/conversions for vague units + a "to taste"/unquantified policy) and a quantity-source-of-truth approach, grounded in the *actual* shape of the data, for review before touching anything. Explicitly did NOT apply changes or run step 3.
+
+## State Before This Session
+Step 1 done. Quantities never normalised: `ingredient_sections` still mixes legacy plain-string lines and newer `{qty,unit,name,note,group}` objects, with many `qty:null` "to taste"/no-amount lines. No gram-normalisation had ever been attempted.
+
+## What Was Done
+Measured the data live via Supabase MCP (project `jsxcctrskkkxgdxfaduo`) rather than assuming, then wrote the proposal:
+1. **Item-shape census**: 4049 legacy strings, 56 structured objects, 53 nulls (blank placeholder lines). Confirmed the `jsonb_typeof` branch is real and strings dominate.
+2. **Unit-bucket distribution** across all real lines (first-match precedence): tbsp 831, tsp 734, leading-number-no-unit 601, already-metric(g/ml/l) 599, no-number-no-unit 549, cup 435, vague(pinch/dash/handful/scoop/slice/sprig/bunch) 204, clove 88, imperial 32, "to taste" 32. → ~35% already metric/trivial, ~49% deterministic conversion, ~16% the judgement tail.
+3. **Sampled** the hard buckets: dual-unit lines carry an embedded gram (`1 cup (60g)`, `3 tbsp / 65ml`, `1/2 cup (150g)`) → highest-confidence signal; the no-number tail splits into bare seasonings, garnish/"to serve", and bare mains missing a qty (`Chicken breasts`, `chickpeas`).
+4. **Found a reusable accelerant**: `recipe-ingredient-normalisation.final.csv` (repo root, from the 2026-06-25 stream) already holds per-line `qty,unit,ingredient,note` keyed `recipe_id|section_ord|item_ord` — parsed stated qtys but never converted to grams or filled blanks; predates recipes added since, so treat as accelerant not source of truth.
+5. **Wrote `quantity-normalisation-plan.md`** (repo root): the full ruleset — density-class volume→gram table (tbsp/tsp/cup, because a tbsp of oil vs honey vs cocoa differ hugely, so a flat "1 tbsp=15g" is wrong), per-piece count→gram table, vague-measure defaults, imperial/range/fraction/dual-unit/heaped parsing, and a 4-way unquantified policy (to_taste / garnish / estimated bare-main / unresolved) each with a `qty_source` provenance flag. Recommends a **new non-destructive `ingredient_grams` jsonb column** on `recipes` (parallel array indexed by sec|item) rather than mutating `ingredient_sections` — this *changes the approach floated in the prior log* ("apply across ingredient_sections"), flagged explicitly as open-question #1.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| quantity-normalisation-plan.md | The step-2 proposal (ruleset + source-of-truth + open questions) | Created | /home/user/daily-shuffle/ |
+| logs/daily-shuffle_log.md | This entry | Modified | /home/user/daily-shuffle/logs/ |
+
+No recipe/Supabase data changed. No `index.html`/`sw.js` change → no cache bump needed.
+
+## Decisions & Reasoning
+- **New `ingredient_grams` column over mutating `ingredient_sections`**: non-destructive/reversible (drop column), zero app-code risk (app reads `ingredient_sections` for display + grocery list; converting 4049 strings→objects would touch every render path for no nutrition benefit), self-describing audit (`qty_source`+`detail`), clean step-3 input. Departs from the prior log's in-place framing on purpose — raised as open Q1 for a yes/no.
+- **Density-class volume table, not a flat per-spoon gram**: oil ≈14g/tbsp, honey ≈21g, cocoa ≈6g, flour ≈8g — a single default would be systematically wrong on a large share of the 2000+ tbsp/tsp/cup lines. Class chosen by keyword-matching the ingredient name (reuse `staple_products` aliases).
+- **Prefer the embedded metric on dual-unit lines** (`1 cup (60g)` → 60g): highest-confidence signal, ~599 lines already have it; ignore the vague half.
+- **Bare mains get a default portion + `estimated` flag (recommended) not left null**: keeps calorie totals realistic while marking low confidence via per-line `qty_source=estimated` + recipe-level `review_flags += quantities_estimated`. Left as open Q3 since it trades honesty vs completeness.
+- **US cup = 240ml** (vs UK 250ml): `cup` is a US convention and this corpus's UK recipes use metric weights; ~4% effect. Open Q2.
+- **Reviewable-CSV-first before any live write**, per the established pricebook/staples convention.
+
+## Current State (end of session)
+Proposal complete and committed on branch `claude/daily-shuffle-qty-normalisation-d8su8h`. `recipes` unchanged (no `ingredient_grams` column exists yet). `staple_products` unchanged (167 rows from step 1). Nothing applied. Draft PR to be opened.
+
+## Next Steps
+1. **Saffron reviews `quantity-normalisation-plan.md`** and answers the 5 open questions (esp. Q1 source-of-truth column, Q3 bare-main portioning). Red-line the §3 conversion tables.
+2. On approval: `apply_migration` to add `ingredient_grams` jsonb to `recipes`; run the §3 rules (deterministic parts mechanical, judgement parts Claude-reasoned per line) over all 327 recipes via Supabase MCP; emit a per-line review CSV before the live write; set `review_flags += quantities_estimated` where needed.
+3. **Then** step 3 (bulk nutrition) using expanded `staple_products` + `ingredient_grams`.
+
+## Open Questions / Blockers
+The 5 sign-off questions in §6 of `quantity-normalisation-plan.md`: (1) new column vs in-place; (2) US vs UK cup; (3) bare-main portioning aggressiveness; (4) garnish 5g default vs exclude; (5) handling the 8 no-`serves` recipes. All block execution but not the proposal. Recommendations given for each.
+
+## Environment & Config Notes
+- Repo `saffronlm-cmyk/daily-shuffle`, branch `claude/daily-shuffle-qty-normalisation-d8su8h` off latest `main` (PR #33 merged). cwd `/home/user/daily-shuffle`.
+- Supabase project `jsxcctrskkkxgdxfaduo`: `recipes` (327 non-deleted; `serves` set on 319/327; `ingredient_sections` jsonb two-shaped; `review_flags` array exists; no gram column yet). Supabase MCP reads work fine from this sandbox (USDA/Apify egress still blocked, but irrelevant here — no external calls needed for step 2).
+
+## Notes & Gotchas
+- **Unicode-fraction gotcha**: a `\m[0-9]` regex does NOT match `½/¼/¾/⅓/⅔/⅛`, so lines like `½ tsp baking soda` leak into "no-number" buckets. The proposal's parser normalises unicode fractions first; any future SQL bucketing must include the fraction chars (as the §1 unit-distribution query does).
+- **`ingredient_sections` also contains 53 `null` items** (blank placeholder rows, mostly recovered-but-empty sections) — skip these, they carry no ingredient.
+- One structured object in the wild has a parser miss: `{"qty":null,"name":"70g vegan chocolate protein powder"}` — the gram is stuck in the name. The §3 parser should re-extract leading metric from names, not just trust the `qty` field.
+- Don't run step 3 until quantities are approved+applied — the whole point of step 2's ordering.
+
 # USDA Staple Lookup Built + 122 Generic Staples Loaded to Supabase
 **Date:** 2026-07-01
 **Project:** Daily Shuffle — recipe/meal-planning PWA
