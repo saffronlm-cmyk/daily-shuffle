@@ -1,10 +1,19 @@
 # Ingredient Quantity Normalisation — Proposal for Review
 
-**Status:** Draft / awaiting sign-off — **no recipe data has been touched.** This document is
-step 2 of the 3-step nutrition-estimation plan (see `logs/daily-shuffle_log.md`, the two
+**Status:** Approved (§6 signed off 2026-07-01) — **no recipe data has been touched yet.** This
+document is step 2 of the 3-step nutrition-estimation plan (see `logs/daily-shuffle_log.md`, the
 2026-07-01 entries). Step 1 (USDA staple expansion → `staple_products` = 167 rows) is complete.
 Step 3 (bulk nutrition re-population) is deliberately **not** started and must not run until the
-quantities below are normalised and this approach is approved.
+quantities below are normalised. The ruleset is now ready to apply — the §6 decisions are locked
+in (see the **Resolved decisions** box below).
+
+> **Resolved decisions (2026-07-01 sign-off):**
+> 1. **Source of truth:** new non-destructive `ingredient_grams` jsonb column (§2). ✅
+> 2. **Cup basis:** **UK cup = 250 ml** (not the US 240 ml originally recommended) — §3.3 updated.
+> 3. **Bare mains with no amount:** assign a default portion + `estimated` flag (§3.6.3). ✅
+> 4. **Garnish / "to serve":** small **5 g** default (§3.6.2). ✅
+> 5. **The 8 recipes with no `serves`:** **skip them** — do not normalise; add a
+>    `serves_missing` review flag so they surface for a manual `serves` fill before any later pass.
 
 The point of this step: the bulk nutrition pass's accuracy ceiling is capped by *unknown
 quantities*, no matter how good the per-ingredient macros are. A perfect gram-value for "avocado"
@@ -119,22 +128,23 @@ Use as-is. `kg`→×1000, `l`→×1000 ml. Liquids in ml converted to grams via 
 `oz → 28.35 g`, `lb → 453.6 g`, `fl oz → 30 ml`. Then treat as metric. `qty_source = "converted"`.
 
 ### 3.3 Volume → grams (density-class table)
-Base volumes: **tsp = 5 ml, tbsp = 15 ml, cup = 240 ml** (US cup — most `cup`-using recipes here are
-US-origin; UK recipes in this corpus use metric weights). Grams = ml × density. Density is
+Base volumes: **tsp = 5 ml, tbsp = 15 ml, cup = 250 ml** (UK cup — per the 2026-07-01 sign-off).
+Grams = ml × density. (tsp/tbsp are the same in UK and US; only the cup differs — the cup columns
+below are 250 ml × density.) Density is
 **ingredient-class-aware** because a tbsp of oil (≈14 g), honey (≈21 g) and cocoa (≈6 g) are wildly
 different — a flat "1 tbsp = 15 g" would be wrong for a large share of lines.
 
 | Class | Example ingredients | g/ml | tsp | tbsp | cup |
 |-------|--------------------|-----:|----:|-----:|----:|
-| Water-like liquid | water, milk, stock, juice, vinegar, wine, most thin sauces | 1.00 | 5 | 15 | 240 |
-| Soy/fish/thin savoury sauce | soy, fish, Worcestershire, tamari | 1.10 | 5.5 | 16 | 264 |
-| Oil / melted fat | olive/veg/coconut/sesame oil, melted butter | 0.91 | 4.5 | 14 | 218 |
-| Syrup / honey | maple, honey, golden syrup, molasses, agave | 1.40 | 7 | 21 | 336 |
-| Granulated sugar | white/caster/brown sugar | 0.85 | 4 | 12.5 | 200 |
-| Thick paste / nut butter | peanut/almond butter, tahini, miso, tomato paste, curry paste | 1.05 | 5 | 16 | 250 |
-| Thick dairy | yoghurt, Greek yoghurt, sour cream, mayo, crème fraîche | 1.02 | 5 | 15 | 245 |
-| Flour / starch | plain/SR/oat flour, cornflour | 0.53 | 2.6 | 8 | 125 |
-| Cocoa / cacao powder | cocoa, cacao | 0.41 | 2 | 6 | 100 |
+| Water-like liquid | water, milk, stock, juice, vinegar, wine, most thin sauces | 1.00 | 5 | 15 | 250 |
+| Soy/fish/thin savoury sauce | soy, fish, Worcestershire, tamari | 1.10 | 5.5 | 16 | 275 |
+| Oil / melted fat | olive/veg/coconut/sesame oil, melted butter | 0.91 | 4.5 | 14 | 227 |
+| Syrup / honey | maple, honey, golden syrup, molasses, agave | 1.40 | 7 | 21 | 350 |
+| Granulated sugar | white/caster/brown sugar | 0.85 | 4 | 12.5 | 213 |
+| Thick paste / nut butter | peanut/almond butter, tahini, miso, tomato paste, curry paste | 1.05 | 5 | 16 | 263 |
+| Thick dairy | yoghurt, Greek yoghurt, sour cream, mayo, crème fraîche | 1.02 | 5 | 15 | 255 |
+| Flour / starch | plain/SR/oat flour, cornflour | 0.53 | 2.6 | 8 | 133 |
+| Cocoa / cacao powder | cocoa, cacao | 0.41 | 2 | 6 | 103 |
 | Fine salt | table/sea salt | 1.20 | 6 | 18 | — |
 | Ground spice | cumin, paprika, cinnamon, etc. | 0.50 | 2.5 | 6 | — |
 | Grated/shredded cheese | cheddar, parmesan, mozzarella | — | — | 7 | 100 |
@@ -144,8 +154,8 @@ different — a flat "1 tbsp = 15 g" would be wrong for a large share of lines.
 | Leafy greens (packed) | spinach, watercress, rocket, herbs | — | — | — | 30 |
 | Berries | blueberries, raspberries | — | — | — | 140 |
 | Chopped veg | onion, pepper, tomato | — | — | — | 150 |
-| **Fallback (unknown solid)** | — | 0.60 | 3 | 9 | 150 |
-| **Fallback (unknown liquid)** | — | 1.00 | 5 | 15 | 240 |
+| **Fallback (unknown solid)** | — | 0.60 | 3 | 9 | 156 |
+| **Fallback (unknown liquid)** | — | 1.00 | 5 | 15 | 250 |
 
 `qty_source = "converted"`. The class is chosen by matching the ingredient name against a keyword
 map (reusing `staple_products` aliases where they help); unmatched → the fallback row + a
@@ -228,7 +238,7 @@ when any line is `estimated`/`unresolved`.
 | `1 pound ground chicken` | 454 | converted | 1 lb × 453.6 |
 | `1½ tbsp light soy sauce` | 24 | converted | 1.5 tbsp × 16 g/tbsp (sauce) |
 | `1/2 cup (150g) maple syrup` | 150 | stated | dual-unit; used stated g |
-| `1 cup pumpkin puree` | 245 | converted | 1 cup × ~245 (thick) |
+| `1 cup pumpkin puree` | 255 | converted | 1 cup (250 ml) × ~1.02 (thick) |
 | `2 chicken breasts` | 340 | converted | 2 × 170 g |
 | `½ avocado` | 75 | converted | 0.5 × 150 g |
 | `1 garlic clove` | 5 | converted | 1 × 5 g |
@@ -244,7 +254,9 @@ when any line is `estimated`/`unresolved`.
 ## 5. How it will be applied (future session — not now)
 
 1. Read every non-deleted recipe's `ingredient_sections` via Supabase MCP (this channel is not
-   sandbox-blocked, unlike USDA/Apify). Branch on `jsonb_typeof`.
+   sandbox-blocked, unlike USDA/Apify). Branch on `jsonb_typeof`. **Skip the 8 recipes with no
+   `serves`** (§6 decision 5): don't normalise them; instead set `review_flags += serves_missing`
+   so they surface for a manual `serves` fill before any later pass.
 2. For each real line, run §3 to produce an `ingredient_grams` entry. The **deterministic** rules
    (metric, imperial, clove, vague, ranges/fractions) run mechanically; the **judgement** calls
    (density class, count-table match, bare-main portioning) are done by Claude-Code reasoning
@@ -258,20 +270,19 @@ when any line is `estimated`/`unresolved`.
 
 ---
 
-## 6. Open questions for sign-off
+## 6. Sign-off decisions (resolved 2026-07-01)
 
-1. **Source of truth: new `ingredient_grams` column vs. in-place `ingredient_sections` edit.**
-   Recommendation is the new column (§2). Confirm?
-2. **Cup basis: US 240 ml (recommended) vs UK/metric 250 ml.** Small (~4%) effect; recommendation is
-   US because `cup` as a unit is a US convention and the corpus's UK recipes use metric weights.
-3. **Bare-main portioning aggressiveness (§3.6.3).** Assign a default portion + `estimated` flag
-   (recommended, keeps estimates flowing) vs. leave `null`/`unresolved` (more honest, but leaves
-   real calories on the table for ~a few hundred lines). Recommendation: default + flag.
-4. **Garnish/"to serve" items: small 5 g default (recommended) vs. exclude from the macro total.**
-   Either is defensible; 5 g keeps them visible without materially moving totals.
-5. **Scope of `serves`:** 8 recipes have no `serves`. Normalise their *total* grams anyway and let
-   step 3 handle the per-serving divide (flag `serves_estimated`), or skip them? Recommendation:
-   normalise anyway; per-serving is step 3's problem.
+All five were answered; the ruleset above already reflects them. Recorded here for the apply-session:
 
-Nothing in §3 is executed until these are answered. The ruleset tables above are the concrete
-artifact to red-line.
+1. **Source of truth:** ✅ new non-destructive `ingredient_grams` jsonb column (§2) — *not* an
+   in-place `ingredient_sections` edit.
+2. **Cup basis:** **UK cup = 250 ml** (overrode the original US 240 ml recommendation). §3.3 cup
+   columns and the §4 example are recomputed at 250 ml.
+3. **Bare-main portioning (§3.6.3):** ✅ assign a default portion + `estimated` flag (keeps calorie
+   totals realistic, low confidence visible) — not leave `null`.
+4. **Garnish / "to serve" (§3.6.2):** ✅ small **5 g** default (kept visible without moving totals).
+5. **8 recipes with no `serves`:** **skip them** (do *not* normalise) and set `serves_missing` on
+   `review_flags` so they surface for a manual `serves` fill first — see §5 step 1.
+
+The ruleset is now ready to apply in a future session; step 3 (bulk nutrition) still runs only
+after these quantities are applied and the pre-write review CSV is spot-checked.
