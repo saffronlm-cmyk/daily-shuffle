@@ -4,6 +4,59 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# Quantity Normalisation — §6 Decisions Signed Off (step 2, ruleset locked)
+**Date:** 2026-07-01
+**Project:** Daily Shuffle — recipe/meal-planning PWA
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete — the 5 open questions from the step-2 proposal are answered and locked into `quantity-normalisation-plan.md`. Ruleset is now ready to *apply* in a future session; no recipe data touched yet; step 3 still not started.
+
+---
+
+## Project Context
+Immediate follow-up to the entry below ("Ingredient Quantity Normalisation — Ruleset & Source-of-Truth Proposal"). That proposal (PR #34) was merged, then Saffron answered the §6 sign-off questions in chat. This session records those answers durably in the plan doc.
+
+## Session Goal
+Pose the §6 open questions to Saffron and bake her answers back into `quantity-normalisation-plan.md` so the apply-session has them without re-litigating.
+
+## What Was Done
+- Posed the 5 §6 questions (4 via the question picker, garnish inline). Answers:
+  1. **Source of truth** → new non-destructive `ingredient_grams` jsonb column (as recommended).
+  2. **Cup basis** → **UK cup = 250 ml** (Saffron overrode my US-240 ml recommendation).
+  3. **Bare mains** → default portion + `estimated` flag (as recommended).
+  4. **Garnish/"to serve"** → 5 g default (as recommended).
+  5. **8 no-`serves` recipes** → **skip them** (Saffron overrode my "normalise anyway"); flag `serves_missing` for a manual serves fill first.
+- Updated `quantity-normalisation-plan.md`: added a "Resolved decisions" box at top; changed §3.3 base cup 240→**250 ml** and recomputed the **nine density-derived cup values** (water 250, soy 275, oil 227, syrup 350, sugar 213, paste 263, dairy 255, flour 133, cocoa 103; fallback liquid 250, fallback solid 156) — left the empirical measured cup-weights (cheese/rice/oats/leafy/berries/veg) unchanged since those are weighed, not density-derived; updated the §4 pumpkin-puree example to 255 g; §5 step 1 now says skip the 8 no-serves recipes with a `serves_missing` flag; rewrote §6 from "open questions" to "resolved decisions".
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| quantity-normalisation-plan.md | Ruleset doc, decisions now locked in | Modified | /home/user/daily-shuffle/ |
+| logs/daily-shuffle_log.md | This entry | Modified | /home/user/daily-shuffle/logs/ |
+
+## Decisions & Reasoning
+- **UK cup (250 ml) over US (240 ml)**: Saffron's call; she's UK-based. Only the cup differs from US (tsp/tbsp identical), and only the *density-derived* cup cells scale by 250/240 ≈ ×1.042 — the measured solid cup-weights (1 cup rice = 185 g etc.) are empirical and unaffected.
+- **Skip the 8 no-serves recipes rather than normalise-then-divide-later**: Saffron preferred not to produce per-serving nutrition off a guessed serves count; cleaner to block them behind a manual serves fill (`serves_missing` flag) than to carry an estimate through step 3.
+
+## Current State (end of session)
+Plan doc fully reflects the locked decisions. `recipes`/`staple_products` unchanged. Branch `claude/daily-shuffle-qty-normalisation-d8su8h` restarted from merged main (post-#34) with the doc/log update; new draft PR to be opened (the old #34 is merged and must not be reused).
+
+## Next Steps
+1. **Apply-session** (future): add `ingredient_grams` jsonb column via `apply_migration`; run §3 over the 327 recipes (skip the 8 no-serves, flag `serves_missing`); emit the pre-write review CSV for spot-check; set `review_flags += quantities_estimated` where lines are `estimated`/`unresolved`.
+2. **Then** step 3 (bulk nutrition) using expanded `staple_products` + `ingredient_grams`.
+
+## Open Questions / Blockers
+N/A — all five sign-off questions resolved.
+
+## Environment & Config Notes
+Same as the entry below. Branch `claude/daily-shuffle-qty-normalisation-d8su8h` (restarted from main after #34 merged, per the merged-PR-is-finished convention). No app-code change → no cache bump.
+
+## Notes & Gotchas
+- Only density-derived cup cells were rescaled to 250 ml; measured cup-weights were deliberately left. If a future editor "fixes" the measured rows to 250 ml by formula they'll be wrong — those are weighed values.
+- The old proposal PR #34 is **merged** — do not reopen it; this follow-up is a new PR on a fresh branch off main.
+
+---
+
 # Ingredient Quantity Normalisation — Ruleset & Source-of-Truth Proposal (step 2, planning)
 **Date:** 2026-07-01
 **Project:** Daily Shuffle — recipe/meal-planning PWA
