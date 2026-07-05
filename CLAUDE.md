@@ -51,6 +51,10 @@ Single user (Saffron), no auth, deployed as static files.
   - `quantity-normalisation-plan.md` — approved ruleset for ingredient-quantity
     normalisation (nutrition step 2). Decisions are locked (UK 250 ml cup, skip the 8
     no-`serves` recipes, etc.) — apply it, don't re-litigate it.
+  - `MONETIZATION.md` — monetization + rollout roadmap (strategy, phases, tasks with
+    acceptance criteria, decision gates, status tracker). Built to be executed one task
+    at a time by any session — read its §0 operating rules before doing any
+    monetization/rollout work, and never start multi-tenant auth before its Gate B.
   - `HANDOFF.md` — roadmap for the ingredient → price book → cost feature stream.
   - `handoff.md` — resume point for the Apify price-book pipeline. (Yes, two different
     handoff files differing only by case — don't confuse them.)
