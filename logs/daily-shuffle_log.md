@@ -4,6 +4,79 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# Claude Config Audit — CLAUDE.md rewrite, 4 skills, browser smoke test, drift automation
+**Date:** 2026-07-05
+**Project:** Daily Shuffle — agent config / dev tooling
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete
+
+---
+
+## Project Context
+Housekeeping session on the agent-facing config rather than the app itself. Saffron asked for a full audit of CLAUDE.md, `.claude/skills`, and `.claude/agents` (dry-run first, then execute), plus a new browser smoke-test workflow. See the 2026-07-01 entries for the state of the nutrition workstream — unchanged this session.
+
+## Session Goal
+Audit and rewrite every instruction file, create the missing skills a repo this shape needs, and add a runnable headless-browser smoke test — first as a reviewed dry-run, then applied on approval.
+
+## State Before This Session
+CLAUDE.md was stale in ways that actively misled: it described `sw.js` as cache-first at `v23` when it had been rewritten to network-first-for-HTML and was at `v32`, said `canonicalise()` lived in three places (it's five), and didn't mention the USDA pipeline, the normalisation workstream/CSVs, either handoff doc, or the keep-alive workflow. `.claude/skills` held only `save-conversation` — a personal cross-machine skill with `~/Documents` paths, other projects' routing tables, `gh` CLI and `present_files` references, and a push-to-main workflow, none of which apply here. `.claude/agents` didn't exist. The repo had zero runtime verification (parse-check only).
+
+## What Was Done
+- **Inventory + audit** of everything in CLAUDE.md and `.claude/`, presented as a full dry-run with proposed file contents; Saffron approved and added one request: also build the browser smoke-test workflow (previously flagged as "the missing piece").
+- **Rewrote CLAUDE.md**: corrected the sw.js description (network-first, one-bump-per-PR, no bump for doc/data-only changes, never trust doc-recorded version numbers), canonicalise now documented in five places, added the USDA staples pipeline, `tools-apply-master.mjs`, the committed data CSVs ("reviewed human decisions — don't regenerate"), both handoff docs, the keep-alive workflow, the nutrition 3-step status (with the step-3-blocked-on-step-2 rule), branch/PR conventions, a concrete JS parse-check command, and slimmed the session-logging block to a pointer at the skill.
+- **Rewrote `save-conversation` SKILL.md** as repo-local: one mode only (rolling log at `logs/daily-shuffle_log.md`, prepend, commit on the working branch, never main), unified template (kept `Mode:`, dropped the unused "Skills Used" section), named the 2026-07-01 §6 entry as the reference standard, added do-nots.
+- **Created `ship-check` skill**: 6-step pre-commit checklist (parse check → smoke test → cache-bump decision → canonicalise sync → res.ok audit → localStorage audit) with a fixed checklist output format.
+- **Created `recipe-db` skill**: Supabase schema map + propose/review/apply/verify discipline for bulk writes, encoding the locked §6 decisions and the review-CSV convention.
+- **Built `scripts/smoke_test.mjs` + `smoke-test` skill**: Playwright/Chromium headless test that serves the repo over a local HTTP server, seeds `ds_recipe_cache` with 5 fixture recipes (one per meal pool), and asserts clean boot, 5 tab containers, tab switching, and that `generatePlan()` renders the fixtures into `#planOutput`. **Ran it — 5/5 green.** First run failed: fixtures lacked `cuisine`/`proteinSource`, which the recipe-card template calls `.charAt()` on unguarded; real cloud recipes always have them, so the fix was fixture-side (noted in the script and skill as a trap).
+- **Deliberately created no `.claude/agents`**: built-in Explore/Plan agents already cover the only plausible use (navigating the 6,000-line index.html); a custom agent set would be bloat for a solo no-CI repo.
+- **Built CLAUDE.md drift automation** (follow-up request): `scripts/claude_md_drift.mjs` mechanically diffs CLAUDE.md's claims against the repo — tabs (both directions), scripts/ files documented, root .md/.csv/.mjs files documented, every `canonicalise()` implementation named in the sync list, sw.js passthrough hosts. Verified it detects (flagged its own then-undocumented self when staged) and passes clean once documented. Wired in three places: ship-check step 7, a "Keep this file true" bullet in CLAUDE.md's Dev workflow, and a **weekly scheduled routine** (`trig_012FVP34K8kH664FDZayj6Lb`, Mondays 07:00 UTC, fresh session, push-notify): runs the script, skims the week's merged diffs and the log's top entry for judgement-level drift the script can't catch (workstream status, conventions, data model), and opens a draft PR with minimal factual edits only when something is stale — otherwise ends silently.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| CLAUDE.md | Project brief — corrected + expanded rewrite | Modified | /home/user/daily-shuffle/ |
+| .claude/skills/save-conversation/SKILL.md | Session-log skill, now repo-local, single source of truth for the template | Modified | /home/user/daily-shuffle/.claude/skills/save-conversation/ |
+| .claude/skills/ship-check/SKILL.md | Pre-commit checklist skill | Created | /home/user/daily-shuffle/.claude/skills/ship-check/ |
+| .claude/skills/recipe-db/SKILL.md | Supabase bulk-work conventions skill | Created | /home/user/daily-shuffle/.claude/skills/recipe-db/ |
+| .claude/skills/smoke-test/SKILL.md | Smoke-test runner/extender skill | Created | /home/user/daily-shuffle/.claude/skills/smoke-test/ |
+| scripts/smoke_test.mjs | Headless-browser smoke test (5 checks, offline, exit-code gated) | Created | /home/user/daily-shuffle/scripts/ |
+| scripts/claude_md_drift.mjs | Mechanical CLAUDE.md drift check (5 checks, exit-code gated) | Created | /home/user/daily-shuffle/scripts/ |
+| scripts/README.md | Added smoke-test + drift-check sections at top | Modified | /home/user/daily-shuffle/scripts/ |
+| (Routine, not a file) | Weekly CLAUDE.md audit trigger trig_012FVP34K8kH664FDZayj6Lb, Mon 07:00 UTC | Created | Claude Code Remote environment |
+| logs/daily-shuffle_log.md | This entry | Modified | /home/user/daily-shuffle/logs/ |
+
+## Decisions & Reasoning
+- **Template lives in the skill, CLAUDE.md just points at it**: the two copies had already drifted (skill had `Mode:` + "Skills Used"; CLAUDE.md had neither). One source of truth; the always-loaded CLAUDE.md keeps only the trigger rule, saving context every session.
+- **No version numbers in docs**: CLAUDE.md said `v23` while sw.js was at `v32` — that class of staleness is structural, so the rewrite says "read it from sw.js" instead of recording a value.
+- **No custom subagents**: considered an index.html-navigator (duplicate of built-in Explore) and a pipeline-reviewer (pipelines run on Saffron's Mac, nothing for an agent to execute). Rejected both as bloat.
+- **Smoke test is offline-by-design with seeded fixtures**: sandbox egress blocks Supabase (confirmed 403 this session), and the app is offline-first anyway — seeding `ds_recipe_cache` tests the real cold-cache-with-data path without any network flakiness.
+- **Fixture shape mirrors real data rather than hardening the app**: the `.charAt()` crash on missing `cuisine` is only reachable with malformed cache data; fixed the fixtures and documented the field requirement instead of patching index.html in a config-only PR (no cache bump needed this way, and app hardening deserves its own change if wanted).
+- **Smoke test wired into ship-check as step 2** so it runs as part of the standard pre-commit ritual, not as an optional extra.
+- **Drift automation = script + routine, not a GitHub Action or hook**: an Action would need an ANTHROPIC_API_KEY secret and CI setup this repo deliberately doesn't have; a settings.json hook only fires inside sessions, which already carry CLAUDE.md + ship-check. The weekly fresh-session routine also catches drift from Saffron's own local pushes, which no in-session mechanism can. The drift script names implementation FILES rather than counts/versions ("canonicalise in FIVE places" is checked by listing, not by parsing "FIVE") so the check itself can't go stale the way the doc did.
+
+## Current State (end of session)
+All files written and committed on `claude/audit-claude-config-ef50ee`; draft PR open. Smoke test passes 5/5 against current main's app code. No app code, no data, and no Supabase state touched — `index.html` and `sw.js` unchanged (hence no cache bump).
+
+## Next Steps
+1. Merge the PR, then start the **quantity-normalisation apply session** — invoke the `recipe-db` skill; the plan is fully locked in `quantity-normalisation-plan.md` (see 2026-07-01 entry).
+2. On the next `index.html` change, exercise the new `ship-check` skill end-to-end and adjust anything that reads wrong in practice.
+3. Optional, Saffron's call: harden the recipe-card template against missing `cuisine`/`proteinSource` (guard the `.charAt()` calls at index.html:1953–1954 and :2089) — a real app change, needs its own PR + cache bump.
+
+## Open Questions / Blockers
+N/A — everything approved in the dry-run was applied, plus the smoke test Saffron requested.
+
+## Environment & Config Notes
+Branch `claude/audit-claude-config-ef50ee`. Smoke test dependencies: global playwright 1.56.1 at `npm root -g` and Chromium at `/opt/pw-browsers` — both preinstalled in the remote sandbox; the script resolves both itself. Confirmed sandbox egress blocks `supabase.co` (CONNECT 403), same as Apify/USDA.
+
+## Notes & Gotchas
+- **Smoke-test fixtures must carry `cuisine` and `proteinSource`** — the recipe-card template calls `.charAt()` on both unguarded. If a future field becomes load-bearing the same way, add it to `FIXTURE_RECIPES` with a comment.
+- The smoke test covers boot/tabs/shuffle only — a green run does NOT prove a new feature works; drive new features directly and add a check if they're core.
+- `.claude/agents` intentionally does not exist — don't "fix" that by scaffolding empty agents.
+- The old personal-machine version of `save-conversation` (with `~/Documents` paths and the multi-project routing table) is gone from this repo; if it's needed elsewhere it lives in Saffron's global setup, not here.
+
+---
+
 # Quantity Normalisation — §6 Decisions Signed Off (step 2, ruleset locked)
 **Date:** 2026-07-01
 **Project:** Daily Shuffle — recipe/meal-planning PWA
