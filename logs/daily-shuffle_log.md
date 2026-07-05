@@ -4,7 +4,7 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
-# Claude Config Audit — CLAUDE.md rewrite, 4 skills, browser smoke test
+# Claude Config Audit — CLAUDE.md rewrite, 4 skills, browser smoke test, drift automation
 **Date:** 2026-07-05
 **Project:** Daily Shuffle — agent config / dev tooling
 **Mode:** Rolling Log + GitHub Push
@@ -29,6 +29,7 @@ CLAUDE.md was stale in ways that actively misled: it described `sw.js` as cache-
 - **Created `recipe-db` skill**: Supabase schema map + propose/review/apply/verify discipline for bulk writes, encoding the locked §6 decisions and the review-CSV convention.
 - **Built `scripts/smoke_test.mjs` + `smoke-test` skill**: Playwright/Chromium headless test that serves the repo over a local HTTP server, seeds `ds_recipe_cache` with 5 fixture recipes (one per meal pool), and asserts clean boot, 5 tab containers, tab switching, and that `generatePlan()` renders the fixtures into `#planOutput`. **Ran it — 5/5 green.** First run failed: fixtures lacked `cuisine`/`proteinSource`, which the recipe-card template calls `.charAt()` on unguarded; real cloud recipes always have them, so the fix was fixture-side (noted in the script and skill as a trap).
 - **Deliberately created no `.claude/agents`**: built-in Explore/Plan agents already cover the only plausible use (navigating the 6,000-line index.html); a custom agent set would be bloat for a solo no-CI repo.
+- **Built CLAUDE.md drift automation** (follow-up request): `scripts/claude_md_drift.mjs` mechanically diffs CLAUDE.md's claims against the repo — tabs (both directions), scripts/ files documented, root .md/.csv/.mjs files documented, every `canonicalise()` implementation named in the sync list, sw.js passthrough hosts. Verified it detects (flagged its own then-undocumented self when staged) and passes clean once documented. Wired in three places: ship-check step 7, a "Keep this file true" bullet in CLAUDE.md's Dev workflow, and a **weekly scheduled routine** (`trig_012FVP34K8kH664FDZayj6Lb`, Mondays 07:00 UTC, fresh session, push-notify): runs the script, skims the week's merged diffs and the log's top entry for judgement-level drift the script can't catch (workstream status, conventions, data model), and opens a draft PR with minimal factual edits only when something is stale — otherwise ends silently.
 
 ## Artifacts Produced / Modified
 
@@ -40,7 +41,9 @@ CLAUDE.md was stale in ways that actively misled: it described `sw.js` as cache-
 | .claude/skills/recipe-db/SKILL.md | Supabase bulk-work conventions skill | Created | /home/user/daily-shuffle/.claude/skills/recipe-db/ |
 | .claude/skills/smoke-test/SKILL.md | Smoke-test runner/extender skill | Created | /home/user/daily-shuffle/.claude/skills/smoke-test/ |
 | scripts/smoke_test.mjs | Headless-browser smoke test (5 checks, offline, exit-code gated) | Created | /home/user/daily-shuffle/scripts/ |
-| scripts/README.md | Added smoke-test section at top | Modified | /home/user/daily-shuffle/scripts/ |
+| scripts/claude_md_drift.mjs | Mechanical CLAUDE.md drift check (5 checks, exit-code gated) | Created | /home/user/daily-shuffle/scripts/ |
+| scripts/README.md | Added smoke-test + drift-check sections at top | Modified | /home/user/daily-shuffle/scripts/ |
+| (Routine, not a file) | Weekly CLAUDE.md audit trigger trig_012FVP34K8kH664FDZayj6Lb, Mon 07:00 UTC | Created | Claude Code Remote environment |
 | logs/daily-shuffle_log.md | This entry | Modified | /home/user/daily-shuffle/logs/ |
 
 ## Decisions & Reasoning
@@ -50,6 +53,7 @@ CLAUDE.md was stale in ways that actively misled: it described `sw.js` as cache-
 - **Smoke test is offline-by-design with seeded fixtures**: sandbox egress blocks Supabase (confirmed 403 this session), and the app is offline-first anyway — seeding `ds_recipe_cache` tests the real cold-cache-with-data path without any network flakiness.
 - **Fixture shape mirrors real data rather than hardening the app**: the `.charAt()` crash on missing `cuisine` is only reachable with malformed cache data; fixed the fixtures and documented the field requirement instead of patching index.html in a config-only PR (no cache bump needed this way, and app hardening deserves its own change if wanted).
 - **Smoke test wired into ship-check as step 2** so it runs as part of the standard pre-commit ritual, not as an optional extra.
+- **Drift automation = script + routine, not a GitHub Action or hook**: an Action would need an ANTHROPIC_API_KEY secret and CI setup this repo deliberately doesn't have; a settings.json hook only fires inside sessions, which already carry CLAUDE.md + ship-check. The weekly fresh-session routine also catches drift from Saffron's own local pushes, which no in-session mechanism can. The drift script names implementation FILES rather than counts/versions ("canonicalise in FIVE places" is checked by listing, not by parsing "FIVE") so the check itself can't go stale the way the doc did.
 
 ## Current State (end of session)
 All files written and committed on `claude/audit-claude-config-ef50ee`; draft PR open. Smoke test passes 5/5 against current main's app code. No app code, no data, and no Supabase state touched — `index.html` and `sw.js` unchanged (hence no cache bump).

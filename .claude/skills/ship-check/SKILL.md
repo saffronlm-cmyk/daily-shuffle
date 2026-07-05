@@ -60,6 +60,11 @@ frozen historical snapshot — leave it alone.
 key doesn't collide with an existing one (grep `index.html` and `legacy/` — legacy
 modules own keys like `ds_food_log`, `ds_pantry` that will come back).
 
+**7. CLAUDE.md drift** — `node scripts/claude_md_drift.mjs` catches the mechanical
+cases (new tab, new script, new root data file, canonicalise copies, sw.js hosts).
+Beyond that, ask: does this diff change any fact CLAUDE.md states (architecture,
+data model, conventions, workstream status)? If yes, update CLAUDE.md in the same PR.
+
 ## Output format
 
 Report the result as a checklist before committing:
@@ -72,6 +77,7 @@ ship-check
 ➖ canonicalise: not touched
 ✅ Writes: new saveDayMeta() checks res.ok, toasts on failure
 ➖ localStorage: no new keys
+✅ CLAUDE.md: drift check clean, no stated facts changed
 → clear to commit
 ```
 
@@ -81,8 +87,8 @@ Any ❌ line = do not commit; fix and re-run.
 
 Diff adds a "copy grocery list" button (markup + one function, no fetch, no storage):
 step 1 runs and passes, step 2 runs and passes, step 3 bumps the cache (app-code
-change — yes, even for a small button), steps 4–6 are ➖. Report the checklist, commit
-with the bump included.
+change — yes, even for a small button), steps 4–6 are ➖, step 7's script is clean and
+no CLAUDE.md fact changed. Report the checklist, commit with the bump included.
 
 ## Do-nots
 

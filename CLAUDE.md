@@ -33,6 +33,10 @@ Single user (Saffron), no auth, deployed as static files.
   - **`smoke_test.mjs`** — headless-browser smoke test (Playwright/Chromium, runs fine
     in the sandbox, fully offline). `node scripts/smoke_test.mjs`. See the `smoke-test`
     skill.
+  - **`claude_md_drift.mjs`** — checks this file against the repo for mechanical
+    drift (tabs, script files, root data files, canonicalise copies, sw.js hosts).
+    `node scripts/claude_md_drift.mjs`. Runs in `ship-check` and in the weekly
+    CLAUDE.md-audit routine.
 - **`tools-apply-master.mjs`** — one-off Node tool from the ingredient-normalisation
   stream. Carries a frozen "app-verbatim" copy of `canonicalise()` — see the sync warning
   in Dev workflow.
@@ -129,8 +133,13 @@ recipe quick-add, bulk staple paste import, tracker AI quick-add.
   (same key logic), and `tools-apply-master.mjs` (frozen snapshot). If you change the
   app's copy, update the scripts' copies to match or price-book/staple keys stop
   matching; the `tools-apply-master.mjs` copy is a historical snapshot — leave it.
+- **Keep this file true.** If your change alters any fact CLAUDE.md states (architecture,
+  sw.js strategy, tabs, data model, workstream status, conventions), update CLAUDE.md in
+  the same PR. `node scripts/claude_md_drift.mjs` catches the mechanical cases and runs
+  as part of ship-check; a weekly scheduled routine audits the judgement-level drift and
+  opens a PR when this file has gone stale.
 - Before shipping any `index.html` change, run the **`ship-check`** skill (JS parse check,
-  smoke test, cache-bump decision, canonicalise sync, `res.ok` audit).
+  smoke test, cache-bump decision, canonicalise sync, `res.ok` audit, CLAUDE.md drift).
 - For any bulk read/write against the Supabase tables, use the **`recipe-db`** skill —
   it holds the schema map and the non-destructive-write conventions.
 - Generated/local-only files are gitignored: `pricebook.filled.csv`, `price_report.md`,
