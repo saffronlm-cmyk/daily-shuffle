@@ -1,3 +1,18 @@
+# Scripts
+
+## Browser smoke test (`smoke_test.mjs`)
+
+Headless-browser smoke test for the app itself — unlike the Python pipelines below,
+this one **is** meant to run from agent sandboxes (fully offline; it seeds fixture
+recipes into `ds_recipe_cache` and asserts clean boot, tab switching, and shuffle):
+
+```bash
+node scripts/smoke_test.mjs
+```
+
+Exit 0 = all checks passed. See `.claude/skills/smoke-test/SKILL.md` for when to run
+it and how to extend it.
+
 # Price-book pipeline
 
 Two small Python scripts (standard library only — no `pip install` needed) that
