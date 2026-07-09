@@ -4,6 +4,76 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# Brand Guidelines Doc — BRAND.md two-zone token system (functional + editorial)
+**Date:** 2026-07-09
+**Project:** Daily Shuffle — brand / design system
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete (PR #39 merged to main)
+
+---
+
+## Project Context
+First design-system artifact for the project. Saffron pasted a "Brand Guidelines Generator" prompt — a locked spec distilled from three rounds of image research, explicitly framed as an execution prompt, not a discovery one. The deliverable is a buildable guideline doc (tokens + component specs), not a mood essay. No app code involved. Nutrition workstream unchanged — see 2026-07-01 entries for that.
+
+## Session Goal
+Turn the locked brand spec into `BRAND.md`: color/type/shape tokens for a two-zone palette (functional + editorial) sharing one cream root, per-component specs, and an archival-numbering signature element. Run DRY-RUN (plan) first, then EXECUTE on approval.
+
+## State Before This Session
+No brand/design doc existed. Styling in `index.html` is ad-hoc. The prompt carried a mode toggle (DRY-RUN default → EXECUTE).
+
+## What Was Done
+- **DRY-RUN plan** presented first: proposed all tokens + component specs and flagged three decisions for Saffron: (a) oxblood primary hex, (b) display serif, (c) whether to keep dual archival numbering. Recommended Fraunces and leading with `#59171B`.
+- **Saffron's three rulings (these overrode my draft framing — capture the reasoning):**
+  1. **Oxblood split by element SIZE, not primary/alternate.** Bright/saturated `#800000` → tiny functional jobs (heart-fill icon, streak) because small elements must read clearly at a glance and deep oxblood looks muddy at icon size. Deep `#59171B` → large editorial surfaces (splash, onboarding) where the quieter tone avoids fatigue over a big area. This is the *opposite* of my draft, which framed `#59171B` as "primary" and `#800000` as a "bright alternate." Do not re-flip these.
+  2. **Fraunces confirmed** — specifically right for a mobile PWA: optical-size axis built for small-to-display, variable (one file), stays soft/warm. Cormorant turns fragile below ~24px on a phone; Spectral risks "generic serif."
+  3. **Dual numbering kept, but fix a collision:** `No.` for recipes and `Fig.` for diary is good differentiation, BUT the draft also used `No. 14` for streak — same format as recipe IDs, so "No. 14" could be misread as recipe #14 vs a 14-day streak. Gave streak its own `Day 14` variant (same Fraunces treatment) so all three markers stay visually related but never ambiguous.
+- **EXECUTE:** wrote `BRAND.md` in full — structured Palette (functional + editorial + bridge) → Type → Shape/Spacing → Components → Signature Element → Open Questions, token tables over prose. All three rulings baked in with inline callouts explaining the *why* (so the reasoning survives).
+- Added a one-line `BRAND.md` reference to CLAUDE.md's planning-docs list so future styling/theming sessions find it.
+- Committed both, opened **draft PR #39**, auto-subscribed to PR activity. Saffron marked it ready, then merged. No CI on repo (`total_count: 0`), no review comments. Cancelled the armed hourly check-in (`trig_01PaFpj7DpXjurkC3vgTUU3R`) on merge.
+- **NOT done (deliberately):** did not emit the CSS custom-properties / Tailwind token block — the prompt said "if requested" and Saffron didn't request it. Offered it twice; still open (see Next Steps).
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| BRAND.md | Brand guidelines: two-zone palette tokens, type, shape/spacing, 10 component specs, archival-numbering signature element, open questions | Created | /home/user/daily-shuffle/ |
+| CLAUDE.md | Added BRAND.md to the planning-docs bullet list | Modified | /home/user/daily-shuffle/ |
+| logs/daily-shuffle_log.md | This entry | Modified | /home/user/daily-shuffle/logs/ |
+
+## Decisions & Reasoning
+- **Oxblood assigned by element size** (Saffron's call): bright `#800000` for icon-scale functional jobs, deep `#59171B` for large editorial fills. Rejected: my own draft's primary/alternate framing. Reason: legibility at icon size vs. eye-fatigue over large areas — a size problem, not a hierarchy one.
+- **Fraunces over Cormorant/Spectral** (Saffron confirmed my rec): optical-size variable font suits the mobile small-to-display range; the alternates fail at phone sizes or read generic.
+- **Streak = `Day 14`, not `No. 14`**: removes ambiguity with recipe catalogue IDs while keeping the archival motif coherent (all three in Fraunces).
+- **Shared cream `#E0D6B8` as a single source token** referenced by both `--fn-bg` and `--ed-cream`: this is "the bridge" that makes it one brand, not two — stated at the top and re-referenced at each relevant decision.
+- **Oxblood's ONLY functional jobs are favourite + streak/milestone**; explicitly NOT active tab indicators (too high-frequency — would make it the everyday color) and NOT over-goal warnings (corrective red moralizes food intake). Both exclusions are in the doc as principled, not incidental.
+- **CTAs are near-black pills (`#1C1815`) in both zones**; accent color lives only in toggles/tags/status — kept out of primary buttons.
+- **Doc-only PR ⇒ no sw.js cache bump** (per CLAUDE.md: doc-only changes don't bump). Correctly skipped.
+- **Log rides a new PR, not the merged one**: PR #39 was already merged when logging, so per the merged-PR rule I restarted the branch from freshly-merged main (`649d48f`) rather than stacking on merged history.
+
+## Current State (end of session)
+`BRAND.md` + the CLAUDE.md reference are merged to main via PR #39. Branch restarted from merged main to carry this log entry on a fresh PR. No app code, data, or Supabase state touched; `index.html`/`sw.js` unchanged (no cache bump).
+
+## Next Steps
+1. **If Saffron wants implementation:** produce the CSS custom-properties `:root` block from BRAND.md §1–3 (all tokens are already named and hex-valued) plus the cafe/coastal accent-swap overrides — offered but not yet requested.
+2. Load Fraunces (variable, Soft optical) as a webfont — currently only Inter is in `index.html`. Decide self-host vs. Google Fonts (note the app is offline-first; a self-hosted subset fits the PWA model better).
+3. When applying any of this to `index.html`, resolve BRAND.md §7 open questions first: icon style (assumed outline+filled-active), dark mode (assumed deferred — no dark counterpart for the cream base yet), photography sourcing, gold-accent scope.
+
+## Open Questions / Blockers
+- CSS/Tailwind token block: offered, not requested — awaiting Saffron.
+- Dark mode: intentionally deferred; the functional cream base has no dark counterpart, and inventing one risks breaking the shared-cream bridge. Flagged in BRAND.md §7, not solved.
+- Gold `#B8842C`: scoped to kickers/rules/small marks only; whether it earns a larger editorial role is unconfirmed.
+
+## Environment & Config Notes
+Repo saffronlm-cmyk/daily-shuffle. Branch `claude/daily-shuffle-brand-guidelines-6fp07w`. PR #39 (BRAND.md) merged. This log entry goes on a new PR off `649d48f`. No credentials, Supabase tables, or cache version touched.
+
+## Notes & Gotchas
+- **Do not re-flip the two oxbloods.** Bright `#800000` = small/icon; deep `#59171B` = large/editorial. This reads backwards vs. a naive "darker = primary" instinct — it's deliberate and Saffron-decided. The doc has a callout warning against the swap; heed it.
+- The two oxbloods are the ONLY reds in the system. Over-goal macro states must stay neutral — never introduce a corrective red, by principle (avoids moralizing food intake), not just brand tidiness.
+- Archival numbering has three distinct formats on purpose: `No. 001` (recipe, permanent zero-padded ID), `Fig. 01` (diary, per-day counter that resets), `Day 14` (streak). Keep them distinct if extending.
+- BRAND.md is now referenced from CLAUDE.md's planning docs — if the palette/type/component facts change, update BRAND.md in the same PR (same "keep the doc true" discipline as CLAUDE.md).
+
+---
+
 # Claude Config Audit — CLAUDE.md rewrite, 4 skills, browser smoke test, drift automation
 **Date:** 2026-07-05
 **Project:** Daily Shuffle — agent config / dev tooling
