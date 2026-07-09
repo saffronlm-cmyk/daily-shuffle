@@ -55,6 +55,10 @@ Single user (Saffron), no auth, deployed as static files.
     acceptance criteria, decision gates, status tracker). Built to be executed one task
     at a time by any session — read its §0 operating rules before doing any
     monetization/rollout work, and never start multi-tenant auth before its Gate B.
+  - `BRAND.md` — brand guidelines: color tokens (functional + editorial two-zone palette
+    sharing one cream root), type (Inter + Fraunces + tracked caps), shape/spacing,
+    component specs, and the archival-numbering signature element. Read before any visual
+    / styling / theming work.
   - `HANDOFF.md` — roadmap for the ingredient → price book → cost feature stream.
   - `handoff.md` — resume point for the Apify price-book pipeline. (Yes, two different
     handoff files differing only by case — don't confuse them.)
