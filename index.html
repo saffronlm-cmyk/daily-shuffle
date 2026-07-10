@@ -13,7 +13,7 @@
 <meta name="apple-mobile-web-app-title" content="Daily Shuffle">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,300..600&display=swap" rel="stylesheet">
 <link rel="apple-touch-icon" href="./icon-192.png">
 <style>
   :root {
@@ -33,6 +33,29 @@
     --purple: #7048a0;
     --radius: 10px;
     --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+    /* ── Daily Shuffle design system (Recipe Detail + Nutrition) ──────────── */
+    --ds-bg: #E0D6B8;
+    --ds-surface: #EDE6D2;
+    --ds-accent: #8A7A66;
+    --ds-text: #3B2E28;
+    --ds-text-muted: #6B5D53;
+    --ds-border: #D2C6A8;
+    --ds-cta: #1C1815;
+    --ds-cta-text: #F3ECD8;
+    --ds-oxblood-deep: #59171B;
+    --ds-oxblood-btn: #3D0F13;
+    --ds-oxblood-bright: #800000;
+    --ds-gold: #B8842C;
+    --ds-favorite-fill: #800000;
+    --ds-radius-card: 20px;
+    --ds-radius-sm: 12px;
+    --ds-radius-pill: 999px;
+    --ds-shadow-card: 0 8px 24px rgba(59,46,40,.12);
+    --ds-shadow-oxblood-soft: 0 10px 26px rgba(89,23,27,.20);
+    --ds-shadow-oxblood-deep: 0 12px 30px rgba(89,23,27,.28);
+    --ds-glass-tint: rgba(224,214,184,.6);
+    --font-display: 'Fraunces', Georgia, serif;
   }
   [data-theme="cafe"] {
     --bg: #F1EEEB;
@@ -45,6 +68,7 @@
     --text: #5C4E48;
     --text2: #A09086;
     --text3: #CFB3A9;
+    --ds-accent: #9C7E86;
   }
   [data-theme="coastal"] {
     --bg: #FFFFFF;
@@ -57,6 +81,7 @@
     --text: #2F4156;
     --text2: #567C8D;
     --text3: #8EAAB8;
+    --ds-accent: #5A6B7E;
   }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 14px; line-height: 1.5; min-height: 100vh; }
@@ -68,15 +93,20 @@
   header { background: var(--surface); border-bottom: 1px solid var(--border); padding: env(safe-area-inset-top) 20px 0; display: flex; align-items: center; gap: 24px; height: calc(56px + env(safe-area-inset-top)); position: sticky; top: 0; z-index: 100; }
   .logo { font-size: 18px; font-weight: 700; color: var(--accent); letter-spacing: -0.5px; white-space: nowrap; }
   .logo span { color: var(--text2); font-weight: 400; }
-  nav { display: flex; gap: 4px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; flex-shrink: 1; min-width: 0; }
-  nav::-webkit-scrollbar { display: none; }
-  nav button { background: none; color: var(--text2); padding: 6px 14px; border-radius: 6px; font-size: 13px; font-weight: 500; transition: all .15s; flex-shrink: 0; white-space: nowrap; }
-  nav button:hover { color: var(--text); background: var(--surface2); }
-  nav button.active { color: var(--accent); background: var(--accent-tint); }
   .header-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
-  main { flex: 1; padding-bottom: env(safe-area-inset-bottom); }
+  main { flex: 1; padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
   .tab-content { display: none; }
   .tab-content.active { display: block; }
+
+  /* ── Bottom nav (Daily Shuffle DS — oxblood floating pill) ────────────── */
+  nav.ds-tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 150; display: flex; justify-content: center; padding: 12px 20px calc(14px + env(safe-area-inset-bottom)); pointer-events: none; }
+  nav.ds-tabbar .ds-tabbar-inner { pointer-events: all; background: var(--ds-oxblood-btn); border-radius: var(--ds-radius-pill); padding: 10px 18px; display: flex; align-items: center; gap: 4px; box-shadow: 0 14px 34px rgba(0,0,0,.28); max-width: 480px; width: 100%; justify-content: space-around; }
+  nav.ds-tabbar button { background: none; border: none; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 4px 10px; opacity: .55; transition: opacity .15s; flex-shrink: 0; }
+  nav.ds-tabbar button:hover { opacity: .8; }
+  nav.ds-tabbar button.active { opacity: 1; }
+  nav.ds-tabbar button svg { color: var(--ds-cta-text); display: block; }
+  nav.ds-tabbar button .ds-tabdot { width: 4px; height: 4px; border-radius: 50%; background: transparent; }
+  nav.ds-tabbar button.active .ds-tabdot { background: var(--ds-cta-text); }
 
   /* ── Recipes Tab ───────────────────────────────────────────────────────── */
   .recipes-layout { max-width: 1200px; margin: 0 auto; }
@@ -145,62 +175,93 @@
   .fav-btn:hover { color: var(--accent); transform: scale(1.2); }
   .fav-btn.active { color: var(--accent); }
   .recipe-card { position: relative; }
-  .modal-fav-btn { background: none; border: 1px solid var(--border); color: var(--text3); padding: 6px 12px; border-radius: 7px; font-size: 13px; transition: all .15s; }
-  .modal-fav-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .modal-fav-btn.active { background: var(--accent-tint); border-color: var(--accent); color: var(--accent); }
+  /* Shared plain modal close button (used by Settings panel etc.) */
+  .modal-close { position: absolute; top: 16px; right: 16px; background: var(--surface2); color: var(--text2); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; border: 1px solid var(--border); }
+  .modal-close:hover { color: var(--text); }
+
+  /* ── Recipe modal — Daily Shuffle DS reskin ─────────────────────────────── */
+  .modal-fav-btn { width: 40px; height: 40px; border-radius: 999px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; background: var(--ds-glass-tint); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+  .modal-fav-btn svg { display: block; }
 
   /* Servings override */
   .servings-override { display: inline-flex; align-items: center; gap: 6px; }
-  .servings-input { width: 48px; background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 3px 6px; border-radius: 5px; font-size: 13px; font-family: var(--font); text-align: center; outline: none; }
-  .servings-input:focus { border-color: var(--accent); }
+  .servings-input { width: 40px; background: var(--ds-bg); border: 1px solid var(--ds-border); color: var(--ds-text); padding: 3px 6px; border-radius: 5px; font-size: 13px; font-family: var(--font); text-align: center; outline: none; }
+  .servings-input:focus { border-color: var(--ds-accent); }
 
-  /* Modal */
+  /* Modal shell */
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.75); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity .2s; }
   .modal-overlay.open { opacity: 1; pointer-events: all; }
-  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; max-width: 680px; width: 100%; max-height: 88vh; overflow-y: auto; padding: 28px; position: relative; }
-  .modal-close { position: absolute; top: 16px; right: 16px; background: var(--surface2); color: var(--text2); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; border: 1px solid var(--border); }
-  .modal-close:hover { color: var(--text); }
-  .modal-type { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; margin-bottom: 8px; }
-  .modal-title { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
-  .modal-desc { color: var(--text2); font-size: 13px; margin-bottom: 18px; line-height: 1.5; font-style: italic; }
-  .modal-meta { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
-  .modal-meta-item { display: flex; align-items: center; gap: 5px; font-size: 13px; color: var(--text2); }
-  .modal-meta-item strong { color: var(--text); }
+  .modal { background: var(--ds-surface); border: none; border-radius: 24px; max-width: 460px; width: 100%; max-height: 88vh; overflow: hidden; padding: 0; position: relative; display: flex; flex-direction: column; box-shadow: 0 30px 70px rgba(59,46,40,.34); color: var(--ds-text); }
+  .modal-hero { position: relative; flex-shrink: 0; height: 200px; background: radial-gradient(130% 100% at 30% 15%, #7a3d2e 0%, #5c2a24 45%, #3b1c1a 100%); }
+  .modal-hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,.28) 0%, rgba(0,0,0,0) 34%, rgba(0,0,0,0) 60%, rgba(59,46,40,.35) 100%); }
+  .modal-hero-caption { position: absolute; left: 50%; top: 52%; transform: translate(-50%,-50%); text-align: center; z-index: 1; }
+  .modal-hero-caption svg { display: block; margin: 0 auto; }
+  .modal-hero-caption span { display: block; font-family: var(--font-display); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: rgba(243,236,216,.55); margin-top: 10px; }
+  .modal-hero-controls { position: absolute; top: 16px; left: 16px; right: 16px; display: flex; justify-content: space-between; z-index: 2; }
+  .modal-hero-group { display: flex; gap: 8px; position: relative; }
+  .modal-glass-btn { width: 40px; height: 40px; border-radius: 999px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; background: var(--ds-glass-tint); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); color: var(--ds-text); }
+  .modal-more-menu { position: absolute; top: 48px; right: 0; background: var(--ds-surface); border: 1px solid var(--ds-border); border-radius: 12px; box-shadow: var(--ds-shadow-card); padding: 6px; display: none; flex-direction: column; min-width: 172px; z-index: 3; }
+  .modal-more-menu.open { display: flex; }
+  .modal-more-menu button, .modal-more-menu a { display: flex; align-items: center; gap: 8px; background: none; border: none; text-align: left; color: var(--ds-text); font-size: 13px; font-family: var(--font); padding: 9px 10px; border-radius: 8px; cursor: pointer; width: 100%; }
+  .modal-more-menu button:hover, .modal-more-menu a:hover { background: var(--ds-bg); }
+  .modal-more-menu .danger { color: var(--ds-oxblood-bright); }
+
+  .modal-scroll { flex: 1; overflow-y: auto; }
+  .modal-scroll::-webkit-scrollbar { width: 0; height: 0; }
+  .modal-card { background: var(--ds-surface); border-radius: 24px 24px 0 0; margin-top: -24px; position: relative; padding: 22px 22px 24px; box-shadow: var(--ds-shadow-card); }
+  .modal-type { font-family: var(--font); font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--ds-text-muted); margin-bottom: 8px; }
+  .modal-title { font-family: var(--font-display); font-weight: 350; font-size: 24px; line-height: 1.15; color: var(--ds-text); letter-spacing: -.2px; margin-bottom: 8px; }
+  .modal-desc { color: var(--ds-text-muted); font-size: 14px; margin-bottom: 16px; line-height: 1.55; font-style: normal; }
+  .modal-meta { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 16px; }
+  .modal-meta-item { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ds-text-muted); }
+  .modal-meta-item strong { color: var(--ds-text); font-weight: 600; }
+  .modal-meta-item svg { flex-shrink: 0; }
   .modal-section { margin-bottom: 16px; }
-  .modal-section h4 { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--text3); margin-bottom: 8px; }
-  .modal-section p { font-size: 13px; color: var(--text2); line-height: 1.6; }
+  .modal-section h4 { font-family: var(--font); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .14em; color: var(--ds-text-muted); margin-bottom: 12px; }
+  .modal-section p { font-size: 14px; color: var(--ds-text-muted); line-height: 1.6; }
   .modal-tags { display: flex; flex-wrap: wrap; gap: 6px; }
-  .modal-tag { font-size: 12px; color: var(--text2); background: var(--surface2); padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border); }
-  .modal-instagram-link { display: inline-flex; align-items: center; gap: 6px; background: var(--accent-tint); color: var(--accent); padding: 8px 16px; border-radius: 7px; font-size: 13px; font-weight: 600; border: 1px solid var(--accent-tint); }
+  .modal-tag { font-size: 12px; color: var(--ds-text-muted); background: var(--ds-bg); padding: 4px 10px; border-radius: 20px; border: 1px solid var(--ds-border); }
+  .modal-instagram-link { display: inline-flex; align-items: center; gap: 6px; background: var(--ds-bg); color: var(--ds-text); padding: 8px 16px; border-radius: 7px; font-size: 13px; font-weight: 600; border: 1px solid var(--ds-border); }
 
   /* ── Recipe full detail (ingredients + method) ──────────────────────────── */
-  .recipe-ingredients { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 4px; }
-  .recipe-ingredient-group { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--accent); margin-top: 10px; margin-bottom: 2px; }
+  .recipe-ingredients { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; counter-reset: ing-counter; }
+  .recipe-ingredient-group { font-family: var(--font); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--ds-accent); margin-top: 12px; margin-bottom: 2px; }
   .recipe-ingredient-group:first-child { margin-top: 0; }
-  .recipe-ingredient-item { font-size: 13px; color: var(--text); padding: 5px 10px; background: var(--surface2); border-radius: 6px; border-left: 2px solid var(--border); line-height: 1.4; }
-  .recipe-method-steps { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; counter-reset: step-counter; }
-  .recipe-method-step { font-size: 13px; color: var(--text2); line-height: 1.6; padding: 10px 12px 10px 42px; background: var(--surface2); border-radius: 8px; position: relative; counter-increment: step-counter; }
-  .recipe-method-step::before { content: counter(step-counter); position: absolute; left: 10px; top: 10px; width: 22px; height: 22px; background: var(--accent-tint); border: 1px solid var(--accent-tint); color: var(--accent); border-radius: 50%; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
-  .recipe-tips { font-size: 12px; color: var(--text3); line-height: 1.6; background: var(--accent-tint); border: 1px solid var(--accent-tint); border-radius: 8px; padding: 12px; white-space: pre-line; }
-  .recipe-storage { font-size: 12px; color: var(--text3); line-height: 1.6; }
-  .modal-divider { height: 1px; background: var(--border); margin: 16px 0; }
+  .recipe-ingredient-item { font-family: var(--font); font-size: 15px; color: var(--ds-text); padding: 9px 0; line-height: 1.4; border-bottom: 1px solid var(--ds-border); counter-increment: ing-counter; display: flex; align-items: baseline; gap: 12px; }
+  .recipe-ingredient-item::before { content: counter(ing-counter, decimal-leading-zero); font-family: var(--font-display); font-size: 13px; color: var(--ds-accent); min-width: 20px; flex-shrink: 0; }
+  .recipe-method-steps { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 16px; counter-reset: step-counter; }
+  .recipe-method-step { font-family: var(--font); font-size: 15px; color: var(--ds-text); line-height: 1.55; padding: 0 0 0 40px; position: relative; counter-increment: step-counter; }
+  .recipe-method-step::before { content: counter(step-counter); position: absolute; left: 0; top: 0; width: 26px; height: 26px; background: var(--ds-bg); border: 1px solid var(--ds-border); color: var(--ds-text); border-radius: 50%; font-family: var(--font-display); font-size: 13px; font-weight: 400; display: flex; align-items: center; justify-content: center; }
+  .recipe-tips { font-size: 13px; color: var(--ds-text-muted); line-height: 1.6; background: var(--ds-bg); border: 1px solid var(--ds-border); border-radius: 12px; padding: 12px; white-space: pre-line; }
+  .recipe-storage { font-size: 13px; color: var(--ds-text-muted); line-height: 1.6; }
+  .modal-divider { height: 1px; background: var(--ds-border); margin: 20px 0; }
 
   /* ── Nutrition grid ─────────────────────────────────────────────────────── */
-  .nutrition-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 10px 0 6px; }
-  .nutrition-cell { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 6px; text-align: center; }
-  .nc-val { font-size: 17px; font-weight: 700; color: var(--text); }
-  .nc-lbl { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: .5px; margin-top: 3px; }
-  .cost-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; color: var(--text2); margin-top: 6px; }
-  .cost-badge strong { color: var(--green); }
+  .nutrition-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 10px 0 6px; }
+  .nutrition-cell { background: var(--ds-bg); border-radius: var(--ds-radius-sm); padding: 12px 4px; display: flex; align-items: baseline; justify-content: center; gap: 4px; white-space: nowrap; }
+  .nc-val { font-family: var(--font); font-size: 12px; font-weight: 400; color: var(--ds-text); }
+  .nc-lbl { font-family: var(--font); font-size: 11px; color: var(--ds-text); letter-spacing: .01em; text-transform: none; margin-top: 0; }
+  .cost-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; color: var(--ds-text-muted); margin-top: 8px; }
+  .cost-badge strong { color: var(--ds-text); }
   .cost-breakdown { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
-  .cost-store { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; flex: 1; min-width: 80px; text-align: center; }
-  .cost-store-name { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--text3); margin-bottom: 4px; }
-  .cost-store-price { font-size: 16px; font-weight: 700; color: var(--text); }
-  .cost-store.cheapest .cost-store-price { color: var(--green); }
-  .cost-note { font-size: 11px; color: var(--text3); margin-top: 6px; line-height: 1.4; font-style: italic; }
-  .btn-estimate { display: inline-flex; align-items: center; gap: 6px; background: var(--accent-tint); color: var(--accent); border: 1px solid var(--accent-tint); padding: 7px 14px; border-radius: 7px; font-size: 12px; font-weight: 600; cursor: pointer; transition: background .15s; }
-  .btn-estimate:hover:not(:disabled) { background: var(--accent-tint); }
+  .cost-store { background: var(--ds-bg); border: 1px solid var(--ds-border); border-radius: var(--ds-radius-sm); padding: 8px 12px; flex: 1; min-width: 80px; text-align: center; }
+  .cost-store-name { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--ds-text-muted); margin-bottom: 4px; }
+  .cost-store-price { font-size: 15px; font-weight: 500; color: var(--ds-text); font-family: var(--font-display); }
+  .cost-store.cheapest .cost-store-price { color: var(--ds-oxblood-bright); }
+  .cost-note { font-size: 11px; color: var(--ds-text-muted); margin-top: 6px; line-height: 1.4; font-style: italic; }
+  .computed-cost { font-size: 13px; color: var(--ds-text); margin-top: 8px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-family: var(--font-display); font-weight: 500; }
+  .computed-cost strong { color: var(--ds-text); font-family: var(--font-display); }
+  .computed-cost-note { font-size: 11px; color: var(--ds-text-muted); font-family: var(--font); font-weight: 400; }
+  .btn-estimate { display: inline-flex; align-items: center; gap: 6px; background: var(--ds-bg); color: var(--ds-text); border: 1px solid var(--ds-border); padding: 7px 14px; border-radius: var(--ds-radius-pill); font-size: 12px; font-weight: 600; cursor: pointer; transition: border-color .15s; }
+  .btn-estimate:hover:not(:disabled) { border-color: var(--ds-accent); }
   .btn-estimate:disabled { opacity: .5; cursor: not-allowed; }
+
+  /* Sticky footer / CTA */
+  .modal-footer { flex-shrink: 0; background: var(--ds-oxblood-deep); padding: 14px 22px calc(14px + env(safe-area-inset-bottom)); display: flex; align-items: center; justify-content: space-between; gap: 12px; box-shadow: 0 -6px 20px rgba(0,0,0,.15); }
+  .modal-footer-info p:first-child { font-family: var(--font); font-size: 12px; color: rgba(243,236,216,.7); }
+  .modal-footer-info p:last-child { font-family: var(--font); font-size: 12px; font-weight: 400; color: var(--ds-cta-text); margin-top: 8px; }
+  .modal-footer-info p:last-child span { color: rgba(243,236,216,.6); }
+  .btn-add-to-plan { font-family: var(--font); font-weight: 600; font-size: 15px; color: var(--ds-cta-text); background: var(--ds-oxblood-btn); border: none; border-radius: var(--ds-radius-pill); padding: 14px 26px; cursor: pointer; white-space: nowrap; }
 
   /* ── Meal Plan Tab ──────────────────────────────────────────────────────── */
   .plan-layout { max-width: 1200px; margin: 0 auto; padding: 28px 24px; }
@@ -446,11 +507,11 @@
   .btn-edit-save:hover { background: var(--accent2); }
   .btn-edit-cancel { background: none; border: 1px solid var(--border); color: var(--text2); padding: 9px 16px; border-radius: 7px; font-size: 13px; transition: all .15s; }
   .btn-edit-cancel:hover { border-color: var(--text2); color: var(--text); }
-  .btn-edit-open { background: none; border: 1px solid var(--border); color: var(--text3); padding: 5px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; letter-spacing: .3px; transition: all .15s; margin-top: 10px; }
-  .btn-edit-open:hover { border-color: var(--accent); color: var(--accent); }
-  .mult-btn { background: var(--surface2); border: 1px solid var(--border); color: var(--text2); padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; transition: all .15s; }
-  .mult-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .mult-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-tint); }
+  .btn-edit-open { background: none; border: 1px solid var(--ds-border); color: var(--ds-text-muted); padding: 5px 12px; border-radius: var(--ds-radius-pill); font-size: 11px; font-weight: 600; letter-spacing: .3px; transition: all .15s; margin-top: 10px; }
+  .btn-edit-open:hover { border-color: var(--ds-accent); color: var(--ds-text); }
+  .mult-btn { font-family: var(--font); background: transparent; border: 1px solid var(--ds-border); color: var(--ds-text); padding: 7px 15px; border-radius: var(--ds-radius-pill); font-size: 13px; font-weight: 600; transition: all .15s; }
+  .mult-btn:hover { border-color: var(--ds-accent); }
+  .mult-btn.active { border-color: var(--ds-accent); color: var(--ds-cta-text); background: var(--ds-accent); }
   /* Full recipe editor */
   .edit-section-divider { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .7px; color: var(--text3); margin: 16px 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
   .edit-full-input { width: 100%; background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 8px 10px; border-radius: 7px; font-size: 13px; font-family: var(--font); outline: none; }
@@ -513,89 +574,128 @@
   .computed-cost-note { font-size: 11px; color: var(--text3); }
 
   /* ── TRACKER TAB ─────────────────────────────────────────────────────── */
-  .trk-wrap { max-width: 760px; margin: 0 auto; padding: 4px 0 60px; }
+  /* ── Nutrition Dashboard — Daily Shuffle DS reskin ──────────────────────── */
+  .trk-wrap { max-width: 460px; margin: 0 auto; padding: 4px 0 60px; font-family: var(--font); }
+  .trk-kicker { font-family: var(--font); font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--ds-text-muted); margin-bottom: 6px; }
+  .trk-heading { font-family: var(--font-display); font-weight: 350; font-size: 26px; color: var(--ds-text); margin-bottom: 16px; }
   .trk-datebar { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:14px; }
-  .trk-datebar .trk-date { font-size:16px; font-weight:700; color:var(--text); }
-  .trk-datebar .trk-date small { display:block; font-size:11px; font-weight:500; color:var(--text3); text-transform:uppercase; letter-spacing:.5px; }
-  .trk-navbtn { background:var(--surface2); border:1px solid var(--border); color:var(--text); border-radius:8px; padding:6px 12px; cursor:pointer; font-size:14px; }
-  .trk-navbtn:hover { border-color:var(--accent); }
-  .trk-toolbtns { display:flex; gap:8px; flex-wrap:wrap; }
-  .trk-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:14px 16px; margin-bottom:14px; }
-  .trk-macros { display:grid; grid-template-columns:repeat(5,1fr); gap:10px; }
+  .trk-datebar .trk-date { font-size:15px; font-weight:600; color:var(--ds-text); cursor:pointer; }
+  .trk-datebar .trk-date small { display:block; font-size:11px; font-weight:500; color:var(--ds-text-muted); text-transform:uppercase; letter-spacing:.08em; margin-top:2px; }
+  .trk-navbtn { background:var(--ds-surface); border:1px solid var(--ds-border); color:var(--ds-text); border-radius:999px; width:32px; height:32px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:15px; flex-shrink:0; }
+  .trk-navbtn:hover { border-color:var(--ds-accent); }
+  .trk-toolbtns { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
+
+  /* Base card */
+  .trk-card { background:var(--ds-surface); border-radius:var(--ds-radius-card); padding:16px 18px; margin-bottom:14px; box-shadow:var(--ds-shadow-oxblood-soft); }
+  .trk-card.deep { box-shadow:var(--ds-shadow-oxblood-deep); }
+
+  /* Calories hero */
+  .trk-hero { display:flex; align-items:center; justify-content:space-between; padding:20px; }
+  .trk-hero-label { font-family:var(--font); font-weight:600; font-size:15px; color:var(--ds-text); }
+  .trk-hero-val { font-family:var(--font); font-size:32px; font-weight:500; color:var(--ds-text); line-height:1.1; margin-top:4px; }
+  .trk-hero-sub { font-family:var(--font); font-size:13px; color:var(--ds-text-muted); margin-top:2px; }
+  .trk-ring-wrap { position:relative; width:92px; height:92px; flex-shrink:0; }
+  .trk-ring-pct { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:var(--font); font-weight:600; font-size:20px; color:var(--ds-text); }
+
+  /* Macro stat cards */
+  .trk-macros { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:14px; }
+  .trk-macros .trk-card { margin-bottom:0; }
   .trk-macro { text-align:center; }
-  .trk-macro .trk-mval { font-size:15px; font-weight:700; color:var(--text); }
-  .trk-macro .trk-mlbl { font-size:10px; text-transform:uppercase; letter-spacing:.5px; color:var(--text3); margin:2px 0 5px; }
-  .trk-bar { height:6px; border-radius:4px; background:var(--surface2); overflow:hidden; }
-  .trk-bar > span { display:block; height:100%; border-radius:4px; background:var(--accent); transition:width .3s; }
-  .trk-bar.cal > span { background:var(--green); }
-  .trk-macro .trk-mtgt { font-size:9px; color:var(--text3); margin-top:3px; }
-  .trk-diary { display:flex; flex-wrap:wrap; gap:14px; font-size:13px; color:var(--text2); }
-  .trk-diary b { color:var(--text); }
-  .trk-diary .trk-net { color:var(--green); font-weight:700; }
-  .trk-diary .trk-net.over { color:var(--accent); }
+  .trk-macro .trk-mval { font-size:16px; font-weight:600; color:var(--ds-text); text-transform:uppercase; letter-spacing:.03em; font-family:var(--font); }
+  .trk-macro .trk-mlbl { font-size:12px; color:var(--ds-text-muted); margin-top:5px; }
+  .trk-macro .trk-mlbl b { color:var(--ds-text); font-weight:600; }
+  .trk-macro .trk-bar { height:5px; border-radius:4px; background:var(--ds-bg); overflow:hidden; margin-top:8px; }
+  .trk-macro .trk-bar > span { display:block; height:100%; border-radius:4px; background:var(--ds-accent); transition:width .3s; }
+
+  /* Eaten / Burned / Deficit editorial strip */
+  .trk-diary { display:flex; flex-wrap:wrap; justify-content:space-around; align-items:center; gap:10px; }
+  .trk-diary .td-cell { text-align:center; }
+  .trk-diary .td-label { font-family:var(--font); font-size:11px; font-weight:600; color:var(--ds-gold); text-transform:uppercase; letter-spacing:.14em; }
+  .trk-diary .td-val { font-family:var(--font-display); font-weight:500; font-size:20px; color:var(--ds-bg); margin-top:5px; }
+  .trk-diary .td-divider { width:1px; height:32px; background:rgba(224,214,184,.2); }
+
   .trk-meal { margin-bottom:12px; }
-  .trk-meal-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
-  .trk-meal-title { font-size:13px; font-weight:700; text-transform:capitalize; color:var(--text); }
-  .trk-meal-kcal { font-size:11px; color:var(--text3); font-weight:500; }
-  .trk-addbtn { background:none; border:1px dashed var(--border); color:var(--text2); border-radius:8px; padding:5px 10px; cursor:pointer; font-size:12px; }
-  .trk-addbtn:hover { border-color:var(--accent); color:var(--accent); }
-  .trk-entry { display:flex; align-items:center; gap:8px; padding:8px 10px; background:var(--surface2); border-radius:8px; margin-bottom:5px; }
-  .trk-entry .trk-etitle { flex:1; min-width:0; font-size:13px; color:var(--text); }
-  .trk-entry .trk-etitle small { display:block; color:var(--text3); font-size:10px; }
-  .trk-entry .trk-emac { font-size:11px; color:var(--text2); white-space:nowrap; }
-  .trk-entry .trk-del { background:none; border:none; color:var(--text3); cursor:pointer; font-size:15px; line-height:1; padding:2px 4px; }
-  .trk-entry .trk-del:hover { color:var(--accent); }
-  .trk-chip { display:inline-block; font-size:9px; text-transform:uppercase; letter-spacing:.4px; padding:1px 6px; border-radius:6px; background:var(--surface); color:var(--text3); margin-left:4px; }
-  .trk-flag { font-size:11px; color:var(--accent); margin-top:4px; }
-  .trk-empty { font-size:12px; color:var(--text3); padding:6px 2px; }
+  .trk-meal:last-child { margin-bottom:0; }
+  .trk-meal-head { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:10px; }
+  .trk-meal-title { font-size:15px; font-weight:600; text-transform:capitalize; color:var(--ds-text); font-family:var(--font); }
+  .trk-meal-kcal { font-size:12px; color:var(--ds-text-muted); font-weight:400; }
+  .trk-addbtn { background:none; border:1px solid var(--ds-border); color:var(--ds-text-muted); border-radius:var(--ds-radius-pill); padding:7px 14px; cursor:pointer; font-size:13px; font-weight:500; }
+  .trk-addbtn:hover { border-color:var(--ds-accent); color:var(--ds-text); }
+  .trk-entry { display:flex; align-items:baseline; gap:8px; padding:7px 0; border-top:1px solid var(--ds-border); margin-bottom:0; background:none; border-radius:0; }
+  .trk-entry .trk-etitle { flex:1; min-width:0; font-size:14px; color:var(--ds-text); }
+  .trk-entry .trk-etitle small { display:block; color:var(--ds-text-muted); font-size:10px; }
+  .trk-entry .trk-emac { font-size:12px; color:var(--ds-text-muted); white-space:nowrap; }
+  .trk-entry .trk-del { background:none; border:none; color:var(--ds-text-muted); cursor:pointer; font-size:15px; line-height:1; padding:2px 4px; }
+  .trk-entry .trk-del:hover { color:var(--ds-oxblood-bright); }
+  .trk-chip { display:inline-block; font-size:9px; text-transform:uppercase; letter-spacing:.4px; padding:1px 6px; border-radius:6px; background:var(--ds-bg); color:var(--ds-text-muted); margin-left:4px; }
+  .trk-flag { font-size:11px; color:var(--ds-oxblood-bright); margin-top:4px; }
+  .trk-empty { font-size:12px; color:var(--ds-text-muted); padding:6px 2px; }
   /* tracker modal (reuses overlay aesthetic) */
   .trk-overlay { position:fixed; inset:0; background:rgba(0,0,0,.5); display:none; align-items:flex-start; justify-content:center; z-index:200; padding:40px 16px; overflow-y:auto; }
   .trk-overlay.open { display:flex; }
-  .trk-panel { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:20px; width:100%; max-width:520px; position:relative; }
-  .trk-panel h3 { margin:0 0 4px; font-size:16px; color:var(--text); }
-  .trk-panel .trk-sub { font-size:12px; color:var(--text3); margin-bottom:14px; }
-  .trk-close { position:absolute; top:12px; right:14px; background:none; border:none; color:var(--text3); font-size:22px; cursor:pointer; line-height:1; }
+  .trk-panel { background:var(--ds-surface); border:none; border-radius:var(--ds-radius-card); padding:20px; width:100%; max-width:520px; position:relative; box-shadow:var(--ds-shadow-card); font-family:var(--font); }
+  .trk-panel h3 { margin:0 0 4px; font-family:var(--font-display); font-weight:500; font-size:17px; color:var(--ds-text); }
+  .trk-panel .trk-sub { font-size:12px; color:var(--ds-text-muted); margin-bottom:14px; }
+  .trk-close { position:absolute; top:12px; right:14px; background:none; border:none; color:var(--ds-text-muted); font-size:22px; cursor:pointer; line-height:1; }
   .trk-field { margin-bottom:10px; }
-  .trk-field label { display:block; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.4px; color:var(--text3); margin-bottom:4px; }
-  .trk-field input, .trk-field select, .trk-field textarea { width:100%; background:var(--surface2); border:1px solid var(--border); color:var(--text); padding:8px 10px; border-radius:8px; font-size:13px; outline:none; font-family:inherit; }
+  .trk-field label { display:block; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.08em; color:var(--ds-text-muted); margin-bottom:4px; }
+  .trk-field input, .trk-field select, .trk-field textarea { width:100%; background:var(--ds-bg); border:1px solid var(--ds-border); color:var(--ds-text); padding:8px 10px; border-radius:8px; font-size:13px; outline:none; font-family:inherit; }
   .trk-field textarea { min-height:70px; resize:vertical; }
   .trk-row { display:flex; gap:8px; }
   .trk-row > * { flex:1; }
-  .trk-btn { background:var(--accent); color:#fff; border:none; border-radius:8px; padding:9px 16px; font-size:13px; font-weight:600; cursor:pointer; }
-  .trk-btn.sec { background:var(--surface2); color:var(--text); border:1px solid var(--border); }
+  .trk-btn { background:var(--ds-cta); color:var(--ds-cta-text); border:none; border-radius:var(--ds-radius-pill); padding:9px 16px; font-size:13px; font-weight:600; cursor:pointer; }
+  .trk-btn.sec { background:none; color:var(--ds-text); border:1px solid var(--ds-border); }
   .trk-btn:disabled { opacity:.6; cursor:default; }
   .trk-tiles { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:8px; }
-  .trk-tile { text-align:left; background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:12px; cursor:pointer; }
-  .trk-tile:hover { border-color:var(--accent); }
-  .trk-tile b { display:block; font-size:13px; color:var(--text); margin-bottom:2px; }
-  .trk-tile span { font-size:11px; color:var(--text3); }
-  .trk-staple-row { display:flex; align-items:center; gap:8px; padding:7px 0; border-bottom:1px solid var(--border); font-size:12px; }
-  .trk-staple-row .nm { flex:1; color:var(--text); }
-  .trk-staple-row .mc { color:var(--text3); white-space:nowrap; }
-  .trk-staple-row button { background:none; border:none; cursor:pointer; color:var(--text3); font-size:13px; }
-  .trk-staple-row button:hover { color:var(--accent); }
-  .trk-confirm-item { display:flex; gap:8px; align-items:center; padding:8px; background:var(--surface2); border-radius:8px; margin-bottom:6px; }
-  .trk-confirm-item .ci-title { flex:1; font-size:12px; color:var(--text); }
-  .trk-confirm-item .ci-title small { display:block; color:var(--text3); font-size:10px; }
-  .trk-confirm-item input { width:54px; background:var(--surface); border:1px solid var(--border); color:var(--text); border-radius:6px; padding:4px 6px; font-size:12px; }
-  .trk-confirm-item .ci-mac { font-size:10px; color:var(--text3); white-space:nowrap; }
+  .trk-tile { text-align:left; background:var(--ds-bg); border:1px solid var(--ds-border); border-radius:10px; padding:12px; cursor:pointer; }
+  .trk-tile:hover { border-color:var(--ds-accent); }
+  .trk-tile b { display:block; font-size:13px; color:var(--ds-text); margin-bottom:2px; }
+  .trk-tile span { font-size:11px; color:var(--ds-text-muted); }
+  .trk-staple-row { display:flex; align-items:center; gap:8px; padding:7px 0; border-bottom:1px solid var(--ds-border); font-size:12px; }
+  .trk-staple-row .nm { flex:1; color:var(--ds-text); }
+  .trk-staple-row .mc { color:var(--ds-text-muted); white-space:nowrap; }
+  .trk-staple-row button { background:none; border:none; cursor:pointer; color:var(--ds-text-muted); font-size:13px; }
+  .trk-staple-row button:hover { color:var(--ds-accent); }
+  .trk-confirm-item { display:flex; gap:8px; align-items:center; padding:8px; background:var(--ds-bg); border-radius:8px; margin-bottom:6px; }
+  .trk-confirm-item .ci-title { flex:1; font-size:12px; color:var(--ds-text); }
+  .trk-confirm-item .ci-title small { display:block; color:var(--ds-text-muted); font-size:10px; }
+  .trk-confirm-item input { width:54px; background:var(--ds-surface); border:1px solid var(--ds-border); color:var(--ds-text); border-radius:6px; padding:4px 6px; font-size:12px; }
+  .trk-confirm-item .ci-mac { font-size:10px; color:var(--ds-text-muted); white-space:nowrap; }
 </style>
 </head>
 <body>
 <div class="app">
   <header>
     <div class="logo">Daily <span>Shuffle</span></div>
-    <nav>
-      <button class="active" onclick="switchTab('plan',this)">🔀 Shuffle</button>
-      <button onclick="switchTab('recipes',this)">🍳 Recipes</button>
-      <button onclick="switchTab('grocery',this)" id="nav-grocery">🛒 Grocery List</button>
-      <button onclick="switchTab('tracker',this)" id="nav-tracker">📊 Tracker</button>
-      <button onclick="switchTab('add',this)">＋ Add Recipe</button>
-    </nav>
     <div class="header-right">
       <button class="settings-btn" id="settingsBtn" onclick="openSettings()" title="API Key Settings">🔑</button>
     </div>
   </header>
+
+  <nav class="ds-tabbar">
+    <div class="ds-tabbar-inner">
+      <button class="active" onclick="switchTab('plan',this)" title="Shuffle">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 18h1.4c1.3 0 2.5-.6 3.3-1.7l6.1-8.6c.7-1.1 2-1.7 3.3-1.7H22"/><path d="m18 2 4 4-4 4"/><path d="M2 6h1.9c1.5 0 2.9.9 3.6 2.2"/><path d="M22 18h-5.9c-1.3 0-2.6-.7-3.3-1.8l-.5-.8"/><path d="m18 14 4 4-4 4"/></svg>
+        <span class="ds-tabdot"></span>
+      </button>
+      <button onclick="switchTab('recipes',this)" title="Recipes">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg>
+        <span class="ds-tabdot"></span>
+      </button>
+      <button onclick="switchTab('grocery',this)" id="nav-grocery" title="Grocery List">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 11-1 9"/><path d="m19 11-4-7"/><path d="M2 11h20"/><path d="m3.5 11 1.6 7.4a2 2 0 0 0 2 1.6h9.8a2 2 0 0 0 2-1.6l1.7-7.4"/><path d="M4.5 15.5h15"/><path d="m5 11 4-7"/><path d="m9 11 1 9"/></svg>
+        <span class="ds-tabdot"></span>
+      </button>
+      <button onclick="switchTab('tracker',this)" id="nav-tracker" title="Tracker">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+        <span class="ds-tabdot"></span>
+      </button>
+      <button onclick="switchTab('add',this)" title="Add Recipe">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+        <span class="ds-tabdot"></span>
+      </button>
+    </div>
+  </nav>
 
   <!-- ── SETTINGS OVERLAY ──────────────────────────────────────────────────── -->
   <div class="settings-overlay" id="settingsOverlay" onclick="closeSettingsOnOverlay(event)">
@@ -977,12 +1077,18 @@
     <!-- ── TRACKER TAB ───────────────────────────────────────────────────── -->
     <div id="tab-tracker" class="tab-content">
       <div class="trk-wrap" id="trkWrap">
+        <p class="trk-kicker" id="trkKicker">Today</p>
+        <h2 class="trk-heading">Nutrition</h2>
         <div class="trk-datebar">
-          <button class="trk-navbtn" onclick="trkShiftDay(-1)" title="Previous day">‹</button>
-          <div class="trk-date" id="trkDateLabel" onclick="trkGoToday()" title="Jump to today" style="cursor:pointer;text-align:center">—<small>today</small></div>
-          <button class="trk-navbtn" onclick="trkShiftDay(1)" title="Next day">›</button>
+          <button class="trk-navbtn" onclick="trkShiftDay(-1)" title="Previous day">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+          </button>
+          <div class="trk-date" id="trkDateLabel" onclick="trkGoToday()" title="Jump to today" style="text-align:center">—<small>today</small></div>
+          <button class="trk-navbtn" onclick="trkShiftDay(1)" title="Next day">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
         </div>
-        <div class="trk-toolbtns" style="justify-content:center;margin-bottom:14px">
+        <div class="trk-toolbtns" style="justify-content:center">
           <button class="trk-addbtn" onclick="trkOpenAddChooser()">＋ Add food</button>
           <button class="trk-addbtn" onclick="trkOpenStaples()">🥫 Staples</button>
           <button class="trk-addbtn" onclick="trkOpenTargets()">🎯 Targets</button>
@@ -2027,17 +2133,16 @@ function openModal(id) {
   const multiplierHtml = hasIngredients ? `
     <div class="modal-section" style="padding-bottom:0">
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-        <span style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px">Multiply</span>
+        <span style="font-family:var(--font);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ds-text-muted);margin-right:2px">Multiply</span>
         ${[1,2,3,4].map(n=>`<button class="mult-btn${n===1?' active':''}" data-mult="${n}" onclick="setModalMultiplier(${n},'${id}')">×${n}</button>`).join('')}
         <button class="mult-btn" data-mult="custom" onclick="promptCustomMultiplier('${id}')">Custom</button>
-        <span style="font-size:11px;color:var(--text3)" id="modal-servings-scaled"></span>
       </div>
     </div>` : '';
 
   // ── Unit toggle HTML ──────────────────────────────────────────────────────
   const unitToggleHtml = hasIngredients ? `
     <div style="display:inline-flex;align-items:center;gap:6px;margin-left:auto">
-      <span style="font-size:11px;color:var(--text3)">Units</span>
+      <span style="font-family:var(--font);font-size:11px;color:var(--ds-text-muted)">Units</span>
       <button class="mult-btn${unitPref==='metric'?' active':''}" onclick="setUnitPref('metric','${id}')">Metric</button>
       <button class="mult-btn${unitPref==='imperial'?' active':''}" onclick="setUnitPref('imperial','${id}')">Imperial</button>
     </div>` : '';
@@ -2050,10 +2155,12 @@ function openModal(id) {
   const srvLabel = srvScale !== 1 ? ` · scaled to ${displayServings} portion${displayServings!=1?'s':''}` : '';
   if(nut && (nut.kcal || nut.protein || nut.carbs || nut.fat)) {
     const scl = n => n != null ? Math.round(n * srvScale) : null;
-    const sclF = n => n != null ? (n * srvScale).toFixed(1) : null;
     nutritionHtml = `<div class="modal-divider"></div>
       <div class="modal-section" id="modal-nutrition-section">
-        <h4>Nutrition <span style="font-size:10px;color:var(--text3);font-weight:400;text-transform:none;letter-spacing:0">(per serving · AI estimate${srvLabel})</span></h4>
+        <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px">
+          <h4 style="margin-bottom:0">Nutrition</h4>
+          <span style="font-family:var(--font);font-size:11px;color:var(--ds-text-muted)">per serving · AI estimate${srvLabel}</span>
+        </div>
         <div class="nutrition-grid">
           <div class="nutrition-cell"><div class="nc-val">${scl(nut.kcal)??'—'}</div><div class="nc-lbl">kcal</div></div>
           <div class="nutrition-cell"><div class="nc-val">${scl(nut.protein)!=null?scl(nut.protein)+'g':'—'}</div><div class="nc-lbl">protein</div></div>
@@ -2061,7 +2168,7 @@ function openModal(id) {
           <div class="nutrition-cell"><div class="nc-val">${scl(nut.fat)!=null?scl(nut.fat)+'g':'—'}</div><div class="nc-lbl">fat</div></div>
         </div>
         ${renderComputedCostHtml(r.id, srvScale)}
-        ${hasApiKey?`<div style="margin-top:10px"><button class="btn-estimate" id="btnEstimateNutrition" onclick="estimateNutritionWithAI('${r.id}')">✨ Re-estimate</button><span id="estimateStatus" style="font-size:12px;color:var(--text3);margin-left:10px"></span></div>`:''}
+        ${hasApiKey?`<div style="margin-top:10px"><button class="btn-estimate" id="btnEstimateNutrition" onclick="estimateNutritionWithAI('${r.id}')">✨ Re-estimate</button><span id="estimateStatus" style="font-size:12px;color:var(--ds-text-muted);margin-left:10px"></span></div>`:''}
       </div>`;
   } else {
     const computedCostHtml = renderComputedCostHtml(r.id, srvScale);
@@ -2070,9 +2177,9 @@ function openModal(id) {
         <div class="modal-section" id="modal-nutrition-section">
           <h4>Nutrition &amp; Cost</h4>
           ${computedCostHtml}
-          ${hasApiKey?`<p style="color:var(--text3);font-size:13px;margin-bottom:10px;margin-top:${computedCostHtml?'10':'0'}px">No nutrition data yet — estimate with AI from the ingredient list.</p>
+          ${hasApiKey?`<p style="color:var(--ds-text-muted);font-size:13px;margin-bottom:10px;margin-top:${computedCostHtml?'10':'0'}px">No nutrition data yet — estimate with AI from the ingredient list.</p>
           <button class="btn-estimate" id="btnEstimateNutrition" onclick="estimateNutritionWithAI('${r.id}')">✨ Estimate with AI</button>
-          <span id="estimateStatus" style="font-size:12px;color:var(--text3);margin-left:10px"></span>`:''}
+          <span id="estimateStatus" style="font-size:12px;color:var(--ds-text-muted);margin-left:10px"></span>`:''}
         </div>`;
     }
   }
@@ -2082,37 +2189,99 @@ function openModal(id) {
   const types = r.mealTypes || [];
   const primaryType = types[0] || '';
   const typeLabel = types.map(t => TYPE_LABELS[t] || t).join(' · ');
+  const archiveNo = String(Math.max(recipes.findIndex(x => x.id === r.id) + 1, 1)).padStart(3, '0');
+
+  // ── More menu (secondary actions tucked behind the ⋯ button) ──────────────
+  const moreMenuHtml = `
+    <button onclick="closeModalMoreMenu();openTagEditor('${r.id}')">✏️ Edit recipe</button>
+    ${r.instagramUrl?`<a href="${r.instagramUrl}" target="_blank" rel="noopener">📱 View on Instagram</a>`:''}
+    <button class="danger" onclick="deleteRecipe('${r.id}')">🗑 Delete recipe</button>
+  `;
+
+  // ── Footer: batch total / per-serving price + Add to plan ─────────────────
+  const costData = computeRecipeCost(r.id);
+  const fallbackCostNum = typeof cost === 'string' ? parseFloat(cost) : (typeof cost === 'number' ? cost : null);
+  const perServingBase = (costData && costData.total > 0) ? costData.perPortion : fallbackCostNum;
+  const footerServings = displayServings * modalMultiplier;
+  let footerInfoHtml = '<div class="modal-footer-info"></div>';
+  if (r.servings) {
+    const priceLine = perServingBase != null
+      ? `<p>£<span id="modal-footer-total">${(perServingBase * footerServings).toFixed(2)}</span> <span>· £<span id="modal-footer-perserving">${perServingBase.toFixed(2)}</span>/serving</span></p>`
+      : '';
+    footerInfoHtml = `<div class="modal-footer-info">
+      <p>Total · <span id="modal-footer-servings">${footerServings}</span> servings</p>
+      ${priceLine}
+    </div>`;
+  }
 
   document.getElementById('modalContent').innerHTML = `
-    <button class="modal-close" onclick="closeModal()">×</button>
-    <button class="modal-fav-btn${isFav?' active':''}" style="position:absolute;top:16px;right:56px" onclick="toggleFav(null,'${r.id}')" title="${isFav?'Remove from favourites':'Add to favourites'}">${isFav?'♥ Saved':'♡ Save'}</button>
-    <div class="modal-type ${TYPE_CLASSES[primaryType]||''}">${typeLabel} · ${CUISINE_EMOJI[r.cuisine]||''} ${r.cuisine.charAt(0).toUpperCase()+r.cuisine.slice(1)}</div>
-    <div class="modal-title">${r.name}</div>
-    ${r.description?`<div class="modal-desc">${r.description}</div>`:''}
-    <div class="modal-meta">
-      ${r.servings?`<div class="modal-meta-item">👥 <span class="servings-override">Serves <input class="servings-input" type="number" min="1" value="${displayServings}" onchange="updateServingOverride('${r.id}',this.value)" title="Change serving count to rescale nutrition"></span></div>`:''}
-      ${r.prepTime?`<div class="modal-meta-item">⏱ <strong>${r.prepTime}</strong></div>`:''}
-      ${'£'.repeat(r.costTier)?`<div class="modal-meta-item">💷 <strong>${'£'.repeat(r.costTier)}</strong></div>`:''}
-      ${unitToggleHtml}
+    <div class="modal-hero">
+      <div class="modal-hero-caption">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="rgba(243,236,216,0.5)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 11h.01"/><path d="M11 15h.01"/><path d="M16 16h.01"/><path d="m2 16 20 6-6-20A20 20 0 0 0 2 16"/><path d="M5.71 17.11a17.04 17.04 0 0 1 11.4-11.4"/></svg>
+        <span>Recipe photo</span>
+      </div>
+      <div class="modal-hero-controls">
+        <button class="modal-glass-btn" aria-label="Close" onclick="closeModal()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--ds-text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+        <div class="modal-hero-group">
+          <button class="modal-fav-btn${isFav?' active':''}" onclick="toggleFav(null,'${r.id}')" title="${isFav?'Remove from favourites':'Add to favourites'}">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="${isFav?'var(--ds-favorite-fill)':'none'}" stroke="${isFav?'var(--ds-favorite-fill)':'var(--ds-text)'}" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7.5-4.6-10-9.3C.4 8.3 2 4.8 5.4 4.1c2-.4 4 .5 5.1 2.2C11.6 4.6 13.6 3.7 15.6 4.1c3.4.7 5 4.2 3.4 7.6C19.5 16.4 12 21 12 21z"/></svg>
+          </button>
+          <button class="modal-glass-btn" aria-label="More" onclick="toggleModalMoreMenu(event)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--ds-text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+          </button>
+          <div class="modal-more-menu" id="modal-more-menu">${moreMenuHtml}</div>
+        </div>
+      </div>
     </div>
-    ${multiplierHtml}
-    <div style="display:flex;gap:8px;align-items:center;margin:4px 0 8px">
-      <button class="btn-edit-open" onclick="openTagEditor('${r.id}')">✏️ Edit recipe</button>
-      <button class="btn-edit-open" style="color:var(--accent);opacity:.7" onclick="deleteRecipe('${r.id}')">🗑 Delete</button>
+    <div class="modal-scroll">
+      <div class="modal-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:10px">
+          <div class="modal-type ${TYPE_CLASSES[primaryType]||''}">${typeLabel}${typeLabel&&r.cuisine?' · ':''}${r.cuisine?(CUISINE_EMOJI[r.cuisine]||'')+' '+r.cuisine.charAt(0).toUpperCase()+r.cuisine.slice(1):''}</div>
+          <span style="font-family:var(--font-display);font-weight:500;font-size:14px;color:var(--ds-text-muted);white-space:nowrap">No. ${archiveNo}</span>
+        </div>
+        <div class="modal-title">${r.name}</div>
+        ${r.description?`<div class="modal-desc">${r.description}</div>`:''}
+        <div class="modal-meta">
+          ${r.servings?`<div class="modal-meta-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--ds-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 21a8 8 0 0 0-16 0"/><circle cx="10" cy="8" r="5"/><path d="M22 20c0-3.37-2-6.5-4-8a5 5 0 0 0-.45-8.3"/></svg><span class="servings-override">Serves <input class="servings-input" type="number" min="1" value="${displayServings}" onchange="updateServingOverride('${r.id}',this.value)" title="Change serving count to rescale nutrition"></span></div>`:''}
+          ${r.prepTime?`<div class="modal-meta-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--ds-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><strong>${r.prepTime}</strong></div>`:''}
+          ${'£'.repeat(r.costTier)?`<div class="modal-meta-item"><strong>${'£'.repeat(r.costTier)}</strong> per portion</div>`:''}
+          ${unitToggleHtml}
+        </div>
+        ${multiplierHtml}
+        <div id="modal-tag-editor" style="display:none"></div>
+        ${r.notes?`<div class="modal-section"><h4>Batch cook notes</h4><p>${r.notes}</p></div>`:''}
+        <div class="modal-divider"></div>
+        <div id="modal-ingredients-section">${ingredientsHtml}</div>
+        ${methodHtml}
+        ${tipsHtml}
+        ${nutritionHtml}
+      </div>
     </div>
-    <div id="modal-tag-editor" style="display:none"></div>
-    ${r.notes?`<div class="modal-section"><h4>Batch cook notes</h4><p>${r.notes}</p></div>`:''}
-    <div class="modal-divider"></div>
-    <div id="modal-ingredients-section">${ingredientsHtml}</div>
-    ${methodHtml}
-    ${tipsHtml}
-    ${nutritionHtml}
-    ${r.instagramUrl?`<div class="modal-divider"></div><div class="modal-section"><h4>Source</h4><a href="${r.instagramUrl}" target="_blank" class="modal-instagram-link">📱 View on Instagram</a></div>`:''}
+    <div class="modal-footer">
+      ${footerInfoHtml}
+      <button class="btn-add-to-plan" onclick="openAddToPlanChooser('${r.id}')">Add to plan</button>
+    </div>
   `;
   document.getElementById('modalOverlay').classList.add('open');
 }
-function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); closeModalMoreMenu(); }
 function closeModalOnOverlay(e) { if(e.target===document.getElementById('modalOverlay')) closeModal(); }
+
+function toggleModalMoreMenu(e) {
+  if (e) e.stopPropagation();
+  const menu = document.getElementById('modal-more-menu');
+  if (menu) menu.classList.toggle('open');
+}
+function closeModalMoreMenu() {
+  const menu = document.getElementById('modal-more-menu');
+  if (menu) menu.classList.remove('open');
+}
+document.addEventListener('click', (e) => {
+  const menu = document.getElementById('modal-more-menu');
+  if (menu && menu.classList.contains('open') && !menu.parentElement.contains(e.target)) closeModalMoreMenu();
+});
 
 function toggleFav(event, id) {
   if(event) event.stopPropagation();
@@ -2130,9 +2299,14 @@ function toggleFav(event, id) {
   // Update modal button if open
   const modalBtn = document.querySelector('.modal-fav-btn');
   if(modalBtn) {
-    modalBtn.classList.toggle('active', favourites.has(id));
-    modalBtn.textContent = favourites.has(id) ? '♥ Saved' : '♡ Save';
-    modalBtn.title = favourites.has(id) ? 'Remove from favourites' : 'Add to favourites';
+    const fav = favourites.has(id);
+    modalBtn.classList.toggle('active', fav);
+    modalBtn.title = fav ? 'Remove from favourites' : 'Add to favourites';
+    const svg = modalBtn.querySelector('svg');
+    if(svg) {
+      svg.setAttribute('fill', fav ? 'var(--ds-favorite-fill)' : 'none');
+      svg.setAttribute('stroke', fav ? 'var(--ds-favorite-fill)' : 'var(--ds-text)');
+    }
   }
   // If favourites filter is active and we unfavourited, re-render
   if(filters.favourites && !favourites.has(id)) renderRecipes();
@@ -4490,11 +4664,30 @@ function setModalMultiplier(factor, recipeId) {
   // Re-render ingredients
   const ingSection = document.getElementById('modal-ingredients-section');
   if (ingSection) ingSection.outerHTML = buildIngredientsHtml(fd, modalMultiplier, unitPref === 'imperial');
-  // Update servings display
-  const srvDisplay = document.getElementById('modal-servings-scaled');
-  if (srvDisplay && r.servings) {
-    const total = r.servings * factor;
-    srvDisplay.textContent = factor > 1 ? ` → ${total} total` : '';
+  // Update the sticky footer's scaled servings + price
+  updateModalFooterTotals(recipeId);
+}
+
+function updateModalFooterTotals(recipeId) {
+  const r = recipes.find(x => x.id === recipeId);
+  if (!r || !r.servings) return;
+  const overrideSrv = servingOverrides[recipeId];
+  const displayServings = overrideSrv || r.servings;
+  const footerServings = displayServings * modalMultiplier;
+  const srvEl = document.getElementById('modal-footer-servings');
+  if (srvEl) srvEl.textContent = footerServings;
+  const totalEl = document.getElementById('modal-footer-total');
+  const perEl = document.getElementById('modal-footer-perserving');
+  if (totalEl || perEl) {
+    const fd = RECIPE_FULL_DATA[recipeId] || null;
+    const costData = computeRecipeCost(recipeId);
+    const cost = fd?.costPerPortion;
+    const fallbackCostNum = typeof cost === 'string' ? parseFloat(cost) : (typeof cost === 'number' ? cost : null);
+    const perServingBase = (costData && costData.total > 0) ? costData.perPortion : fallbackCostNum;
+    if (perServingBase != null) {
+      if (totalEl) totalEl.textContent = (perServingBase * footerServings).toFixed(2);
+      if (perEl) perEl.textContent = perServingBase.toFixed(2);
+    }
   }
 }
 
@@ -4781,10 +4974,52 @@ function openPicker(dayIndex, slot) {
 function closePicker() {
   document.getElementById('pickerOverlay').classList.remove('open');
   pickerContext = null;
+  const wrap = document.querySelector('.picker-search-wrap');
+  if(wrap) wrap.style.display = '';
 }
 
 function closePickerOnOverlay(e) {
   if(e.target===document.getElementById('pickerOverlay')) closePicker();
+}
+
+// ─── ADD TO PLAN (from Recipe Detail modal) ─────────────────────────────────
+// Reuses the recipe-picker overlay/panel, but in reverse: instead of picking a
+// recipe for a fixed day/slot, the recipe is fixed and we pick the day/slot.
+function openAddToPlanChooser(recipeId) {
+  const r = getRecipeById(recipeId); if(!r) return;
+  if(!currentPlan || !currentPlan.length){ showToast('Generate a plan first, from the Shuffle tab'); return; }
+  if(planLocked){ showToast('Plan is locked 🔒 — unlock it from the Shuffle tab to change it'); return; }
+  pickerContext = null;
+  document.getElementById('pickerTitle').textContent = `Add “${r.name}” to plan`;
+  document.getElementById('pickerHint').textContent = 'Choose a day and meal slot';
+  const wrap = document.querySelector('.picker-search-wrap');
+  if(wrap) wrap.style.display = 'none';
+
+  const rows = [];
+  currentPlan.forEach((day, dayIndex) => {
+    const active = day.activeSlots || {};
+    Object.keys(SLOT_LABELS).forEach(slot => {
+      if(active[slot] === false) return;
+      const current = day[slot];
+      rows.push(`<div class="picker-item" onclick="assignRecipeToPlanSlot('${recipeId}',${dayIndex},'${slot}')">
+        <div class="picker-item-name">Day ${day.day ?? dayIndex+1} — ${SLOT_LABELS[slot]}</div>
+        <div class="picker-item-meta">${current ? `<span>Currently: ${current.name}</span>` : '<span style="opacity:.7">— empty —</span>'}</div>
+      </div>`);
+    });
+  });
+  document.getElementById('pickerList').innerHTML = rows.join('') || '<div style="padding:24px;text-align:center;color:var(--text3)">No days in the current plan</div>';
+  document.getElementById('pickerOverlay').classList.add('open');
+}
+
+function assignRecipeToPlanSlot(recipeId, dayIndex, slot) {
+  const r = getRecipeById(recipeId);
+  if(!r || !currentPlan || !currentPlan[dayIndex]) return;
+  currentPlan[dayIndex][slot] = r;
+  const dayNo = currentPlan[dayIndex].day ?? dayIndex+1;
+  closePicker();
+  closeModal();
+  renderPlanOutput(currentPlan);
+  showToast(`Added to Day ${dayNo} — ${SLOT_LABELS[slot]}`);
 }
 
 function filterPicker() {
@@ -5545,82 +5780,111 @@ function trkSum(entries){
 function trkExerciseCals(){ return (trkMeta.exercise||[]).reduce((a,x)=>a+trkNum(x.caloriesBurned),0); }
 
 // ── render ──────────────────────────────────────────────────────────────────
+// Meal ids that map onto the design's editorial "log" cards.
+const TRK_MEAL_LABELS = { breakfast:'Breakfast', snack:'Snack', lunch:'Lunch', dinner:'Dinner', dessert:'Dessert', drinks:'Drinks' };
+
 function renderTracker(){
   const body = document.getElementById('trkBody');
   if(!body) return;
-  // date label
+  // date label + kicker
   const fd = trkFmtDate(trkDay);
   const dl = document.getElementById('trkDateLabel');
   if(dl) dl.innerHTML = `${trkEsc(fd.main)}<small>${trkEsc(fd.sub)}</small>`;
+  const kicker = document.getElementById('trkKicker');
+  if(kicker) kicker.textContent = `${fd.sub === 'today' ? 'Today' : fd.sub.charAt(0).toUpperCase()+fd.sub.slice(1)} · ${fd.main}`;
 
   const tot = trkSum(trkEntries);
+  const food = Math.round(tot.cal), ex = Math.round(trkExerciseCals());
+  const tdee = (trkMeta.tdee!=null && trkMeta.tdee!=='') ? Math.round(trkNum(trkMeta.tdee)) : null;
+
+  // ── Eaten / Burned / Deficit — editorial oxblood register ─────────────────
+  let burnLabel, burnVal, thirdLabel, thirdVal;
+  if(tdee!=null){
+    burnLabel = 'Burned'; burnVal = tdee.toLocaleString();
+    const deficit = tdee - food;
+    thirdLabel = deficit >= 0 ? 'Deficit' : 'Surplus'; thirdVal = Math.abs(deficit).toLocaleString();
+  } else {
+    burnLabel = 'Exercise'; burnVal = ex.toLocaleString();
+    thirdLabel = 'Deficit'; thirdVal = '—';
+  }
+  const diaryHtml = `<div class="trk-card deep trk-diary" style="background:var(--ds-oxblood-deep)">
+    <div class="td-cell"><div class="td-label">Eaten</div><div class="td-val">${food.toLocaleString()}</div></div>
+    <div class="td-divider"></div>
+    <div class="td-cell"><div class="td-label">${burnLabel}</div><div class="td-val">${burnVal}</div></div>
+    <div class="td-divider"></div>
+    <div class="td-cell"><div class="td-label">${thirdLabel}</div><div class="td-val">${thirdVal}</div></div>
+  </div>`;
+
+  // ── Calories hero card with ring ──────────────────────────────────────────
+  const calGoal = trkTargets.cal || 0;
+  const calPctReal = calGoal > 0 ? Math.round(food/calGoal*100) : 0;
+  const calPctVis = Math.max(0, Math.min(100, calPctReal));
+  const left = calGoal - food;
+  const R = 41.5, CIRC = 2 * Math.PI * R;
+  const dashOffset = (CIRC * (1 - calPctVis/100)).toFixed(2);
+  const leftLabel = calGoal > 0
+    ? `of ${calGoal.toLocaleString()} · ${left >= 0 ? left.toLocaleString()+' left' : Math.abs(left).toLocaleString()+' over'}`
+    : 'no calorie goal set';
+  const calorieHtml = `<div class="trk-card trk-hero">
+    <div>
+      <p class="trk-hero-label">Calories</p>
+      <p class="trk-hero-val">${food.toLocaleString()}</p>
+      <p class="trk-hero-sub">${leftLabel}</p>
+    </div>
+    <div class="trk-ring-wrap">
+      <svg width="92" height="92" style="transform:rotate(-90deg)">
+        <circle cx="46" cy="46" r="${R}" fill="none" stroke="var(--ds-border)" stroke-width="9"/>
+        <circle cx="46" cy="46" r="${R}" fill="none" stroke="var(--ds-accent)" stroke-width="9" stroke-linecap="round" stroke-dasharray="${CIRC.toFixed(2)}" stroke-dashoffset="${dashOffset}"/>
+      </svg>
+      <div class="trk-ring-pct">${calGoal > 0 ? calPctReal + '%' : '—'}</div>
+    </div>
+  </div>`;
+
+  // ── Macro stat cards (protein / carbs / fat / fibre) ──────────────────────
   const macroDefs = [
-    { k:'cal', lbl:'kcal', val:tot.cal, tgt:trkTargets.cal, cls:'cal' },
-    { k:'prot', lbl:'protein', val:tot.prot, tgt:trkTargets.prot },
-    { k:'carb', lbl:'carbs', val:tot.carb, tgt:trkTargets.carb },
-    { k:'fat', lbl:'fat', val:tot.fat, tgt:trkTargets.fat },
-    { k:'fib', lbl:'fibre', val:tot.fib, tgt:trkTargets.fib },
+    { name:'Protein', val:tot.prot, tgt:trkTargets.prot },
+    { name:'Carbs',   val:tot.carb, tgt:trkTargets.carb },
+    { name:'Fat',     val:tot.fat,  tgt:trkTargets.fat },
+    { name:'Fibre',   val:tot.fib,  tgt:trkTargets.fib },
   ];
   const macroHtml = macroDefs.map(m => {
-    const pct = m.tgt > 0 ? Math.min(100, Math.round(m.val/m.tgt*100)) : 0;
-    const v = m.k==='cal' ? Math.round(m.val) : trkRound1(m.val);
-    return `<div class="trk-macro">
-      <div class="trk-mval">${v}</div>
-      <div class="trk-mlbl">${m.lbl}</div>
-      <div class="trk-bar ${m.cls||''}"><span style="width:${pct}%"></span></div>
-      <div class="trk-mtgt">/ ${m.k==='cal'?m.tgt:m.tgt+'g'}</div>
+    const pct = m.tgt > 0 ? Math.round(m.val/m.tgt*100) : 0;
+    const pctVis = Math.max(0, Math.min(100, pct));
+    return `<div class="trk-card trk-macro" style="padding:16px 8px">
+      <div class="trk-mval">${m.name}</div>
+      <div class="trk-mlbl">${trkRound1(m.val)}g${m.tgt > 0 ? ` · <b>${pct}%</b>` : ''}</div>
+      ${m.tgt > 0 ? `<div class="trk-bar"><span style="width:${pctVis}%"></span></div>` : ''}
     </div>`;
   }).join('');
 
-  // diary line
-  const food = Math.round(tot.cal), ex = Math.round(trkExerciseCals());
-  const tdee = (trkMeta.tdee!=null && trkMeta.tdee!=='') ? Math.round(trkNum(trkMeta.tdee)) : null;
-  let diaryHtml;
-  if(tdee!=null){
-    // TDEE logged (e.g. Apple Watch EOD) — true deficit = burn − food. Exercise is already inside TDEE, so it is NOT added.
-    const deficit = tdee - food;
-    const isDef = deficit >= 0;
-    diaryHtml = `<div class="trk-diary">
-      <div>Burned <b>${tdee}</b></div>
-      <div>Food <b>${food}</b></div>
-      <div>${isDef?'Deficit':'Surplus'} <span class="trk-net ${isDef?'':'over'}">${Math.abs(deficit)}</span></div>
-      <div style="opacity:.55">Goal ${trkTargets.cal} · Exercise ${ex} (in TDEE)</div>
-    </div>`;
-  } else {
-    // No TDEE yet — show food vs goal, but no phantom deficit number until the day's burn is entered.
-    diaryHtml = `<div class="trk-diary">
-      <div>Goal <b>${trkTargets.cal}</b></div>
-      <div>Food <b>${food}</b></div>
-      <div>Exercise <b>${ex}</b></div>
-      <div>Deficit <span class="trk-net" style="opacity:.55">— log TDEE</span></div>
-    </div>`;
-  }
-
-  // meals
+  // ── Today's log — one editorial card per meal ─────────────────────────────
   const mealsHtml = TRK_MEALS.map(mealId => {
     const entries = trkMealEntries(mealId);
     const mt = trkSum(entries);
-    const rows = entries.length ? entries.map(e => trkEntryRow(e)).join('') : `<div class="trk-empty">— nothing logged —</div>`;
+    const label = TRK_MEAL_LABELS[mealId] || mealId;
+    const rows = entries.length ? entries.map(e => trkEntryRow(e)).join('') : `<div class="trk-entry"><span class="trk-empty" style="padding:0">— nothing logged —</span></div>`;
     const flag = trkMealFlag(entries);
-    return `<div class="trk-meal">
+    return `<div class="trk-card deep trk-meal">
       <div class="trk-meal-head">
-        <span class="trk-meal-title">${mealId}</span>
+        <span class="trk-meal-title">${label}</span>
         <span class="trk-meal-kcal">${Math.round(mt.cal)} kcal · ${trkRound1(mt.prot)}g P</span>
       </div>
       ${rows}
       ${flag ? `<div class="trk-flag">⚠ ${trkEsc(flag)}</div>` : ''}
-      <button class="trk-addbtn" style="margin-top:4px" onclick="trkOpenAddChooser('${mealId}')">＋ add to ${mealId}</button>
-      ${entries.length ? `<button class="trk-addbtn" style="margin-top:4px" onclick="trkSaveMealFromSlot('${mealId}')">💾 save as meal</button>` : ''}
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+        <button class="trk-addbtn" onclick="trkOpenAddChooser('${mealId}')">＋ Add to ${label.toLowerCase()}</button>
+        ${entries.length ? `<button class="trk-addbtn" onclick="trkSaveMealFromSlot('${mealId}')">💾 Save as meal</button>` : ''}
+      </div>
     </div>`;
   }).join('');
 
-  // exercise
-  const exList = (trkMeta.exercise||[]).map((x,i)=>`<div class="trk-entry"><span class="trk-etitle">${trkEsc(x.name)}<small>${x.durationMin?x.durationMin+' min':''}</small></span><span class="trk-emac">${Math.round(trkNum(x.caloriesBurned))} kcal</span><button class="trk-del" onclick="trkDeleteExercise(${i})">×</button></div>`).join('') || `<div class="trk-empty">— none —</div>`;
-  const exerciseHtml = `<div class="trk-card">
+  // ── Exercise + TDEE ───────────────────────────────────────────────────────
+  const exList = (trkMeta.exercise||[]).map((x,i)=>`<div class="trk-entry"><span class="trk-etitle">${trkEsc(x.name)}<small>${x.durationMin?x.durationMin+' min':''}</small></span><span class="trk-emac">${Math.round(trkNum(x.caloriesBurned))} kcal</span><button class="trk-del" onclick="trkDeleteExercise(${i})">×</button></div>`).join('') || `<div class="trk-entry"><span class="trk-empty" style="padding:0">— none —</span></div>`;
+  const exerciseHtml = `<div class="trk-card deep">
     <div class="trk-meal-head"><span class="trk-meal-title">🏃 Exercise</span><span class="trk-meal-kcal">${ex} kcal burned</span></div>
     ${exList}
-    <button class="trk-addbtn" style="margin-top:6px" onclick="trkOpenExercise()">＋ add exercise</button>
-    <div class="trk-field" style="margin-top:10px">
+    <button class="trk-addbtn" style="margin-top:12px" onclick="trkOpenExercise()">＋ Add exercise</button>
+    <div class="trk-field" style="margin-top:12px">
       <label>TDEE — total burned today (Apple Watch EOD)</label>
       <input id="trkTdeeInput" type="number" step="any" value="${tdee!=null?tdee:''}" placeholder="e.g. 2100" onchange="trkSetTdee(this.value)">
     </div>
@@ -5628,9 +5892,11 @@ function renderTracker(){
   </div>`;
 
   body.innerHTML = `
-    <div class="trk-card"><div class="trk-macros">${macroHtml}</div></div>
-    <div class="trk-card">${diaryHtml}</div>
-    <div class="trk-card">${mealsHtml}</div>
+    ${diaryHtml}
+    ${calorieHtml}
+    <div class="trk-macros">${macroHtml}</div>
+    <p class="trk-kicker" style="margin:2px 0 12px">Today's log</p>
+    ${mealsHtml}
     ${exerciseHtml}
     ${!trkHasCloud() ? `<div class="trk-empty" style="text-align:center">⚠ No Supabase credentials — logging to this browser only. Add them in Settings 🔑 to sync.</div>` : ''}
   `;
