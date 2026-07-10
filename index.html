@@ -192,8 +192,8 @@
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.75); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity .2s; }
   .modal-overlay.open { opacity: 1; pointer-events: all; }
   .modal { background: var(--ds-surface); border: none; border-radius: 24px; max-width: 460px; width: 100%; max-height: 88vh; overflow: hidden; padding: 0; position: relative; display: flex; flex-direction: column; box-shadow: 0 30px 70px rgba(59,46,40,.34); color: var(--ds-text); }
-  .modal-hero { position: relative; flex-shrink: 0; height: 200px; background: radial-gradient(130% 100% at 30% 15%, #7a3d2e 0%, #5c2a24 45%, #3b1c1a 100%); }
-  .modal-hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,.28) 0%, rgba(0,0,0,0) 34%, rgba(0,0,0,0) 60%, rgba(59,46,40,.35) 100%); }
+  .modal-hero { position: relative; flex-shrink: 0; height: 200px; margin: 16px 16px 0; border-radius: var(--ds-radius-card); background: radial-gradient(130% 100% at 30% 15%, #7a3d2e 0%, #5c2a24 45%, #3b1c1a 100%); background-size: cover; background-position: center; }
+  .modal-hero::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(180deg, rgba(0,0,0,.28) 0%, rgba(0,0,0,0) 34%, rgba(0,0,0,0) 60%, rgba(59,46,40,.35) 100%); }
   .modal-hero-caption { position: absolute; left: 50%; top: 52%; transform: translate(-50%,-50%); text-align: center; z-index: 1; }
   .modal-hero-caption svg { display: block; margin: 0 auto; }
   .modal-hero-caption span { display: block; font-family: var(--font-display); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: rgba(243,236,216,.55); margin-top: 10px; }
@@ -208,7 +208,7 @@
 
   .modal-scroll { flex: 1; overflow-y: auto; }
   .modal-scroll::-webkit-scrollbar { width: 0; height: 0; }
-  .modal-card { background: var(--ds-surface); border-radius: 24px 24px 0 0; margin-top: -24px; position: relative; padding: 22px 22px 24px; box-shadow: var(--ds-shadow-card); }
+  .modal-card { background: var(--ds-surface); border-radius: 24px 24px 0 0; margin-top: -20px; position: relative; padding: 34px 22px 24px; box-shadow: var(--ds-shadow-card); }
   .modal-type { font-family: var(--font); font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--ds-text-muted); margin-bottom: 8px; }
   .modal-title { font-family: var(--font-display); font-weight: 350; font-size: 24px; line-height: 1.15; color: var(--ds-text); letter-spacing: -.2px; margin-bottom: 8px; }
   .modal-desc { color: var(--ds-text-muted); font-size: 14px; margin-bottom: 16px; line-height: 1.55; font-style: normal; }
