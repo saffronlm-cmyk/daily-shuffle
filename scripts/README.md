@@ -1,3 +1,30 @@
+# Scripts
+
+## Browser smoke test (`smoke_test.mjs`)
+
+Headless-browser smoke test for the app itself — unlike the Python pipelines below,
+this one **is** meant to run from agent sandboxes (fully offline; it seeds fixture
+recipes into `ds_recipe_cache` and asserts clean boot, tab switching, and shuffle):
+
+```bash
+node scripts/smoke_test.mjs
+```
+
+Exit 0 = all checks passed. See `.claude/skills/smoke-test/SKILL.md` for when to run
+it and how to extend it.
+
+## CLAUDE.md drift check (`claude_md_drift.mjs`)
+
+Compares the facts `CLAUDE.md` states against the repo (tabs, scripts/ files, root
+data files, `canonicalise()` copies, sw.js passthrough hosts). Also sandbox-safe:
+
+```bash
+node scripts/claude_md_drift.mjs
+```
+
+Exit 0 = no drift. Runs as a ship-check step and inside the weekly CLAUDE.md-audit
+routine.
+
 # Price-book pipeline
 
 Two small Python scripts (standard library only — no `pip install` needed) that

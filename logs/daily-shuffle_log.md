@@ -77,6 +77,271 @@ Full mobile editorial redesign is live on the branch and verified in-browser acr
 - **Fraunces loads from Google Fonts** — degrades to Georgia offline. Acceptable for now; revisit if full-offline serif fidelity matters.
 - Standard project gotcha reconfirmed: the service worker will serve stale HTML/CSS after an edit — bump `sw.js` CACHE every shippable change (now v34).
 
+---
+
+# Claude Config Audit — CLAUDE.md rewrite, 4 skills, browser smoke test, drift automation
+**Date:** 2026-07-05
+**Project:** Daily Shuffle — agent config / dev tooling
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete
+
+---
+
+## Project Context
+Housekeeping session on the agent-facing config rather than the app itself. Saffron asked for a full audit of CLAUDE.md, `.claude/skills`, and `.claude/agents` (dry-run first, then execute), plus a new browser smoke-test workflow. See the 2026-07-01 entries for the state of the nutrition workstream — unchanged this session.
+
+## Session Goal
+Audit and rewrite every instruction file, create the missing skills a repo this shape needs, and add a runnable headless-browser smoke test — first as a reviewed dry-run, then applied on approval.
+
+## State Before This Session
+CLAUDE.md was stale in ways that actively misled: it described `sw.js` as cache-first at `v23` when it had been rewritten to network-first-for-HTML and was at `v32`, said `canonicalise()` lived in three places (it's five), and didn't mention the USDA pipeline, the normalisation workstream/CSVs, either handoff doc, or the keep-alive workflow. `.claude/skills` held only `save-conversation` — a personal cross-machine skill with `~/Documents` paths, other projects' routing tables, `gh` CLI and `present_files` references, and a push-to-main workflow, none of which apply here. `.claude/agents` didn't exist. The repo had zero runtime verification (parse-check only).
+
+## What Was Done
+- **Inventory + audit** of everything in CLAUDE.md and `.claude/`, presented as a full dry-run with proposed file contents; Saffron approved and added one request: also build the browser smoke-test workflow (previously flagged as "the missing piece").
+- **Rewrote CLAUDE.md**: corrected the sw.js description (network-first, one-bump-per-PR, no bump for doc/data-only changes, never trust doc-recorded version numbers), canonicalise now documented in five places, added the USDA staples pipeline, `tools-apply-master.mjs`, the committed data CSVs ("reviewed human decisions — don't regenerate"), both handoff docs, the keep-alive workflow, the nutrition 3-step status (with the step-3-blocked-on-step-2 rule), branch/PR conventions, a concrete JS parse-check command, and slimmed the session-logging block to a pointer at the skill.
+- **Rewrote `save-conversation` SKILL.md** as repo-local: one mode only (rolling log at `logs/daily-shuffle_log.md`, prepend, commit on the working branch, never main), unified template (kept `Mode:`, dropped the unused "Skills Used" section), named the 2026-07-01 §6 entry as the reference standard, added do-nots.
+- **Created `ship-check` skill**: 6-step pre-commit checklist (parse check → smoke test → cache-bump decision → canonicalise sync → res.ok audit → localStorage audit) with a fixed checklist output format.
+- **Created `recipe-db` skill**: Supabase schema map + propose/review/apply/verify discipline for bulk writes, encoding the locked §6 decisions and the review-CSV convention.
+- **Built `scripts/smoke_test.mjs` + `smoke-test` skill**: Playwright/Chromium headless test that serves the repo over a local HTTP server, seeds `ds_recipe_cache` with 5 fixture recipes (one per meal pool), and asserts clean boot, 5 tab containers, tab switching, and that `generatePlan()` renders the fixtures into `#planOutput`. **Ran it — 5/5 green.** First run failed: fixtures lacked `cuisine`/`proteinSource`, which the recipe-card template calls `.charAt()` on unguarded; real cloud recipes always have them, so the fix was fixture-side (noted in the script and skill as a trap).
+- **Deliberately created no `.claude/agents`**: built-in Explore/Plan agents already cover the only plausible use (navigating the 6,000-line index.html); a custom agent set would be bloat for a solo no-CI repo.
+- **Built CLAUDE.md drift automation** (follow-up request): `scripts/claude_md_drift.mjs` mechanically diffs CLAUDE.md's claims against the repo — tabs (both directions), scripts/ files documented, root .md/.csv/.mjs files documented, every `canonicalise()` implementation named in the sync list, sw.js passthrough hosts. Verified it detects (flagged its own then-undocumented self when staged) and passes clean once documented. Wired in three places: ship-check step 7, a "Keep this file true" bullet in CLAUDE.md's Dev workflow, and a **weekly scheduled routine** (`trig_012FVP34K8kH664FDZayj6Lb`, Mondays 07:00 UTC, fresh session, push-notify): runs the script, skims the week's merged diffs and the log's top entry for judgement-level drift the script can't catch (workstream status, conventions, data model), and opens a draft PR with minimal factual edits only when something is stale — otherwise ends silently.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| CLAUDE.md | Project brief — corrected + expanded rewrite | Modified | /home/user/daily-shuffle/ |
+| .claude/skills/save-conversation/SKILL.md | Session-log skill, now repo-local, single source of truth for the template | Modified | /home/user/daily-shuffle/.claude/skills/save-conversation/ |
+| .claude/skills/ship-check/SKILL.md | Pre-commit checklist skill | Created | /home/user/daily-shuffle/.claude/skills/ship-check/ |
+| .claude/skills/recipe-db/SKILL.md | Supabase bulk-work conventions skill | Created | /home/user/daily-shuffle/.claude/skills/recipe-db/ |
+| .claude/skills/smoke-test/SKILL.md | Smoke-test runner/extender skill | Created | /home/user/daily-shuffle/.claude/skills/smoke-test/ |
+| scripts/smoke_test.mjs | Headless-browser smoke test (5 checks, offline, exit-code gated) | Created | /home/user/daily-shuffle/scripts/ |
+| scripts/claude_md_drift.mjs | Mechanical CLAUDE.md drift check (5 checks, exit-code gated) | Created | /home/user/daily-shuffle/scripts/ |
+| scripts/README.md | Added smoke-test + drift-check sections at top | Modified | /home/user/daily-shuffle/scripts/ |
+| (Routine, not a file) | Weekly CLAUDE.md audit trigger trig_012FVP34K8kH664FDZayj6Lb, Mon 07:00 UTC | Created | Claude Code Remote environment |
+| logs/daily-shuffle_log.md | This entry | Modified | /home/user/daily-shuffle/logs/ |
+
+## Decisions & Reasoning
+- **Template lives in the skill, CLAUDE.md just points at it**: the two copies had already drifted (skill had `Mode:` + "Skills Used"; CLAUDE.md had neither). One source of truth; the always-loaded CLAUDE.md keeps only the trigger rule, saving context every session.
+- **No version numbers in docs**: CLAUDE.md said `v23` while sw.js was at `v32` — that class of staleness is structural, so the rewrite says "read it from sw.js" instead of recording a value.
+- **No custom subagents**: considered an index.html-navigator (duplicate of built-in Explore) and a pipeline-reviewer (pipelines run on Saffron's Mac, nothing for an agent to execute). Rejected both as bloat.
+- **Smoke test is offline-by-design with seeded fixtures**: sandbox egress blocks Supabase (confirmed 403 this session), and the app is offline-first anyway — seeding `ds_recipe_cache` tests the real cold-cache-with-data path without any network flakiness.
+- **Fixture shape mirrors real data rather than hardening the app**: the `.charAt()` crash on missing `cuisine` is only reachable with malformed cache data; fixed the fixtures and documented the field requirement instead of patching index.html in a config-only PR (no cache bump needed this way, and app hardening deserves its own change if wanted).
+- **Smoke test wired into ship-check as step 2** so it runs as part of the standard pre-commit ritual, not as an optional extra.
+- **Drift automation = script + routine, not a GitHub Action or hook**: an Action would need an ANTHROPIC_API_KEY secret and CI setup this repo deliberately doesn't have; a settings.json hook only fires inside sessions, which already carry CLAUDE.md + ship-check. The weekly fresh-session routine also catches drift from Saffron's own local pushes, which no in-session mechanism can. The drift script names implementation FILES rather than counts/versions ("canonicalise in FIVE places" is checked by listing, not by parsing "FIVE") so the check itself can't go stale the way the doc did.
+
+## Current State (end of session)
+All files written and committed on `claude/audit-claude-config-ef50ee`; draft PR open. Smoke test passes 5/5 against current main's app code. No app code, no data, and no Supabase state touched — `index.html` and `sw.js` unchanged (hence no cache bump).
+
+## Next Steps
+1. Merge the PR, then start the **quantity-normalisation apply session** — invoke the `recipe-db` skill; the plan is fully locked in `quantity-normalisation-plan.md` (see 2026-07-01 entry).
+2. On the next `index.html` change, exercise the new `ship-check` skill end-to-end and adjust anything that reads wrong in practice.
+3. Optional, Saffron's call: harden the recipe-card template against missing `cuisine`/`proteinSource` (guard the `.charAt()` calls at index.html:1953–1954 and :2089) — a real app change, needs its own PR + cache bump.
+
+## Open Questions / Blockers
+N/A — everything approved in the dry-run was applied, plus the smoke test Saffron requested.
+
+## Environment & Config Notes
+Branch `claude/audit-claude-config-ef50ee`. Smoke test dependencies: global playwright 1.56.1 at `npm root -g` and Chromium at `/opt/pw-browsers` — both preinstalled in the remote sandbox; the script resolves both itself. Confirmed sandbox egress blocks `supabase.co` (CONNECT 403), same as Apify/USDA.
+
+## Notes & Gotchas
+- **Smoke-test fixtures must carry `cuisine` and `proteinSource`** — the recipe-card template calls `.charAt()` on both unguarded. If a future field becomes load-bearing the same way, add it to `FIXTURE_RECIPES` with a comment.
+- The smoke test covers boot/tabs/shuffle only — a green run does NOT prove a new feature works; drive new features directly and add a check if they're core.
+- `.claude/agents` intentionally does not exist — don't "fix" that by scaffolding empty agents.
+- The old personal-machine version of `save-conversation` (with `~/Documents` paths and the multi-project routing table) is gone from this repo; if it's needed elsewhere it lives in Saffron's global setup, not here.
+
+---
+
+# Quantity Normalisation — §6 Decisions Signed Off (step 2, ruleset locked)
+**Date:** 2026-07-01
+**Project:** Daily Shuffle — recipe/meal-planning PWA
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete — the 5 open questions from the step-2 proposal are answered and locked into `quantity-normalisation-plan.md`. Ruleset is now ready to *apply* in a future session; no recipe data touched yet; step 3 still not started.
+
+---
+
+## Project Context
+Immediate follow-up to the entry below ("Ingredient Quantity Normalisation — Ruleset & Source-of-Truth Proposal"). That proposal (PR #34) was merged, then Saffron answered the §6 sign-off questions in chat. This session records those answers durably in the plan doc.
+
+## Session Goal
+Pose the §6 open questions to Saffron and bake her answers back into `quantity-normalisation-plan.md` so the apply-session has them without re-litigating.
+
+## What Was Done
+- Posed the 5 §6 questions (4 via the question picker, garnish inline). Answers:
+  1. **Source of truth** → new non-destructive `ingredient_grams` jsonb column (as recommended).
+  2. **Cup basis** → **UK cup = 250 ml** (Saffron overrode my US-240 ml recommendation).
+  3. **Bare mains** → default portion + `estimated` flag (as recommended).
+  4. **Garnish/"to serve"** → 5 g default (as recommended).
+  5. **8 no-`serves` recipes** → **skip them** (Saffron overrode my "normalise anyway"); flag `serves_missing` for a manual serves fill first.
+- Updated `quantity-normalisation-plan.md`: added a "Resolved decisions" box at top; changed §3.3 base cup 240→**250 ml** and recomputed the **nine density-derived cup values** (water 250, soy 275, oil 227, syrup 350, sugar 213, paste 263, dairy 255, flour 133, cocoa 103; fallback liquid 250, fallback solid 156) — left the empirical measured cup-weights (cheese/rice/oats/leafy/berries/veg) unchanged since those are weighed, not density-derived; updated the §4 pumpkin-puree example to 255 g; §5 step 1 now says skip the 8 no-serves recipes with a `serves_missing` flag; rewrote §6 from "open questions" to "resolved decisions".
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| quantity-normalisation-plan.md | Ruleset doc, decisions now locked in | Modified | /home/user/daily-shuffle/ |
+| logs/daily-shuffle_log.md | This entry | Modified | /home/user/daily-shuffle/logs/ |
+
+## Decisions & Reasoning
+- **UK cup (250 ml) over US (240 ml)**: Saffron's call; she's UK-based. Only the cup differs from US (tsp/tbsp identical), and only the *density-derived* cup cells scale by 250/240 ≈ ×1.042 — the measured solid cup-weights (1 cup rice = 185 g etc.) are empirical and unaffected.
+- **Skip the 8 no-serves recipes rather than normalise-then-divide-later**: Saffron preferred not to produce per-serving nutrition off a guessed serves count; cleaner to block them behind a manual serves fill (`serves_missing` flag) than to carry an estimate through step 3.
+
+## Current State (end of session)
+Plan doc fully reflects the locked decisions. `recipes`/`staple_products` unchanged. Branch `claude/daily-shuffle-qty-normalisation-d8su8h` restarted from merged main (post-#34) with the doc/log update; new draft PR to be opened (the old #34 is merged and must not be reused).
+
+## Next Steps
+1. **Apply-session** (future): add `ingredient_grams` jsonb column via `apply_migration`; run §3 over the 327 recipes (skip the 8 no-serves, flag `serves_missing`); emit the pre-write review CSV for spot-check; set `review_flags += quantities_estimated` where lines are `estimated`/`unresolved`.
+2. **Then** step 3 (bulk nutrition) using expanded `staple_products` + `ingredient_grams`.
+
+## Open Questions / Blockers
+N/A — all five sign-off questions resolved.
+
+## Environment & Config Notes
+Same as the entry below. Branch `claude/daily-shuffle-qty-normalisation-d8su8h` (restarted from main after #34 merged, per the merged-PR-is-finished convention). No app-code change → no cache bump.
+
+## Notes & Gotchas
+- Only density-derived cup cells were rescaled to 250 ml; measured cup-weights were deliberately left. If a future editor "fixes" the measured rows to 250 ml by formula they'll be wrong — those are weighed values.
+- The old proposal PR #34 is **merged** — do not reopen it; this follow-up is a new PR on a fresh branch off main.
+
+---
+
+# Ingredient Quantity Normalisation — Ruleset & Source-of-Truth Proposal (step 2, planning)
+**Date:** 2026-07-01
+**Project:** Daily Shuffle — recipe/meal-planning PWA
+**Mode:** Rolling Log + GitHub Push
+**Status:** In Progress — proposal written for review; **no recipe data touched.** Awaiting Saffron's sign-off on 5 open questions before any live write.
+
+---
+
+## Project Context
+Step 2 of the 3-step nutrition-estimation plan. See the two 2026-07-01 entries below: "USDA Staple Lookup Built…" (step 1, complete — `staple_products` now 167 rows) and "Nutrition Estimation Feasibility…" (the 3-step plan + full background). Step 3 (bulk recipe nutrition pass) is deliberately still pending and must not run until quantities are normalised and this proposal is approved.
+
+## Session Goal
+Propose the ingredient-quantity normalisation ruleset (gram-weight defaults/conversions for vague units + a "to taste"/unquantified policy) and a quantity-source-of-truth approach, grounded in the *actual* shape of the data, for review before touching anything. Explicitly did NOT apply changes or run step 3.
+
+## State Before This Session
+Step 1 done. Quantities never normalised: `ingredient_sections` still mixes legacy plain-string lines and newer `{qty,unit,name,note,group}` objects, with many `qty:null` "to taste"/no-amount lines. No gram-normalisation had ever been attempted.
+
+## What Was Done
+Measured the data live via Supabase MCP (project `jsxcctrskkkxgdxfaduo`) rather than assuming, then wrote the proposal:
+1. **Item-shape census**: 4049 legacy strings, 56 structured objects, 53 nulls (blank placeholder lines). Confirmed the `jsonb_typeof` branch is real and strings dominate.
+2. **Unit-bucket distribution** across all real lines (first-match precedence): tbsp 831, tsp 734, leading-number-no-unit 601, already-metric(g/ml/l) 599, no-number-no-unit 549, cup 435, vague(pinch/dash/handful/scoop/slice/sprig/bunch) 204, clove 88, imperial 32, "to taste" 32. → ~35% already metric/trivial, ~49% deterministic conversion, ~16% the judgement tail.
+3. **Sampled** the hard buckets: dual-unit lines carry an embedded gram (`1 cup (60g)`, `3 tbsp / 65ml`, `1/2 cup (150g)`) → highest-confidence signal; the no-number tail splits into bare seasonings, garnish/"to serve", and bare mains missing a qty (`Chicken breasts`, `chickpeas`).
+4. **Found a reusable accelerant**: `recipe-ingredient-normalisation.final.csv` (repo root, from the 2026-06-25 stream) already holds per-line `qty,unit,ingredient,note` keyed `recipe_id|section_ord|item_ord` — parsed stated qtys but never converted to grams or filled blanks; predates recipes added since, so treat as accelerant not source of truth.
+5. **Wrote `quantity-normalisation-plan.md`** (repo root): the full ruleset — density-class volume→gram table (tbsp/tsp/cup, because a tbsp of oil vs honey vs cocoa differ hugely, so a flat "1 tbsp=15g" is wrong), per-piece count→gram table, vague-measure defaults, imperial/range/fraction/dual-unit/heaped parsing, and a 4-way unquantified policy (to_taste / garnish / estimated bare-main / unresolved) each with a `qty_source` provenance flag. Recommends a **new non-destructive `ingredient_grams` jsonb column** on `recipes` (parallel array indexed by sec|item) rather than mutating `ingredient_sections` — this *changes the approach floated in the prior log* ("apply across ingredient_sections"), flagged explicitly as open-question #1.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| quantity-normalisation-plan.md | The step-2 proposal (ruleset + source-of-truth + open questions) | Created | /home/user/daily-shuffle/ |
+| logs/daily-shuffle_log.md | This entry | Modified | /home/user/daily-shuffle/logs/ |
+
+No recipe/Supabase data changed. No `index.html`/`sw.js` change → no cache bump needed.
+
+## Decisions & Reasoning
+- **New `ingredient_grams` column over mutating `ingredient_sections`**: non-destructive/reversible (drop column), zero app-code risk (app reads `ingredient_sections` for display + grocery list; converting 4049 strings→objects would touch every render path for no nutrition benefit), self-describing audit (`qty_source`+`detail`), clean step-3 input. Departs from the prior log's in-place framing on purpose — raised as open Q1 for a yes/no.
+- **Density-class volume table, not a flat per-spoon gram**: oil ≈14g/tbsp, honey ≈21g, cocoa ≈6g, flour ≈8g — a single default would be systematically wrong on a large share of the 2000+ tbsp/tsp/cup lines. Class chosen by keyword-matching the ingredient name (reuse `staple_products` aliases).
+- **Prefer the embedded metric on dual-unit lines** (`1 cup (60g)` → 60g): highest-confidence signal, ~599 lines already have it; ignore the vague half.
+- **Bare mains get a default portion + `estimated` flag (recommended) not left null**: keeps calorie totals realistic while marking low confidence via per-line `qty_source=estimated` + recipe-level `review_flags += quantities_estimated`. Left as open Q3 since it trades honesty vs completeness.
+- **US cup = 240ml** (vs UK 250ml): `cup` is a US convention and this corpus's UK recipes use metric weights; ~4% effect. Open Q2.
+- **Reviewable-CSV-first before any live write**, per the established pricebook/staples convention.
+
+## Current State (end of session)
+Proposal complete and committed on branch `claude/daily-shuffle-qty-normalisation-d8su8h`. `recipes` unchanged (no `ingredient_grams` column exists yet). `staple_products` unchanged (167 rows from step 1). Nothing applied. Draft PR to be opened.
+
+## Next Steps
+1. **Saffron reviews `quantity-normalisation-plan.md`** and answers the 5 open questions (esp. Q1 source-of-truth column, Q3 bare-main portioning). Red-line the §3 conversion tables.
+2. On approval: `apply_migration` to add `ingredient_grams` jsonb to `recipes`; run the §3 rules (deterministic parts mechanical, judgement parts Claude-reasoned per line) over all 327 recipes via Supabase MCP; emit a per-line review CSV before the live write; set `review_flags += quantities_estimated` where needed.
+3. **Then** step 3 (bulk nutrition) using expanded `staple_products` + `ingredient_grams`.
+
+## Open Questions / Blockers
+The 5 sign-off questions in §6 of `quantity-normalisation-plan.md`: (1) new column vs in-place; (2) US vs UK cup; (3) bare-main portioning aggressiveness; (4) garnish 5g default vs exclude; (5) handling the 8 no-`serves` recipes. All block execution but not the proposal. Recommendations given for each.
+
+## Environment & Config Notes
+- Repo `saffronlm-cmyk/daily-shuffle`, branch `claude/daily-shuffle-qty-normalisation-d8su8h` off latest `main` (PR #33 merged). cwd `/home/user/daily-shuffle`.
+- Supabase project `jsxcctrskkkxgdxfaduo`: `recipes` (327 non-deleted; `serves` set on 319/327; `ingredient_sections` jsonb two-shaped; `review_flags` array exists; no gram column yet). Supabase MCP reads work fine from this sandbox (USDA/Apify egress still blocked, but irrelevant here — no external calls needed for step 2).
+
+## Notes & Gotchas
+- **Unicode-fraction gotcha**: a `\m[0-9]` regex does NOT match `½/¼/¾/⅓/⅔/⅛`, so lines like `½ tsp baking soda` leak into "no-number" buckets. The proposal's parser normalises unicode fractions first; any future SQL bucketing must include the fraction chars (as the §1 unit-distribution query does).
+- **`ingredient_sections` also contains 53 `null` items** (blank placeholder rows, mostly recovered-but-empty sections) — skip these, they carry no ingredient.
+- One structured object in the wild has a parser miss: `{"qty":null,"name":"70g vegan chocolate protein powder"}` — the gram is stuck in the name. The §3 parser should re-extract leading metric from names, not just trust the `qty` field.
+- Don't run step 3 until quantities are approved+applied — the whole point of step 2's ordering.
+
+# USDA Staple Lookup Built + 122 Generic Staples Loaded to Supabase
+**Date:** 2026-07-01
+**Project:** Daily Shuffle — recipe/meal-planning PWA
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete — step 1 of the 3-step nutrition plan done end-to-end (script built, run by Saffron locally, reviewed, applied to `staple_products`). Steps 2 (quantity normalisation) and 3 (bulk recipe nutrition pass) still pending.
+
+---
+
+## Project Context
+Direct continuation of the 2026-07-01 "Nutrition Estimation Feasibility — Research & Planning" entry (immediately below). That session produced a 3-step plan: (1) expand `staple_products` via a local USDA lookup script; (2) normalise ingredient quantities; (3) bulk-repopulate recipe nutrition. This session executed step 1 in full.
+
+## Session Goal
+Build `scripts/usda_staples.py` (Next Steps #1 from the prior entry), have Saffron run it locally against USDA FoodData Central, review/fix matches over several iterations, and apply the confirmed generic-staple macros into the bundled Supabase `staple_products` table.
+
+## State Before This Session
+Planning done, nothing built. `staple_products` had 45 rows, all Saffron's branded/specific products (plus a few she'd since added as "(generic)" — see Gotchas), no generic pantry basics like salt/oil/garlic. Saffron held a USDA FDC API key locally.
+
+## What Was Done
+1. **Regenerated the candidate list**: re-ran the ingredient-frequency SQL (in the prior entry) via Supabase MCP → 209 names ≥4 recipes. Hand-deduped to **`scripts/staple_candidates.csv`** (~135 canonical names): merged regex artifacts / plurals / near-synonyms (e.g. `arlic cloves`→garlic), dropped junk (`water`, `oil`, `of salt`), and added `force-include` core items (potato, butter, cheddar, beef mince, lentils, black beans, bread, pasta, natural yoghurt). Columns: `name,category,recipe_count,source,merged_from`.
+2. **Built `scripts/usda_staples.py`** (stdlib-only, build-only, mirrors `price_pricebook.py`): searches FDC `Foundation,SR Legacy`, extracts per-100g cal/protein/carbs/fat/fibre/sugar, writes a reviewable CSV with match score + confidence flag. Modes: `--dry-run`, `--probe`, `--sample`, `--in/--out`.
+3. **Iterated over ~5 rounds of Saffron running it locally** (sandbox is gateway-blocked from `api.nal.usda.gov`, so she runs it and pastes results back — same pattern as Apify). Fixes made in response to real output:
+   - **Foundation energy bug**: Foundation foods store Energy under nutrient number **957/958** (Atwater), not 208 → calories came back blank for ~20 items. Fixed `extract_nutrients` to resolve 208/957/958 (KCAL only, priority-ordered).
+   - **Wrong-form matches**: word-overlap scoring rubber-stamped wrong forms (avocado→"Oil, avocado", carrot→dehydrated, milk→"Crackers, milk", etc.). Added ~45 `TERM_OVERRIDES` steering to the right whole/raw/cooked entry or a documented proxy.
+   - **Override scoring**: `match_score` now scores against the override term (not `max(name,term)`) when a name has an override — a bare name that fully matches several forms saturated at 1.0 and couldn't distinguish them (coconut cream sweetened vs raw).
+   - **Detail-endpoint 404s**: FDC `/food/{fdcId}` 404s on some entries (egg, milk, cheddar, tuna, dill, dijon) — now non-fatal, falls back to nutrients embedded in the `/foods/search` payload.
+   - **`REJECT_SUBSTRINGS`** (puff/fries/tots/tater) so raw sweet potato beats "Sweet Potato puffs".
+   - Per Saffron's calls: beans/grains → **cooked** forms (rice/pasta/chickpeas/lentils/black beans); sweetcorn → whole kernel; coconut cream → unsweetened/raw; oats stay dry.
+4. **Applied to Supabase** (this channel is NOT sandbox-blocked): assembled final rows from the three report CSVs (main + `staple_report_cooked.csv` + `staple_report_retry.csv`, retry/cooked winning), via a local builder (`scratchpad/build_staples_sql.py`). Inserted **122 rows** into `staple_products` (serving 100 g, aliases from cleaned `merged_from`, `flags={usda_seed}`, provenance in `notes`). Table now 45→**167 rows**, all seeded rows have calories.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| scripts/usda_staples.py | USDA FDC lookup script | Created | /home/user/daily-shuffle/scripts/ |
+| scripts/staple_candidates.csv | ~135 deduped candidate names (committed input) | Created | /home/user/daily-shuffle/scripts/ |
+| scripts/staple_candidates_cooked.csv | 5-row subset (beans/grains → cooked) | Created | /home/user/daily-shuffle/scripts/ |
+| scripts/staple_candidates_retry.csv | 11-row subset (404 recoveries + wrong-form fixes) | Created | /home/user/daily-shuffle/scripts/ |
+| scripts/README.md | Docs for the new pipeline | Modified | /home/user/daily-shuffle/scripts/ |
+| .gitignore | Ignore `scripts/staple_report*.csv` | Modified | /home/user/daily-shuffle/ |
+| `staple_products` (Supabase) | +122 generic-staple rows, tagged `usda_seed` | Modified | project jsxcctrskkkxgdxfaduo |
+
+Report CSVs (`staple_report*.csv`) are git-ignored and live only on Saffron's machine; the data was pasted into this session and is captured in the applied rows.
+
+## Decisions & Reasoning
+- **Skipped 7 items Saffron already has as generics** (fish sauce, sriracha, mayonnaise, egg, blueberries, raspberries, almond milk) rather than duplicate — avoids matcher ambiguity, doesn't overwrite her curated values. Where she only had a *branded* version (almond butter/Legend, dark chocolate/Lidl, peanut butter/Pip&Nut, protein powder/Free Soul, tinned salmon), kept the generic as **additive** so bare recipe terms are grounded.
+- **Skipped 6 no-USDA-generic items for hand-fill**: nutritional yeast, coconut aminos, gochujang, chilli crisp, thai red curry paste, rice paper.
+- **serving 100 g for all** (USDA basis), including liquids — reference macros for grounding, not a serving suggestion.
+- **`flags={usda_seed}` + FDC id in `notes`** so the whole batch is identifiable and reversible (`delete ... where 'usda_seed' = any(flags)`).
+- **Proxies documented in-code** where USDA lacks a generic: coconut sugar→brown sugar, rice vinegar→distilled vinegar, gochugaru→cayenne, chilli oil→sesame oil, vanilla paste→vanilla extract, dark chocolate→"SPECIAL DARK bar".
+
+## Current State (end of session)
+Step 1 complete. `staple_products` = 167 rows (45 original + 122 seeded). The in-app `fetchMacroEstimate` reads this table live and alias-aware, so it benefits immediately with zero code changes. Branch `claude/focused-darwin-enipb5`, draft PR #33 open (scripts + docs; the DB change is not in git). No app code (`index.html`/`sw.js`) touched — no cache bump needed.
+
+## Next Steps
+1. **Hand-fill the 6 skipped items** + blank `missing:` cells (milk sugar ≈5g lactose; cheddar/tuna/dijon sugar ≈0; some Foundation produce missing fibre/sugar) in `staple_products` whenever convenient — Saffron said she'll do this as needed.
+2. **Step 2 (separate session): ingredient quantity normalisation** — gram-weight defaults for vague units ("1 tbsp", "1 medium avocado") and a policy for "to taste"; apply across `ingredient_sections` for all 327 recipes (branch on `jsonb_typeof` — legacy string vs structured object shapes).
+3. **Step 3: bulk Claude Code pass** over all 327 recipes using the expanded `staple_products` + normalised quantities to (re)populate nutrition columns, with chain-of-thought + self-consistency + `review_flags`.
+4. Merge PR #33 when happy (no CI in this repo).
+
+## Open Questions / Blockers
+- Whether the in-app matcher prefers the new generic over an existing branded row for a bare term (e.g. "peanut butter") wasn't verified against `fetchMacroEstimate`'s exact logic — expected to be fine (closest-canonical match), but worth confirming if estimates look off.
+- Carried over, unresolved: chicken thighs/tomato-paste-style Foundation rows have `fibre_g`/`sugar_g` null (legitimately ~0 for meat; left null not 0).
+
+## Environment & Config Notes
+- Supabase project `jsxcctrskkkxgdxfaduo`; table `staple_products` (PK on `id` uuid — **no unique constraint on `name`**, so dedupe is manual). Seeded rows tagged `flags @> {usda_seed}`.
+- `api.nal.usda.gov` blocked at the sandbox egress gateway (same as `api.apify.com`) — `usda_staples.py` must run on Saffron's machine with `USDA_FDC_API_KEY` exported per shell. Supabase MCP is NOT blocked.
+- USDA quirks encoded in the script: Foundation energy = nutrient 957/958; `/food/{fdcId}` 404s on some entries; search payload carries nutrients as a fallback.
+
+## Notes & Gotchas
+- **`staple_products` already had a few generics** beyond the "all branded" snapshot in the prior entry (Fish sauce/Sriracha/Mayonnaise/Eggs/Blueberries/Raspberries "(generic)", Unsweetened almond milk, Chilli crisp oil) — those were the 7 skipped. Re-check existing rows before any future bulk staple insert; don't trust the older "no generics" claim.
+- **Aliases were cleaned** from `merged_from` (dropped regex artifacts, my annotation parentheticals, and "juice of…" fragments; fixed `arlic→garlic`, `reen→green`, etc.). The raw `merged_from` column still contains the artifacts — don't load it verbatim.
+- **`canonicalise` singular/plural quirk**: words ending vowel+"es"/"s" (e.g. "potatoes", "tomatoes") don't reduce to singular, so plural search terms can dock a point off the match score (cosmetic — sweet potato flagged `review_match` at 0.75 despite a correct 86-kcal match). Prefer singular in overrides.
+- To roll back this batch: `delete from public.staple_products where 'usda_seed' = any(flags);`
+
 # Nutrition Estimation Feasibility — Research & Planning
 **Date:** 2026-07-01
 **Project:** Daily Shuffle — recipe/meal-planning PWA
