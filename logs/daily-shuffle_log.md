@@ -4,6 +4,79 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# Mobile Editorial Redesign — Foundation + All Screens Re-skinned
+**Date:** 2026-07-15
+**Project:** Daily Shuffle — recipe/meal-planning PWA
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete (mobile) — desktop layout is the next session's work
+
+---
+
+## Project Context
+See earlier entries (2026-07-01 nutrition estimation; 2026-06-25/29 ingredient + parser work) for data/architecture background. This session was a **visual redesign stream**, orthogonal to the price/nutrition data work. Saffron used Claude Design (claude.ai/design) to mock up a mobile-first editorial reskin of the app and exported two handoff bundles; this session implemented them on the live repo.
+
+## Session Goal
+Implement the Claude Design high-fidelity prototypes as a mobile-first editorial redesign of the whole app — new oxblood/cream + Fraunces brand register, floating bottom tab bar, and every screen re-skinned — **without breaking any existing functionality**. Desktop layout explicitly deferred to a later session.
+
+## State Before This Session
+App was desktop-oriented: top header + horizontal emoji nav, light cream/taupe theme (`--bg #F5F2EC` etc.), plain cards. Single-file `index.html` (~6,200 lines, grew to ~6,500). No design tokens beyond the three legacy theme blocks. On branch `claude/focused-darwin-enipb5` with an unrelated uncommitted `HANDOFF.md` edit (price-book stream — left untouched all session).
+
+## What Was Done
+Worked in four passes, verifying each in-browser via a localhost server + Chrome automation (file:// is blocked by the extension, so `python3 -m http.server 8747` was used throughout).
+
+1. **Foundation + Recipe Library proof** (plan-approved first). Added the prototype's design tokens to `:root` (namespaced `--fn-*`/`--ed-*`/`--cta`, Fraunces via Google Fonts with Georgia fallback, radii/shadow/glass). Inlined the needed Lucide icons as a hidden `<svg><symbol>` sprite at top of `<body>` (offline-safe, no new network requests — deliberate, the app is cache-first PWA). Wrapped the app as a ~430px mobile column centered on a dark `#2A2320` backdrop on wide screens. Added a floating oxblood bottom tab bar (markup after `</main>`) wired to the **existing** `switchTab()` (added a `.tabbar` active/dot sync line inside it). Relocated settings to a top-corner icon. Re-skinned Recipe Library: kicker + Fraunces title, pill search + filter button, restyled `#recipesFilterbar` chips, and rewrote the `renderRecipes()` card template to the prototype's image cards (gradient placeholders, archival `No. 0NN` badges, glass hearts using `--ed-oxblood-bright`, hero + 2-col grid). Updated `toggleFav()` selectors from `.recipe-card/.fav-btn` → `.rl-card/.rl-fav`.
+
+2. **Rolled the register across the other four tabs.** Rather than replace the app's richer functionality with the simpler mockups, **remapped the legacy `:root` tokens** (`--bg`, `--surface`, `--accent`, `--text`, …) to the editorial palette so modals + every un-bespoke screen inherit cream/oxblood at once; then gave Shuffle / Grocery / Add / Tracker editorial headers (kicker + Fraunces title) and pill-styled primary actions (oxblood CTA).
+
+3. **Two bespoke prototypes** (second bundle: `daily-shuffle-prototype-screens-1`, which added the Recipe Detail + Nutrition designs the first bundle lacked). **Nutrition Dashboard**: full rewrite of `renderTracker()` — oxblood editorial stat strip (Eaten/Burned/Deficit), calorie hero card with a real SVG progress ring, name-leads macro cards, per-meal log cards; `trkEntryRow()` reskinned to `.nd-logrow`. **Recipe Detail modal**: restyled `openModal()`'s output — kicker + `No. 0NN` archive mark, Fraunces title, icon meta row (users/clock/££), oxblood pill multiplier, numbered-circle method, compact single-line nutrition tiles. Kept it as the app's feature-rich centered modal (edit/delete/cost/tips/estimate) rather than the prototype's full-screen photo-hero + "Add to plan" sticky bar, since the app has no recipe photos and no add-to-plan-from-detail action.
+
+4. **Cleanup pass** (Saffron's follow-ups). Stripped emoji app-wide per the no-emoji brand rule via a `deEmoji()` helper that mutates the label-map constants at source (`CRAVING_LABELS`, `PROTEIN_LABELS`, `MEAL_TYPE_LABELS`, `CARB_TYPE_LABELS`, `CUISINE_EMOJI`, `PROTEIN_EMOJI`, `FILTER_CHIPS`) plus targeted edits + `perl -i` sweeps for inline-markup and JS status strings. Removed Grocery header duplication and rebuilt grocery rows to the prototype's catalogue design (round oxblood check + colour swatch + stacked name/qty + price). Gave Shuffle day cards the editorial register. Reconciled cafe/coastal alt themes to accent-only swaps on the shared base.
+
+5. **Two layout bugs** (Saffron's final follow-ups). Tracker had no side margin (`.trk-wrap` padding was `4px 0 60px`) → `4px 22px 60px` + de-doubled the header inline padding. Add Recipe form overflowed and looked off-brand: **root cause = responsive breakpoints key off viewport width (`@media max-width:768px`), which never fires now that the app is a fixed 430px column on desktop**, so `.form-grid` stayed 2-col and spilled the card. Fixed with `#tab-add .form-grid { grid-template-columns: 1fr }` and a full editorial restyle of the Add form (cards, inputs, chips, buttons). Hit the project's classic **stale-service-worker trap** mid-verify — a reload showed no change until the SW cache was bumped; confirmed via a `?v=` cache-busted URL.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| index.html | The entire app — all redesign markup/CSS/JS changes | Modified | /Users/saffron/daily-shuffle/ |
+| sw.js | Service worker — cache bumped v32 → v34 | Modified | /Users/saffron/daily-shuffle/ |
+| HANDOFF.md | Pre-existing price-book edit — **NOT touched/committed** this session | Untouched | /Users/saffron/daily-shuffle/ |
+
+Committed as `342bc14` on branch `claude/mobile-redesign-foundation` (index.html + sw.js only). Not pushed, not merged, not deployed.
+
+## Decisions & Reasoning
+- **Additive tokens, then remap legacy tokens** rather than find/replace every hardcoded colour: kept the diff safe and let un-bespoke screens inherit the register for free.
+- **Inline SVG sprite, not icon files**: preserves the single-file, offline-first, no-new-requests nature of the PWA.
+- **Kept app functionality over prototype simplicity**: the mockups (esp. Shuffle/Grocery/Recipe-Detail) are thinner than the shipped features; adapted the *look* onto the real feature set rather than downgrading.
+- **Recipe Detail stayed a centered modal**, not the prototype's full-screen hero — no recipe photos exist and there's no "add to plan from detail" action to anchor the sticky CTA.
+- **Left HANDOFF.md out of the commit**: it's an unrelated uncommitted change from the price-book stream that predates this work.
+- **Mobile-only for now**: all new layout assumes the ~430px column; desktop is a separate deliberate effort (next session).
+
+## Current State (end of session)
+Full mobile editorial redesign is live on the branch and verified in-browser across all five tabs + Recipe Detail modal: tab bar switches with active dots, favourites toggle + persist, cards open the detail modal, search/filters work, grocery checks toggle, tracker renders real data, Add form saves. JS parses clean (3 inline `<script>` blocks, 0 errors via the `new Function()` check). SW at v34.
+
+## Next Steps
+1. **Desktop layout** — the stated next deliverable. The whole redesign currently assumes a fixed ~430px mobile column; the key structural issue to solve first is that **responsive rules key off viewport width but the app is a fixed-width column**, so a real desktop layout needs either (a) a max-width breakpoint that expands the column into a multi-pane desktop shell (e.g. persistent side nav instead of the bottom tab bar, multi-column recipe grid, side-by-side plan+grocery), or (b) container-query-based components. Decide the desktop information architecture with Saffron before building.
+2. Consider pushing the branch + opening a PR (nothing pushed yet) once desktop lands, or push now if she wants to test on a phone.
+3. Optional polish carried over: recipe cards still use gradient placeholders (no photography); the prototype's full-screen recipe-detail hero + "Add to plan" flow was not built.
+
+## Open Questions / Blockers
+- **Desktop IA is undecided** — bottom tab bar vs. side nav, how the mobile column expands, whether plan+grocery go side-by-side. Needs a design decision with Saffron before implementation (worth another Claude Design pass or a plan-mode discussion).
+- No recipe photography exists; cards/hero use warm gradient placeholders. Real images would need a source + storage decision.
+
+## Environment & Config Notes
+- Repo: `/Users/saffron/daily-shuffle`, branch `claude/mobile-redesign-foundation` (created off `claude/focused-darwin-enipb5`). Remote `origin` = github.com/saffronlm-cmyk/daily-shuffle. Commit `342bc14` local-only.
+- Verify loop: `python3 -m http.server 8747` in the repo, open `http://localhost:8747/index.html` (file:// blocked by the Chrome extension). Bump `sw.js` CACHE or use a `?v=` query when a reload "doesn't show" — SW is cache-first for assets.
+- JS sanity check (no linter/bundler): extract inline `<script>` blocks and `new Function(src)` each — used all session, kept at 0 errors.
+- Prototype bundles: `~/Downloads/daily-shuffle-high-fidelity-prototypes` (screens 1: library/shuffle/grocery/add + 4 editorial screens) and `~/Downloads/daily-shuffle-prototype-screens-1` (Recipe Detail + Nutrition + a design-system change memo). Design tokens live under each bundle's `_ds/…/tokens/`.
+
+## Notes & Gotchas
+- **Design tokens are namespaced**: bespoke screens use `--fn-*`/`--ed-*`/`--cta`; the legacy `--bg/--surface/--accent/--text` were *remapped* to the same palette so both coexist. Don't delete the legacy vars — lots of un-migrated inline styles still reference them.
+- **`deEmoji()` runs once at load** over the label-map constants — new emoji added to those maps get stripped automatically; emoji hardcoded in markup/JS strings do not (had to sweep those manually).
+- **Two prototype bundles, not one**: the 4 editorial screens (Splash/Onboarding/Empty/Weekly-recap) from bundle 1 were **deferred** and never built — they're new features, not reskins.
+- **Fraunces loads from Google Fonts** — degrades to Georgia offline. Acceptable for now; revisit if full-offline serif fidelity matters.
+- Standard project gotcha reconfirmed: the service worker will serve stale HTML/CSS after an edit — bump `sw.js` CACHE every shippable change (now v34).
+
 # Nutrition Estimation Feasibility — Research & Planning
 **Date:** 2026-07-01
 **Project:** Daily Shuffle — recipe/meal-planning PWA
