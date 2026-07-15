@@ -804,6 +804,10 @@
   .cal-meal-slot, .plan-meal-slot { color: var(--ed-gold); letter-spacing: .08em; }
   .cal-badge, .plan-day-pill { border-radius: var(--radius-pill); font-family: var(--font-ui); }
   .cal-day.is-batch .cal-day-header { background: rgba(89,23,27,.06); }
+  /* Let plan controls shrink to their grid cells — a native date input's
+     intrinsic min-width otherwise stretches its track and overflows the card. */
+  #tab-plan .control-group { min-width: 0; }
+  #tab-plan .control-select, #tab-plan .control-input { min-width: 0; max-width: 100%; }
 
   /* ── Add Recipe tab — editorial register ──
      The app is a fixed ~430px column, so viewport media queries never fire on
