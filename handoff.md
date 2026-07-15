@@ -138,3 +138,34 @@ maxResultsPerQuery), `--sample N`, `--token`, `--dry-run`, `--probe TERM`.
 The app is a static PWA (single `index.html`, localStorage price book under
 `ds_pricebook`). `canonicalise()` is duplicated in both scripts and MUST mirror
 the app's version in `index.html` for keys/aliases to line up.
+
+---
+
+## Future — cost-aware features (salvaged from the retired `HANDOFF.md` roadmap)
+
+The old uppercase `HANDOFF.md` (ingredient-normalisation roadmap) was removed to
+end a filesystem case-collision with this file. Its Phase-1 CSV/normalisation
+work is done; the only part not captured elsewhere was the downstream
+cost-feature vision, preserved here. **Once variants are priced, the existing
+engine lights up** — this is the payoff and the next design space:
+
+- **Surface recipe cost**: `computeRecipeCost()` already returns per-recipe /
+  per-portion / unpriced counts; show £/portion on recipe cards (a `costTier`
+  field already exists) and in the modal.
+- **Plan & grocery cost**: `_groceryAggregate()` + the plan cost label already
+  exist — verify totals, show per-item £, per-category subtotals, and a
+  **whole-plan basket total**; flag "N unpriced".
+- **Shop-by-product grocery view**: collapse variants under their **product**
+  family within each aisle.
+- **Per-100g normalisation**: auto-compute on import for like-for-like
+  comparison and value flags.
+- **Budget-aware meal planning**: filter/sort the shuffle by cost tier; set a
+  weekly budget; warn when a plan exceeds it; "cheaper swap" suggestions using
+  same-product alternatives.
+- **Price history & receipts**: `applyReceiptToPriceBook()` + entry `updatedAt`
+  already exist — track price over time, show trends, let a receipt scan refresh
+  prices.
+- **Store comparison**: multiple stores per variant → cheapest-basket / per-store
+  totals.
+- **Cost × nutrition**: cost per gram of protein / per kcal — bridges to the
+  stashed macro/Track modules (`legacy/macro-calc.*`, `legacy/track.*`).

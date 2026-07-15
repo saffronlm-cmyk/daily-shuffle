@@ -59,9 +59,11 @@ Single user (Saffron), no auth, deployed as static files.
     sharing one cream root), type (Inter + Fraunces + tracked caps), shape/spacing,
     component specs, and the archival-numbering signature element. Read before any visual
     / styling / theming work.
-  - `HANDOFF.md` — roadmap for the ingredient → price book → cost feature stream.
-  - `handoff.md` — resume point for the Apify price-book pipeline. (Yes, two different
-    handoff files differing only by case — don't confuse them.)
+  - `handoff.md` — resume point for the Apify price-book pipeline, plus (appended) the
+    salvaged cost-aware-features vision from the retired `HANDOFF.md` roadmap. (The old
+    uppercase `HANDOFF.md` was removed — it collided with this file on case-insensitive
+    macOS. Its ingredient-normalisation Phase-1 work is done; the cost-feature roadmap
+    lives here now.)
 - **`.github/workflows/supabase-keepalive.yml`** — daily ping so the free-tier Supabase
   project doesn't auto-pause. Schedule triggers only fire from `main`, so it must stay
   on `main`. The inlined anon key is already public in `index.html` — not a leak.
