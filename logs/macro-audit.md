@@ -229,3 +229,47 @@ are calorie-dense and were consistently under-counted → unusually high OFF rat
 
 **Running totals through Batch G:** ~110 of 310 ready recipes covered (10 written + ~98 audited).
 
+### Batch H (2026-07-16) — next 30 alphabetically ("Double Roast Chicken…" → "Harissa Chicken…") (read-only)
+
+| Recipe | serves | Stored | Recompute (per serving) | Verdict |
+|---|---|---|---|---|
+| Double Roast Chicken with Chicken Fat Rice | 8 | null×6 | ~600–650/…/… (rough) | ◐ stored all null; "2 whole chickens" size approx |
+| Easy Chicken Traybake | 4 | 448/38/22/22/4/3 | ~589/34/25/37/…/… | ⚠ fat undercount (dup of "Chicken and Potato Traybake") |
+| Easy Chipotle Chicken & Corn Salsa | 6 | 338/38/8/17/1/3 | ~425/48/18/15.5/…/… | ⚠ protein/cal low (1.36kg thigh) |
+| Easy Curry Noodles with Crispy Beef | 3 | 528/22/42/31/3.5/5 | ~614/15/52/34.7/…/… | ✅ borderline (noodle/coconut swing) |
+| Easy Poke Salad Bowl | 1 | 558/37/67/16/6/5 | ~617/38.7/63/20/…/… | ✅ close |
+| Easy Tuna Salad Mix | 3 | 148/26/6/4/1.5/3 | ~224/32/13/5/…/… | ⚠ protein/cal low (425g can ÷3; mayo unquantified) |
+| Egg White Protein Oats | 1 | 285/30.5/28/5.5/3.8/14 | ~305/22.6/39/6.6/7/13.3 | ✅ close (stored protein looks high vs ingredients) |
+| Fiery Chilli Prawn Linguine | 3 | 337/24/42/9/3/8 | ~578/35.6/91/4.4/…/… | ⚠ carbs undercount (300g dry pasta) |
+| Fluffy Breakfast Carrot Cake Loaf | 10 | 250/5/null/null/null/null | ~330/6.3/33/20/…/… | ⚠ fat/cal low (150ml olive oil) + nulls |
+| Fluffy Greek Yogurt Pancakes | 3 | 495/39/56/10/–/– | ~193/13.6/26/3.5/…/… | ⚠ stored WAY over-stated (protein impossible) |
+| Fluffy Vegan Protein Pancakes | 2 | 288/18/38/5/2.5/5 | ~339/14.3/56.5/4.2/…/… | ⚠ carbs/cal high (100g flour) |
+| Frozen Berry Breakfast Crumble | 6 | 265/8/null/null/null/null | ~279/9.2/42/9.3/5.8/15 | ✅ close + nulls to fill |
+| Frozen Strawberry Raspberry PB Bites | 8 | 88/1.5/8/5.5/1.5/5 | — | ◐ "peanut butter" & "1 bag choc" unquantified |
+| Garlic Cucumber Salad | 2 | 38/1.5/6/1.5/1/3 | ~64/1.3/7.4/3.15/1/2.5 | ⚠ minor (chili-crisp oil; tiny absolute) |
+| Garlic Miso Somen Noodles | 2 | 378/18/52/12/4/6 | ~608/21.5/86.5/16.8/…/… | ⚠ carbs undercount (200g dry somen) |
+| GF Easy Pan Dumplings (No Wrappers) | 4 | null×6 | — | ◐ coating flour no qty; stored null |
+| GF Easy Pan Dumplings (Pan-Fried) | 4 | null×6 | — | ◐ shaping starch no qty; stored null |
+| Giant Rice Cake Snickers Wagon Wheel | 1 | 488/14/44/30/4/22 | ~630/16/61/40.6/…/… | ⚠ undercount (PB+peanuts+choc) |
+| Glass & Konjac Chicken Japchae | 4 | 470/37/66/7/14/12.5 | ~473/38.8/65.8/6.8/14/13 | ✅ great match |
+| Glowing Skin Soup | 4 | 148/2.5/22/6.5/4/12 | ~242/2.75/14.8/17/…/… | ⚠ fat undercount (olive oil+coconut cream) |
+| Gluten Free Cinnamon Buns | 6 | 488/8/78/16/3/36 | ~1188/…/193/… | ⚠ big undercount OR serves >6 (800g flour) |
+| Gochujang Prawn Noodle Soup | 2 | 338/20/48/8/3.5/5 | ~418/25.5/51.5/9.5/…/… | ✅ borderline (udon nest weight swing) |
+| Golden Coconut Chicken Curry | 4 | 488/34/22/32/6/6 | ~624/30/12.5/48.7 (no rice) | ⚠ fat undercount (coconut cream+oil); rice missing |
+| Greek Chicken Gyros Protein Filling | 2 | 200/25/12/5/2/6 | ~202/28/13.6/3.5/…/… | ✅ great match |
+| Greek Yogurt Raspberry Blueberry Bake | 1 | 278/18/34/6/2.5/26 | ~322/25/42.7/5.8/…/… | ✅ close (berries unquantified) |
+| Green Goddess Chicken Prep Mix | 2 | 280/24/null/null/null/null | ~287/35.5/14/9.5/…/… | ◐ cal matches; protein low; null macros |
+| Green Goddess Pasta Salad | 3 | 398/22/44/14/6/4 | ~795/43.7/82/32.7/…/… | ⚠ big undercount (1 box pasta + feta + oil) |
+| Green Goddess Salad | 3 | 388/11/37.5/24.5/11.5/18 | (Batch A) | ✅ already corrected |
+| Halloween Chocolate Almond Butter Balls | 12 | 118/3.5/8/8.5/1.5/5 | ~175/7.1/11.7/12.7/…/… | ⚠ undercount (almond butter+almonds) |
+| Harissa Chicken with Roasted Veg and Feta | 1 | 555/53/null/null/null/null | ~755/65/61/23/…/… | ◐ feta qty; protein ~matches; null macros |
+
+- Fully auditable: 23/30 (8 ✅, 15 ⚠). Partial: 6. Already-done: 1.
+- Notables: **Fluffy Greek Yogurt Pancakes** is over-stated (stored 495 vs ~193 — protein
+  impossible). **GF Cinnamon Buns** likely serves more than 6 (800g flour). Six recipes have
+  `null` calories/macros needing values regardless (Double Roast Chicken, both GF Pan
+  Dumplings, Carrot Loaf, Green Goddess Prep, Harissa Chicken). Coconut-milk "light or full"
+  and dry-noodle weights remain the biggest single swing factors.
+
+**Running totals through Batch H:** ~140 of 310 ready recipes covered (10 written + ~128 audited).
+
