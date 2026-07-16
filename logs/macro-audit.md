@@ -89,3 +89,38 @@ Verdicts: ✅OK (within ~15%) · ⚠OFF (recommend correction) · ◐PARTIAL (a 
 
 **Running totals through Batch C:** ~30 of 310 ready recipes covered (10 written + 20 audited).
 
+### Batch D (2026-07-16) — next 20 alphabetically ("Burger…" → "Chicken Shawarma…") (read-only)
+
+| Recipe | serves | Stored | Recompute (per serving) | Verdict |
+|---|---|---|---|---|
+| Burger Bowl | 1 | 440/50/30/10/–/– | — | ◐ only 2/16 ingredients have qty |
+| Butternut Peanut Butter Protein Mug Cake | 1 | 248/22/22/8.5/4.5/8 | ~247/21/26/7/4/6 | ✅ great match |
+| Butternut Protein Brownie (butternut/egg-white) | 5 | 412/52/38/6/–/– | **~110/15.5/12.5/1.5/3/1.5** | ⚠ stored wildly high (impossible protein) |
+| Butternut Protein Brownie (pumpkin/egg-white) | 5 | 189/25/16/3/–/– | **~98/15/9.5/1.5/2.8/2.5** | ⚠ stored ~2× |
+| Butternut Squash Mac and Cheese | 4 | 348/12/52/11/5.5/10 | **~542/21/79/17/7/10** | ⚠ stored low (squash size a swing) |
+| Café Style Jacket Potatoes (Chicken/Bacon/Corn) | 4 | 601/66/61/12/–/– | — | ◐ ingredient list incomplete (no potato/corn listed) |
+| California Rolls in a Bowl | 2 | 505/14/80/15/11/18 | — | ⛔ ingredient list empty (nulls) |
+| Caramel Rice Cake Strawberry Treat | 1 | 348/14/37/12/3.8/16 | — | ◐ PB/choc/yoghurt no qty |
+| Caramelised Onion Rice with Tikka Cod | 2 | 488/45/52/8/9/12 | **~578/48.5/83/4.5/15/15** | ⚠ carbs low (rice+chickpea+peas) |
+| Carrot Cake Baked Oats (serves 4) | 4 | 407/18/54.5/14.5/7/18 | (Batch A) | ✅ already corrected |
+| Carrot Cake Baked Oats (serves 1) | 1 | 268/8.5/46/5/5.5/14 | — | ⛔ ingredient list empty (nulls) |
+| Carrot Cake Loaf | 5 | 178/14.5/16/6.5/2.8/7 | **~100/7/12.5/2.5/2/3.5** | ⚠ stored ~2× (protein impossible) |
+| Carrot Cake Meal Prep Baked Oats | 5 | 318/16/46/7/5/20 | ~386/22/53/10/6.5/13 | ⚠ protein/cal low |
+| Carrot Cake Overnight Oats | 1 | 298/10/48/7/6/14 | ~328/12/49/9.5/7.5/11 | ✅ close (toppings unquantified) |
+| Cauliflower Cheese Gnocchi Bake | 3 | 360/19/null/null/null/null | ~401/18/56/11/7/… | ✅ close; carbs/fat/fibre/sugar null |
+| Char Siu Chicken | 2 | 689/42/79/22/–/– | ~686/42.5/78/21/…/… | ✅ great match; fibre/sugar null |
+| Chicken & Egg Breakfast Casserole | 8 | 228/20/12/11/2/4 | ~315/21.5/15/18.5/2.5/4.5 | ⚠ fat/cal low (avo oil+eggs+cheese) |
+| Chicken and Potato Traybake | 4 | 448/38/26/22/4/3 | ~589/34/25/37/…/… | ⚠ fat low (skin-on legs+thighs+marg) |
+| Chicken Pad Thai | 4 | 555/50/47/18/3.5/10 | ~549/54/44.5/15/…/… | ✅ great match |
+| Chicken Shawarma Crispy Rice Salad | 4 | 488/30/34/26/3.5/6 | **~657/32.5/43/40/…/…** | ⚠ fat/cal low (tahini + multiple ¼-cup oils) |
+
+- Fully auditable: 14/20 (6 ✅ OK, 8 ⚠ OFF). Partial: 3. Deferred (empty): 2. Already-done: 1.
+- Standouts: protein-powder bakes (both Butternut Brownies, Carrot Cake Loaf) carry
+  **impossibly high** stored protein/calories — likely per-recipe totals miscounted as
+  per-serving. Oil/tahini-heavy dishes (Shawarma Salad, Breakfast Casserole, Traybake)
+  are consistently **under**-counted on fat.
+- Recurring: `null` carbs/fat/fibre/sugar on several (Cauliflower Gnocchi, Char Siu,
+  Burger Bowl, Café Jacket Potatoes, both Butternut Brownies).
+
+**Running totals through Batch D:** ~50 of 310 ready recipes covered (10 written + ~39 audited).
+
