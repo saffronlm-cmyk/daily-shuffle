@@ -453,3 +453,47 @@ drive a very high under-count rate.
 
 **Running totals through Batch L:** ~260 of 310 ready recipes covered (10 written + ~248 audited).
 
+### Batch M (2026-07-16) — next 30 alphabetically ("Spicy Peanut Chicken Noodles…" → "Tahini Oat Chocolate Chip Bars") (read-only)
+
+| Recipe | serves | Stored | Recompute (per serving) | Verdict |
+|---|---|---|---|---|
+| Spicy Peanut Chicken Noodles | 2 | 676/50/60/26/–/– | ~701/48.5/45.5/34/…/… | ✅ close (udon weight swing) |
+| Spicy Tofu Bowl | 1 | 550/36/null/null/null/null | ~694/33/60/33/…/… | ⚠ fat/cal high (1.5 tbsp sesame oil) + nulls |
+| Spicy Tom Kha Soup with Tofu | 2 | 288/12/18/20/3.5/7 | ~663/17.5/15.5/56/…/… | ⚠ fat big undercount (400ml coconut milk) |
+| Spicy Tuna Bowl | 1 | 448/36/44/14/3.5/4 | ~573/36/46/23/…/… | ⚠ fat high (mayo+chilli oil) |
+| Spring Greens Carbonara | 2 | 460/22/null/null/null/null | ~514/30.6/70/12.2/…/… | ✅ cal close + nulls |
+| Steamed Rice Paper Dumplings with Shrimp | 4 | 198/18/16/8/1/3 | ~444/26/38.75/19/…/… | ⚠ big undercount (15-20 sheets + ¼c avocado oil) |
+| Sticky Chicken, Gochujang & Coconut Broth on Sticky Rice | 2 | 646/41/null/null/null/null | ~813/46.5/37.5/47.5 (no rice) | ⚠ fat/cal low (coconut milk); rice missing |
+| Sticky Lemon Sesame Garlic Prawns | 2 | 428/30/52/10/3/8 | ~350/24/42.5/6.5/…/… | ✅ borderline (stored a bit higher) |
+| Sticky Mango Chicken Prep Bowls | 2 | 400/38/null/null/null/null | ~367/40.5/27.5/7/…/… | ✅ cal/protein close + nulls |
+| Sticky Miso Chicken Bowl w/ Tahini Broccoli | 2 | 480/40/null/null/null/null | ~569/51/52.5/11/…/… | ✅ cal reasonable + nulls |
+| Sticky Miso Chicken Prep Boxes | 3 | 520/50/null/null/null/null | ~428/37.6/30/13.3/…/… | ⚠ stored protein high; cal lower + nulls |
+| Sticky Soy Chicken w/ Garlic Rice in Spicy Broth | 1 | 618/44/72/14/3/8 | ~1533/60/165/50/…/… | ⚠ big discrepancy (1 cup dry rice+2 oils; likely serves 2) |
+| Sticky Toffee Chia Pudding | 2 | 378/6.5/48/18/7.5/30 | ~462 base / ~707 w/ caramel | ⚠ undercount (coconut yog+dates) |
+| Sticky Toffee Date Oats | 1 | 445/12/66/16/9/28 | ~741/16/112/17/…/… | ⚠ low (¾c oats+dates+2×maple+nut butter) |
+| Strawberry Ice Cream | 3 | 168/4.5/22/7.5/1/18 | — | ⛔ ingredient list empty (nulls) |
+| Stuffed Breakfast Chicken Sausage Pitas | 1 | 289/29/null/null/null/null | ~392 (no avocado) | ◐ sausage macros vary; avocado optional; nulls |
+| Summer Peach Chia Pudding | 1 | 388/5/42/22/9.5/28 | ~589/10/46/41/…/… | ⚠ fat low (130ml coconut milk+chia) |
+| Summer Salmon and Blackberry Salad | 2 | 398/36/14/24/6/6 | ~564/25.5/15/40/…/… | ⚠ fat low (avo+salmon+2 tbsp sesame oil); NO blackberries in ingredients |
+| Sunflower Sesame Date Chocolate Bites | 12 | 108/2/12/6.5/1.5/9 | ~156/3.1/17.4/9.8/…/… | ⚠ low (seeds+choc) |
+| Sushi Salad | 2 | 452/35/null/null/null/null | ~478/37.5/45/14/…/… | ✅ cal/protein match + nulls |
+| Sweet and Salty Date Caramel Oat Cookie Slice | 16 | 148/1.5/22/6/1.5/14 | ~276/2.75/48.8/9.2/…/… | ⚠ big undercount (oats+flour+honey+450g dates) |
+| Sweet Potato and Kale with Tahini Dressing | 2 | 488/14/58/22/12/8 | ~674/18.5/82/31.5/…/… | ⚠ low (150g quinoa dry/cooked ambiguous) |
+| Sweet Potato Beef Taco Bowl | 4 | 458/40/43.6/14.8/–/– | ~515/39.7/32.5/23/…/… | ✅ protein exact (fat swings on beef) + nulls |
+| Sweet Potato Blondies | 12 | 198/4/22/11/2.5/12 | ~202/4.1/19.2/12.4/…/… | ✅ great match |
+| Sweet Potato Chicken Enchilada Skillet | 4 | 328/26/38/7/9/8 | ~295/22/30/7.25/…/… | ✅ close |
+| Sweet Potato Chocolate Cake | 8 | 148/2/16/8.5/2/10 | ~237/2.8/27.75/12/…/… | ⚠ low (300g dark chocolate total) |
+| Sweet Potato Chocolate Chip Cookies | 12 | 138/3.5/11/10/1.5/6.5 | ~211/4.8/14.2/15.5/…/… | ⚠ low (2 cups almond flour+coconut oil) |
+| Sweet Potato Olive Oil Cake | 10 | 268/4.5/26/17/2.5/16 | ~452/7.7/35/32.2/…/… | ⚠ big undercount (oil+almond flour+maple+caramel) |
+| Sweet Potato Toast w/ Avocado & Tofu Scramble | 4 | 248/12/22/14/6.5/5 | ~294/14.25/18.75/17.5/…/… | ✅ close |
+| Tahini Oat Chocolate Chip Bars | 9 | 198/5.5/18/13/2/9 | ~315/8.1/26.7/20.3/…/… | ⚠ low (almond flour+tahini+maple) |
+
+- Fully auditable: 28/30 (10 ✅, 18 ⚠). Partial: 1. Deferred (empty): 1 (Strawberry Ice Cream).
+- **Data-integrity:** Summer Salmon and Blackberry Salad has **no blackberries** in its
+  ingredient list; Sticky Soy Chicken w/ Garlic Rice (serves 1) has 1 cup dry rice + 2 oil
+  additions → recompute 1533 vs stored 618, strongly suggesting it should be **serves 2**.
+- The almond-flour / olive-oil / coconut-milk dessert & soup families continue to under-count
+  hard; gram-specified bakes (Sweet Potato Blondies) still nail it.
+
+**Running totals through Batch M:** ~290 of 310 ready recipes covered (10 written + ~278 audited).
+
