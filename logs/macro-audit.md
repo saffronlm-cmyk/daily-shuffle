@@ -273,3 +273,47 @@ are calorie-dense and were consistently under-counted → unusually high OFF rat
 
 **Running totals through Batch H:** ~140 of 310 ready recipes covered (10 written + ~128 audited).
 
+### Batch I (2026-07-16) — next 30 alphabetically ("Healthy Grass Fed…" → "Matcha Date Butter Balls") (read-only)
+
+| Recipe | serves | Stored | Recompute (per serving) | Verdict |
+|---|---|---|---|---|
+| Healthy Grass Fed Gelatin Chocolate Mousse | 4 | 118/12/10/3.5/1.5/7 | ~75/8.3/9.7/1.4/…/7 | ✅ borderline (yoghurt-fat swing) |
+| Healthy Lemon Bars | 9 | 178/4.5/12/14/1.5/8 | ~260/7.4/18.9/17.9/3.3/11.4 | ⚠ low (almond flour+coconut oil+maple) |
+| Healthy Orange & Cashew Chicken | 2 | 600/50/null/null/null/null | ~595/45/46/19.5/…/… | ✅ cal/protein match + nulls |
+| High Fibre Sticky Toffee Oats | 1 | 420/23/null/null/null/null | ~948/24/141/37/…/… | ⚠ low (base alone >stored; toppings est.) |
+| High Protein Asian Crispy Rice Salad | 4 | 382/12/60/12/4/3 | ~336/8.2/54.6/9.3/…/… | ✅ close |
+| High Protein Brownie Bowl | 2 | 130/11/21/1/–/– | ~139/7.8/24.3/1.8/…/… | ✅ close |
+| High Protein Carrot Cake Overnight Oats | 1 | 448/36/44/11/7.5/14 | ~607/51/59/19/13/… | ⚠ low (chia+protein+milk) |
+| High Protein Chicken Enchilada Bake | 4 | 328/42/18/12/4/6 | ~350/34/11.6/16.8/…/… | ✅ close (cheese swing) |
+| High Protein Chickpea Flour Pancakes | 2 | 318/28/32/5/4.5/8 | ~432/42/41/8.75/…/… | ⚠ low (2-3 scoops protein + chickpea flour) |
+| High Protein Chocolate Lava Pudding | 1 | 464/53.4/null/null/null/null | ~494/54/38/19.5/…/… | ✅ cal/protein match + nulls |
+| High Protein Chocolate Loaf | 10 | 118/9/12/3.5/2/3 | ~138/10.1/17.4/4.1/…/… | ✅ close (choc chips unquantified) |
+| High Protein Pumpkin Spice Muffins | 12 | 88/5.5/12/2/1.5/4 | ~114/7.1/16.7/2.3/…/… | ⚠ mild low (2 cups oats) |
+| High Protein Salmon Potato Salad | 2 | null×6 | ~869/42/70/36/…/… | ◐ stored all null; would fill ~869/42/70/36 |
+| High Protein Salmon Potato Salad (DUP) | 2 | null×6 | (identical) | ◐ exact duplicate row of the above |
+| High Protein Tiramisu Overnight Oats | 1 | 438/45/46/7/–/– | ~474/45/53/11/…/… | ✅ close + nulls |
+| High Protein Tuna Salad | 6 | 157/20/8/5/–/– | ~180/23.5/9.7/4.8/…/… | ✅ close + nulls |
+| Homemade Carrot Cake | 10 | 97/8.4/9/3/–/– | ~117/9.2/9.9/3.6/…/… | ✅ close + nulls |
+| Honey Glazed Salmon Bowls with Peach Salsa | 4 | 298/24/16/16/3/10 | ~439/28.7/23/24/…/… | ⚠ fat/cal low (salmon+avocado+oil) |
+| Honey Mustard Chicken Power Bowl | 4 | 488/34/44/18/9/10 | ~684/35.8/58/33.5/…/… | ⚠ fat/carbs low (¼-cup oil dressing+2 avo+quinoa) |
+| Honey Sesame Salmon Bowl | 2 | 488/36/44/18/2/8 | ~371/24.5/10/22.5 (no rice) | ◐ rice + mayo qty missing |
+| Instant Noodle Jars | 1 | 348/16/48/8/5/4 | ~458 (tofu unquantified) | ◐ tofu has no qty |
+| Lemon and Blueberry Baked Oats | 4 | 248/16/36/4/4.5/12 | ~383/25.5/51.7/8.1/…/… | ⚠ low (200g oats+80g protein) |
+| Lemon and Coconut Cake | 10 | 153/12.8/13.9/6.1/–/– | ~155/13.3/11.5/6/…/… | ✅ great match + nulls |
+| Loaf Pan Lemon & Yoghurt Chicken | 5 | 298/32/5/16/0.8/2.5 | ~293/44/4/9/…/… | ⚠ cal matches but protein low (1.1kg thigh); fat swings on skin |
+| Mango Yogurt Bites | 7 | 70/2/8.5/3.5/0.5/8 | (Batch A) | ✅ already corrected |
+| Maple Cinnamon Pumpkin Overnight Oats | 1 | 368/16/44/14/6.5/16 | ~599/27/63/27.5/10/16 | ⚠ low (pecans+chia+collagen) |
+| Maple Sriracha Tofu Protein Bowl | 3 | 428/18/46/18/8/10 | ~698/40/69/32/…/… | ⚠ big undercount (450g tofu+avo+oils; protein 18→~40) |
+| Marinated Chicken Thighs w/ Mint Jalapeño Sauce | 2 | 448/38/6/30/1/2 | ~623/30/7.5/52/…/… | ⚠ fat high (3 tbsp marinade oil partly discarded) |
+| Marinated Fish Tacos | null | 410/null/null/null/null | — | ◐ serves is null — can't divide; needs serving count |
+| Matcha Date Butter Balls | 12 | 98/0.5/12/6/0.8/11 | ~136/0.5/18/7.8/…/15.8 | ⚠ carbs/cal high (12 dates) |
+
+- Fully auditable: 24/30 (11 ✅, 13 ⚠). Partial: 5. Already-done: 1.
+- **Data-integrity finds:** (a) "High Protein Salmon Potato Salad" exists **twice, identical**,
+  both with null macros — a de-dupe candidate; (b) "Marinated Fish Tacos" has **`serves = null`**
+  (like Vegan Protein Waffles did) so it can't be divided until a count is set.
+- Same themes: tofu/salmon/oil/nut-butter mains under-counted; the well-specified protein-bake
+  family (Choc Loaf, Lemon & Coconut Cake, Homemade Carrot Cake, Tuna Salad) matches closely.
+
+**Running totals through Batch I:** ~170 of 310 ready recipes covered (10 written + ~158 audited).
+
