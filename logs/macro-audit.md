@@ -158,3 +158,40 @@ Verdicts: ✅OK (within ~15%) · ⚠OFF (recommend correction) · ◐PARTIAL (a 
 
 **Running totals through Batch E:** ~70 of 310 ready recipes covered (10 written + ~58 audited).
 
+### Batch F (2026-07-16) — next 20 alphabetically ("Chocolate Hazelnut…" → "Cottage Cheese Pancakes") (read-only)
+
+Dessert/baked-goods-heavy stretch. Nut-butter / oil / maple / date / protein-powder weights
+are calorie-dense and were consistently under-counted → unusually high OFF rate this batch.
+
+| Recipe | serves | Stored | Recompute (per serving) | Verdict |
+|---|---|---|---|---|
+| Chocolate Hazelnut Cookie Dough Balls | 15 | 128/3.5/8/9.5/1.5/5 | ~177/5/14/12/…/… | ⚠ low (cashew butter+maple; choc chips unquantified) |
+| Chocolate Peanut Butter Protein Cookie Dough | 4 | 228/14/14/14/3/5 | ~257/21/10/15.5/…/… | ⚠ protein low |
+| Chocolate Protein Chia Seed Pudding | 6 | 96/9.5/7.8/3.3/3.2/9.5 | ~116/11/9.7/4.4/4/2.75 | ✅ close (toppings excluded) |
+| Chocolate Protein Yogurt Bowl | 1 | 468/42/32/18/5/10 | ~521/49/34.5/22/5/17 | ✅ close |
+| Chocolate Raspberry Baked Protein Oats | 6 | 168/15/17/5.5/6.2/7 | ~210/12.7/26/6.5/4.7/12.5 | ⚠ carbs/sugar low (dates) |
+| Chocolate Rice Cake Strawberry Treat | 1 | 352/14/38/12/3.8/17 | ~316/12.5/33.5/16/4/13 | ✅ close (fully gram-spec'd) |
+| Chocolate Strawberry Baked Oats | 1 | 405/29/48/9/6.5/10 | ~487/38/59/13.5/9/14 | ⚠ low |
+| Chocolate Sweet Potato Mug Cake | 1 | 298/9.5/38/12/3.5/22 | ~270/11/28/13.4/3/13 | ✅ close |
+| Chocolate Tahini Brownies (≠ Vegan Tahini) | 9 | 178/5.5/12/13/2.5/8.5 | **~273/7/24.5/18.8/4.4/14.8** | ⚠ low (1 cup tahini + ½ cup maple) |
+| Chocolate Zucchini Bread | 8 | 268/7/16/21/3.5/10 | **~395/10/34/26.6/5/24** | ⚠ low (almond flour+choc+coconut sugar) |
+| Chopped Jalapeño Cheddar Chicken Salad | 3 | 185/24/8/6/1.5/6 | ~253/32/11/8.7/1.7/5.7 | ⚠ protein low |
+| Cinnamon Buckwheat Smoothie | 1 | 398/14/58/11/6.5/22 | ~498/26/68/16.5/9/23 | ⚠ protein/cal low |
+| Cinnamon Roll Baked Oats | 5 | 688/14/82/36/7/42 | ~515/15/60/25/6/25 | ⚠ stored HIGH (rare over-estimate) |
+| Cinnamon Roll Date Cake | 9 | 248/3.5/42/8/1.5/28 | **~417/3/80.5/10/2.5/60.7** | ⚠ carbs/sugar big undercount (dates+3 sugars+glaze) |
+| Coconut Prawn Curry | 4 | 228/28/8/10/1.5/4 | **~453/53/13/21/2/5.5** | ⚠ big undercount (1kg prawns + coconut milk) |
+| Coffee Protein Ice Cream Affogato | 1 | 175/20/null/null/null/null | ~321/50/13/7.4/…/… | ⚠ protein low (1 cup yog + 1.25 scoops) + nulls |
+| Cookie Dough Caramel Bars | 12 | 188/3.5/20/11/2.5/12 | ~224/3.5/26.6/13/2.5/16.8 | ⚠ carbs/cal a bit high (choc chips unquantified) |
+| Copycat Nando's Peri Peri Chicken Burgers | 4 | 518/40/38/22/2/6 | ~772/43/38/47.5/…/… | ⚠ fat high (½ cup mayo+oils; some marinade discarded) |
+| Cosmic Brownie Overnight Oats | 1 | 488/28/48/20/9/16 | ~695/35/72/34/…/… | ⚠ low (chia+PB+choc; opt protein extra) |
+| Cottage Cheese Pancakes | 3 | 218/16/18/8/1.5/8 | ~328/24/28/12.8/1.7/9.3 | ⚠ low (eggs+cottage cheese+oats) |
+
+- Fully auditable: 20/20. ✅ close: 4. ⚠ off: 16 (mostly under-counts; Cinnamon Roll Baked
+  Oats is the one over-estimate).
+- Takeaway: the **dessert/baked-goods segment is systematically under-estimated** — the AI
+  passes seem to have missed or under-weighted nut butters, oils, maple/dates. When you decide
+  what to fix, this alphabetic band (and the oats/smoothie/mug-cake families generally) is the
+  highest-yield place to start.
+
+**Running totals through Batch F:** ~90 of 310 ready recipes covered (10 written + ~78 audited).
+
