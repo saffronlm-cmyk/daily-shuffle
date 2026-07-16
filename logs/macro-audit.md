@@ -195,3 +195,37 @@ are calorie-dense and were consistently under-counted → unusually high OFF rat
 
 **Running totals through Batch F:** ~90 of 310 ready recipes covered (10 written + ~78 audited).
 
+### Batch G (2026-07-16) — next 20 alphabetically ("Creamy Cucumber…" → "Double Choc Fudge Cookie") (read-only)
+
+| Recipe | serves | Stored | Recompute (per serving) | Verdict |
+|---|---|---|---|---|
+| Creamy Cucumber Avocado Broccoli Salad | 4 | 375/9/25/29/8.5/5 | ~344/7/19/28/7.5/3 | ✅ close |
+| Creamy Mango and Coconut Cod Curry | 2 | 380/34/null/null/null/null | ~397/34/…/…/…/… (light coconut) | ✅ protein matches; cal swings on coconut type; null macros |
+| Creamy Peanut Miso Ramen | 4 | 528/18/44/34/5.5/8 | ~998/23/100/52.5/…/… | ⚠ likely low (400g dry noodles + PB+tahini+coconut; noodle/coconut assumptions swing) |
+| Creamy Thai Coconut Chicken Meatballs | 4 | 271/28/null/null/null/null | ~338/29.5/…/… (no rice) | ◐ rice to serve unquantified; protein matches; null macros |
+| Crispy Bang Bang Chicken | 1 | 427/42/44/9/–/– | ~539/41/56/15/…/… | ⚠ cal/carbs/fat low (cornflour+egg+sauces; frying oil extra) |
+| Crispy Chicken Dumplings | 2 | 459/29/50/15/1.5/2 | ~482/27/55/15/…/… | ✅ close |
+| Crispy Chicken Rice Paper Dumplings | 2 | 358/26/24/18/2/8 | ~450/25/37/19.7/…/… | ⚠ carbs/cal low |
+| Crispy Chilli Beef Protein Bowls | 4 | 484/31/35/20/null/null | ~421/27/25/21.5 (no rice) | ◐ rice unquantified; close once rice added |
+| Crispy Gluten Free Shrimp Dumplings | 7 | 128/9/14/3/0.8/2 | — | ◐ wrapper flour has no qty |
+| Crispy Quinoa Edamame Salad | 2 | 413/17/46/20/14/9 | ~377/13/33/21/10/4.5 | ✅ close |
+| Crispy Rice and Chicken Salad | 2 | 635/51/44/29/–/– | ~627/36/52/28.5/…/… | ⚠ cal matches but stored protein over-stated (300g chicken+2 eggs ≈ 31/serving) |
+| Crispy Rice Paper Spring Rolls Without Frying | 4 | 198/7/32/3.5/2.5/3 | ~412/10/81/3/…/… | ⚠ carbs undercount (24 rice-paper sheets) |
+| Crispy Rice Salad with Miso Tofu | 2 | 488/35/42/22/6.5/8 | ~916/38/78/50.5/…/… | ⚠ fat/carbs low (sesame oil+avo+50g sesame seeds) |
+| Crispy Rice Tuna Salad | 2 | 418/26/44/16/3/4 | ~494/19/57.5/19/…/… | ⚠ carbs/cal high; mayo/yogurt qty missing |
+| Crispy Rosemary Chicken w/ Apple Beetroot Slaw | 2 | 412/38/null/null/null/null | ~742/62/82/15.6/…/… | ⚠ high (100g panko+flour+feta; breading adherence uncertain) + nulls |
+| Crispy Tempeh Rice and Cucumber Salad | 2 | 488/20/48/24/4/8 | ~852/30.5/67.5/52.5/…/… | ⚠ low (sesame oil+peanuts+plant mayo) |
+| Dak Gomtang (Korean Chicken Soup) | 3 | 410/32/44/9/1/5 | ~406/23/35/17/…/… | ✅ cal matches; protein/fat swing on skin-on leg yield |
+| Date Me Greek Yogurt Bowl | 1 | 248/18/38/3/2.5/30 | ~271/21/43/2.4/3.2/32 | ✅ close |
+| Date Tahini Bites w/ Sunflower Sesame Crust | 12 | 128/2.5/18/6/1.8/14 | **~278/6.5/30/16.8/4.2/20.8** | ⚠ big undercount (2 cups seeds + tahini) |
+| Double Choc Fudge Cookie | 1 | 356/41.8/null/null/null/null | ~365/41/40/7.4/…/… | ✅ cal/protein match; null macros to fill |
+| Fully auditable: 17/20 (7 ✅, 10 ⚠). Partial: 3 (rice/wrapper qty). ||||
+
+- Recurring: seed/nut/oil-dense salads under-counted (Miso Tofu, Tempeh, Date Tahini Bites);
+  "rice to serve" unquantified again (Thai Meatballs, Chilli Beef). One likely **over**-stated
+  protein (Crispy Rice & Chicken Salad — cal matches but protein ~+60%).
+- `null` macros to fill: Mango Cod Curry, Thai Meatballs, Chilli Beef, Rice&Chicken Salad,
+  Rosemary Chicken, Dak Gomtang(part), Double Choc Cookie.
+
+**Running totals through Batch G:** ~110 of 310 ready recipes covered (10 written + ~98 audited).
+
