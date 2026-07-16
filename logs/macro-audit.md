@@ -364,3 +364,48 @@ drive a very high under-count rate.
 
 **Running totals through Batch J:** ~200 of 310 ready recipes covered (10 written + ~188 audited).
 
+### Batch K (2026-07-16) — next 30 alphabetically ("Pho Gà…" → "Raspberry Chocolate Chip Baked Oatmeal") (read-only)
+
+| Recipe | serves | Stored | Recompute (per serving) | Verdict |
+|---|---|---|---|---|
+| Pho Gà - Vietnamese Chicken Pho | 4 | 501/20/87/8/3.5/5 | (soup, fat rendered) | ⚠ protein low (1.5kg thigh); carbs/noodles match |
+| Phò Inspired Chicken Broth and Rice | 2 | 352/30/46/5/3/12 | ~468/25/63.5/4/…/… | ⚠ carbs/cal high (rice+hoisin+honey) |
+| Pickled Red Onions | 8 | 12/0.2/2.5/0/0.3/1.5 | ~5.5 + absorbed brine | ✅ plausible (brine discarded) |
+| Pistachio Tiramisu Oats | 1 | 318/25/28/11/2.5/14 | ~283/22/28/8.6/…/… | ✅ close |
+| Prawn Fried Rice | 2 | 428/30/56/10/2/1 | ~551/32.5/55/19/…/… | ⚠ fat low (4 eggs + oil) |
+| Protein Berry Parfait | 1 | 265/30/null/null/null/null | ~230/35/18/2.1/…/… | ✅ cal/protein close + nulls |
+| Protein Brownie (Pumpkin) | 3 | 198/23.5/18/5.5/4.2/6 | ~236/25/28/5.3/…/… | ✅ close |
+| Protein Brownie (Sweet Potato) | 3 | 173/13.9/16.8/5.1/3.5/7.5 | ~156/11/23.3/3.7/…/… | ✅ close |
+| Protein Brownie Bake | 2 | 318/22/24/14/4.5/9 | ~237/16/27/9/…/… | ⚠ stored higher than recompute |
+| Protein Oatmeal Breakfast Cookies | 8 | 158/8.5/16/6.5/2/8 | ~162/9.5/18.3/6.25/…/… | ✅ close |
+| Protein Packed Roasted Squash Pasta | 4 | 348/14/52/9/6/6 | ~597/18.2/89/17/…/… | ⚠ low (300g pasta+squash+2×oil) |
+| Protein Pancakes | 15 | 312/24/28/11/5/8 | ~52/3/6.9/1.5/…/… | ⚠ stored MASSIVELY over-stated (serves likely ~2-3) |
+| Protein Pancakes (Simple) | 2 | 331/37/25/10/–/– | ~334/27.9/35/8.5/…/… | ✅ cal match (protein/carbs swing on scoops) |
+| Protein Power BLT | 1 | 500/43/null/null/null/null | ~503/52/45/9.2/…/… | ✅ cal match + nulls |
+| Protein Pumpkin Chocolate Chip Muffins | 12 | 118/4.5/18/4/1.5/8 | ~143/3.8/23.3/4/…/… | ✅ close (brown-sugar-sub swing) |
+| Pumpkin Bread | 10 | 238/3.5/34/10/1.5/20 | ~257/3.9/43.3/8.5/…/37 | ⚠ carbs/sugar low (maple+glaze) |
+| Pumpkin Brookies | 12 | 348/5/28/26/3/18 | ~532/5.5/53.3/35.9/…/… | ⚠ low (2×⅔-cup olive oil batches) |
+| Pumpkin Candy Apple Salad | 1 | 498/7.5/62/24/7/38 | ~913/16/104/52/…/… | ⚠ low (2 apples+almond butter+granola; portion-heavy) |
+| Pumpkin Chocolate Chip Cookies | 2 | 168/5.5/18/10/3/10 | ~163/4.5/16.6/10.25/…/… | ✅ great match |
+| Pumpkin Cream Cheese Muffins | 6 | 298/7/22/21/3.5/12 | ~496/10.8/41/32.7/…/… | ⚠ low (cream cheese+almond flour+oil) |
+| Pumpkin Donuts | 8 | 88/1.5/16/1.5/1.8/6 | ~97/1.7/20.7/0.9/…/… | ✅ close |
+| Pumpkin Pecan Pancakes | null | 148/4/18/7.5/2.5/3.5 | — | ◐ serves is null — can't divide |
+| Pumpkin Protein Muffins | 9 | 162/12/18/5.5/3.8/6.5 | ~139/8.5/15.2/4.9/…/… | ✅ close |
+| Pumpkin Protein Mug Cake | 1 | 318/28/18/12/2.5/6 | ~283/30/13/6.9/…/… | ✅ close |
+| Pumpkin Season Baked Oats | 1 | 288/12/44/7/4.5/14 | ~348/14.5/49.5/9.8/…/… | ✅ close (toppings unquantified) |
+| Pumpkin Spice Olive Oil Cake | 10 | 388/6/32/28/3/22 | ~673/11.7/48/50/…/… | ⚠ big undercount (3.5c almond flour+oils+maple) |
+| Quick Chicken Laksa | 2 | 488/30/42/22/2.5/4 | ~1092/42/55/72/…/… | ⚠ big undercount (instant noodles+oil+coconut+chicken) |
+| Quick Chinese Vegetable Noodle Soup | null | 108/null/null/null/null | — | ◐ serves null; ingredient list has no noodles despite title |
+| Raspberry Cheesecake Protein Bowl | 1 | 225/21/null/null/null/null | ~303/32/18.5/12/…/… | ⚠ protein/cal high (cream cheese+yog+protein) + nulls |
+| Raspberry Chocolate Chip Baked Oatmeal | 1 | 468/14/58/20/8/14 | ~750/24/92/34/…/… | ⚠ low (¾c oats+sunbutter+chia) |
+
+- Fully auditable: 28/30 (14 ✅, 14 ⚠). Partial: 2 (both serves null).
+- **4th over-statement:** Protein Pancakes (serves 15 — protein/cal ~6× too high; likely serves 2-3).
+- **Data-integrity:** Pumpkin Pecan Pancakes & Quick Chinese Veg Noodle Soup both have
+  `serves = null`; the latter also has **no noodles listed** despite being a "noodle soup".
+- The well-specified protein-brownie/cookie family (both Protein Brownies, Oatmeal Cookies,
+  Pumpkin Choc Chip Cookies, Donuts) matches closely; the olive-oil-heavy cakes/brookies and
+  coconut-noodle laksa are the big under-counts.
+
+**Running totals through Batch K:** ~230 of 310 ready recipes covered (10 written + ~218 audited).
+
