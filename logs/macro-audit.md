@@ -497,3 +497,92 @@ drive a very high under-count rate.
 
 **Running totals through Batch M:** ~290 of 310 ready recipes covered (10 written + ~278 audited).
 
+### Batch N (2026-07-16) — final 29 alphabetically ("Thai Chicken Noodle Soup" → "Zesty + Spicy Chicken Fusion Bowl") (read-only)
+
+| Recipe | serves | Stored | Recompute (per serving) | Verdict |
+|---|---|---|---|---|
+| Thai Chicken Noodle Soup | 4 | 189/17/null/null/null/null | ~300/25/30/3.75/…/… | ⚠ cal/protein low + nulls |
+| Thai Drunken Noodles (Pad Kee Mao) | 2 | 454/null/null/null/null/null | ~666/27.5/92.5/17.5/…/… | ⚠ cal low (200g dry noodles) + nulls |
+| Thai Glass Noodle Salad with Prawns | 2 | 448/28/44/18/3/8 | ~834/33.5/75/41.5/…/… | ⚠ big undercount (150g vermicelli+pork+peanut oil) |
+| Thai Prawn Meatball Bowl w/ Spicy Peanut Sauce | 2 | 332/24/null/null/null/null | ~354/25/31/9.5/…/… | ✅ cal/protein match + nulls |
+| Thai Red Curry Pot Roast Chicken | 4 | 548/42/28/30/4/6 | ~1232/57/40/90 (all-in) | ⚠ fat/cal low (whole bird + coconut cream; rendering uncertain) |
+| Thai Style Chicken Satay | 3 | 498/38/42/22/2.5/7 | ~465/43/10/27.6 (no rice) | ◐ rice unquantified; fat a bit high (coconut+PB) |
+| The Easiest Soy Chicken | 3 | 448/38/42/14/4/2 | ~583/42.3/76.7/9/…/… | ⚠ carbs low (1.5 cups dry rice) |
+| Tiramisu Inspired Rice Cake Tower | 1 | 348/40/28/5/1.5/6 | ~359/41/33.5/6.3/…/… | ✅ great match |
+| Toffee Pecan Apple Crumble | 6 | 318/3/44/16/5/28 | ~527/6.5/71.3/27.2/…/… | ⚠ low (apples+dates+oats+pecans+2×coconut oil) |
+| Tuna Avocado Wrap | 1 | 448/38/28/18/5/4 | ~644/35/43/36/…/… | ⚠ fat low (mayo+pesto+avocado) |
+| Tuna Chilli Crunch Salad | 1 | 390/33/null/null/null/null | ~393/31/20/16/…/… | ✅ cal/protein match + nulls |
+| Tuna Gnocchi Bake | 3 | 388/28/52/8/4/6 | ~463/28.7/64.7/6/…/… | ✅ close (protein exact) |
+| Tuna Melt Sandwich | 1 | 548/42/44/22/5/5 | ~733/45/51/34/…/… | ⚠ fat low (avocado+mayo+cheddar+hummus) |
+| Tuna Salad Meal Prep | 4 | 168/26/4/6/0.5/2 | ~255/32/8.25/9.5/…/… | ⚠ protein/cal low (4 cans tuna+mayo) |
+| Turkey Burgers | 4 | 178/28/2/7/0.3/0.5 | ~180/28.8/1.5/5.95/…/… | ✅ great match |
+| Turkey Taco Scramble | 4 | 450/46/24.5/19/3.5/4 | ~472/42.75/25/19.4/…/… | ✅ close |
+| Tuscan-Style Chicken Meatballs & Baby Mushrooms | 4 | 298/26/14/16/2.5/5 | ~359/29.75/15/12/…/… | ✅ close (mince-fat swing) |
+| Ultimate Christmas Pasta Salad | 2 | 548/36/46/24/3/8 | ~933/45.5/72.5/44/…/… | ⚠ big undercount (bacon+stilton+walnuts) |
+| Vegan Blueberry Protein Pancakes w/ Sticky Toffee | null | 142/8.5/18/4/2/5 | — | ◐ serves is null — can't divide |
+| Vegan Chocolate Brownie Pancakes | 2 | 118/4/18/3.5/3/5 | ~373/11.2/62/11.1/…/… | ⚠ stored under-stated (100g flour alone > stored) |
+| Vegan Chocolate Cake Baked Oats | 1 | 368/18/48/11/5.5/8 | ~392/17/51/10/…/… | ✅ close |
+| Vegan Chocolate Fudge Cake Oats | 1 | 298/26/24/9/4/3 | ~417/28/35/9/…/… | ⚠ cal/carbs high (toppings) |
+| Vegan Protein Waffles | 2 | 463/29/46/18/3/9.5 | (Batch A) | ✅ already corrected |
+| Vegan Tahini Brownies | 9 | 292/6/36.5/16/4.5/22.5 | (Batch A) | ✅ already corrected |
+| Vietnamese Chicken & Noodle Bowls | 4 | 592/39/75/14.5/4/10 | (Batch A) | ✅ already corrected |
+| Vietnamese Lettuce Wraps with Peanut Sauce | 3 | 460/36.5/51/14.5/6.5/15.5 | (Batch A) | ✅ already corrected |
+| Vietnamese Noodles with Lemongrass Chicken | 4 | 368/32/36/9/3.5/10 | — | ⛔ ingredient list empty (nulls) |
+| XL Gluten Free Rice Paper Dumplings | 4 | 256/21/15.5/12.5/1.5/2 | (Batch A) | ✅ already corrected |
+| Zesty + Spicy Chicken Fusion Bowl | 4 | 600/45/25/32/null/null | ~504/47.5/22.5/26.25 (no rice) | ✅ close (rice unquantified) + nulls |
+
+- Fully auditable: 21/29 (9 ✅, 12 ⚠). Partial: 2. Empty: 1. Already-done (Batch A): 5.
+- **`SELECT` returned only 29 rows past "Tahini Oat…" → this is the end of the library.**
+
+---
+
+## SWEEP COMPLETE — consolidated summary (2026-07-16)
+
+**Coverage:** all ~310 `import_status='ready'` recipes reviewed across Batches A–N.
+- **10 corrected & written** to Supabase (Batch A, from Saffron's supplied ingredient lists).
+- **~255 read-only audited** with a recompute + verdict.
+- **~40 not auditable** (empty ingredient lists, null `serves`, or too many unquantified items).
+
+**Headline pattern — stored estimates skew LOW.** Of the auditable recipes, the clear
+majority are under-counted, and the error is systematic: **oils (¼-cup dressings, 2-3 tbsp
+cooking oil), nut/seed butters, tahini, coconut milk/cream (full tins), dry noodle/pasta/rice
+weights, dates, and almond flour** were repeatedly missed or under-weighted. Calorie-dense
+desserts/bakes, oats/smoothies, and coconut-noodle/curry dishes are the worst-affected
+families and the highest-yield place to start a correction pass.
+
+**Recipes that consistently MATCHED** were the ones with explicit gram weights per ingredient
+(rice-paper dumplings, protein brownies/cookies, Turkey Burgers, gram-spec'd bakes) — evidence
+that accuracy tracks quantity precision, i.e. **applying quantity-normalisation (workstream
+step 2) would fix most of this at the root.**
+
+**Over-statements (stored too HIGH — rarer, ~8):** Fluffy Greek Yogurt Pancakes, Oat Flour
+Pancakes, Protein Pancakes, both Butternut Protein Brownies, Salmon Poke Bowl Meal Prep,
+Crispy Rice & Chicken Salad, Cinnamon Roll Baked Oats. Several look like per-recipe totals or
+wrong serving counts stored as per-serving.
+
+**Serving-count issues:** `serves = null` on Marinated Fish Tacos, Pumpkin Pecan Pancakes,
+Quick Chinese Veg Noodle Soup, Vegan Blueberry Protein Pancakes (Vegan Protein Waffles already
+fixed). Likely-wrong counts: GF Cinnamon Buns (800g flour ÷6 → probably 12+), Sticky Soy
+Chicken w/ Garlic Rice (÷1 → probably 2), Oat Flour Pancakes / Protein Pancakes / Fluffy Greek
+Pancakes (÷12/÷15/÷3 all too high).
+
+**Duplicate rows:** "High Protein Salmon Potato Salad" (×2, identical, both null macros);
+"Roast Chicken Rice Salad" ≈ "Roast Chicken and Charred Corn Rice Salad" (inconsistent stored).
+
+**Ingredient-list integrity gaps:** Café Style Jacket Potatoes (no potato/corn listed),
+Chilli Lime Shrimp "Veggie" Bowl (no veg), Summer Salmon and "Blackberry" Salad (no
+blackberries), Quick Chinese Vegetable "Noodle" Soup (no noodles). Plus many rows with `null`
+carbs/fat/fibre/sugar even where calories/protein exist.
+
+**Empty ingredient lists (can't audit until populated):** Apple Almond Yogurt Bowl, California
+Rolls in a Bowl, Bounty Bar Overnight Oats, Brownie Batter Overnight Oats, Blended Raspberry
+Protein Chia Pudding, Carrot Cake Baked Oats (serves 1), Strawberry Ice Cream, Vietnamese
+Noodles with Lemongrass Chicken.
+
+**Recommended next step:** nothing was written in the audit (per instruction). When ready,
+the highest-value action is to **apply quantity-normalisation (step 2) then bulk-recompute
+(step 3)** rather than hand-patching; short of that, prioritise the dessert/bake + oats +
+coconut-curry families and the serving-count/duplicate fixes above.
+
+**Running totals — SWEEP COMPLETE:** ~310/310 ready recipes reviewed (10 written + ~255 audited + ~45 not-auditable/already-done).
+
