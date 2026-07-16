@@ -124,3 +124,37 @@ Verdicts: ✅OK (within ~15%) · ⚠OFF (recommend correction) · ◐PARTIAL (a 
 
 **Running totals through Batch D:** ~50 of 310 ready recipes covered (10 written + ~39 audited).
 
+### Batch E (2026-07-16) — next 20 alphabetically ("Chicken Shawarma Sheet Pan…" → "Chocolate Date PB Squares…") (read-only)
+
+| Recipe | serves | Stored | Recompute (per serving) | Verdict |
+|---|---|---|---|---|
+| Chicken Shawarma Sheet Pan Dinner | 4 | 398/36/10/22/2/4 | ~372/44/12/14/…/… | ✅ close (tray "Olive oil" qty unstated → fat uncertain) |
+| Chicken Spring Roll Bowl | 2 | 623/47/69/18/4.5/6 | ~613/47/64/18/…/… | ✅ great match |
+| Chicken Tikka Masala | 4 | 448/32/10/30/2/6 | **~646/36/17/47/…/…** | ⚠ fat/cal low (oil+80g butter+cream) |
+| Chile Lime Chipotle Chicken | 4 | 338/38/4/18/0.5/1.5 | ~392/57/2.5/15/…/… | ⚠ protein low (1134g thigh ÷4) |
+| Chili Crunch Ground Chicken Bowls | 4 | 398/28/44/10/2/10 | **~498/24/56/20/…/…** | ⚠ fat/carbs low |
+| Chili Honey Chicken Bowl | 2 | 488/38/42/18/5/28 | ~601/46/43/27/5.5/33 (no rice) | ◐ rice qty missing; fat/protein look low |
+| Chilli Lime Shrimp and Veggie Bowl | 2 | 228/36/5/8/1/1 | — | ◐ ingredient list has no veggies (title mismatch); marinade oil uncertain |
+| Chilli Oil | 50 | 88/0.2/0.5/10/0.2/0.1 | ~85/0.1/0.4/9.4/…/… | ✅ great match |
+| Chipotle Chicken & Rice Skillet | 4 | 498/38/32/28/2/3 | ~374/22/4/28/…/… (no rice) | ◐ rice qty missing (in title); protein gap |
+| Chipotle Chicken Chop Bowl | 1 | 352/36/42/3/–/– | ~350/32/42/3/…/… | ✅ great match; fibre/sugar null |
+| Choc, PB and Raspberry Overnight Oats | 1 | 388/18/44/14/10/12 | **~496/26/54/20/17/11** | ⚠ low (chia+PB+protein) |
+| Chocolate Baked Oats | 1 | 388/28/42/8/6/8 | ~414/33/51/9/6.4/14 | ✅ close (protein scoop swing) |
+| Chocolate Banana Rice Paper Pie | 5 | 172/2.8/33.2/3.9/–/– | ~166/3.8/30.6/3.7/…/… | ✅ great match; fibre/sugar null |
+| Chocolate Blueberry Baked Oatmeal | 1 | 248/8/42/5/6/10 | ~288/10/45/8/7.6/10 | ✅ close (toppings unquantified) |
+| Chocolate Chia Mousse | 3 | 263/12/null/null/null/null | ~211/12/17/11.6/5.5/6 | ✅ protein matches; null macros to fill; cal swings on yoghurt type |
+| Chocolate Chia Overnight Oats | 1 | 502/38/42/18/5.5/15 | **~689/46/71/26/11/25** | ⚠ low (choc shell+oats+protein) |
+| Chocolate Chip Protein Pancakes | 3 | 398/28/36/12/3/6 | ~368/24/38/12.7/2.3/5 | ✅ close |
+| Chocolate Covered Pumpkin Bites | 12 | 148/5.5/12/9.5/1.5/7 | ~127/3.8/13/6.85/1.4/9.7 | ✅ close (choc-chip cup a swing) |
+| Chocolate Date Cake | 9 | 253/5.5/51/5/4.5/32 | (Batch A) | ✅ already corrected |
+| Chocolate Date Peanut Butter Squares | 12 | 128/2.5/18/6.5/1.5/13 | ~165/2.6/28.5/6.25/2.9/23 | ⚠ carbs/sugar low (15-date weight swing) |
+
+- Fully auditable: 16/20 (10 ✅ OK/close, 6 ⚠ OFF). Partial: 3. Already-done: 1.
+- Patterns holding: **chicken curries/skillets under-counted on fat** (Tikka Masala worst —
+  oil+butter+cream); **overnight-oats/chia recipes under-counted** (chia+PB+protein weight);
+  "rice/cauli rice of choice" (no qty) keeps appearing on bowls/skillets, including two where
+  it's literally in the title ("& Rice Skillet"). Data-quality one-offs: Chilli Lime Shrimp
+  "Veggie" Bowl lists no vegetables.
+
+**Running totals through Batch E:** ~70 of 310 ready recipes covered (10 written + ~58 audited).
+
