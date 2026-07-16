@@ -409,3 +409,47 @@ drive a very high under-count rate.
 
 **Running totals through Batch K:** ~230 of 310 ready recipes covered (10 written + ~218 audited).
 
+### Batch L (2026-07-16) — next 30 alphabetically ("Raspberry Coconut…" → "Spicy Chilli Rice Paper Wontons") (read-only)
+
+| Recipe | serves | Stored | Recompute (per serving) | Verdict |
+|---|---|---|---|---|
+| Raspberry Coconut Chocolate Bars | 10 | 128/1.5/14/8/2.5/10 | ~190/2.1/21/13.1/…/… | ⚠ low (choc chips+coconut) |
+| Rice Cakes w/ Nut Butter, Strawberries & Choc | 1 | 239/4.6/20.2/15.9/1.5/6.5 | ~252/6.1/28.3/13.8/…/… | ✅ close |
+| Rice Paper Kimchi Jeon with Tuna | 2 | 349/26/49/5/–/– | ~349/25/47.5/6/…/… | ✅ great match + nulls |
+| Rice Paper Pad See Ew with Shrimp | 1 | 542/51/68/7/–/– | ~546/57/62/7/…/… | ✅ great match + nulls |
+| Roast Chicken and Charred Corn Rice Salad | 2 | 488/38/62/18/6/8 | ~568/38/55/17/…/… | ✅ close |
+| Roast Chicken Breast | 4 | 185/35/1/4.5/0/0.5 | ~203/36.75/0.5/5.3/…/… | ✅ great match (brine discarded) |
+| Roast Chicken Crispy Rice Salad w/ Tahini Miso | 6 | 705/51/58/28/3/8 | ~664/46.3/46.3/27/…/… | ✅ close |
+| Roast Chicken Rice Salad | 2 | 398/32/42/12/6/6 | ~568/38/55/17/…/… | ⚠ near-dup of Charred Corn Rice Salad; under-counted + inconsistent stored |
+| Roasted Butternut Squash and Carrot Soup | 4 | 188/3/28/8/5/12 | ~307/3.75/31.3/19.25/…/… | ⚠ fat low (coconut milk+2-3 tbsp oil) |
+| Roasted Cod on Sweet Potato | 2 | 347/49.1/null/null/null/null | ~571/41.6/64.7/14.75/…/… | ⚠ cal low (600g sweet potato) + nulls |
+| Salmon Crispy Rice Paper Bites | 3 | 198/22/14/7/1.5/4 | ~275/17/22.7/10.7/…/… | ⚠ low (salmon+rice paper+honey) |
+| Salmon Poke Bowl Meal Prep | 2 | 573/47/null/null/null/null | ~400/14/32.5/18.5/…/… | ⚠ stored protein over-stated (1 tin salmon ≈ 33g total) |
+| Saucy Shredded Chicken Tacos | 6 | 278/30/10/12/0.5/5 | ~310/37.5/13.3/10/…/… | ✅ close (tortillas to-serve excluded) |
+| Seared Miso Tuna Crispy Rice Bowl | 2 | 528/43/50/17/–/– | ~611/38/48/28.5/…/… | ⚠ fat high (multiple sesame oil + seeds) |
+| Shrimp Avocado and Greens with Lemony Tahini | 4 | 234/20/8/14/4.5/2 | ~260/23.25/7.25/16/…/… | ✅ close |
+| Simple Honey Date Cake | 9 | 228/3.5/38/7/1.5/25 | ~255/3/45.7/7.8/1.5/30.2 | ✅ close |
+| Simple Salmon Bowl | 1 | 488/36/42/20/2/4 | ~561/28/40/28/…/… | ⚠ fat high (salmon+mayo) |
+| Singapore Chicken Noodles | 4 | 388/24/38/16/2.5/4 | ~359/15.5/26/20.25/…/… | ✅ borderline (cal close; protein/carb swing) |
+| Single Serve Baked French Toast | 1 | 388/18/48/12/3.5/18 | ~417/19/52/11.6/…/… | ✅ close |
+| Single Serve Double Chocolate Butter Cake | 2 | 278/2.5/34/15/2/22 | ~357/2.8/42/21/…/… | ⚠ low (butter+oil+brown sugar) |
+| Single Serve Sticky Date Pudding | 1 | 235/12/35/5/–/– | ~335/12/55/5/…/… | ⚠ carbs/cal high (date+flour+maple) |
+| Single Serve Vegan Chocolate Mug Cake | 1 | 248/4.5/28/12/3/14 | ~272/4/28/10.5/…/… | ✅ close |
+| Skillet Chicken Thighs with Mushroom Gravy | 4 | 318/32/8/18/1.5/2 | ~418/42.75/8.75/21.75/…/… | ⚠ protein low (780g thighs+4 tbsp oil) |
+| Smashed Broccoli Salad w/ Greek Yogurt Dressing | 4 | 325/12/21/25/7.5/4 | ~371/9.25/19/29.25/…/… | ✅ close |
+| Smoky Caramelised Red Pepper Orzo | 2 | 353/12/null/null/null/null | ~359 base (no optional prawns/feta) | ✅ base matches + nulls |
+| Smoky Chicken Tacos with Roasted Corn Salsa | 4 | 348/33/16/18/4/4 | ~372/36.75/18/16.25/…/… | ✅ close |
+| Snickers Overnight Oats | 1 | 412/12/52/18/7.5/14 | ~534/15.4/66/25/…/… | ⚠ low (30g choc+peanuts+PB) |
+| Speedy Pad Thai Noodle Salad | 1 | 420/32/null/null/null/null | ~560/38/69/11/…/… | ⚠ cal/carbs low + nulls |
+| Spicy Asian Noodles with Spinach & Chilli Crisp | 2 | 348/10/46/16/4/4 | ~522/9/65/23/…/… | ⚠ low (tahini+chilli crisp+sesame oil) |
+| Spicy Chilli Rice Paper Wontons with Shrimp | 1 | 516/34/68/11/–/– | ~478/37/58/8/…/… | ✅ close + nulls |
+
+- Fully auditable: 30/30 (16 ✅, 14 ⚠). No blockers this batch.
+- **Duplicate:** "Roast Chicken Rice Salad" ≈ "Roast Chicken and Charred Corn Rice Salad"
+  (same ingredients) but stored 398 vs 488 — inconsistent; de-dupe candidate.
+- **Over-statement:** Salmon Poke Bowl Meal Prep (protein 47 vs ~14 — 1 tin salmon can't yield that).
+- Rice-paper dishes (Kimchi Jeon, Pad See Ew, Pad See Ew Shrimp) match beautifully — they're
+  gram-specified. Salmon/oil bowls and dessert bars remain under-counted.
+
+**Running totals through Batch L:** ~260 of 310 ready recipes covered (10 written + ~248 audited).
+
