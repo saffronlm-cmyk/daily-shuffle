@@ -317,3 +317,50 @@ are calorie-dense and were consistently under-counted → unusually high OFF rat
 
 **Running totals through Batch I:** ~170 of 310 ready recipes covered (10 written + ~158 audited).
 
+### Batch J (2026-07-16) — next 30 alphabetically ("Mayak Korean…" → "Peanutty Chicken Salad") (read-only)
+
+Noodle / Pad-Thai / peanut-sauce heavy stretch → dry-noodle weights + peanut butter + oils
+drive a very high under-count rate.
+
+| Recipe | serves | Stored | Recompute (per serving) | Verdict |
+|---|---|---|---|---|
+| Mayak Korean Marinated Eggs | 4 | 108/10/5/6/0.5/3 | ~85–138 (marinade absorption) | ✅ borderline (most marinade discarded) |
+| Meal Prep Spicy Tuna Quesadilla | 2 | 345/28/null/null/null/null | ~343/27.5/39/7.7/…/… | ✅ cal/protein match + nulls |
+| Mediterranean Chicken & Rice Skillet | 4 | 480/40/null/null/null/null | ~345/21.7/5/24 (no rice) | ◐ rice unquantified; protein looks high in stored |
+| Microwave Chocolate Protein Oats | 1 | 248/21.5/22/8.5/5.5/6 | ~380/34.5/37/13/…/… | ⚠ low (20g cocoa+protein+choc) |
+| Middle Eastern Chicken & Rice Bowl | 4 | 428/38/8/26/1.5/3 | ~422/47/5/22 (no rice) | ⚠ protein low (907g thigh); rice not in stored either |
+| Miến Gà - Vietnamese Glass Noodle Chicken Soup | 4 | 445/34/38/16/2.2/4 | ~ (fat renders out) | ✅ borderline (skin fat skimmed + garlic-oil drizzle discarded) |
+| Miso Peanut Ramen Bowl | 4 | 498/18/44/30/4/8 | ~628/24/51/36.6/…/… | ⚠ low (coconut+tofu+PB+noodles) |
+| Miso Soy Chicken with Coconut Lime Rice | 4 | 578/38/52/22/1.5/8 | ~776/38/62.5/35.3/…/… | ⚠ fat/cal low (coconut milk rice + oil) |
+| Muffin Top Pumpkin Protein Cookies | 10 | 148/7/12/8.5/2/6.5 | ~148/6.1/13.1/8.6/…/… | ✅ great match |
+| Nandos Chicken Pasta Salad | 1 | 418/49/42/7/–/– | ~493/49/46/12/…/… | ✅ close (protein exact; fat higher) |
+| No Bake Coconut Cookies | 20 | 168/3/22/8.5/2/14 | ~242/4.6/27.6/13.8/…/… | ⚠ low (coconut oil+PB+choc) |
+| Oat Flour Pancakes | 12 | 97/8.2/10.5/2.8/1.2/5.5 | ~53/2.65/7.6/1.3/…/… | ⚠ stored over-stated (protein impossible; serves likely ~6) |
+| One Pan Vegan Sushi Bake | 3 | 464/16/65/16/7/3 | ~633/23.3/64.3/25.7/…/… | ⚠ fat/cal low (mayo+avo+tofu+edamame) |
+| Pad Kra Pao - Thai Basil Chicken | 2 | 597/44/63/19/1.8/4.5 | ~581/41/48.5/21/…/… | ✅ close |
+| Pad See Ew - Thai Stir Fried Noodles | 2 | 488/28/58/16/3/5 | ~713/27/93/26.5/…/… | ⚠ carbs/fat low (200g dry noodles+3 tbsp oil) |
+| Pad See Ew with Beef | 2 | 388/44/42/14/3.5/5 | ~864/41.5/92/33/…/… | ⚠ big undercount (200g dry noodles) |
+| Pad Thai Inspired Saucy Chicken Noodles | 5 | 525/28/62/18/3.5/14 | ~729/33/83/24.8/…/… | ⚠ carbs/fat low (397g noodles+coconut sugar) |
+| Pad Thai with Chicken and Prawns | 4 | 528/30/62/18/4/14 | ~650/40/75/23.75/…/… | ⚠ low |
+| Pad Thai with Prawns | 2 | 418/28/48/14/5/10 | ~511/27.5/65/11.5/…/… | ⚠ carbs low (120g noodles) |
+| Peach and Nectarine Overnight Oats | 1 | 318/10/54/6/7.5/16 | ~400/12/58/11/…/… | ⚠ base alone > stored (fat) |
+| Peaches and Cream Chia Pudding | 2 | 195/5.5/32/6/7/20 | ~244/8.75/29.5/11.5/…/… | ⚠ fat low (4 tbsp chia) |
+| Peanut Butter and Jam Breakfast Oat Bars | 4 | 248/6.5/42/5.5/7/16 | ~374/11.1/62/9.75/…/… | ⚠ low (200g oats+PB+banana) |
+| Peanut Butter Banana French Toast | 1 | 488/18/58/18/5/24 | ~611/22/66/23/…/… | ◐ PB & banana amounts unstated |
+| Peanut Butter Chicken Coconut Noodles | 2 | 485/44/52/18/3/4 | ~913/42/89/35/…/… | ⚠ big undercount (200g noodles+coconut cream+PB) |
+| Peanut Butter Chicken Katsu Noodles | 3 | 495/56/60/11/4/8 | — | ◐ rice + chicken amounts unquantified |
+| Peanut Butter Cup Overnight Oats | 1 | 448/28/38/18/4/8 | ~518/35/49/18.5/…/… | ✅ close (fat matches; PB-cup size varies) |
+| Peanut Butter Protein Balls | 16 | 148/6.5/14/8/1.8/6 | ~171/6.6/18.4/8.6/…/… | ✅ close |
+| Peanut Noodle Stir Fry | 3 | 398/18/44/18/7/8 | ~665/45/41/35.3/…/… | ⚠ big undercount (½ cup PB+450g tofu) |
+| Peanut Tofu Salad Jars | 4 | 278/18/28/8/5.5/6 | ~351/28.8/22.5/13.75/…/… | ⚠ protein/fat low (454g tofu; quinoa unquantified) |
+| Peanutty Chicken Salad | 1 | 544/62/22/23/6.5/6 | ~534/61/22/21/…/… | ✅ great match |
+| Fully auditable: 27/30 (9 ✅, 18 ⚠). Partial: 3. ||||
+
+- Very high under-count rate driven by **dry-noodle weights** (200–400g dry noodles per recipe)
+  + **peanut butter / coconut** in the Pad Thai / peanut-noodle family. Third over-statement
+  found: **Oat Flour Pancakes** (serves 12 — protein/cal impossible; likely serves ~6).
+- Clean matches on the gram-specified ones (Muffin Top Cookies, Peanutty Chicken Salad,
+  Pad Kra Pao, Meal Prep Tuna Quesadilla).
+
+**Running totals through Batch J:** ~200 of 310 ready recipes covered (10 written + ~188 audited).
+
