@@ -7,7 +7,7 @@
 
 <!-- PWA -->
 <link rel="manifest" href="./manifest.json">
-<meta name="theme-color" content="#F5F2EC">
+<meta name="theme-color" content="#3D0F13">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Daily Shuffle">
@@ -1377,9 +1377,9 @@ function setTheme(name) {
     btn.style.borderColor = btn.dataset.themeBtn === name ? 'var(--accent)' : 'var(--border)';
     btn.style.boxShadow = btn.dataset.themeBtn === name ? '0 0 0 2px var(--accent-tint)' : 'none';
   });
-  // Update meta theme-color
-  const colors = { natural: '#F5F2EC', cafe: '#F1EEEB', coastal: '#FFFFFF' };
-  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', colors[name] || '#F5F2EC');
+  // Update meta theme-color. Alt themes are accent-only swaps on one
+  // cream/oxblood base, so the browser chrome stays oxblood across all of them.
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#3D0F13');
 }
 
 // ─── CRAVINGS TAXONOMY ───────────────────────────────────────────────────────

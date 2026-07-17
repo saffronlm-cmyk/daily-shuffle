@@ -4,6 +4,79 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# Redesign Ship — Merge to Main, Icon, Layout Fixes, Repo Cleanup
+**Date:** 2026-07-17
+**Project:** Daily Shuffle — mobile redesign finalisation + repo hygiene
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete — mobile redesign is now live on `main`; desktop layout remains the next deliverable
+
+---
+
+## Project Context
+Directly continues the 2026-07-15 entry (mobile editorial redesign — full oxblood/cream + Fraunces + bottom-tab-bar reskin of every screen, built on branch `claude/mobile-redesign-foundation`). That session left the redesign committed but **not merged** and flagged desktop as next. This session shipped it to `main`, resolved a competing design refresh already on main, cleaned up branches + a docs collision, added the app icon, and fixed three layout bugs. See 2026-07-15 for the full redesign detail — not repeated here.
+
+## Session Goal
+Merge the mobile redesign to `main`; reconcile it against the parallel design work already on main; clean up obsolete branches and a HANDOFF file collision; replace the off-brand app icon with the on-brand 1a mark; fix reported layout overflows (Add form, Tracker margins, Shuffle controls); align PWA chrome colours to the oxblood register.
+
+## State Before This Session
+Redesign complete on `claude/mobile-redesign-foundation` at commit `2b2f61d`, unmerged. `origin/main` had **diverged 13 commits** since the branch was cut — critically including PR #41 (`991b2b2 "Apply design refresh to index.html"`), a **separate, competing** design refresh to the same file from another session. A pre-existing uncommitted `HANDOFF.md` change was in the working tree. ~18 remote branches existed, most stale.
+
+## What Was Done
+1. **Merge reconciliation (the load-bearing decision).** A merge of the branch into main conflicted in `index.html`, `sw.js`, `logs/daily-shuffle_log.md`. Verified via `git log --oneline 70da8fa..origin/main -- index.html` that the **only** commit touching `index.html`/`sw.js` since the branch base was PR #41's design refresh — i.e. taking our version discards *only* the competing design, zero functional/backend work. Saffron chose "this redesign wins." Resolved `index.html`+`sw.js` with `--ours`, took main's log with `--theirs` then spliced our entry on top, kept all of main's other new files (BRAND.md, MONETIZATION.md, quantity-normalisation-plan.md, CLAUDE.md rewrite, 4 skills, scripts). Smoke-tested the merged tree in-browser before committing. Fast-forwarded `origin/main` (`ef012a3..557a4c2`, no force).
+2. **Branch cleanup.** Classified all remote branches by `git branch -r --merged origin/main` + per-branch `merge-base --is-ancestor` checks. Deleted **11 obsolete** remote branches (merged, session-log-only, or superseded — incl. `update-root-index-html-hzmwfx` whose design PR #41 was the one we overrode). Kept 4 with genuinely un-landed code (see Open Questions). Corrected an earlier misread: `daily-shuffle-foundations-C2e6Q`'s keep-alive workflow is already identical on main (obsolete too, left for Saffron to confirm-delete). Deleted 2 stale local branches.
+3. **HANDOFF.md case-collision.** The perpetual "modified HANDOFF.md" was **not a real edit** — `HANDOFF.md` and `handoff.md` are one physical file on case-insensitive macOS; git tracks both paths; the physical file held `handoff.md`'s Apify-pipeline content, so git reported the uppercase path as modified forever. Fixed: salvaged the unique cost-aware-features vision from the uppercase roadmap into `handoff.md`, `git rm --cached HANDOFF.md`, updated the CLAUDE.md pointer. Working tree is finally clean.
+4. **App icon → design 1a.** Prototype `Daily Shuffle - App Icon.dc.html` (in `~/Documents/Claude/PERSONAL/Daily_Shuffle/daily-shuffle-prototype-screens-1/`) offered 4 directions; Saffron picked **1a "Oxblood · cream mark"**: full-bleed oxblood radial gradient (`#5c1a1f→#3D0F13→#2a090c`) + cream `#F3ECD8` shuffle-loop glyph. No SVG→PNG CLI tools available (no rsvg/imagemagick/inkscape/sharp), so authored the brand SVG and rasterised via **macOS `qlmanage -t`** (QuickLook) at 512 and 192 — verified crisp in-browser. Maskable-safe (full-bleed, glyph at 56% inside safe zone; manifest icons are `purpose:"any maskable"`).
+5. **Layout fixes (all the same root cause).** The app is a fixed ~430px column but its responsive rules key off **viewport width** (`@media max-width:768px`), which never fires on desktop — so multi-column grids overflow the column. Fixed three: **Add form** (`#tab-add .form-grid → 1fr` + full editorial restyle of the form), **Tracker** side margins (`.trk-wrap` padding `4px 0` → `4px 22px`), **Shuffle controls** (`#tab-plan .control-group/select/input { min-width:0 }` so the native date input shrinks to its `1fr` cell instead of stretching past the card). Also stripped remaining emoji (`deEmoji()` helper over the label-map constants + manual sweeps), rebuilt Grocery rows to the prototype catalogue design, reskinned Shuffle day cards, and reconciled cafe/coastal to accent-only swaps.
+6. **PWA chrome colours → oxblood.** `index.html` `<meta name="theme-color">` was still the old light `#F5F2EC`; manifest `theme_color`/`background_color` were `#120d0b`. Set all to `#3D0F13` (the CTA/tab-bar/icon oxblood). Also replaced the stale per-theme JS colour map (`natural/cafe/coastal → F5F2EC/F1EEEB/FFFFFF` at ~line 1381) with a constant `#3D0F13`, since alt themes are now accent-only on one cream/oxblood base.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| index.html | Redesign merged; Add/Tracker/Shuffle overflow fixes; theme-color meta + JS map → oxblood | Modified | /Users/saffron/daily-shuffle/ |
+| sw.js | Cache bumped across the session, now **v36** | Modified | /Users/saffron/daily-shuffle/ |
+| manifest.json | theme_color + background_color → `#3D0F13` | Modified | /Users/saffron/daily-shuffle/ |
+| icon-192.png / icon-512.png | Regenerated as the 1a oxblood/cream shuffle mark | Modified | /Users/saffron/daily-shuffle/ |
+| handoff.md | Appended salvaged cost-feature roadmap from the retired uppercase file | Modified | /Users/saffron/daily-shuffle/ |
+| HANDOFF.md | Untracked (case-collided with handoff.md) | Deleted (from index) | /Users/saffron/daily-shuffle/ |
+| CLAUDE.md | Updated handoff-docs pointer | Modified | /Users/saffron/daily-shuffle/ |
+| logs/daily-shuffle_log.md | This entry + merged main's log entries | Modified | /Users/saffron/daily-shuffle/logs/ |
+
+## Decisions & Reasoning
+- **Redesign wins over PR #41's design refresh**: Saffron's call. De-risked first by confirming PR #41 was the *only* index.html change on main since the branch base, so nothing functional was lost — only a competing visual pass discarded.
+- **`qlmanage` for SVG→PNG**: no rasteriser was installed and installing one wasn't warranted for two icons; QuickLook ships with macOS, renders SVG gradients + stroke paths faithfully, and produced exact-dimension PNGs. Verified visually rather than trusting it blind.
+- **Single oxblood `#3D0F13` for all theme-colors** (not per-theme): the redesign collapsed the three themes to accent-only swaps on one cream/oxblood base, so the browser chrome should be constant. The old per-theme map was stale light values.
+- **Left the 4 un-landed-code branches undeleted**: they hold work not on main (see below) — deleting them loses it. Only deleted branches proven fully-merged or session-log-only.
+- **Kept manifest → oxblood rather than cream**: the launch splash + chrome reading as the brand oxblood matches the icon and tab bar; a cream chrome would clash with the dark backdrop the mobile column sits on.
+
+## Current State (end of session)
+Mobile redesign is **live on `main`** (last shipped tip before this log commit: `fc56549`, the Shuffle controls fix). Icon 1a live. Add/Tracker/Shuffle overflow bugs fixed and verified at 390px. This session's final code change — the theme-colour/manifest oxblood alignment + SW **v36** — is committed on `claude/mobile-redesign-foundation` alongside this log entry, **pushed to the branch but NOT yet merged to main** (no merge instruction given this turn; awaiting Saffron's go). Working tree clean. JS parses clean (3 blocks, 0 errors); manifest is valid JSON.
+
+## Next Steps
+1. **Merge the theme-colour + log commit to main** if Saffron approves (same fast-forward pattern: `git branch -f main <branch> && git push origin <branch>:main`). Direct-push-to-main is gated by the safety classifier and needs per-turn authorisation.
+2. **Desktop layout — THE next deliverable.** Branch fresh off current `main` (it keeps moving). The core problem, now proven three times (Add form, Tracker, Shuffle controls): **responsive rules key off viewport width but the app is a fixed-width column**, so any multi-column grid overflows on desktop. Solve structurally — either a max-width breakpoint that expands the column into a real multi-pane desktop shell (side nav replacing the bottom tab bar, multi-column recipe grid, side-by-side plan+grocery), or container-query-based components. Decide the desktop IA with Saffron before building (consider another Claude Design pass — that workflow has worked well three times now).
+3. Optional carry-over polish: recipe cards/detail hero still use gradient placeholders (no photography); the prototype's full-screen recipe-detail hero + "Add to plan" sticky flow was not built.
+
+## Open Questions / Blockers
+- **Desktop IA undecided** — side nav vs. bottom bar, how the column expands, plan+grocery side-by-side. Needs a design decision before implementation.
+- **4 un-landed-code branches to triage** (kept, not yet actioned): `daily-shuffle-qty-normalisation-d8su8h` (quantity-normalisation script + applied ruleset, "DB write pending"), `recipe-ingredient-prices-RYSob` (19-commit ingredient CSV pipeline, possibly partly superseded), `gallant-wright-xo9frd` (Apify `--resume` + quota detection, confirmed absent from main's script), `recipe-null-supabase-GnoDV` (old RLS migration, may be superseded). Plus `daily-shuffle-foundations-C2e6Q` (now confirmed obsolete — safe to delete). Decide which to land vs. delete.
+- No recipe photography exists; a source + storage decision is needed before the photo-hero designs can ship.
+
+## Environment & Config Notes
+- Repo `/Users/saffron/daily-shuffle`, working branch `claude/mobile-redesign-foundation`; `main` fast-forwards to it. Remote `origin` = github.com/saffronlm-cmyk/daily-shuffle. No open PR — merges done by direct fast-forward push.
+- **Service worker at v36.** Bump on every shippable index.html/asset change (the project's #1 "my fix isn't showing" cause).
+- Icon prototype + handoff bundle live under `~/Documents/Claude/PERSONAL/Daily_Shuffle/daily-shuffle-prototype-screens-1/` (also zipped as `Daily Shuffle icone-handoff.zip`). Design tokens under its `_ds/…/tokens/`.
+- Two handoff docs on main, distinct: `handoff.md` (Apify price pipeline + salvaged cost-feature roadmap). The uppercase `HANDOFF.md` is gone.
+
+## Notes & Gotchas
+- **macOS case-insensitive FS**: never keep two files differing only in case (`HANDOFF.md`/`handoff.md`) — git shows a permanent phantom "modified" and only one can physically exist. Resolved this session.
+- **The fixed-column-vs-viewport-media-query trap is systemic**: every `@media (max-width: …)` rule in the file is dead on desktop now that the app is a fixed ~430px column. Any grid using viewport breakpoints will overflow until desktop is built properly. Fix new grids with `min-width:0` + column-scoped single-column rules as a stopgap; solve structurally in the desktop pass.
+- **`qlmanage` quirk**: it writes `<name>.svg.png` in the `-o` dir and resets shell cwd after running — use absolute paths and `mv` the output.
+- **`deEmoji()` runs once at load** over the label-map constants; emoji hardcoded in markup/JS strings are NOT auto-stripped (swept manually this session). New emoji added to the constant maps get stripped automatically.
+- SW is now v36 — if verifying in-browser, a stale SW will serve old CSS/manifest; hard-reload with a `?v=` query or bump again.
+
+---
+
 # Mobile Editorial Redesign — Foundation + All Screens Re-skinned
 **Date:** 2026-07-15
 **Project:** Daily Shuffle — recipe/meal-planning PWA
