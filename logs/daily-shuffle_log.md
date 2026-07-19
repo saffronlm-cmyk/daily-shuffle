@@ -4,6 +4,97 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# Add Recipe — Chicken Mince Konjac Japchae
+**Date:** 2026-07-19
+**Project:** Daily Shuffle — recipe library (Supabase `recipes`)
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete — recipe is live in the app
+
+---
+
+## Project Context
+One-off recipe addition to the bundled Supabase recipe library
+(`jsxcctrskkkxgdxfaduo`), which backs the live PWA. See CLAUDE.md "Data & sync" and
+the `recipe-db` skill for the schema. The app fetches `recipes?import_status=eq.ready`
+(index.html:1511) network-first and caches to `ds_recipe_cache`, so a data insert with
+`import_status='ready'` makes the recipe appear on the next app open — no `index.html`
+or `sw.js` change, no cache bump.
+
+## Session Goal
+Add Saffron's "Chicken Mince Konjac Japchae" (serves 5) to Supabase and the app.
+
+## State Before This Session
+`recipes`: 336 total / 310 ready. A **sibling** recipe already existed —
+"Glass & Konjac Chicken Japchae" (id `b8bb9c91…`, chicken **breast** + frozen veg,
+serves 4, different sauce). The new recipe is a distinct variant (chicken **mince 5%**,
+fresh mushrooms/carrots/red onion, MSG + fish sauce + sweet-chilli sauce), so it was
+added as a **new row**, not an overwrite of the sibling.
+
+## What Was Done
+Inserted one row into `recipes` via Supabase MCP `execute_sql`, mirroring the sibling
+recipe's field conventions:
+- `ingredient_sections` jsonb → two sections MAIN (8 items) + SAUCE (8 items), each item
+  `{qty,name,note,unit,group}` matching the existing shape. Garlic entered as
+  `qty:4, unit:"clove"`; red onions `qty:3, unit:null`; noodles/mince/veg in grams;
+  sauce liquids in ml, brown sugar in g.
+- `method_steps` text[] → the 7 steps verbatim (step 2's "just under" phrasing kept).
+- Classification: `meal_type='dinner'`, `meal_types=['lunch','dinner']`,
+  `protein_source='chicken'`, `cuisine='korean'`, `carb_type='none'` (matches the
+  sibling — konjac-based), `serves=5`, `cost_tier='2'`, `prep_cook_time='35 minutes'`,
+  `craving_tags=['savoury','highprotein','glutenfree','asian','comfort','healthy']`.
+- **Macros are an AI estimate** (flagged in `notes`, same as the sibling): per serve
+  cal 590 / protein 46 / carbs 47 / fat 13 / fibre 9 / sugar 15. Derived by hand-summing
+  ingredient macros (chicken mince 5% ≈ 172 kcal·20 g P/100 g dominates; konjac ≈ 0;
+  glass noodles + brown sugar + sweet chilli drive carbs/sugar) and dividing by 5. Rough
+  — not from the nutrition pipeline (step 3 is still blocked).
+- id / created_at / updated_at left to defaults (`gen_random_uuid()`, `now()`).
+- New id: `7670cb5c-e6ef-437e-bc3b-fd0780b4e19d`.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| Supabase `recipes` row | New recipe `7670cb5c…` | Created | Supabase `jsxcctrskkkxgdxfaduo` |
+| logs/daily-shuffle_log.md | This entry | Modified | /home/user/daily-shuffle/logs/ |
+
+No `index.html` / `sw.js` / `manifest.json` change — app is data-driven from Supabase.
+
+## Decisions & Reasoning
+- **New row, not overwrite of the sibling japchae**: different protein form (mince vs
+  breast), different vegetables (fresh vs frozen) and a materially different sauce (adds
+  fish sauce, MSG, sweet chilli). Two legitimately distinct recipes.
+- **Macros included as an AI estimate rather than left null**: the sibling recipe carries
+  estimated macros and the app surfaces macros in Shuffle/Tracker; a filled estimate is
+  more useful than null. Flagged clearly in `notes` so it's not mistaken for measured.
+  If Saffron wants them blanked or recomputed via the real pipeline, easy to update by id.
+- **No cache bump / no code change**: recipe delivery is pure data
+  (`import_status=eq.ready`); CLAUDE.md says data-only changes don't need a `sw.js` bump.
+
+## Current State (end of session)
+Recipe live: `recipes` now 337 total / 311 ready. Row verified read-back — 2 sections,
+7 steps, `import_status='ready'`, `is_hidden=false`. It will appear in the app on next
+open (network-first recipe fetch refreshes `ds_recipe_cache`).
+
+## Next Steps
+1. None required. Optional: if Saffron reviews the macros and wants them exact, update
+   row `7670cb5c-e6ef-437e-bc3b-fd0780b4e19d` once nutrition step 3 is unblocked.
+
+## Open Questions / Blockers
+N/A.
+
+## Environment & Config Notes
+Repo `saffronlm-cmyk/daily-shuffle`, branch `claude/chicken-konjac-japchae-recipe-v6uboe`.
+Supabase project `jsxcctrskkkxgdxfaduo`, table `recipes`, open anon RLS. No cache bump
+(current `sw.js` version unchanged). No credentials handled.
+
+## Notes & Gotchas
+- Don't confuse this with the sibling **"Glass & Konjac Chicken Japchae"** (`b8bb9c91…`) —
+  they're near-namesakes but different recipes; both are meant to exist.
+- `carb_type='none'` is deliberate (konjac-forward, small glass-noodle portion) and
+  matches the sibling — leave it unless Saffron reclassifies.
+
+---
+
 # Redesign Ship — Merge to Main, Icon, Layout Fixes, Repo Cleanup
 **Date:** 2026-07-17
 **Project:** Daily Shuffle — mobile redesign finalisation + repo hygiene
