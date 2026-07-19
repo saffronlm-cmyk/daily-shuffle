@@ -32,6 +32,37 @@ weights).
 
 ---
 
+## Batch A2 — Tier 1 normalisation corrections (2026-07-16) — WRITTEN
+
+First tranche of audit-derived corrections applied. 15 highest-severity recipes from the
+normalisation-priority list (biggest stored-vs-recompute gaps, driven by unweighted
+oils/nut butters/tahini/coconut/dry-noodle/date quantities). Assumptions confirmed by
+Saffron: **coconut milk = light**, **quinoa = cooked**, **instant noodle pack = 85 g**.
+(Coconut *cream* left full-fat — it's a distinct ingredient.)
+
+| Recipe | serves | Before | After |
+|---|---|---|---|
+| Quick Chicken Laksa | 2 | 488/30/42/22/2.5/4 | **897/41/58/52/2/3** |
+| Crispy Rice Salad with Miso Tofu | 2 | 488/35/42/22/6.5/8 | **916/38/78/50.5/6.5/12** |
+| Peanut Butter Chicken Coconut Noodles | 2 | 485/44/52/18/3/4 | **913/42/89/35/3/6** |
+| Ultimate Christmas Pasta Salad | 2 | 548/36/46/24/3/8 | **933/45.5/72.5/44/4/10** |
+| Pad See Ew with Beef | 2 | 388/44/42/14/3.5/5 | **864/41.5/92/33/3.5/5** |
+| Crispy Tempeh Rice and Cucumber Salad | 2 | 488/20/48/24/4/8 | **852/30.5/67.5/52.5/4/9** |
+| Thai Glass Noodle Salad with Prawns | 2 | 448/28/44/18/3/8 | **834/33.5/75/41.5/3/9** |
+| Green Goddess Pasta Salad | 3 | 398/22/44/14/6/4 | **795/44/82/32.5/6/5** |
+| Sweet Potato and Kale with Tahini Dressing | 2 | 488/14/58/22/12/8 | **488/11.5/50/28.5/9/8** (cooked quinoa) |
+| Pumpkin Spice Olive Oil Cake | 10 | 388/6/32/28/3/22 | **673/11.5/48/50/5/26** |
+| Spicy Tom Kha Soup with Tofu | 2 | 288/12/18/20/3.5/7 | **415/17.5/15.5/28/3.5/7** (light coconut) |
+| Coconut Prawn Curry | 4 | 228/28/8/10/1.5/4 | **375/53/13/12.5/2/5.5** (light coconut) |
+| Steamed Rice Paper Dumplings with Shrimp | 4 | 198/18/16/8/1/3 | **444/26/39/19/1.5/3** |
+| Date Tahini Bites with Sunflower Sesame Crust | 12 | 128/2.5/18/6/1.8/14 | **278/6.5/30/16.5/4/21** |
+| Sweet and Salty Date Caramel Oat Cookie Slice | 16 | 148/1.5/22/6/1.5/14 | **276/2.75/49/9/2.5/16** |
+
+Verified read-back: all 15 rows updated. `ingredient_sections` untouched (raw source of truth).
+Tier 2 candidates (~28) tracked in `logs/normalisation-priority.md`.
+
+---
+
 ## Read-only library audit (no writes)
 
 Goal: sweep the whole `recipes` library (import_status='ready'), recompute macros where
