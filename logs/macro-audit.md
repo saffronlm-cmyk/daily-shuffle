@@ -63,6 +63,37 @@ Tier 2 candidates (~28) tracked in `logs/normalisation-priority.md`.
 
 ---
 
+## Batch A3 — Tier 2 normalisation corrections, tranche 1 (2026-07-16) — WRITTEN
+
+14 Tier 2 recipes Saffron selected from `normalisation-priority.md`. Same confirmed defaults
+(light coconut where unspecified, cooked quinoa, 85 g noodle pack). Two per-recipe calls she
+confirmed: Golden Coconut Chicken Curry computed **without rice** (rice is "to serve", no qty)
+and coconut *cream* kept full-fat; Miso Soy Chicken kept **full-fat coconut milk** (recipe
+specifies it explicitly, overriding the light default).
+
+| Recipe | serves | Before | After |
+|---|---|---|---|
+| Cosmic Brownie Overnight Oats | 1 | 488/28/48/20/9/16 | **696/35/72/34/18/31.5** |
+| Golden Coconut Chicken Curry | 4 | 488/34/22/32/6/6 | **624/31/15/49/3/2.5** (no rice, full cream) |
+| Miso Soy Chicken with Coconut Lime Rice | 4 | 578/38/52/22/1.5/8 | **776/33/74/35.5/1.5/10** (full-fat coconut) |
+| Garlic Miso Somen Noodles | 2 | 378/18/52/12/4/6 | **608/22/86.5/16.5/3.5/6** |
+| Pad See Ew | 2 | 488/28/58/16/3/5 | **713/27/93/26.5/2.5/3.5** |
+| Pad Thai Inspired Saucy Chicken Noodles | 5 | 525/28/62/18/3.5/14 | **725/35/89.5/25/4/17.5** |
+| Sweet Potato Olive Oil Cake | 10 | 268/4.5/26/17/2.5/16 | **451/7.5/35/32/4/20** |
+| Fiery Chilli Prawn Linguine | 3 | 337/24/42/9/3/8 | **578/36/90.5/6/6/12** |
+| Chocolate Zucchini Bread | 8 | 268/7/16/21/3.5/10 | **394/10/33.5/26.5/5/24** |
+| Peanut Noodle Stir Fry | 3 | 398/18/44/18/7/8 | **668/46/52.5/36/9/17** |
+| Maple Sriracha Tofu Protein Bowl | 3 | 428/18/46/18/8/10 | **698/40.5/72.5/32/11.5/24** |
+| Chicken Tikka Masala | 4 | 448/32/10/30/2/6 | **652/36/18/47.5/2/5** |
+| Cinnamon Roll Date Cake | 9 | 248/3.5/42/8/1.5/28 | **417/3/81/10/3/61** |
+| Toffee Pecan Apple Crumble | 6 | 318/3/44/16/5/28 | **526/6.5/71.5/27/9.5/42** |
+
+Verified read-back: all 14 rows updated. `ingredient_sections` untouched. **Corrected-recipe
+total now 39** (10 Batch A + 15 Tier 1 + 14 Tier 2 tranche 1). Remaining Tier 2 (14) still open
+in `normalisation-priority.md`.
+
+---
+
 ## Read-only library audit (no writes)
 
 Goal: sweep the whole `recipes` library (import_status='ready'), recompute macros where

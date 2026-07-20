@@ -30,24 +30,29 @@ Format: `stored kcal → recompute kcal` (per serving).
 - [x] Date Tahini Bites with Sunflower Sesame Crust — 128 → 278
 - [x] Sweet and Salty Date Caramel Oat Cookie Slice — 148 → 276
 
-## Tier 2 — to review (tick to include in the next normalisation pass)
+## Tier 2 — tranche 1 DONE (written to Supabase, 2026-07-16, Batch A3)
+
+Precise before → after in `macro-audit.md` Batch A3.
+
+- [x] Cosmic Brownie Overnight Oats — 488 → 696
+- [x] Golden Coconut Chicken Curry — 488 → 624 (no rice, full cream)
+- [x] Miso Soy Chicken with Coconut Lime Rice — 578 → 776 (full-fat coconut)
+- [x] Garlic Miso Somen Noodles — 378 → 608
+- [x] Pad See Ew — 488 → 713
+- [x] Pad Thai Inspired Saucy Chicken Noodles — 525 → 725
+- [x] Sweet Potato Olive Oil Cake — 268 → 451
+- [x] Fiery Chilli Prawn Linguine — 337 → 578
+- [x] Chocolate Zucchini Bread — 268 → 394
+- [x] Peanut Noodle Stir Fry — 398 → 668
+- [x] Maple Sriracha Tofu Protein Bowl — 428 → 698
+- [x] Chicken Tikka Masala — 448 → 652
+- [x] Cinnamon Roll Date Cake — 248 → 417
+- [x] Toffee Pecan Apple Crumble — 318 → 526
+
+## Tier 2 — remaining (tick to include in the next pass)
 
 Numbers are audit-pass estimates; each gets firmed to precise per-serving figures when selected.
 
-- [ ] Peanut Noodle Stir Fry — 398 → ~665
-- [ ] Maple Sriracha Tofu Bowl — 428 → ~698
-- [ ] Chicken Tikka Masala — 448 → ~646
-- [ ] Cinnamon Roll Date Cake — 248 → ~417
-- [ ] Toffee Pecan Apple Crumble — 318 → ~527
-- [ ] Chocolate Zucchini Bread — 268 → ~395
-- [ ] Fiery Chilli Prawn Linguine — 337 → ~578
-- [ ] Sweet Potato Olive Oil Cake — 268 → ~452
-- [ ] Pad Thai Inspired Saucy Chicken Noodles — 525 → ~729
-- [ ] Pad See Ew — 488 → ~713
-- [ ] Garlic Miso Somen Noodles — 378 → ~608
-- [ ] Miso Soy Chicken with Coconut Lime Rice — 578 → ~776
-- [ ] Golden Coconut Chicken Curry — 488 → ~624
-- [ ] Cosmic Brownie Overnight Oats — 488 → ~695
 - [ ] Raspberry Chocolate Chip Baked Oatmeal — 468 → ~750
 - [ ] Sticky Toffee Date Oats — 445 → ~741
 - [ ] Chocolate Chia Overnight Oats — 502 → ~689
