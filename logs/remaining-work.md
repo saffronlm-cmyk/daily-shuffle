@@ -6,7 +6,8 @@ tranche 1). Compiled from the library audit (`macro-audit.md`). Format for recal
 says otherwise), **cooked quinoa**, **85 g instant-noodle pack**. Estimates are audit-pass
 figures; each gets firmed to precise 6-macro per-serving values when you pick it.
 
-★ = was on the Tier 2 priority list.
+★ = was on the Tier 2 priority list — **all ★ now DONE** (written 2026-07-16, Batch A4, with
+optional toppings included; precise after-values in `macro-audit.md`). 53 recipes corrected so far.
 
 ---
 
@@ -16,8 +17,8 @@ figures; each gets firmed to precise 6-macro per-serving values when you pick it
 - [ ] Air Fryer Cinnamon Roll Oats — 398→616
 - [ ] Baked Middle Eastern Chicken Tray — 318→377
 - [ ] Basic Oat Flour Pancakes — 68→153 (check serving basis)
-- [ ] ★ Blended Overnight Oats — 398→475
-- [ ] ★ Blueberry, Lemon & Coconut Overnight Oats — 332→437
+- [x] ★ Blended Overnight Oats — 398→475
+- [x] ★ Blueberry, Lemon & Coconut Overnight Oats — 332→437
 - [ ] Butternut Squash Mac and Cheese — 348→542
 - [ ] Caramelised Onion Rice with Tikka Cod — 488→578
 - [ ] Carrot Cake Meal Prep Baked Oats — 318→386
@@ -27,13 +28,13 @@ figures; each gets firmed to precise 6-macro per-serving values when you pick it
 - [ ] Chile Lime Chipotle Chicken — 338→392
 - [ ] Chili Crunch Ground Chicken Bowls — 398→498
 - [ ] Choc, PB and Raspberry Overnight Oats — 388→496
-- [ ] ★ Chocolate Chia Overnight Oats — 502→689
+- [x] ★ Chocolate Chia Overnight Oats — 502→689
 - [ ] Chocolate Date Peanut Butter Squares — 128→165
 - [ ] Chocolate Hazelnut Cookie Dough Balls — 128→177
 - [ ] Chocolate Peanut Butter Protein Cookie Dough — 228→257
 - [ ] Chocolate Raspberry Baked Protein Oats — 168→210
 - [ ] Chocolate Strawberry Baked Oats — 405→487
-- [ ] ★ Chocolate Tahini Brownies — 178→273
+- [x] ★ Chocolate Tahini Brownies — 178→273
 - [ ] Chopped Jalapeño Cheddar Chicken Salad — 185→253
 - [ ] Cinnamon Buckwheat Smoothie — 398→498
 - [ ] Coffee Protein Ice Cream Affogato — 175→321 (+null macros)
@@ -55,7 +56,7 @@ figures; each gets firmed to precise 6-macro per-serving values when you pick it
 - [ ] Giant Rice Cake Snickers Wagon Wheel — 488→630
 - [ ] Glowing Skin Soup — 148→242
 - [ ] Gluten Free Cinnamon Buns — 488→1188 (also check serves, §B)
-- [ ] ★ Halloween Chocolate Almond Butter Balls — 118→175
+- [x] ★ Halloween Chocolate Almond Butter Balls — 118→175
 - [ ] Healthy Lemon Bars — 178→260
 - [ ] High Fibre Sticky Toffee Oats — 420→948 (+null macros)
 - [ ] High Protein Carrot Cake Overnight Oats — 448→607
@@ -65,13 +66,13 @@ figures; each gets firmed to precise 6-macro per-serving values when you pick it
 - [ ] Honey Mustard Chicken Power Bowl — 488→684
 - [ ] Lemon and Blueberry Baked Oats — 248→383
 - [ ] Loaf Pan Lemon & Yoghurt Chicken — 298→293 (protein 32→~44)
-- [ ] ★ Maple Cinnamon Pumpkin Overnight Oats — 368→599
+- [x] ★ Maple Cinnamon Pumpkin Overnight Oats — 368→599
 - [ ] Marinated Chicken Thighs w/ Mint Jalapeño Sauce — 448→623
 - [ ] Matcha Date Butter Balls — 98→136
 - [ ] Microwave Chocolate Protein Oats — 248→380
 - [ ] Middle Eastern Chicken & Rice Bowl — 428 (cal ok; protein 38→~47; rice not counted)
 - [ ] Miso Peanut Ramen Bowl — 498→628
-- [ ] ★ No Bake Coconut Cookies — 168→242
+- [x] ★ No Bake Coconut Cookies — 168→242
 - [ ] One Pan Vegan Sushi Bake — 464→633
 - [ ] Pad Thai with Chicken and Prawns — 528→650
 - [ ] Pad Thai with Prawns — 418→511
@@ -88,7 +89,7 @@ figures; each gets firmed to precise 6-macro per-serving values when you pick it
 - [ ] Pumpkin Candy Apple Salad — 498→913 (portion-heavy single serving)
 - [ ] Pumpkin Cream Cheese Muffins — 298→496
 - [ ] Raspberry Cheesecake Protein Bowl — 225→303 (+null macros)
-- [ ] ★ Raspberry Chocolate Chip Baked Oatmeal — 468→750
+- [x] ★ Raspberry Chocolate Chip Baked Oatmeal — 468→750
 - [ ] Raspberry Coconut Chocolate Bars — 128→190
 - [ ] Roast Chicken Rice Salad — 398→568 (see dup, §C)
 - [ ] Roasted Butternut Squash and Carrot Soup — 188→307
@@ -99,21 +100,21 @@ figures; each gets firmed to precise 6-macro per-serving values when you pick it
 - [ ] Single Serve Double Chocolate Butter Cake — 278→357
 - [ ] Single Serve Sticky Date Pudding — 235→335
 - [ ] Skillet Chicken Thighs with Mushroom Gravy — 318→418
-- [ ] ★ Snickers Overnight Oats — 412→534
+- [x] ★ Snickers Overnight Oats — 412→534
 - [ ] Speedy Pad Thai Noodle Salad — 420→560 (+null macros)
 - [ ] Spicy Asian Noodles with Spinach & Chilli Crisp — 348→522
 - [ ] Spicy Tofu Bowl — 550→694 (+null macros)
 - [ ] Spicy Tuna Bowl — 448→573
 - [ ] Sticky Chicken, Gochujang & Coconut Broth on Sticky Rice — 646→813 (no rice; +nulls)
 - [ ] Sticky Soy Chicken w/ Garlic Rice in Spicy Broth — 618→1533 (check serves, §B — likely 2)
-- [ ] ★ Sticky Toffee Chia Pudding — 378→462
-- [ ] ★ Sticky Toffee Date Oats — 445→741
+- [x] ★ Sticky Toffee Chia Pudding — 378→462
+- [x] ★ Sticky Toffee Date Oats — 445→741
 - [ ] Summer Peach Chia Pudding — 388→589
 - [ ] Summer Salmon and Blackberry Salad — 398→564 (fix ingredients first, §D)
 - [ ] Sunflower Sesame Date Chocolate Bites — 108→156
-- [ ] ★ Sweet Potato Chocolate Cake — 148→237
-- [ ] ★ Sweet Potato Chocolate Chip Cookies — 138→211
-- [ ] ★ Tahini Oat Chocolate Chip Bars — 198→315
+- [x] ★ Sweet Potato Chocolate Cake — 148→237
+- [x] ★ Sweet Potato Chocolate Chip Cookies — 138→211
+- [x] ★ Tahini Oat Chocolate Chip Bars — 198→315
 - [ ] Thai Chicken Noodle Soup — 189→300 (+null macros)
 - [ ] Thai Drunken Noodles (Pad Kee Mao) — 454→666 (+null macros)
 - [ ] Thai Red Curry Pot Roast Chicken — 548→1232 (whole-bird rendering uncertain)
@@ -241,7 +242,7 @@ Quick wins: recompute just fills the missing macro fields (cal/protein already c
 
 | Section | Count |
 |---|---|
-| A. Recalculate — under-counted | 111 |
+| A. Recalculate — under-counted | 111 (14 ★ done → **97 left**) |
 | B. Over-stated / serving-count | 14 |
 | C. Duplicate rows | 3 |
 | D. Ingredient-list integrity | 4 |

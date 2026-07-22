@@ -94,6 +94,37 @@ in `normalisation-priority.md`.
 
 ---
 
+## Batch A4 — Tier 2 normalisation, tranche 2 (final Tier 2) (2026-07-16) — WRITTEN
+
+The remaining 14 Tier 2 recipes (mostly overnight-oats / baked-oat / dessert families).
+Saffron said **include all optional toppings** — so these figures fold in every listed topping
+(Raspberry fold-ins; Sticky Toffee Date sauce; Halloween Balls +optional protein powder; Sticky
+Toffee Chia +caramel topping; Blended OO +yoghurt/protein/choc-flake topping). This clears the
+whole Tier 2 list.
+
+| Recipe | serves | Before | After (toppings in) |
+|---|---|---|---|
+| Raspberry Chocolate Chip Baked Oatmeal | 1 | 468/14/58/20/8/14 | **776/24/95.5/35.5/18/32.5** |
+| Sticky Toffee Date Oats | 1 | 445/12/66/16/9/28 | **778/21/127/22/14.5/68** |
+| Chocolate Chia Overnight Oats | 1 | 502/38/42/18/5.5/15 | **692/48/71/26/11.5/30** |
+| Snickers Overnight Oats | 1 | 412/12/52/18/7.5/14 | **535/15.5/66/25/12/21** |
+| Sweet Potato Chocolate Chip Cookies | 12 | 138/3.5/11/10/1.5/6.5 | **211/5/14/15.5/3/8.5** |
+| Tahini Oat Chocolate Chip Bars | 9 | 198/5.5/18/13/2/9 | **315/8/26.5/20.5/4/14.5** |
+| Sweet Potato Chocolate Cake | 8 | 148/2/16/8.5/2/10 | **237/3/28/12/6/13** |
+| No Bake Coconut Cookies | 20 | 168/3/22/8.5/2/14 | **242/4.5/27.5/14/2.5/16** |
+| Halloween Chocolate Almond Butter Balls | 12 | 118/3.5/8/8.5/1.5/5 | **175/7/11.5/12.5/3/6.5** (+protein powder) |
+| Chocolate Tahini Brownies | 9 | 178/5.5/12/13/2.5/8.5 | **272/7/24.5/19/4.5/15** |
+| Sticky Toffee Chia Pudding | 2 | 378/6.5/48/18/7.5/30 | **708/13/96/35/12/68** (+caramel) |
+| Maple Cinnamon Pumpkin Overnight Oats | 1 | 368/16/44/14/6.5/16 | **596/27/63/27.5/10.5/23.5** |
+| Blended Overnight Oats | 1 | 398/32/36/12/6.5/6 | **617/50/58/19.5/10/15** (+topping) |
+| Blueberry, Lemon and Coconut Overnight Oats | 1 | 332/17/42/8/8.5/14 | **437/22/55/15.5/13/12.5** |
+
+Verified read-back: all 14 rows updated. `ingredient_sections` untouched. **Corrected-recipe
+total now 53** (10 Batch A + 15 Tier 1 + 28 Tier 2). Tier 2 list fully cleared. Broader
+worklist tracked in `remaining-work.md`.
+
+---
+
 ## Read-only library audit (no writes)
 
 Goal: sweep the whole `recipes` library (import_status='ready'), recompute macros where

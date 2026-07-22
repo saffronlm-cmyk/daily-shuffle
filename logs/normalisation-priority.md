@@ -49,21 +49,21 @@ Precise before → after in `macro-audit.md` Batch A3.
 - [x] Cinnamon Roll Date Cake — 248 → 417
 - [x] Toffee Pecan Apple Crumble — 318 → 526
 
-## Tier 2 — remaining (tick to include in the next pass)
+## Tier 2 — tranche 2 DONE (written to Supabase, 2026-07-16, Batch A4) — all optional toppings included
 
-Numbers are audit-pass estimates; each gets firmed to precise per-serving figures when selected.
+Precise before → after in `macro-audit.md` Batch A4. **Tier 2 fully cleared.**
 
-- [ ] Raspberry Chocolate Chip Baked Oatmeal — 468 → ~750
-- [ ] Sticky Toffee Date Oats — 445 → ~741
-- [ ] Chocolate Chia Overnight Oats — 502 → ~689
-- [ ] Snickers Overnight Oats — 412 → ~534
-- [ ] Sweet Potato Chocolate Chip Cookies — 138 → ~211
-- [ ] Tahini Oat Chocolate Chip Bars — 198 → ~315
-- [ ] Sweet Potato Chocolate Cake — 148 → ~237
-- [ ] No Bake Coconut Cookies — 168 → ~242
-- [ ] Halloween Chocolate Almond Butter Balls — 118 → ~175
-- [ ] Chocolate Tahini Brownies — 178 → ~273
-- [ ] Sticky Toffee Chia Pudding — 378 → ~462
-- [ ] Maple Cinnamon Pumpkin Overnight Oats — 368 → ~599
-- [ ] Blended Overnight Oats — 398 → ~475
-- [ ] Blueberry, Lemon & Coconut Overnight Oats — 332 → ~437
+- [x] Raspberry Chocolate Chip Baked Oatmeal — 468 → 776
+- [x] Sticky Toffee Date Oats — 445 → 778
+- [x] Chocolate Chia Overnight Oats — 502 → 692
+- [x] Snickers Overnight Oats — 412 → 535
+- [x] Sweet Potato Chocolate Chip Cookies — 138 → 211
+- [x] Tahini Oat Chocolate Chip Bars — 198 → 315
+- [x] Sweet Potato Chocolate Cake — 148 → 237
+- [x] No Bake Coconut Cookies — 168 → 242
+- [x] Halloween Chocolate Almond Butter Balls — 118 → 175 (+optional protein)
+- [x] Chocolate Tahini Brownies — 178 → 272
+- [x] Sticky Toffee Chia Pudding — 378 → 708 (+caramel topping)
+- [x] Maple Cinnamon Pumpkin Overnight Oats — 368 → 596
+- [x] Blended Overnight Oats — 398 → 617 (+topping)
+- [x] Blueberry, Lemon & Coconut Overnight Oats — 332 → 437
