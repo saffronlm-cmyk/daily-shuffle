@@ -1,0 +1,254 @@
+# Remaining recipe edits — master worklist
+
+Everything still outstanding after the 39 already corrected (Batch A + Tier 1 + Tier 2
+tranche 1). Compiled from the library audit (`macro-audit.md`). Format for recalcs:
+`stored kcal → recompute estimate`. Defaults when firming: **light coconut** (unless recipe
+says otherwise), **cooked quinoa**, **85 g instant-noodle pack**. Estimates are audit-pass
+figures; each gets firmed to precise 6-macro per-serving values when you pick it.
+
+★ = was on the Tier 2 priority list — **all ★ now DONE** (written 2026-07-16, Batch A4, with
+optional toppings included; precise after-values in `macro-audit.md`). 53 recipes corrected so far.
+
+---
+
+## A. Recalculate — under-counted (stored too low). Biggest bucket; straight recompute+write.
+
+- [ ] 4 Ingredient Rice Cake Chocolate Bars — 165→266
+- [ ] Air Fryer Cinnamon Roll Oats — 398→616
+- [ ] Baked Middle Eastern Chicken Tray — 318→377
+- [ ] Basic Oat Flour Pancakes — 68→153 (check serving basis)
+- [x] ★ Blended Overnight Oats — 398→475
+- [x] ★ Blueberry, Lemon & Coconut Overnight Oats — 332→437
+- [ ] Butternut Squash Mac and Cheese — 348→542
+- [ ] Caramelised Onion Rice with Tikka Cod — 488→578
+- [ ] Carrot Cake Meal Prep Baked Oats — 318→386
+- [ ] Chicken & Egg Breakfast Casserole — 228→315
+- [ ] Chicken and Potato Traybake — 448→589 (see dup, §C)
+- [ ] Chicken Shawarma Crispy Rice Salad — 488→657
+- [ ] Chile Lime Chipotle Chicken — 338→392
+- [ ] Chili Crunch Ground Chicken Bowls — 398→498
+- [ ] Choc, PB and Raspberry Overnight Oats — 388→496
+- [x] ★ Chocolate Chia Overnight Oats — 502→689
+- [ ] Chocolate Date Peanut Butter Squares — 128→165
+- [ ] Chocolate Hazelnut Cookie Dough Balls — 128→177
+- [ ] Chocolate Peanut Butter Protein Cookie Dough — 228→257
+- [ ] Chocolate Raspberry Baked Protein Oats — 168→210
+- [ ] Chocolate Strawberry Baked Oats — 405→487
+- [x] ★ Chocolate Tahini Brownies — 178→273
+- [ ] Chopped Jalapeño Cheddar Chicken Salad — 185→253
+- [ ] Cinnamon Buckwheat Smoothie — 398→498
+- [ ] Coffee Protein Ice Cream Affogato — 175→321 (+null macros)
+- [ ] Cookie Dough Caramel Bars — 188→224
+- [ ] Copycat Nando's Peri Peri Chicken Burgers — 518→772
+- [ ] Cottage Cheese Pancakes — 218→328
+- [ ] Creamy Peanut Miso Ramen — 528→998
+- [ ] Crispy Bang Bang Chicken — 427→539
+- [ ] Crispy Chicken Rice Paper Dumplings — 358→450
+- [ ] Crispy Rice Paper Spring Rolls Without Frying — 198→412
+- [ ] Crispy Rice Tuna Salad — 418→494
+- [ ] Crispy Rosemary Chicken w/ Apple Beetroot Slaw — 412→742 (+null macros)
+- [ ] Easy Chicken Traybake — 448→589 (see dup, §C)
+- [ ] Easy Chipotle Chicken & Corn Salsa — 338→425
+- [ ] Easy Tuna Salad Mix — 148→224
+- [ ] Fluffy Breakfast Carrot Cake Loaf — 250→330 (+null macros)
+- [ ] Fluffy Vegan Protein Pancakes — 288→339
+- [ ] Garlic Cucumber Salad — 38→64 (minor, tiny absolute)
+- [ ] Giant Rice Cake Snickers Wagon Wheel — 488→630
+- [ ] Glowing Skin Soup — 148→242
+- [ ] Gluten Free Cinnamon Buns — 488→1188 (also check serves, §B)
+- [x] ★ Halloween Chocolate Almond Butter Balls — 118→175
+- [ ] Healthy Lemon Bars — 178→260
+- [ ] High Fibre Sticky Toffee Oats — 420→948 (+null macros)
+- [ ] High Protein Carrot Cake Overnight Oats — 448→607
+- [ ] High Protein Chickpea Flour Pancakes — 318→432
+- [ ] High Protein Pumpkin Spice Muffins — 88→114
+- [ ] Honey Glazed Salmon Bowls with Peach Salsa — 298→439
+- [ ] Honey Mustard Chicken Power Bowl — 488→684
+- [ ] Lemon and Blueberry Baked Oats — 248→383
+- [ ] Loaf Pan Lemon & Yoghurt Chicken — 298→293 (protein 32→~44)
+- [x] ★ Maple Cinnamon Pumpkin Overnight Oats — 368→599
+- [ ] Marinated Chicken Thighs w/ Mint Jalapeño Sauce — 448→623
+- [ ] Matcha Date Butter Balls — 98→136
+- [ ] Microwave Chocolate Protein Oats — 248→380
+- [ ] Middle Eastern Chicken & Rice Bowl — 428 (cal ok; protein 38→~47; rice not counted)
+- [ ] Miso Peanut Ramen Bowl — 498→628
+- [x] ★ No Bake Coconut Cookies — 168→242
+- [ ] One Pan Vegan Sushi Bake — 464→633
+- [ ] Pad Thai with Chicken and Prawns — 528→650
+- [ ] Pad Thai with Prawns — 418→511
+- [ ] Peach and Nectarine Overnight Oats — 318→400
+- [ ] Peaches and Cream Chia Pudding — 195→244
+- [ ] Peanut Butter and Jam Breakfast Oat Bars — 248→374
+- [ ] Peanut Tofu Salad Jars — 278→351
+- [ ] Pho Gà - Vietnamese Chicken Pho — 501 (protein 20→higher; soup, fat renders)
+- [ ] Phò Inspired Chicken Broth and Rice — 352→468
+- [ ] Prawn Fried Rice — 428→551
+- [ ] Protein Packed Roasted Squash Pasta — 348→597
+- [ ] Pumpkin Bread — 238→257
+- [ ] Pumpkin Brookies — 348→532
+- [ ] Pumpkin Candy Apple Salad — 498→913 (portion-heavy single serving)
+- [ ] Pumpkin Cream Cheese Muffins — 298→496
+- [ ] Raspberry Cheesecake Protein Bowl — 225→303 (+null macros)
+- [x] ★ Raspberry Chocolate Chip Baked Oatmeal — 468→750
+- [ ] Raspberry Coconut Chocolate Bars — 128→190
+- [ ] Roast Chicken Rice Salad — 398→568 (see dup, §C)
+- [ ] Roasted Butternut Squash and Carrot Soup — 188→307
+- [ ] Roasted Cod on Sweet Potato — 347→571 (+null macros)
+- [ ] Salmon Crispy Rice Paper Bites — 198→275
+- [ ] Seared Miso Tuna Crispy Rice Bowl — 528→611
+- [ ] Simple Salmon Bowl — 488→561
+- [ ] Single Serve Double Chocolate Butter Cake — 278→357
+- [ ] Single Serve Sticky Date Pudding — 235→335
+- [ ] Skillet Chicken Thighs with Mushroom Gravy — 318→418
+- [x] ★ Snickers Overnight Oats — 412→534
+- [ ] Speedy Pad Thai Noodle Salad — 420→560 (+null macros)
+- [ ] Spicy Asian Noodles with Spinach & Chilli Crisp — 348→522
+- [ ] Spicy Tofu Bowl — 550→694 (+null macros)
+- [ ] Spicy Tuna Bowl — 448→573
+- [ ] Sticky Chicken, Gochujang & Coconut Broth on Sticky Rice — 646→813 (no rice; +nulls)
+- [ ] Sticky Soy Chicken w/ Garlic Rice in Spicy Broth — 618→1533 (check serves, §B — likely 2)
+- [x] ★ Sticky Toffee Chia Pudding — 378→462
+- [x] ★ Sticky Toffee Date Oats — 445→741
+- [ ] Summer Peach Chia Pudding — 388→589
+- [ ] Summer Salmon and Blackberry Salad — 398→564 (fix ingredients first, §D)
+- [ ] Sunflower Sesame Date Chocolate Bites — 108→156
+- [x] ★ Sweet Potato Chocolate Cake — 148→237
+- [x] ★ Sweet Potato Chocolate Chip Cookies — 138→211
+- [x] ★ Tahini Oat Chocolate Chip Bars — 198→315
+- [ ] Thai Chicken Noodle Soup — 189→300 (+null macros)
+- [ ] Thai Drunken Noodles (Pad Kee Mao) — 454→666 (+null macros)
+- [ ] Thai Red Curry Pot Roast Chicken — 548→1232 (whole-bird rendering uncertain)
+- [ ] The Easiest Soy Chicken — 448→583
+- [ ] Tuna Avocado Wrap — 448→644
+- [ ] Tuna Melt Sandwich — 548→733
+- [ ] Tuna Salad Meal Prep — 168→255
+- [ ] Vegan Chocolate Brownie Pancakes — 118→373
+- [ ] Vegan Chocolate Fudge Cake Oats — 298→417
+
+## B. Recompute — over-stated (stored too high) &/or serving-count suspect
+
+Stored values look like per-recipe totals or wrong serving counts. Recompute AND decide serves.
+
+- [ ] Asian Chicken Salad w/ Cucumber & Seaweed — 461/50 → ~212/25 (2× high; +null macros)
+- [ ] Butternut Protein Brownie (butternut/egg-white) — 412/52 → ~110 (impossible protein)
+- [ ] Butternut Protein Brownie (pumpkin/egg-white) — 189 → ~98
+- [ ] Carrot Cake Loaf — 178/14.5 → ~100/7 (impossible protein)
+- [ ] Cinnamon Roll Baked Oats — 688 → ~515
+- [ ] Crispy Rice and Chicken Salad — 635 (cal ok) protein 51 → ~31
+- [ ] Fluffy Greek Yogurt Pancakes — 495 → ~193 (serves likely > 3)
+- [ ] Oat Flour Pancakes — 97 → ~53 (serves likely ~6, not 12)
+- [ ] Protein Brownie Bake — 318 → ~237
+- [ ] Protein Pancakes — 312 → ~52 (serves likely ~2-3, not 15)
+- [ ] Salmon Poke Bowl Meal Prep — 573/47 → ~400/14 (1 tin salmon; +null macros)
+- [ ] Sticky Miso Chicken Prep Boxes — 520/50 → ~428/37.6 (+null macros)
+- [ ] Gluten Free Cinnamon Buns — set serves to ~12 (800 g flour ÷6 is off)
+- [ ] Sticky Soy Chicken w/ Garlic Rice — set serves to 2 (then recompute ÷2)
+
+## C. Duplicate rows — dedupe (then correct the survivor)
+
+- [ ] High Protein Salmon Potato Salad — **two identical rows**, both null macros → delete one, fill the other (~869/42/70/36)
+- [ ] Roast Chicken Rice Salad ≈ Roast Chicken and Charred Corn Rice Salad — near-identical, stored 398 vs 488 → reconcile / dedupe
+- [ ] Easy Chicken Traybake ≈ Chicken and Potato Traybake — same recipe → dedupe
+
+## D. Ingredient-list integrity — fix ingredients BEFORE macros
+
+- [ ] Café Style Jacket Potatoes with Chicken, Bacon & Sweetcorn — no potato/corn in ingredient list
+- [ ] Chilli Lime Shrimp and Veggie Bowl — no vegetables listed (title says "Veggie")
+- [ ] Summer Salmon and Blackberry Salad — no blackberries listed
+- [ ] Quick Chinese Vegetable Noodle Soup — no noodles listed (also serves null, §B)
+
+## E. Empty ingredient lists — populate ingredients, then compute
+
+- [ ] Apple Almond Yogurt Bowl
+- [ ] Blended Raspberry Protein Chia Pudding
+- [ ] Bounty Bar Overnight Oats
+- [ ] Brownie Batter Overnight Oats
+- [ ] California Rolls in a Bowl
+- [ ] Carrot Cake Baked Oats (serves 1)
+- [ ] Strawberry Ice Cream
+- [ ] Vietnamese Noodles with Lemongrass Chicken
+
+## F. Partial — need ONE missing quantity from you, then computable
+
+Mostly "rice/base to serve" with no amount, or an unweighted key item.
+
+- [ ] 30 Minute Bang Bang Chicken Bowls — rice/cauli-rice base qty
+- [ ] Bone Broth Smothered Chicken — white rice qty
+- [ ] Brothy Miso Ginger Chicken and Rice — white rice qty
+- [ ] Buffalo Chicken Wrap — how much of the slaw/dressing is actually used
+- [ ] Burger Bowl — 13 of 16 ingredients unquantified
+- [ ] Caramel Rice Cake Strawberry Treat — PB / chocolate / yoghurt qty
+- [ ] Chili Honey Chicken Bowl — rice qty
+- [ ] Chipotle Chicken & Rice Skillet — rice qty
+- [ ] Creamy Thai Coconut Chicken Meatballs — rice qty (+null macros)
+- [ ] Crispy Chilli Beef Protein Bowls — rice qty
+- [ ] Crispy Gluten Free Shrimp Dumplings — glutinous-rice-flour wrapper qty
+- [ ] Double Roast Chicken with Chicken Fat Rice — 2 whole-chicken weights (stored null)
+- [ ] Frozen Strawberry Raspberry PB Bites — PB & "1 bag" chocolate qty
+- [ ] GF Easy Pan Dumplings (No Wrappers) — coating flour qty (stored null)
+- [ ] GF Easy Pan Dumplings (Pan-Fried) — shaping starch qty (stored null)
+- [ ] Green Goddess Chicken Prep Mix — protein 24→~35; fill null macros
+- [ ] Harissa Chicken with Roasted Veg and Feta — feta qty (+null macros)
+- [ ] Honey Sesame Salmon Bowl — rice & mayo qty
+- [ ] Instant Noodle Jars — tofu qty
+- [ ] Mediterranean Chicken & Rice Skillet — rice qty (stored protein looks high)
+- [ ] Peanut Butter Banana French Toast — PB & banana qty
+- [ ] Peanut Butter Chicken Katsu Noodles — rice & chicken qty
+- [ ] Stuffed Breakfast Chicken Sausage Pitas — sausage type; avocado optional (+null macros)
+- [ ] Thai Style Chicken Satay — rice qty
+
+## G. Macro-completeness fills — calories/protein look right, but carbs/fat/fibre/sugar are null
+
+Quick wins: recompute just fills the missing macro fields (cal/protein already close).
+
+- [ ] Banh Cuon - Vietnamese Rice Paper Rolls (fibre/sugar)
+- [ ] Cauliflower Cheese Gnocchi Bake (carbs/fat/fibre/sugar)
+- [ ] Char Siu Chicken (fibre/sugar)
+- [ ] Chipotle Chicken Chop Bowl (fibre/sugar)
+- [ ] Chocolate Banana Rice Paper Pie (fibre/sugar)
+- [ ] Chocolate Chia Mousse (all macros)
+- [ ] Creamy Mango and Coconut Cod Curry (all macros)
+- [ ] Double Choc Fudge Cookie (all macros)
+- [ ] Frozen Berry Breakfast Crumble (all macros)
+- [ ] Healthy Orange & Cashew Chicken (all macros)
+- [ ] High Protein Brownie Bowl (fibre/sugar)
+- [ ] High Protein Chocolate Lava Pudding (all macros)
+- [ ] High Protein Tiramisu Overnight Oats (fibre/sugar)
+- [ ] High Protein Tuna Salad (fibre/sugar)
+- [ ] Homemade Carrot Cake (fibre/sugar)
+- [ ] Lemon and Coconut Cake (fibre/sugar)
+- [ ] Meal Prep Spicy Tuna Quesadilla (all macros)
+- [ ] Nandos Chicken Pasta Salad (fibre/sugar)
+- [ ] Protein Berry Parfait (all macros)
+- [ ] Protein Pancakes (Simple) (fibre/sugar)
+- [ ] Protein Power BLT (all macros)
+- [ ] Rice Paper Kimchi Jeon with Tuna (fibre/sugar)
+- [ ] Rice Paper Pad See Ew with Shrimp (fibre/sugar)
+- [ ] Smoky Caramelised Red Pepper Orzo (all macros)
+- [ ] Spicy Chilli Rice Paper Wontons with Shrimp (fibre/sugar)
+- [ ] Spicy Peanut Chicken Noodles (fibre/sugar)
+- [ ] Spring Greens Carbonara (all macros)
+- [ ] Sticky Mango Chicken Prep Bowls (all macros)
+- [ ] Sticky Miso Chicken Bowl w/ Tahini Broccoli (all macros)
+- [ ] Sushi Salad (all macros)
+- [ ] Sweet Potato Beef Taco Bowl (fibre/sugar)
+- [ ] Thai Prawn Meatball Bowl w/ Spicy Peanut Sauce (all macros)
+- [ ] Tuna Chilli Crunch Salad (all macros)
+- [ ] Zesty + Spicy Chicken Fusion Bowl (fibre/sugar)
+
+---
+
+## Counts
+
+| Section | Count |
+|---|---|
+| A. Recalculate — under-counted | 111 (14 ★ done → **97 left**) |
+| B. Over-stated / serving-count | 14 |
+| C. Duplicate rows | 3 |
+| D. Ingredient-list integrity | 4 |
+| E. Empty ingredient lists | 8 |
+| F. Partial — need one quantity | 24 |
+| G. Macro-completeness fills | 34 |
+
+Some recipes appear in two sections (e.g. a dedupe that also needs a recompute); net unique
+≈ 190 of the ~310 ready recipes. The clean, fully-correct remainder needs nothing.
