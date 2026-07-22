@@ -679,3 +679,135 @@ coconut-curry families and the serving-count/duplicate fixes above.
 
 **Running totals — SWEEP COMPLETE:** ~310/310 ready recipes reviewed (10 written + ~255 audited + ~45 not-auditable/already-done).
 
+---
+
+## Batch B — Section A bulk recompute+write (2026-07-22) — WRITTEN
+
+Worked the whole of **§A "Recalculate — under-counted"** from `logs/remaining-work.md`, in
+9 sweeps of ~10, computing precise 6-macro per-serving values from each recipe's
+`ingredient_sections` against `staple_products` + standard USDA-equivalent values. **82
+recipes recomputed and written** to `recipes` (calories, protein_g, carbs_g, fat_g, fibre_g,
+sugar_g). Method validated against the audit-pass estimates: the large majority landed within
+~10% of the `→` estimate; where they diverged the reason is recorded below. Saffron made her
+own manual edits (§B/C/D/E/F worklist) in parallel during this run.
+
+**Locked defaults applied:** light coconut (unless recipe says otherwise), cooked quinoa, UK
+250 ml cup, 85 g instant-noodle pack. Computation scripts saved in the session scratchpad
+(`sweep2.mjs`…`sweep9.mjs`, staples table in `macrocalc.mjs`).
+
+Format: `kcal / protein / carbs / fat / fibre / sugar` per serving.
+
+| Recipe | serves | Before kcal | After |
+|---|---|---|---|
+| 4 Ingredient Rice Cake Chocolate Bars | 4 | 165 | 278/5/30.5/15/2/18 |
+| Air Fryer Cinnamon Roll Oats | 1 | 398 | 641/17.5/76.5/31/8/34.5 |
+| Baked Middle Eastern Chicken Tray | 4 | 318 | 463/55.5/10.5/23.5/2.5/3.5 |
+| Butternut Squash Mac and Cheese | 4 | 348 | 525/20/76/17.5/5.5/14 |
+| Caramelised Onion Rice with Tikka Cod | 2 | 488 | 638/48.5/93/8/14/25 |
+| Carrot Cake Meal Prep Baked Oats | 5 | 318 | 395/20.5/57.5/12/6.5/20 |
+| Chicken & Egg Breakfast Casserole | 8 | 228 | 317/24/15/17.5/2.5/4 |
+| Chicken Shawarma Crispy Rice Salad | 4 | 488 | 686/31/42/46/4/9 |
+| Chile Lime Chipotle Chicken | 4 | 338 | 482/55/7.5/27/2.5/2 |
+| Chili Crunch Ground Chicken Bowls | 4 | 398 | 469/30.5/52/15/2.5/11.5 |
+| Choc, PB and Raspberry Overnight Oats | 1 | 388 | 488/26.5/59.5/18.5/18.5/11.5 |
+| Chocolate Date Peanut Butter Squares | 12 | 128 | 161/2.5/26/6/2.5/20 |
+| Chocolate Hazelnut Cookie Dough Balls | 15 | 128 | 199/4.5/16.5/13.5/2/10 |
+| Chocolate Peanut Butter Protein Cookie Dough | 4 | 228 | 274/22.5/12/16/4/5.5 |
+| Chocolate Raspberry Baked Protein Oats | 6 | 168 | 192/13.5/25/5.5/6/11.5 |
+| Chocolate Strawberry Baked Oats | 1 | 405 | 487/39/65/12.5/15/20 |
+| Chopped Jalapeño Cheddar Chicken Salad (×2 dup rows) | 3 | 185 | 263/31.5/11.5/9.5/2/7 |
+| Cinnamon Buckwheat Smoothie | 1 | 398 | 506/25/69/16/9/24.5 |
+| Coffee Protein Ice Cream Affogato | 1 | 175 | 297/55/11.5/3/1.5/9 |
+| Cookie Dough Caramel Bars | 12 | 188 | 267/4.5/31/14.5/3.5/21.5 |
+| Copycat Nando's Peri Peri Chicken Burgers | 4 | 518 | 788/46/41/48/4.5/7.5 |
+| Cottage Cheese Pancakes | 3 | 218 | 351/24/34/13.5/2.5/14 |
+| Creamy Peanut Miso Ramen | 4 | 528 | 876/26/106.5/41/6.5/11 (light coconut) |
+| Crispy Bang Bang Chicken | 1 | 427 | 536/43/53.5/15/1/26 |
+| Crispy Chicken Rice Paper Dumplings | 2 | 358 | 435/33/43/16/2.5/14 |
+| Crispy Rice Paper Spring Rolls Without Frying | 4 | 198 | 396/10.5/81/4.5/5.5/7.5 |
+| Crispy Rice Tuna Salad | 2 | 418 | 480/19/52/21.5/3.5/3 |
+| Crispy Rosemary Chicken w/ Apple Beetroot & Horseradish Slaw | 2 | 412 | 755/62.5/90.5/17.5/13/28 |
+| Easy Chipotle Chicken & Corn Salsa | 6 | 338 | 476/46/18/26/4/5 |
+| Easy Tuna Salad Mix | 3 | 148 | 200/21/9/9/3/4 |
+| Fluffy Breakfast Carrot Cake Loaf | 10 | 250 | 328/6.5/33/20/4/16 |
+| Fluffy Vegan Protein Pancakes | 2 | 288 | 349/13.5/62.5/4/3.5/10.5 |
+| Garlic Cucumber Salad | 2 | 38 | 49/2/5.5/2.5/1.5/2.5 |
+| Giant Rice Cake Snickers Wagon Wheel | 1 | 488 | 694/17.5/65/42/7.5/34.5 |
+| Glowing Skin Soup | 4 | 148 | 242/4/19.5/18/3.5/7 |
+| Healthy Lemon Bars | 9 | 178 | 245/7.5/17/16.5/2.5/12 |
+| High Fibre Sticky Toffee Oats | 1 | 420 | 889/25/127/36.5/16/77 |
+| High Protein Carrot Cake Overnight Oats | 1 | 448 | 642/51/62/23/14.5/24.5 |
+| High Protein Chickpea Flour Pancakes | 2 | 318 | 443/44/50.5/9/7.5/16.5 |
+| High Protein Pumpkin Spice Muffins | 12 | 88 | 120/7.5/18/2.5/2.5/5.5 |
+| Honey Glazed Salmon Bowls with Peach Salsa | 4 | 298 | 466/29.5/29/27/5/20 |
+| Honey Mustard Chicken Power Bowl | 4 | 488 | 685/36.5/59.5/35/13/13.5 |
+| Lemon and Blueberry Baked Oats | 4 | 248 | 370/26.5/52.5/7.5/7/14.5 |
+| Loaf Pan Lemon & Yoghurt Chicken | 5 | 298 | 361/43/8.5/18/2/2.5 |
+| Marinated Chicken Thighs with Mint Jalapeño Sauce | 2 | 448 | 811/44.5/13.5/65/3.5/4.5 |
+| Matcha Date Butter Balls | 12 | 98 | 136/0.5/13.5/9.5/1/12 |
+| Microwave Chocolate Protein Oats | 1 | 248 | 389/35.5/46/12/15/12.5 |
+| Miso Peanut Ramen Bowl | 4 | 498 | 576/21/48.5/35.5/3.5/8.5 (full-fat, per recipe) |
+| One Pan Vegan Sushi Bake | 3 | 464 | 665/29/75/31/16.5/7 |
+| Pad Thai with Chicken and Prawns | 4 | 528 | 651/33.5/73.5/26/4.5/16.5 |
+| Pad Thai with Prawns | 2 | 418 | 540/30.5/76/13.5/7/15 |
+| Peach and Nectarine Overnight Oats | 1 | 318 | 394/17.5/59/12/12/12 (base, opt. toppings excl.) |
+| Peaches and Cream Chia Pudding | 2 | 195 | 247/8.5/30/11.5/9.5/18 (base, opt. toppings excl.) |
+| Peanut Butter and Jam Breakfast Oat Bars | 4 | 248 | 402/12/68.5/11/14/20.5 |
+| Peanut Tofu Salad Jars | 4 | 278 | 424/35/43/15.5/11.5/12 (quinoa qty est.) |
+| Phò Inspired Chicken Broth and Rice | 2 | 352 | 581/36/85/10/4.5/31 |
+| Prawn Fried Rice | 2 | 428 | 583/32.5/49.5/27.5/1.5/3 |
+| Protein Packed Roasted Squash Pasta | 4 | 348 | 620/21/97.5/19/10.5/10 |
+| Pumpkin Bread | 10 | 238 | 261/4/42/9/2.5/27.5 |
+| Pumpkin Brookies | 12 | 348 | 558/6/53/36.5/4/31.5 |
+| Pumpkin Candy Apple Salad | 1 | 498 | 1002/17/112/57/17/70 (portion-heavy 1-serve) |
+| Pumpkin Cream Cheese Muffins | 6 | 298 | 502/11.5/41/32.5/5/20 |
+| Raspberry Coconut Chocolate Bars | 10 | 128 | 212/2/21/13.5/4/15 |
+| Roasted Butternut Squash and Carrot Soup | 4 | 188 | 233/4/30.5/13/5.5/8.5 (light coconut) |
+| Salmon Crispy Rice Paper Bites | 3 | 198 | 259/17/24/11/1/7 |
+| Seared Miso Tuna Crispy Rice Bowl | 2 | 528 | 740/48/61/35/10.5/8 (sesame-heavy) |
+| Simple Salmon Bowl | 1 | 488 | 566/32.5/40.5/29.5/2.5/2.5 |
+| Speedy Pad Thai Noodle Salad | 1 | 420 | 588/41.5/76/13.5/7.5/16 |
+| Spicy Asian Noodles with Spinach and Chilli Crisp | 2 | 348 | 533/15.5/63/25/6/5 |
+| Spicy Tofu Bowl | 1 | 550 | 734/35.5/70/36.5/5.5/19 |
+| Spicy Tuna Bowl | 1 | 448 | 538/37/57/18/6.5/11 |
+| Sticky Chicken, Gochujang & Coconut Broth on Sticky Rice | 2 | 646 | 655/48.5/60/26.5/3/42 (light coconut, rice not counted) |
+| Summer Peach Chia Pudding | 1 | 388 | 463/8.5/62/24/13.5/42 (light coconut) |
+| Sunflower Sesame Date Chocolate Bites | 12 | 108 | 154/3/17/9/2.5/13 |
+| Thai Chicken Noodle Soup | 4 | 189 | 339/27.5/47/5.5/5.5/12 |
+| Thai Drunken Noodles (Pad Kee Mao) | 2 | 454 | 707/29/95.5/23/4/7 |
+| The Easiest Soy Chicken | 3 | 448 | 656/44/80/17.5/3/2.5 |
+| Tuna Avocado Wrap | 1 | 448 | 652/33/54.5/33.5/9.5/7.5 |
+| Tuna Melt Sandwich | 1 | 548 | 760/44/71.5/34/11/6 |
+| Tuna Salad Meal Prep | 4 | 168 | 228/24/7/11/0.5/4 |
+| Vegan Chocolate Brownie Pancakes | 2 | 118 | 381/11.5/63/11.5/6.5/15.5 |
+| Vegan Chocolate Fudge Cake Oats | 1 | 298 | 428/33/49/12.5/8/14 |
+
+**Skipped / flagged back to Saffron (not written):**
+- **Middle Eastern Chicken & Rice Bowl** — "rice of choice" has no quantity (load-bearing);
+  belongs in §F. Not written.
+- **Pho Gà - Vietnamese Chicken Pho** — 1.5 kg bone-in skin-on thighs simmered into broth;
+  meat-yield-per-bowl and fat-rendering are genuinely uncertain (doc's own "soup, fat renders"
+  flag). Not written.
+- Also excluded per the pre-agreed hand-off list: the 2 §C traybake/rice-salad dups, the 2 §B
+  serve-count fixes (GF Cinnamon Buns, Sticky Soy Chicken w/ Garlic Rice), Summer Salmon &
+  Blackberry Salad (§D), Basic Oat Flour Pancakes + Thai Red Curry Pot Roast Chicken (eyeball).
+
+**Divergences worth an eyeball (written as computed, faithful to ingredient list):**
+- **Chicken-thigh weight cases** running above the audit estimate because the recipe states a
+  full 2.5–3 lb thigh weight for the serving count: Baked ME Chicken Tray (463), Chile Lime
+  Chipotle Chicken (482), Loaf Pan Lemon & Yoghurt Chicken (361), Easy Chipotle Chicken & Corn
+  Salsa (476).
+- **Marinated Chicken Thighs w/ Mint Jalapeño (811)** — bone-in skin-on thigh + 4 tbsp oil ÷2;
+  all marinade oil counted as consumed. Bump down if discounting oil retention.
+- **Light-coconut default** pulled these under their (full-fat-assuming) estimates: Creamy
+  Peanut Miso Ramen, Roasted Butternut & Carrot Soup, Sticky Chicken Gochujang Broth, Summer
+  Peach Chia. Switch any to full-fat on request.
+
+**Latent duplicate rows surfaced (not in §C, flagged for dedupe):**
+- **Chopped Jalapeño Cheddar Chicken Salad** — two identical rows; both updated to 263 to stay
+  consistent, but the dedupe (which survives) is Saffron's call.
+- **Loaf Pan Lemon & Yoghurt Chicken** ≈ **Baked Middle Eastern Chicken Tray** — identical
+  ingredient list, different serves (5 vs 4); likely the same recipe.
+
+Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.
+
