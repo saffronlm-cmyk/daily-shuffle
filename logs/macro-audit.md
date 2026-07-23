@@ -864,3 +864,49 @@ written directly. Worth a proper fix in `index.html` at some point.
 
 Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.
 
+---
+
+## Batch D — §F "need one quantity" + remaining §D (2026-07-23) — WRITTEN
+
+Twelve recipes. Two kinds of work: (a) **rice-exclusion** recipes — recomputed from the
+existing DB ingredient lists **minus the unquantified rice line**, per Saffron's instruction
+("calculate without rice, note it's excluded"); (b) recipes where Saffron supplied or updated
+the list. Faithful compute of listed quantities (full mayo/sauce, skin-on chicken, listed
+oils) means several run well above the prior rough stored values — same pattern as Batch B.
+
+Format: `kcal / protein / carbs / fat / fibre / sugar` per serving.
+
+| Recipe | serves | Before | After |
+|---|---|---|---|
+| 30 Minute Bang Bang Chicken Bowls | 4 | 388 | 571/43.5/16.5/37.5/1.5/12 (rice excl) |
+| Bone Broth Smothered Chicken | 4 | 368 | 650/44/17/45/2.5/4.5 (rice excl; skin-on thigh) |
+| Brothy Miso Ginger Chicken and Rice | 3 | 485 | 555/40.5/29/32/1.5/18.5 (rice excl) |
+| Chili Honey Chicken Bowl | 2 | 488 | 667/44.5/47/37/7.5/35 (rice excl) |
+| Chipotle Chicken & Rice Skillet | 4 | 498 | 424/24.5/10/32.5/4/2.5 (rice excl) |
+| Creamy Thai Coconut Chicken Meatballs | 4 | 271 | 305/32.5/11.5/15/1.5/6 (rice excl; light coconut) |
+| Crispy Chilli Beef Protein Bowls | 4 | 484 | 437/28.5/28/23/5.5/16.5 (rice excl) |
+| Chilli Lime Shrimp and Veggie Bowl | 2 | 228 | 342/46/6.5/16/3/1 (+ingredients+method; veg excl) |
+| Summer Salad with Blackened Salmon | 2 | 398 | 638/34.5/29/44.5/8.5/11 (+ingredients+method) |
+| Buffalo Chicken Wrap | 2 | 618 | 600/54.5/37.5/24/3/6.5 (per assembled wrap) |
+| Burger Bowl | 1 | 440 | 472/44/35.5/17/6/8 (qtys→weight) |
+| Caramel Rice Cake Strawberry Treat | 1 | 348 | 409/12/42.5/21.5/4.5/22 |
+
+Wrote ingredient_sections + method_steps for the two §D recipes (Chilli Lime Shrimp, Summer
+Salad — previously empty) and re-quantified Burger Bowl + Caramel Rice Cake. Rice-excluded
+recipes carry a note to add ~200 kcal / 44 g carbs per 150 g cooked rice.
+
+**Flagged to Saffron (written as computed, may adjust):**
+- **Chilli Lime Shrimp (342)** — counts the full 2 tbsp marinade olive oil (~248 kcal); the
+  marinade is drained before griddling, so discounting the oil lands ~280. Awaiting her call.
+- **Chipotle Skillet protein 38→24.5** — computed "5 bone-in skin-on thighs" as ~480 g edible;
+  if the thighs are larger or skinless, protein should be higher.
+
+**Still outstanding on the §F list:** Crispy Gluten Free Shrimp Dumplings, Double Roast Chicken
+w/ Chicken Fat Rice, Frozen Strawberry Raspberry PB Bites, GF Easy Pan Dumplings (×2), Green
+Goddess Chicken Prep Mix, Harissa Chicken w/ Roasted Veg & Feta, Honey Sesame Salmon Bowl,
+Instant Noodle Jars, Mediterranean Chicken & Rice Skillet, Peanut Butter Banana French Toast,
+Peanut Butter Chicken Katsu Noodles, Stuffed Breakfast Chicken Sausage Pitas, Thai Style
+Chicken Satay. Plus §B, §C, §G, and the 2 §A eyeball / 2 §A flagged items.
+
+Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.
+
