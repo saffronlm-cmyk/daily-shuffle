@@ -829,6 +829,9 @@ Format: `kcal / protein / carbs / fat / fibre / sugar` per serving.
 | Bounty Bar Overnight Oats | 1 | (empty/388) | 556/11/61.5/32.5/14/23.5 |
 | Strawberry Ice Cream | 3 | (empty/168) | 282/7/36/13/2/34.5 |
 | Vietnamese Noodles with Lemongrass Chicken | 4 | (empty/368) | 641/45.5/68/22/4.5/19 |
+| Quick Chinese Vegetable Soup (§D, protein was null) | 2 | (empty/108) | 196/11/23/6.5/3.5/10 |
+| Chicken and Bacon Caesar Pasta Salad (§D, + description) | 2 | (empty/601) | 541/59/47.5/12.5/2/5.5 |
+| Carrot Cake Baked Oats (salted caramel, serves 1) | 1 | (deleted/448) | 718/44/77.5/29/10/28.5 |
 
 The pre-existing macro values on these rows were rough placeholders; recomputes from the real
 lists supersede them (notably Bounty Bar +168 from 25 g melted chocolate + coconut yoghurt;
@@ -838,13 +841,22 @@ Strawberry Ice Cream +114 from the 100 g white-chocolate coating; Vietnamese Noo
 **§D deletions:** `Brownie Batter Overnight Oats` and `California Rolls in a Bowl` set
 `import_status='deleted'` (were still `ready` despite being marked deleted on Saffron's side).
 
-**Still outstanding (ingredients not yet supplied):**
-- `Chicken and Bacon Caesar Pasta Salad` (§D rename) — needs the real ingredient list before I
-  can write a description or verify its 601/66 macros.
-- `Quick Chinese Vegetable Soup` (§D rename) — `protein_g` still null; needs ingredients.
-- `Carrot Cake Baked Oats (serves 1, salted caramel)` — the only Carrot Cake row with real
-  ingredients but flagged `import_status='deleted'`; awaiting Saffron's call on flipping to
-  `ready` (she confirmed the three Carrot Cake rows are distinct recipes, not dupes).
+**Second pass (2026-07-23, same batch):** Saffron supplied the three remaining lists. Written:
+`Quick Chinese Vegetable Soup` (196/11 — protein was null; wrote ingredients+method),
+`Chicken and Bacon Caesar Pasta Salad` (541/59 + ingredients+method+subtitle; recompute from
+the real list came in under the old 601/66 placeholder), and `Carrot Cake Baked Oats (salted
+caramel, serves 1)` (718/44 — full recipe with 30 g protein + PB + cream cheese + walnuts far
+exceeds the old 448 placeholder; **flipped `import_status='deleted'→'ready'`** so it now shows).
+
+- Note: `Quick Chinese Vegetable Soup` 196 is the faithful compute including low-sodium stock
+  (~60/serving) + the 2 tbsp fried-shallot topping (~40/serving); the source's "108 cal"
+  subtitle claim treats stock as ~0 and the toppings as optional garnish. Left as 196 pending
+  Saffron's preference.
+
+**Still empty-in-DB (§D renames, macros present but ingredient lists never synced from app):**
+`Summer Salad with Blackened Salmon` (398/36) and `Chilli Lime Shrimp and Veggie Bowl`
+(228/36, shrimp+marinade only, veg is a serving-suggestion per Saffron). Both render with no
+ingredients in the app until their lists are pasted in.
 
 **Note on app→DB sync:** in-app edits to bundled-library recipes persist to local storage, not
 the shared Supabase `recipes` table, so authored ingredients don't appear in the DB until
