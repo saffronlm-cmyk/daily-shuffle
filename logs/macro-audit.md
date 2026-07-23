@@ -885,7 +885,7 @@ Format: `kcal / protein / carbs / fat / fibre / sugar` per serving.
 | Chipotle Chicken & Rice Skillet | 4 | 498 | 424/24.5/10/32.5/4/2.5 (rice excl) |
 | Creamy Thai Coconut Chicken Meatballs | 4 | 271 | 305/32.5/11.5/15/1.5/6 (rice excl; light coconut) |
 | Crispy Chilli Beef Protein Bowls | 4 | 484 | 437/28.5/28/23/5.5/16.5 (rice excl) |
-| Chilli Lime Shrimp and Veggie Bowl | 2 | 228 | 342/46/6.5/16/3/1 (+ingredients+method; veg excl) |
+| Chilli Lime Shrimp and Veggie Bowl | 2 | 228 | 280/46/6.5/9/3/1 (+ingredients+method; veg excl; ~half marinade oil) |
 | Summer Salad with Blackened Salmon | 2 | 398 | 638/34.5/29/44.5/8.5/11 (+ingredients+method) |
 | Buffalo Chicken Wrap | 2 | 618 | 600/54.5/37.5/24/3/6.5 (per assembled wrap) |
 | Burger Bowl | 1 | 440 | 472/44/35.5/17/6/8 (qtys→weight) |
@@ -896,8 +896,8 @@ Salad — previously empty) and re-quantified Burger Bowl + Caramel Rice Cake. R
 recipes carry a note to add ~200 kcal / 44 g carbs per 150 g cooked rice.
 
 **Flagged to Saffron (written as computed, may adjust):**
-- **Chilli Lime Shrimp (342)** — counts the full 2 tbsp marinade olive oil (~248 kcal); the
-  marinade is drained before griddling, so discounting the oil lands ~280. Awaiting her call.
+- **Chilli Lime Shrimp** — resolved to **280** (counts ~half the 2 tbsp marinade oil as
+  consumed; the rest drains off before griddling). Full-oil compute was 342.
 - **Chipotle Skillet protein 38→24.5** — computed "5 bone-in skin-on thighs" as ~480 g edible;
   if the thighs are larger or skinless, protein should be higher.
 
