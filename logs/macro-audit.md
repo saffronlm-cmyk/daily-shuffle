@@ -811,3 +811,44 @@ Format: `kcal / protein / carbs / fat / fibre / sugar` per serving.
 
 Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.
 
+---
+
+## Batch C — §E empty-ingredient recipes populated + §D deletions (2026-07-23) — WRITTEN
+
+Saffron supplied the actual ingredient lists (pasted in chat — her in-app edits had stayed in
+local storage and never reached Supabase). For each, wrote **ingredient_sections (real
+strings) + method_steps + all 6 macros** to `recipes`. Computed per serving from the supplied
+lists the same way as Batch B.
+
+Format: `kcal / protein / carbs / fat / fibre / sugar` per serving.
+
+| Recipe | serves | Before | After |
+|---|---|---|---|
+| Apple Almond Yogurt Bowl | 1 | (empty/418) | 397/13.5/50.5/18.5/6.5/37 |
+| Blended Raspberry Protein Chia Pudding | 3 | (empty/268) | 283/22.5/22/12.5/14.5/3 |
+| Bounty Bar Overnight Oats | 1 | (empty/388) | 556/11/61.5/32.5/14/23.5 |
+| Strawberry Ice Cream | 3 | (empty/168) | 282/7/36/13/2/34.5 |
+| Vietnamese Noodles with Lemongrass Chicken | 4 | (empty/368) | 641/45.5/68/22/4.5/19 |
+
+The pre-existing macro values on these rows were rough placeholders; recomputes from the real
+lists supersede them (notably Bounty Bar +168 from 25 g melted chocolate + coconut yoghurt;
+Strawberry Ice Cream +114 from the 100 g white-chocolate coating; Vietnamese Noodles +273 from
+800 g thigh + 200 g dry vermicelli ÷4).
+
+**§D deletions:** `Brownie Batter Overnight Oats` and `California Rolls in a Bowl` set
+`import_status='deleted'` (were still `ready` despite being marked deleted on Saffron's side).
+
+**Still outstanding (ingredients not yet supplied):**
+- `Chicken and Bacon Caesar Pasta Salad` (§D rename) — needs the real ingredient list before I
+  can write a description or verify its 601/66 macros.
+- `Quick Chinese Vegetable Soup` (§D rename) — `protein_g` still null; needs ingredients.
+- `Carrot Cake Baked Oats (serves 1, salted caramel)` — the only Carrot Cake row with real
+  ingredients but flagged `import_status='deleted'`; awaiting Saffron's call on flipping to
+  `ready` (she confirmed the three Carrot Cake rows are distinct recipes, not dupes).
+
+**Note on app→DB sync:** in-app edits to bundled-library recipes persist to local storage, not
+the shared Supabase `recipes` table, so authored ingredients don't appear in the DB until
+written directly. Worth a proper fix in `index.html` at some point.
+
+Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.
+
