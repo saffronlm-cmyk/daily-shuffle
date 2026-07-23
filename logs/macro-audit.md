@@ -988,6 +988,13 @@ Format: `kcal / protein / carbs / fat / fibre / sugar` per serving.
 - **Thai Satay** — sticky rice excluded (note added); light coconut milk per project default;
   600g raw thighs across 3 servings; small pickled-veg portion included, sauce fully counted.
 
+**Frozen Strawberry Raspberry PB Bites (serves 8) — 88 → 144/2.6/13.5/9/3.5/9.** Saffron
+supplied the missing quantities: 200g strawberries (¾ box), 150g raspberries (1 box), 8 tsp
+peanut butter, 100g dark chocolate chips (1 bag), plus the 1 tbsp chia and 1 tbsp coconut oil
+already listed. Firmed the `ingredient_sections` with these amounts (the vague "box"/"bag"/bare
+"Peanut butter" lines) and recomputed — the dark-chocolate coating (100g) and PB drive it well
+above the old 88 kcal placeholder. **This closes §F entirely** — all 24 items now written.
+
 **Batch E note corrections (caught while matching the rice-exclusion note convention):**
 - **Mediterranean Chicken & Rice Skillet** — Batch E wrote the macros rice-excluded but left
   `notes` null and the stale `carbs_not_stated/fat_not_stated` flags. Added the rice-exclusion

@@ -184,7 +184,7 @@ Mostly "rice/base to serve" with no amount, or an unweighted key item.
 - [x] Crispy Chilli Beef Protein Bowls — rice qty — Batch D, 437 (rice excl)
 - [x] Crispy Gluten Free Shrimp Dumplings — glutinous-rice-flour wrapper qty — Batch E, 68 (coating ~15g adhered assumed, confirmed)
 - [x] Double Roast Chicken with Chicken Fat Rice — 2 whole-chicken weights (stored null) — Batch E, 534 (1.15kg raw/chicken, ~52% roasted yield assumed, confirmed)
-- [ ] Frozen Strawberry Raspberry PB Bites — PB & "1 bag" chocolate qty — deferred, Saffron reviewing full recipe (box sizes also unquantified)
+- [x] Frozen Strawberry Raspberry PB Bites — PB & "1 bag" chocolate qty — Batch F, 144 (200g strawb / 150g rasp / 8 tsp PB / 100g dark choc; qtys supplied by Saffron)
 - [x] GF Easy Pan Dumplings (No Wrappers) — coating flour qty (stored null) — Batch E, 170 (coating ~15g adhered assumed, confirmed)
 - [x] GF Easy Pan Dumplings (Pan-Fried) — shaping starch qty (stored null) — Batch E, 328 (coating ~15g adhered assumed, confirmed)
 - [x] Green Goddess Chicken Prep Mix — protein 24→~35; fill null macros — Batch E, 267/28 (full recipe supplied)
@@ -247,7 +247,7 @@ Quick wins: recompute just fills the missing macro fields (cal/protein already c
 | C. Duplicate rows | 3 |
 | D. Ingredient-list integrity | 4 (3 done, 1 left) |
 | E. Empty ingredient lists | 8 (all done) |
-| F. Partial — need one quantity | 24 (23 done, 1 left — Frozen Strawberry Raspberry PB Bites deferred) |
+| F. Partial — need one quantity | 24 (all done ✅) |
 | G. Macro-completeness fills | 34 |
 
 Some recipes appear in two sections (e.g. a dedupe that also needs a recompute); net unique
