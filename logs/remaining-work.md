@@ -153,46 +153,46 @@ Stored values look like per-recipe totals or wrong serving counts. Recompute AND
 ## D. Ingredient-list integrity — fix ingredients BEFORE macros
 
 - [ ] Café Style Jacket Potatoes with Chicken, Bacon & Sweetcorn — no potato/corn in ingredient list
-- [ ] Chilli Lime Shrimp and Veggie Bowl — no vegetables listed (title says "Veggie")
-- [ ] Summer Salmon and Blackberry Salad — no blackberries listed
-- [ ] Quick Chinese Vegetable Noodle Soup — no noodles listed (also serves null, §B)
+- [x] Chilli Lime Shrimp and Veggie Bowl — no vegetables listed (title says "Veggie") — Batch D, 280 (veg = serving suggestion, excl)
+- [x] Summer Salmon and Blackberry Salad — no blackberries listed — Batch D, 638 (written as "Summer Salad with Blackened Salmon")
+- [x] Quick Chinese Vegetable Noodle Soup — no noodles listed (also serves null, §B) — Batch C, 196
 
 ## E. Empty ingredient lists — populate ingredients, then compute
 
-- [ ] Apple Almond Yogurt Bowl
-- [ ] Blended Raspberry Protein Chia Pudding
-- [ ] Bounty Bar Overnight Oats
-- [ ] Brownie Batter Overnight Oats
-- [ ] California Rolls in a Bowl
-- [ ] Carrot Cake Baked Oats (serves 1)
-- [ ] Strawberry Ice Cream
-- [ ] Vietnamese Noodles with Lemongrass Chicken
+- [x] Apple Almond Yogurt Bowl — Batch C, 397
+- [x] Blended Raspberry Protein Chia Pudding — Batch C, 283
+- [x] Bounty Bar Overnight Oats — Batch C, 556
+- [x] Brownie Batter Overnight Oats — Batch C, deleted (`import_status='deleted'`)
+- [x] California Rolls in a Bowl — Batch C, deleted (`import_status='deleted'`)
+- [x] Carrot Cake Baked Oats (serves 1) — Batch C, 718 (un-deleted → ready)
+- [x] Strawberry Ice Cream — Batch C, 282
+- [x] Vietnamese Noodles with Lemongrass Chicken — Batch C, 641
 
 ## F. Partial — need ONE missing quantity from you, then computable
 
 Mostly "rice/base to serve" with no amount, or an unweighted key item.
 
-- [ ] 30 Minute Bang Bang Chicken Bowls — rice/cauli-rice base qty
-- [ ] Bone Broth Smothered Chicken — white rice qty
-- [ ] Brothy Miso Ginger Chicken and Rice — white rice qty
-- [ ] Buffalo Chicken Wrap — how much of the slaw/dressing is actually used
-- [ ] Burger Bowl — 13 of 16 ingredients unquantified
-- [ ] Caramel Rice Cake Strawberry Treat — PB / chocolate / yoghurt qty
-- [ ] Chili Honey Chicken Bowl — rice qty
-- [ ] Chipotle Chicken & Rice Skillet — rice qty
-- [ ] Creamy Thai Coconut Chicken Meatballs — rice qty (+null macros)
-- [ ] Crispy Chilli Beef Protein Bowls — rice qty
-- [ ] Crispy Gluten Free Shrimp Dumplings — glutinous-rice-flour wrapper qty
-- [ ] Double Roast Chicken with Chicken Fat Rice — 2 whole-chicken weights (stored null)
-- [ ] Frozen Strawberry Raspberry PB Bites — PB & "1 bag" chocolate qty
-- [ ] GF Easy Pan Dumplings (No Wrappers) — coating flour qty (stored null)
-- [ ] GF Easy Pan Dumplings (Pan-Fried) — shaping starch qty (stored null)
-- [ ] Green Goddess Chicken Prep Mix — protein 24→~35; fill null macros
-- [ ] Harissa Chicken with Roasted Veg and Feta — feta qty (+null macros)
-- [ ] Honey Sesame Salmon Bowl — rice & mayo qty
-- [ ] Instant Noodle Jars — tofu qty
-- [ ] Mediterranean Chicken & Rice Skillet — rice qty (stored protein looks high)
-- [ ] Peanut Butter Banana French Toast — PB & banana qty
+- [x] 30 Minute Bang Bang Chicken Bowls — rice/cauli-rice base qty — Batch D, 571 (rice excl)
+- [x] Bone Broth Smothered Chicken — white rice qty — Batch D, 650 (rice excl)
+- [x] Brothy Miso Ginger Chicken and Rice — white rice qty — Batch D, 555 (rice excl)
+- [x] Buffalo Chicken Wrap — how much of the slaw/dressing is actually used — Batch D, 600
+- [x] Burger Bowl — 13 of 16 ingredients unquantified — Batch D, 472
+- [x] Caramel Rice Cake Strawberry Treat — PB / chocolate / yoghurt qty — Batch D, 409
+- [x] Chili Honey Chicken Bowl — rice qty — Batch D, 667 (rice excl)
+- [x] Chipotle Chicken & Rice Skillet — rice qty — Batch D, 424 (rice excl; protein 24.5 open decision, see macro-audit.md)
+- [x] Creamy Thai Coconut Chicken Meatballs — rice qty (+null macros) — Batch D, 305 (rice excl)
+- [x] Crispy Chilli Beef Protein Bowls — rice qty — Batch D, 437 (rice excl)
+- [x] Crispy Gluten Free Shrimp Dumplings — glutinous-rice-flour wrapper qty — Batch E, 68 (coating ~15g adhered assumed, flagged)
+- [x] Double Roast Chicken with Chicken Fat Rice — 2 whole-chicken weights (stored null) — Batch E, 534 (1.15kg raw/chicken, ~52% roasted yield assumed)
+- [ ] Frozen Strawberry Raspberry PB Bites — PB & "1 bag" chocolate qty — deferred, Saffron reviewing full recipe (box sizes also unquantified)
+- [x] GF Easy Pan Dumplings (No Wrappers) — coating flour qty (stored null) — Batch E, 170 (coating ~15g adhered assumed, flagged)
+- [x] GF Easy Pan Dumplings (Pan-Fried) — shaping starch qty (stored null) — Batch E, 328 (coating ~15g adhered assumed, flagged)
+- [x] Green Goddess Chicken Prep Mix — protein 24→~35; fill null macros — Batch E, 267/28 (full recipe supplied)
+- [x] Harissa Chicken with Roasted Veg and Feta — feta qty (+null macros) — Batch E, 943 (feta excl per Saffron; thigh weight assumed)
+- [x] Honey Sesame Salmon Bowl — rice & mayo qty — Batch E, 463 (rice excl; mayo 1 tbsp)
+- [x] Instant Noodle Jars — tofu qty — Batch E, 956 (tofu block assumed 300g — flagged, adjust if smaller pack)
+- [x] Mediterranean Chicken & Rice Skillet — rice qty (stored protein looks high) — Batch E, 377 (rice excl; thigh weight assumed)
+- [x] Peanut Butter Banana French Toast — PB & banana qty — Batch E, 627 (small banana ~100g, 1 tbsp PB)
 - [ ] Peanut Butter Chicken Katsu Noodles — rice & chicken qty
 - [ ] Stuffed Breakfast Chicken Sausage Pitas — sausage type; avocado optional (+null macros)
 - [ ] Thai Style Chicken Satay — rice qty
@@ -245,9 +245,9 @@ Quick wins: recompute just fills the missing macro fields (cal/protein already c
 | A. Recalculate — under-counted | 111 (14 ★ done → **97 left**) |
 | B. Over-stated / serving-count | 14 |
 | C. Duplicate rows | 3 |
-| D. Ingredient-list integrity | 4 |
-| E. Empty ingredient lists | 8 |
-| F. Partial — need one quantity | 24 |
+| D. Ingredient-list integrity | 4 (3 done, 1 left) |
+| E. Empty ingredient lists | 8 (all done) |
+| F. Partial — need one quantity | 24 (20 done, 4 left) |
 | G. Macro-completeness fills | 34 |
 
 Some recipes appear in two sections (e.g. a dedupe that also needs a recompute); net unique

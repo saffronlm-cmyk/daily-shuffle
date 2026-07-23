@@ -910,3 +910,56 @@ Chicken Satay. Plus §B, §C, §G, and the 2 §A eyeball / 2 §A flagged items.
 
 Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.
 
+---
+
+## Batch E — §F remaining "need one quantity" items (2026-07-23) — WRITTEN
+
+Ten recipes. Saffron supplied the missing quantity/decision for each (rice-exclusion notes,
+feta/mayo qty, full ingredient list for Green Goddess, whole-chicken weight range, small
+banana + 1 tbsp PB). Two items needed my own estimate where she was genuinely unsure (dumpling
+coatings, tofu block size) — written as computed and flagged below, same "easily adjusted"
+pattern as Chipotle Skillet/Chilli Lime Shrimp in Batch D. `Chipotle Chicken & Rice Skillet`
+was already resolved in Batch D (re-flagged by Saffron this round, but no change needed — rice
+was already excluded there). `Frozen Strawberry Raspberry PB Bites` deferred — full recipe
+relayed back to her since the "box" sizes for strawberries/raspberries are also unquantified.
+
+Format: `kcal / protein / carbs / fat / fibre / sugar` per serving.
+
+| Recipe | serves | Before | After |
+|---|---|---|---|
+| Mediterranean Chicken & Rice Skillet | 4 | 480/40 | 377/25.5/10/25.5/2/2 (rice excl; thigh weight assumed) |
+| Harissa Chicken with Roasted Veg and Feta | 1 | 555/53 | 943/56.5/84/43/17.5/29 (feta excl; thigh weight assumed) |
+| Honey Sesame Salmon Bowl | 2 | 488/36 | 463/32/10.5/32/0.5/9.5 (rice excl; mayo 1 tbsp) |
+| Instant Noodle Jars | 1 | 348/16 | 956/66/102/35/13/7 (tofu block assumed 300g; noodles 85g default) |
+| Crispy Gluten Free Shrimp Dumplings | 7 | 128/9 | 68/8/5.5/1.6/0.2/1 (rice-flour coating ~15g adhered assumed) |
+| GF Easy Pan Dumplings (No Wrappers) | 4 | null | 170/12/3.5/11.5/0.1/0.1 (coating flour ~15g adhered assumed) |
+| GF Easy Pan Dumplings (Pan-Fried) | 4 | null | 328/21/7/23.5/0.5/0.5 (potato-starch coating ~15g adhered assumed) |
+| Double Roast Chicken with Chicken Fat Rice | 8 | null | 534/44/30/25/0.6/2 (2×1.15kg raw chickens, ~52% roasted yield) |
+| Green Goddess Chicken Prep Mix | 2 | 280/24 (nulls) | 267/28/20/9.5/6.5/8.5 (full recipe supplied) |
+| Peanut Butter Banana French Toast | 1 | 488/18 | 627/19/76/29/5/26.5 (small banana ~100g, 1 tbsp PB, + maple syrup to serve) |
+
+**Flagged to Saffron (written as computed, may adjust):**
+- **Instant Noodle Jars → 956/66g protein** — assumes a full ~300g firm-tofu block (UK blocks
+  run 280–396g) for a single serving; if the recipe means a smaller pack, protein/calories
+  should come down substantially. Biggest open decision in this batch.
+- **Crispy GF Shrimp Dumplings / GF Easy Pan Dumplings (×2)** — Saffron wasn't sure of the
+  coating amount ("rolled in a bowl of flour/starch"); assumed ~15g flour or starch actually
+  adheres/is consumed across the batch (light dusting, most falls back in the bowl). Low
+  materiality (≤1.5g carbs/serving either way) but flagged for consistency.
+- **Harissa Chicken with Roasted Veg and Feta → 943 kcal, up from 555** — this is a large single
+  serving as written (whole onion, whole pepper, ⅓ tin chickpeas, 2 bone-in skin-on thighs);
+  faithful compute of the full listed quantities. Feta excluded per Saffron (garnish/crumble).
+- **Double Roast Chicken** — 52% raw-to-cooked-edible yield is a standard whole-roast-chicken
+  assumption, not from the recipe itself; bump serves or yield % if it runs light/heavy for 8.
+
+**Bone-in skin-on chicken thigh convention (Mediterranean Skillet, Harissa Chicken):** no
+per-thigh weight given, so used ~100g edible cooked meat+skin per thigh — same figure implied
+by the Chipotle Skillet compute in Batch D (480 g ÷ 5 thighs = 96 g). Flag and bump if thighs
+run bigger.
+
+**Doc hygiene:** `remaining-work.md` §D/§E/§F checkboxes were stale since Batch C/D (writes
+happened but the worklist was never ticked) — backfilled all of Batch C/D's completions plus
+this batch's in the same pass.
+
+Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.
+
