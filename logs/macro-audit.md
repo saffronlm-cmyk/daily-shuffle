@@ -995,6 +995,44 @@ already listed. Firmed the `ingredient_sections` with these amounts (the vague "
 "Peanut butter" lines) and recomputed — the dark-chocolate coating (100g) and PB drive it well
 above the old 88 kcal placeholder. **This closes §F entirely** — all 24 items now written.
 
+---
+
+## §D Café Style resolution + §B sync-bug finding (2026-07-23) — Café done, §B BLOCKED
+
+**§D Café Style Jacket Potatoes → ALREADY DONE.** Saffron asked to rename "Café Style Jacket
+Potatoes with Chicken, Bacon & Sweetcorn" to "Chicken and Bacon Caesar Pasta Salad" and gave the
+corrected recipe + method. On checking the DB there is **no Café Style row** — it was already
+renamed to `Chicken and Bacon Caesar Pasta Salad` (id `d1ab3cbc…`) back in Batch C, and that row
+already holds exactly the recipe/method she re-supplied (100g pasta, 250g seasoned chicken breast,
+4 turkey bacon rashers, lettuce + the Greek-yoghurt/parmesan/anchovy Caesar dressing), macros
+**541/59/47.5/12.5/2/5.5**. A fresh recompute of her list lands ~553/63 — within assumption noise
+of the stored 541/59, so left as is. No DB write needed; ticked the stale §D checkbox. **§D now
+fully closed (4/4).**
+
+**§B is BLOCKED by the app→DB sync bug.** Saffron edited the §B recipes in-app ("adjusted in
+app", "edited – recalculate", "deleted one and reformatted the other"), but per the known bug
+those edits persist only to browser local storage, **not** Supabase. Pulled all 8 §B rows — the
+DB state does **not** reflect her edits:
+
+- **7 of 8 have entirely NULL/empty ingredient lists in the DB** — Asian Chicken Salad w/
+  Cucumber & Crispy Seaweed (461/50), Carrot Cake Loaf (178/14.5), Cinnamon Roll Baked Oats
+  (688/14), Crispy Rice and Chicken Salad (635/51), Fluffy Greek Yogurt Pancakes (495/39), Oat
+  Flour Pancakes (97/8.2, serves 12). **Cannot recompute** — no ingredients in the DB to compute
+  from. Need Saffron to paste the edited ingredient lists + confirmed serves for each.
+- **Butternut Protein Brownie ×2** — both rows still `ready` in the DB (her in-app deletion never
+  synced): `207e379e…` pumpkin-puree variant (189/25, serves 5) and `67a68e1c…` butternut-puree
+  variant (412/52, serves 5). These two *do* carry ingredient lists (structured qty/unit objects),
+  so a faithful recompute is possible: butternut variant ≈ **114/16/12.6/1.7/2.7/1.7** per serving,
+  pumpkin variant ≈ **101/15.4/9.2/1.4/3/2.5** per serving (both ÷5) — the old 412/52 & 189/25
+  were whole-recipe-ish totals, matching the audit's "→~110 / ~98". But since she "reformatted"
+  one in-app (may have changed quantities that didn't sync), holding the write until she confirms
+  which variant survives and whether the reformat changed the recipe.
+
+Note: the §A "Basic Oat Flour Pancakes" (id `9af1cd54…`, has ingredients) is a *different* row
+from the §B "Oat Flour Pancakes" (id `25fe14ad…`, null ingredients, serves 12).
+
+No DB write this pass beyond the doc ticks — §B awaits Saffron's pasted lists / dedupe decision.
+
 **Batch E note corrections (caught while matching the rice-exclusion note convention):**
 - **Mediterranean Chicken & Rice Skillet** — Batch E wrote the macros rice-excluded but left
   `notes` null and the stale `carbs_not_stated/fat_not_stated` flags. Added the rice-exclusion

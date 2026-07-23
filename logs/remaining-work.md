@@ -152,7 +152,7 @@ Stored values look like per-recipe totals or wrong serving counts. Recompute AND
 
 ## D. Ingredient-list integrity — fix ingredients BEFORE macros
 
-- [ ] Café Style Jacket Potatoes with Chicken, Bacon & Sweetcorn — no potato/corn in ingredient list
+- [x] Café Style Jacket Potatoes with Chicken, Bacon & Sweetcorn — no potato/corn in ingredient list — RESOLVED: was already renamed to "Chicken and Bacon Caesar Pasta Salad" in Batch C with the correct Caesar recipe + method + macros (541/59). No separate Café Style row remains in the DB. Saffron re-confirmed the same recipe/method 2026-07-23.
 - [x] Chilli Lime Shrimp and Veggie Bowl — no vegetables listed (title says "Veggie") — Batch D, 280 (veg = serving suggestion, excl)
 - [x] Summer Salmon and Blackberry Salad — no blackberries listed — Batch D, 638 (written as "Summer Salad with Blackened Salmon")
 - [x] Quick Chinese Vegetable Noodle Soup — no noodles listed (also serves null, §B) — Batch C, 196
@@ -245,7 +245,7 @@ Quick wins: recompute just fills the missing macro fields (cal/protein already c
 | A. Recalculate — under-counted | 111 (14 ★ done → **97 left**) |
 | B. Over-stated / serving-count | 14 |
 | C. Duplicate rows | 3 |
-| D. Ingredient-list integrity | 4 (3 done, 1 left) |
+| D. Ingredient-list integrity | 4 (all done ✅ — Café Style resolved via the Batch C rename) |
 | E. Empty ingredient lists | 8 (all done) |
 | F. Partial — need one quantity | 24 (all done ✅) |
 | G. Macro-completeness fills | 34 |
