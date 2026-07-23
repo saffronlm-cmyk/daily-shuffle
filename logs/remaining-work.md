@@ -193,9 +193,9 @@ Mostly "rice/base to serve" with no amount, or an unweighted key item.
 - [x] Instant Noodle Jars — tofu qty — Batch E, 956 (tofu block assumed 300g, confirmed)
 - [x] Mediterranean Chicken & Rice Skillet — rice qty (stored protein looks high) — Batch E, 377 (rice excl; thigh weight assumed)
 - [x] Peanut Butter Banana French Toast — PB & banana qty — Batch E, 627 (small banana ~100g, 1 tbsp PB)
-- [ ] Peanut Butter Chicken Katsu Noodles — rice & chicken qty
-- [ ] Stuffed Breakfast Chicken Sausage Pitas — sausage type; avocado optional (+null macros)
-- [ ] Thai Style Chicken Satay — rice qty
+- [x] Peanut Butter Chicken Katsu Noodles — rice & chicken qty — Batch F, 430 (rice excl; 150g cooked chicken breast/serving)
+- [x] Stuffed Breakfast Chicken Sausage Pitas — sausage type; avocado optional (+null macros) — Batch F, 397 (full recipe supplied; base w/o optional avocado)
+- [x] Thai Style Chicken Satay — rice qty — Batch F, 496 (rice excl; light coconut)
 
 ## G. Macro-completeness fills — calories/protein look right, but carbs/fat/fibre/sugar are null
 
@@ -247,7 +247,7 @@ Quick wins: recompute just fills the missing macro fields (cal/protein already c
 | C. Duplicate rows | 3 |
 | D. Ingredient-list integrity | 4 (3 done, 1 left) |
 | E. Empty ingredient lists | 8 (all done) |
-| F. Partial — need one quantity | 24 (20 done, 4 left) |
+| F. Partial — need one quantity | 24 (23 done, 1 left — Frozen Strawberry Raspberry PB Bites deferred) |
 | G. Macro-completeness fills | 34 |
 
 Some recipes appear in two sections (e.g. a dedupe that also needs a recompute); net unique

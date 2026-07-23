@@ -959,3 +959,43 @@ this batch's in the same pass.
 
 Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.
 
+---
+
+## Batch F — final 3 §F "need one quantity" items + Batch E note fixes (2026-07-23) — WRITTEN
+
+Saffron supplied the last three §F quantities/decisions. Written faithfully, rice-excluded per
+her standing instruction where a "rice/base to serve" line was unquantified. This closes §F
+except the deferred Frozen Strawberry Raspberry PB Bites.
+
+Format: `kcal / protein / carbs / fat / fibre / sugar` per serving.
+
+| Recipe | serves | Before | After |
+|---|---|---|---|
+| Peanut Butter Chicken Katsu Noodles | 3 | 495/56 (incl rice) | 430/52/18/16/3.5/6 (rice excl; 150g cooked chicken breast/serving) |
+| Stuffed Breakfast Chicken Sausage Pitas | 1 | 289/29 (null carbs/fat) | 397/29/40/14/7/5 (full recipe; base w/o optional avocado) |
+| Thai Style Chicken Satay | 3 | 498/38 (incl rice) | 496/41.5/14/31/1.5/7.5 (rice excl; light coconut) |
+
+**Decisions applied:**
+- **Katsu** — "Rice of choice" excluded (note added: +200 kcal / +44g carbs per 150g cooked
+  rice); chicken assumed 150g cooked breast per serving per Saffron. The listed title says
+  "Noodles" but the ingredient list is a katsu peanut sauce over rice — computed the sauce +
+  chicken only.
+- **Stuffed Pitas** — full recipe supplied. Wrote the **base** stuffed pita (pita + 120g lean
+  chicken sausage meat + tomato/spinach/spring onion) without the optional ½-avocado dressing,
+  which is labelled "optional to serve". Avocado adds ~125 kcal / +10.5g fat / +9g carbs —
+  noted on the row. Chicken sausage meat assumed ~160 kcal/100g (lean); bump if using a
+  fattier banger.
+- **Thai Satay** — sticky rice excluded (note added); light coconut milk per project default;
+  600g raw thighs across 3 servings; small pickled-veg portion included, sauce fully counted.
+
+**Batch E note corrections (caught while matching the rice-exclusion note convention):**
+- **Mediterranean Chicken & Rice Skillet** — Batch E wrote the macros rice-excluded but left
+  `notes` null and the stale `carbs_not_stated/fat_not_stated` flags. Added the rice-exclusion
+  note and cleared the resolved flags.
+- **Honey Sesame Salmon Bowl** — its `notes` still read "per serving from 2 **with rice**"
+  though Batch E computed it rice-**excluded** (463, carbs 10.5). Corrected the note to say rice
+  excluded (+200 kcal / +44g carbs per 150g) and dropped the resolved `nutrition_not_stated`
+  flag (kept `serves_estimated`).
+
+Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.
+
