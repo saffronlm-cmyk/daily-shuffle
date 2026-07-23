@@ -938,19 +938,15 @@ Format: `kcal / protein / carbs / fat / fibre / sugar` per serving.
 | Green Goddess Chicken Prep Mix | 2 | 280/24 (nulls) | 267/28/20/9.5/6.5/8.5 (full recipe supplied) |
 | Peanut Butter Banana French Toast | 1 | 488/18 | 627/19/76/29/5/26.5 (small banana ~100g, 1 tbsp PB, + maple syrup to serve) |
 
-**Flagged to Saffron (written as computed, may adjust):**
-- **Instant Noodle Jars → 956/66g protein** — assumes a full ~300g firm-tofu block (UK blocks
-  run 280–396g) for a single serving; if the recipe means a smaller pack, protein/calories
-  should come down substantially. Biggest open decision in this batch.
-- **Crispy GF Shrimp Dumplings / GF Easy Pan Dumplings (×2)** — Saffron wasn't sure of the
-  coating amount ("rolled in a bowl of flour/starch"); assumed ~15g flour or starch actually
-  adheres/is consumed across the batch (light dusting, most falls back in the bowl). Low
-  materiality (≤1.5g carbs/serving either way) but flagged for consistency.
-- **Harissa Chicken with Roasted Veg and Feta → 943 kcal, up from 555** — this is a large single
-  serving as written (whole onion, whole pepper, ⅓ tin chickpeas, 2 bone-in skin-on thighs);
-  faithful compute of the full listed quantities. Feta excluded per Saffron (garnish/crumble).
-- **Double Roast Chicken** — 52% raw-to-cooked-edible yield is a standard whole-roast-chicken
-  assumption, not from the recipe itself; bump serves or yield % if it runs light/heavy for 8.
+**Flagged to Saffron — confirmed as written, no changes (2026-07-23):**
+- **Instant Noodle Jars → 956/66g protein** — full ~300g firm-tofu block assumption confirmed.
+- **Crispy GF Shrimp Dumplings / GF Easy Pan Dumplings (×2)** — ~15g adhered coating assumption
+  confirmed.
+- **Harissa Chicken with Roasted Veg and Feta → 943 kcal, up from 555** — faithful compute of
+  the full listed quantities (whole onion, whole pepper, ⅓ tin chickpeas, 2 bone-in skin-on
+  thighs, feta excluded) confirmed.
+- **Double Roast Chicken** — 52% raw-to-cooked-edible whole-roast-chicken yield assumption
+  confirmed.
 
 **Bone-in skin-on chicken thigh convention (Mediterranean Skillet, Harissa Chicken):** no
 per-thigh weight given, so used ~100g edible cooked meat+skin per thigh — same figure implied
