@@ -4,6 +4,85 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# Batch O — 3 decision-gated §A recipes resolved with Saffron's calls
+**Date:** 2026-07-24
+**Project:** Daily Shuffle — recipe library macros (Supabase `recipes`)
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete — 3 rows written + verified; §A down to 1 open item
+
+---
+
+## Project Context
+Direct continuation of the same-day Batch M/N entries (below). After Batch N, §A had 4
+decision-gated items left (unstated chicken weights / rice qty / rendering). Saffron gave
+calls on 3 of them this turn.
+
+## Session Goal
+Resolve the decision-gated §A items using Saffron's per-recipe calls, write them, and update
+the record.
+
+## What Was Done
+Saffron's calls and the resulting writes (all serves 4, per-serving, staple-grounded):
+- **Middle Eastern Chicken & Rice Bowl** (`4e79b17f…`): "½ cup cooked rice". Full recompute
+  (2 lb thighs → ~43 g protein/serve, confirming the "→~47" note; mayo white sauce; sumac
+  salad; cucumber/feta optional excluded) → 428 → **658/48/41/33/3.5/4.5**.
+- **Pho Gà** (`8990b52a…`): "logical split of the remaining meat + carbs". Counted the full
+  edible thigh meat (~730 g cooked, bones+skin discarded) split evenly ÷4; broth fat skimmed;
+  360 g dried noodles ÷4 → 501 → **750/55/90/18/3.5/11**.
+- **Thai Red Curry Pot Roast** (`15de62d0…`): "count just the meat, reduce oil significantly,
+  don't count the rice + note it". ~780 g cooked meat from the 1.8 kg bird; oil 3 tbsp→~1 tbsp;
+  full 400 ml coconut cream sauce + potatoes + beans; jasmine rice excluded → 548 →
+  **920/61/42/56/5.5/9**.
+`review_flags` cleared on all 3; assumption notes appended to `notes` on Pho Gà + Thai Red
+Curry (rice-exclusion recorded on the latter).
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| Supabase `recipes` (3 rows) | §A decision-gated recomputes | Modified | Supabase `jsxcctrskkkxgdxfaduo` |
+| logs/macro-audit.md | Batch O entry | Modified | /home/user/daily-shuffle/logs/ |
+| logs/remaining-work.md | 3 §A ticks + RESUME cleaned to 1 open item | Modified | /home/user/daily-shuffle/logs/ |
+| logs/daily-shuffle_log.md | This entry | Modified | /home/user/daily-shuffle/logs/ |
+
+Data-only Supabase change — no `index.html`/`sw.js`, **no cache bump**.
+
+## Decisions & Reasoning
+- **Followed Saffron's per-recipe calls exactly** rather than my own defaults: she chose to
+  count the full Pho Gà meat yield (not a lowball), meat-only for the Thai curry with reduced
+  oil, and ½ cup rice for the Middle Eastern bowl. These were the load-bearing judgement calls
+  the recipes needed.
+- **Thai curry rice excluded + noted** (per her instruction) — consistent with the other
+  rice-to-serve recipes in the library; recorded in the row's `notes`.
+- **Appended to `notes` rather than overwriting** — fetched existing notes first (they carry
+  freezing/GI guidance) and concatenated the macro-assumption sentence.
+
+## Current State (end of session)
+3 rows written + verified. §A has **1 item left** (Chicken and Potato Traybake — needs a
+cooked-meat-weight call). Ready library at 0 null macros (311 ready). Changes committed on
+`claude/pr-48-remaining-work-raln2k` (restarted from `origin/main` @ 968f16a after PR #50
+merged); new draft PR opened.
+
+## Next Steps
+1. Saffron gives a cooked-meat weight for **Chicken and Potato Traybake** (or "eyeball ~590")
+   → one-line write closes §A entirely.
+2. Then the whole macro-correction stream (§A–§G) is done.
+
+## Open Questions / Blockers
+- Chicken and Potato Traybake weight (last §A item). Systematic step-3 nutrition still blocked
+  on `ingredient_grams` (PR #36) — unchanged.
+
+## Environment & Config Notes
+Repo `saffronlm-cmyk/daily-shuffle`, branch `claude/pr-48-remaining-work-raln2k` (restarted from
+`origin/main` @ 968f16a). Supabase `jsxcctrskkkxgdxfaduo`, table `recipes`. Wrote by explicit id
+UPDATE via Supabase MCP; `notes` appended with `||`. No cache bump.
+
+## Notes & Gotchas
+- Pho Gà at 750/serve and Thai curry at 920/serve are legitimately calorie-dense once the full
+  meat + noodles (pho) / coconut cream (curry) are counted — not errors. The old 501/548 were
+  undercounts.
+- Branch deletion still blocked here (egress 403); stale merged branches need the GitHub UI.
+
 # §A reconciliation + close-out — Batch N (recipe macros)
 **Date:** 2026-07-24
 **Project:** Daily Shuffle — recipe library macros (Supabase `recipes`)
