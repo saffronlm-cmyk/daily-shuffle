@@ -201,40 +201,45 @@ Mostly "rice/base to serve" with no amount, or an unweighted key item.
 
 Quick wins: recompute just fills the missing macro fields (cal/protein already close).
 
-- [ ] Banh Cuon - Vietnamese Rice Paper Rolls (fibre/sugar)
-- [ ] Cauliflower Cheese Gnocchi Bake (carbs/fat/fibre/sugar)
-- [ ] Char Siu Chicken (fibre/sugar)
-- [ ] Chipotle Chicken Chop Bowl (fibre/sugar)
-- [ ] Chocolate Banana Rice Paper Pie (fibre/sugar)
-- [ ] Chocolate Chia Mousse (all macros)
-- [ ] Creamy Mango and Coconut Cod Curry (all macros)
-- [ ] Double Choc Fudge Cookie (all macros)
-- [ ] Frozen Berry Breakfast Crumble (all macros)
-- [ ] Healthy Orange & Cashew Chicken (all macros)
-- [ ] High Protein Brownie Bowl (fibre/sugar)
-- [ ] High Protein Chocolate Lava Pudding (all macros)
-- [ ] High Protein Tiramisu Overnight Oats (fibre/sugar)
-- [ ] High Protein Tuna Salad (fibre/sugar)
-- [ ] Homemade Carrot Cake (fibre/sugar)
-- [ ] Lemon and Coconut Cake (fibre/sugar)
-- [ ] Meal Prep Spicy Tuna Quesadilla (all macros)
-- [ ] Nandos Chicken Pasta Salad (fibre/sugar)
-- [ ] Protein Berry Parfait (all macros)
-- [ ] Protein Pancakes (Simple) (fibre/sugar)
-- [ ] Protein Power BLT (all macros)
-- [ ] Rice Paper Kimchi Jeon with Tuna (fibre/sugar)
-- [ ] Rice Paper Pad See Ew with Shrimp (fibre/sugar)
-- [ ] Smoky Caramelised Red Pepper Orzo (all macros)
-- [ ] Spicy Chilli Rice Paper Wontons with Shrimp (fibre/sugar)
-- [ ] Spicy Peanut Chicken Noodles (fibre/sugar)
-- [ ] Spring Greens Carbonara (all macros)
-- [ ] Sticky Mango Chicken Prep Bowls (all macros)
-- [ ] Sticky Miso Chicken Bowl w/ Tahini Broccoli (all macros)
-- [ ] Sushi Salad (all macros)
-- [ ] Sweet Potato Beef Taco Bowl (fibre/sugar)
-- [ ] Thai Prawn Meatball Bowl w/ Spicy Peanut Sauce (all macros)
-- [ ] Tuna Chilli Crunch Salad (all macros)
-- [ ] Zesty + Spicy Chicken Fusion Bowl (fibre/sugar)
+**✅ ALL 34 DONE — Batch J (2026-07-23).** Filled the missing carbs/fat/fibre/sugar (kept
+existing cal/protein) for every recipe below, staple-grounded from the DB ingredient lists.
+17 had all four null; 17 needed only fibre/sugar. Plus the Blueberry Protein Yoghurt Bowl
+(sugar-only gap, not on this list) filled in passing. See macro-audit.md Batch J.
+
+- [x] Banh Cuon - Vietnamese Rice Paper Rolls (fibre/sugar)
+- [x] Cauliflower Cheese Gnocchi Bake (carbs/fat/fibre/sugar)
+- [x] Char Siu Chicken (fibre/sugar)
+- [x] Chipotle Chicken Chop Bowl (fibre/sugar)
+- [x] Chocolate Banana Rice Paper Pie (fibre/sugar)
+- [x] Chocolate Chia Mousse (all macros)
+- [x] Creamy Mango and Coconut Cod Curry (all macros)
+- [x] Double Choc Fudge Cookie (all macros)
+- [x] Frozen Berry Breakfast Crumble (all macros)
+- [x] Healthy Orange & Cashew Chicken (all macros)
+- [x] High Protein Brownie Bowl (fibre/sugar)
+- [x] High Protein Chocolate Lava Pudding (all macros)
+- [x] High Protein Tiramisu Overnight Oats (fibre/sugar)
+- [x] High Protein Tuna Salad (fibre/sugar)
+- [x] Homemade Carrot Cake (fibre/sugar)
+- [x] Lemon and Coconut Cake (fibre/sugar)
+- [x] Meal Prep Spicy Tuna Quesadilla (all macros)
+- [x] Nandos Chicken Pasta Salad (fibre/sugar)
+- [x] Protein Berry Parfait (all macros)
+- [x] Protein Pancakes (Simple) (fibre/sugar)
+- [x] Protein Power BLT (all macros)
+- [x] Rice Paper Kimchi Jeon with Tuna (fibre/sugar)
+- [x] Rice Paper Pad See Ew with Shrimp (fibre/sugar)
+- [x] Smoky Caramelised Red Pepper Orzo (all macros)
+- [x] Spicy Chilli Rice Paper Wontons with Shrimp (fibre/sugar)
+- [x] Spicy Peanut Chicken Noodles (fibre/sugar)
+- [x] Spring Greens Carbonara (all macros)
+- [x] Sticky Mango Chicken Prep Bowls (all macros)
+- [x] Sticky Miso Chicken Bowl w/ Tahini Broccoli (all macros)
+- [x] Sushi Salad (all macros)
+- [x] Sweet Potato Beef Taco Bowl (fibre/sugar)
+- [x] Thai Prawn Meatball Bowl w/ Spicy Peanut Sauce (all macros)
+- [x] Tuna Chilli Crunch Salad (all macros)
+- [x] Zesty + Spicy Chicken Fusion Bowl (fibre/sugar)
 
 ---
 
@@ -248,7 +253,7 @@ Quick wins: recompute just fills the missing macro fields (cal/protein already c
 | D. Ingredient-list integrity | 4 (all done ✅ — Café Style resolved via the Batch C rename) |
 | E. Empty ingredient lists | 8 (all done) |
 | F. Partial — need one quantity | 24 (all done ✅) |
-| G. Macro-completeness fills | 34 |
+| G. Macro-completeness fills | 34 (all done ✅ — Batch J) |
 
 Some recipes appear in two sections (e.g. a dedupe that also needs a recompute); net unique
 ≈ 190 of the ~310 ready recipes. The clean, fully-correct remainder needs nothing.

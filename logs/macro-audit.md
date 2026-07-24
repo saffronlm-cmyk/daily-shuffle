@@ -1135,6 +1135,42 @@ a stray entry, deletion). Reported back to Saffron.
   (§G) and "Chocolate Chip Protein Pancakes" @kylecarillet.
   → **RESOLVED (Batch I):** Saffron chose **per pancake, serves 12** (not 15). 853 kcal ÷12 =
   **71/4/7.5/2.7/1.2/3.8** per pancake. **§B now fully closed (14/14).**
+
+---
+
+## Batch J — §G macro-completeness fills, all 34 (2026-07-23) — WRITTEN
+
+Filled the missing macro fields on every §G recipe, keeping the existing (audit-confirmed)
+calories + protein and computing the null carbs/fat/fibre/sugar staple-grounded from each DB
+ingredient list. Two groups:
+
+- **17 with all four null** (carbs+fat+fibre+sugar): Cauliflower Cheese Gnocchi Bake, Chocolate
+  Chia Mousse, Creamy Mango & Coconut Cod Curry, Double Choc Fudge Cookie, Frozen Berry Breakfast
+  Crumble, Healthy Orange & Cashew Chicken, High Protein Chocolate Lava Pudding, Meal Prep Spicy
+  Tuna Quesadilla, Protein Berry Parfait, Protein Power BLT, Smoky Caramelised Red Pepper Orzo,
+  Spring Greens Carbonara, Sticky Mango Chicken Prep Bowls, Sticky Miso Chicken Bowl w/ Tahini
+  Broccoli, Sushi Salad, Thai Prawn Meatball Bowl, Tuna Chilli Crunch Salad.
+- **17 needing only fibre+sugar** (cal/protein/carbs/fat already present): Banh Cuon, Char Siu
+  Chicken, Chipotle Chicken Chop Bowl, Chocolate Banana Rice Paper Pie, High Protein Brownie Bowl,
+  High Protein Tiramisu Overnight Oats, High Protein Tuna Salad, Homemade Carrot Cake, Lemon &
+  Coconut Cake, Nandos Chicken Pasta Salad, Protein Pancakes (Simple), Rice Paper Kimchi Jeon with
+  Tuna, Rice Paper Pad See Ew with Shrimp, Spicy Chilli Rice Paper Wontons, Spicy Peanut Chicken
+  Noodles, Sweet Potato Beef Taco Bowl, Zesty + Spicy Chicken Fusion Bowl.
+
+Also filled **Blueberry Protein Yoghurt Bowl** (sugar-only gap, not on the §G list) → sugar 15.
+Cleared the resolved `*_not_stated` review_flags on all of them. Where a full line-item compute
+ran above the stored calories (several composed bowls), carbs/fat were kept roughly consistent
+with the trusted stored cal rather than inflating it — fibre/sugar (the actually-missing fields)
+computed directly from the ingredients.
+
+**Left untouched (not §G):** the two `High Protein Salmon Potato Salad` rows (§C dedupe — needs
+Saffron's call), `Marinated Fish Tacos` (serves + protein null — can't compute per-serving until
+serves is set), and 3 §A recompute items still carrying nulls (Raspberry Cheesecake Protein Bowl,
+Roasted Cod on Sweet Potato, Single Serve Sticky Date Pudding).
+
+**§G now fully closed (34/34).** Remaining open work: §A recomputes, §C dedupes (3).
+
+Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.
 - **Sticky Soy Chicken with Garlic Rice in Spicy Broth** (`4f1e46fe…`) — she asked "Source?" and
   leaned "likely 2". Source = **@food_bylucy**. The existing 618 (serves 1) is a **large
   under-count**: 1 cup *dry* jasmine rice (~185g ≈ 666 kcal) + 2 tbsp neutral oil + 1 tbsp sesame
