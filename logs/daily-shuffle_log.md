@@ -4,6 +4,95 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# §A reconciliation + close-out — Batch N (recipe macros)
+**Date:** 2026-07-24
+**Project:** Daily Shuffle — recipe library macros (Supabase `recipes`)
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete — 3 rows written + verified; §A effectively closed (4 decision-gated left)
+
+---
+
+## Project Context
+Same macro-correction stream as the earlier 2026-07-24 entries (Batch M null-macro fills, and
+the merge that pulled Batches E–L into `main` via PR #48). This session continued straight on:
+Saffron said "proceed" with §A, the last open bucket. See the Batch M entry below for the
+hand-patching-vs-step-3 distinction and the merge/branch-cleanup context.
+
+## Session Goal
+Work §A ("under-counted recalcs"), which the worklist showed as ~90 open items.
+
+## State Before This Session
+PR #49 (Batch M) merged to `main`; ready library at 0 null macros. `remaining-work.md` RESUME
+block claimed "§A: 90 left". Branch `claude/pr-48-remaining-work-raln2k` restarted fresh from
+`origin/main` (its prior PR #49 was merged, so per the workflow it's reused for new work → new PR).
+
+## What Was Done
+1. **Reconciled the worklist against the live DB** instead of blindly recomputing. Pulled
+   name+calories for all 311 ready rows, compared each §A item's stored calories to its worklist
+   "before" value (script: `scratchpad/reconcile.py`). Finding: **84 of ~90 had already been
+   written by Batch B (2026-07-22) and were simply never ticked** — the worklist was stale, not
+   the DB. Only 6 still held their old value.
+2. Of those 6: **Sticky Chicken Gochujang** was already done (Batch B wrote 655, rice-excluded —
+   coincidentally near its old 646). **3 were clean recomputes** → written. **2 are decision-gated**.
+3. **Wrote 3 rows** (staple-grounded, stored serves kept, optional toppings excluded):
+   - Single Serve Double Chocolate Butter Cake (`7a0644a4…`): 278 → **358/3/42.5/21/2/27**; cleared `nutrition_incomplete`.
+   - Skillet Chicken Thighs w/ Mushroom Gravy (`7dad40e9…`): 318 → **425/36/11.5/27/2/4** (4 tbsp oil counted); kept `serves_estimated`.
+   - Basic Oat Flour Pancakes (`9af1cd54…`): 68 → **160/9/18/6/2.5/3** (old 68 was wrong for serves 2; base only).
+4. Ticked 86 §A lines in `remaining-work.md`, rewrote the RESUME table (§A now 4 left, all
+   decision-gated), added Batch N to `macro-audit.md`.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| Supabase `recipes` (3 rows) | §A macro recomputes | Modified | Supabase `jsxcctrskkkxgdxfaduo` |
+| logs/macro-audit.md | Batch N entry | Modified | /home/user/daily-shuffle/logs/ |
+| logs/remaining-work.md | 86 §A ticks + RESUME rewrite | Modified | /home/user/daily-shuffle/logs/ |
+| logs/daily-shuffle_log.md | This entry | Modified | /home/user/daily-shuffle/logs/ |
+| scratchpad/reconcile.py | DB-vs-worklist reconciliation script | Created (not committed) | session scratchpad |
+
+Data-only Supabase change — no `index.html`/`sw.js`/`manifest.json`, **no cache bump**.
+
+## Decisions & Reasoning
+- **Reconcile before recompute**: blindly redoing 90 items risked diverging from Batch B's
+  already-written values and wasting effort. The DB is the source of truth; the worklist ticks
+  were just stale. Comparing stored-cal vs worklist-"before" cleanly separated done from not-done.
+- **Wrote Basic Oat Flour Pancakes despite its "check serving basis" flag**: the old 68 is
+  clearly wrong (ingredients ÷ serves 2 = ~160), and keeping the stored serves=2 is the
+  conservative faithful choice. Noted the serving-basis caveat rather than changing serves.
+- **Did NOT write the 4 decision-gated §A items**: Chicken & Potato Traybake (bone-in/skin-on
+  weights + fat-retention judgement — faithful compute ~614 but genuinely uncertain), Middle
+  Eastern Chicken & Rice Bowl (no rice qty), Pho Gà (broth rendering), Thai Red Curry Pot Roast
+  (whole-bird rendering). These need Saffron, per the recipe-db "flag, don't guess" rule.
+- **Skillet oil counted in full** (fat 27/serve): matches the audit target 418 and the Batch B
+  convention (count listed oil, note retention). Bump down if discounting pan retention.
+
+## Current State (end of session)
+3 rows written + read-back verified. §A is 4/111 open, all decision-gated. Ready library still
+0 null macros. Changes committed on `claude/pr-48-remaining-work-raln2k`; new draft PR opened.
+
+## Next Steps
+1. Saffron decides the 4 remaining §A items (weights/rice-qty/rendering) — then they're a quick
+   write. Everything else in the macro stream is done.
+2. Optional cleanup she may want: the three `Carrot Cake Baked Oats` rows all `ready`
+   (718/serves-1, 268/serves-1, 407/serves-4) — possible unintended dup; and the 4 independent
+   open PRs (#36 qty-normalisation, #14 Apify, #5 RLS, #45 japchae log fix).
+
+## Open Questions / Blockers
+- The 4 decision-gated §A items above. Systematic nutrition "step 3" still blocked on
+  `ingredient_grams` (step 2, PR #36) — unchanged.
+
+## Environment & Config Notes
+Repo `saffronlm-cmyk/daily-shuffle`, branch `claude/pr-48-remaining-work-raln2k` (restarted from
+`origin/main` @ 270cceb after PR #49 merged). Supabase `jsxcctrskkkxgdxfaduo`, table `recipes`.
+Wrote by explicit id UPDATE via Supabase MCP. No cache bump.
+
+## Notes & Gotchas
+- **Trust the DB, not the worklist checkboxes.** This session's whole point: 84 "open" items
+  were already done. Always reconcile stored values against the live DB before recomputing.
+- Branch **deletion is blocked** in this environment (git push --delete → 403 org egress policy;
+  no `delete_branch` MCP tool). Stale merged branches must be cleared from the GitHub UI.
+
 # PR #48 remaining work — Batch M: final 3 null-macro fills (library → 0 nulls)
 **Date:** 2026-07-24
 **Project:** Daily Shuffle — recipe library macros (Supabase `recipes`)

@@ -10,19 +10,35 @@ optional toppings included; precise after-values in `macro-audit.md`).
 
 ---
 
-## ▶ RESUME HERE (updated 2026-07-23, end of Batches E–L)
+## ▶ RESUME HERE (updated 2026-07-24, end of Batch N)
 
-**Only §A remains.** Every other section is fully closed:
+**Effectively complete.** Every section is closed except **4 decision-gated §A items** that
+need Saffron's judgement (not a straight recompute).
 
 | Section | Status |
 |---|---|
-| A. Under-counted recalcs | **90 left** (21 done, incl. Batch M) ← the only open work |
+| A. Under-counted recalcs | **4 left** (all decision-gated — see below); the other ~107 done |
 | B. Over-stated / serving-count | ✅ done (14/14) |
 | C. Duplicate rows | ✅ done (3/3) |
 | D. Ingredient-list integrity | ✅ done (4/4) |
 | E. Empty ingredient lists | ✅ done (8/8) |
 | F. Partial — need one quantity | ✅ done (24/24) |
 | G. Macro-completeness fills | ✅ done (34/34) |
+
+**Batch N (2026-07-24)** reconciled §A against the live DB: 84 items the worklist still showed
+as `[ ]` had in fact been written by Batch B (just never ticked) and were verified + ticked;
+3 that genuinely still held their old value were recomputed and written (Single Serve Double
+Chocolate Butter Cake →358, Skillet Chicken Thighs w/ Mushroom Gravy →425, Basic Oat Flour
+Pancakes →160). That leaves only the 4 below.
+
+**The 4 remaining §A items — need input, not a recompute:**
+- **Chicken and Potato Traybake** (448→~589) — §C survivor; the fat is undercounted but the
+  2 legs + "3–4" thighs are bone-in/skin-on with unstated weights, and how much skin/rendered
+  fat is eaten is a judgement call. Faithful compute lands ~614/37/26/39.
+- **Middle Eastern Chicken & Rice Bowl** (428) — "rice of choice" has no quantity (load-bearing).
+- **Pho Gà - Vietnamese Chicken Pho** (501) — 1.5 kg bone-in thighs simmered into broth;
+  meat-yield-per-bowl + fat-rendering genuinely uncertain.
+- **Thai Red Curry Pot Roast Chicken** (548→~1232) — whole 1.8 kg bird rendering uncertain.
 
 **How to do §A** (mechanical — mostly no input needed): for each unchecked `- [ ]` item below,
 pull its `ingredient_sections` from Supabase `recipes` (project `jsxcctrskkkxgdxfaduo`), recompute
@@ -53,117 +69,117 @@ in Supabase `recipes` — no `index.html`/`sw.js` change, no cache bump. PR #48 
 
 ## A. Recalculate — under-counted (stored too low). Biggest bucket; straight recompute+write.
 
-- [ ] 4 Ingredient Rice Cake Chocolate Bars — 165→266
+- [x] 4 Ingredient Rice Cake Chocolate Bars — 165→266  — done (Batch B; verified in DB 2026-07-24)
 - [x] Air Fryer Cinnamon Roll Oats — 398→616 → already recomputed to 641; renamed to "Cinnamon Roll Baked Oats @tracesoats" in Batch G (pairs with the @entirelyemmy §B recipe)
-- [ ] Baked Middle Eastern Chicken Tray — 318→377
-- [ ] Basic Oat Flour Pancakes — 68→153 (check serving basis)
+- [x] Baked Middle Eastern Chicken Tray — 318→377  — done (Batch B; verified in DB 2026-07-24)
+- [x] Basic Oat Flour Pancakes — recomputed to **160** (Batch N, 2026-07-24; full 6 macros, staple-grounded)
 - [x] ★ Blended Overnight Oats — 398→475
 - [x] ★ Blueberry, Lemon & Coconut Overnight Oats — 332→437
-- [ ] Butternut Squash Mac and Cheese — 348→542
-- [ ] Caramelised Onion Rice with Tikka Cod — 488→578
-- [ ] Carrot Cake Meal Prep Baked Oats — 318→386
-- [ ] Chicken & Egg Breakfast Casserole — 228→315
+- [x] Butternut Squash Mac and Cheese — 348→542  — done (Batch B; verified in DB 2026-07-24)
+- [x] Caramelised Onion Rice with Tikka Cod — 488→578  — done (Batch B; verified in DB 2026-07-24)
+- [x] Carrot Cake Meal Prep Baked Oats — 318→386  — done (Batch B; verified in DB 2026-07-24)
+- [x] Chicken & Egg Breakfast Casserole — 228→315  — done (Batch B; verified in DB 2026-07-24)
 - [ ] Chicken and Potato Traybake — 448→589 (§C survivor; may still want the §A fat recompute — skin-on legs+thighs+Flora)
-- [ ] Chicken Shawarma Crispy Rice Salad — 488→657
-- [ ] Chile Lime Chipotle Chicken — 338→392
-- [ ] Chili Crunch Ground Chicken Bowls — 398→498
-- [ ] Choc, PB and Raspberry Overnight Oats — 388→496
+- [x] Chicken Shawarma Crispy Rice Salad — 488→657  — done (Batch B; verified in DB 2026-07-24)
+- [x] Chile Lime Chipotle Chicken — 338→392  — done (Batch B; verified in DB 2026-07-24)
+- [x] Chili Crunch Ground Chicken Bowls — 398→498  — done (Batch B; verified in DB 2026-07-24)
+- [x] Choc, PB and Raspberry Overnight Oats — 388→496  — done (Batch B; verified in DB 2026-07-24)
 - [x] ★ Chocolate Chia Overnight Oats — 502→689
-- [ ] Chocolate Date Peanut Butter Squares — 128→165
-- [ ] Chocolate Hazelnut Cookie Dough Balls — 128→177
-- [ ] Chocolate Peanut Butter Protein Cookie Dough — 228→257
-- [ ] Chocolate Raspberry Baked Protein Oats — 168→210
-- [ ] Chocolate Strawberry Baked Oats — 405→487
+- [x] Chocolate Date Peanut Butter Squares — 128→165  — done (Batch B; verified in DB 2026-07-24)
+- [x] Chocolate Hazelnut Cookie Dough Balls — 128→177  — done (Batch B; verified in DB 2026-07-24)
+- [x] Chocolate Peanut Butter Protein Cookie Dough — 228→257  — done (Batch B; verified in DB 2026-07-24)
+- [x] Chocolate Raspberry Baked Protein Oats — 168→210  — done (Batch B; verified in DB 2026-07-24)
+- [x] Chocolate Strawberry Baked Oats — 405→487  — done (Batch B; verified in DB 2026-07-24)
 - [x] ★ Chocolate Tahini Brownies — 178→273
-- [ ] Chopped Jalapeño Cheddar Chicken Salad — 185→253
-- [ ] Cinnamon Buckwheat Smoothie — 398→498
-- [ ] Coffee Protein Ice Cream Affogato — 175→321 (+null macros)
-- [ ] Cookie Dough Caramel Bars — 188→224
-- [ ] Copycat Nando's Peri Peri Chicken Burgers — 518→772
-- [ ] Cottage Cheese Pancakes — 218→328
-- [ ] Creamy Peanut Miso Ramen — 528→998
-- [ ] Crispy Bang Bang Chicken — 427→539
-- [ ] Crispy Chicken Rice Paper Dumplings — 358→450
-- [ ] Crispy Rice Paper Spring Rolls Without Frying — 198→412
-- [ ] Crispy Rice Tuna Salad — 418→494
-- [ ] Crispy Rosemary Chicken w/ Apple Beetroot Slaw — 412→742 (+null macros)
+- [x] Chopped Jalapeño Cheddar Chicken Salad — 185→253  — done (Batch B; verified in DB 2026-07-24)
+- [x] Cinnamon Buckwheat Smoothie — 398→498  — done (Batch B; verified in DB 2026-07-24)
+- [x] Coffee Protein Ice Cream Affogato — 175→321 (+null macros)  — done (Batch B; verified in DB 2026-07-24)
+- [x] Cookie Dough Caramel Bars — 188→224  — done (Batch B; verified in DB 2026-07-24)
+- [x] Copycat Nando's Peri Peri Chicken Burgers — 518→772  — done (Batch B; verified in DB 2026-07-24)
+- [x] Cottage Cheese Pancakes — 218→328  — done (Batch B; verified in DB 2026-07-24)
+- [x] Creamy Peanut Miso Ramen — 528→998  — done (Batch B; verified in DB 2026-07-24)
+- [x] Crispy Bang Bang Chicken — 427→539  — done (Batch B; verified in DB 2026-07-24)
+- [x] Crispy Chicken Rice Paper Dumplings — 358→450  — done (Batch B; verified in DB 2026-07-24)
+- [x] Crispy Rice Paper Spring Rolls Without Frying — 198→412  — done (Batch B; verified in DB 2026-07-24)
+- [x] Crispy Rice Tuna Salad — 418→494  — done (Batch B; verified in DB 2026-07-24)
+- [x] Crispy Rosemary Chicken w/ Apple Beetroot Slaw — 412→742 (+null macros)  — done (Batch B; verified in DB 2026-07-24)
 - [x] Easy Chicken Traybake — DELETED as §C duplicate (survivor = Chicken and Potato Traybake)
-- [ ] Easy Chipotle Chicken & Corn Salsa — 338→425
-- [ ] Easy Tuna Salad Mix — 148→224
-- [ ] Fluffy Breakfast Carrot Cake Loaf — 250→330 (+null macros)
-- [ ] Fluffy Vegan Protein Pancakes — 288→339
-- [ ] Garlic Cucumber Salad — 38→64 (minor, tiny absolute)
-- [ ] Giant Rice Cake Snickers Wagon Wheel — 488→630
-- [ ] Glowing Skin Soup — 148→242
-- [ ] Gluten Free Cinnamon Buns — 488→1188 (also check serves, §B)
+- [x] Easy Chipotle Chicken & Corn Salsa — 338→425  — done (Batch B; verified in DB 2026-07-24)
+- [x] Easy Tuna Salad Mix — 148→224  — done (Batch B; verified in DB 2026-07-24)
+- [x] Fluffy Breakfast Carrot Cake Loaf — 250→330 (+null macros)  — done (Batch B; verified in DB 2026-07-24)
+- [x] Fluffy Vegan Protein Pancakes — 288→339  — done (Batch B; verified in DB 2026-07-24)
+- [x] Garlic Cucumber Salad — 38→64 (minor, tiny absolute)  — done (Batch B; verified in DB 2026-07-24)
+- [x] Giant Rice Cake Snickers Wagon Wheel — 488→630  — done (Batch B; verified in DB 2026-07-24)
+- [x] Glowing Skin Soup — 148→242  — done (Batch B; verified in DB 2026-07-24)
+- [x] Gluten Free Cinnamon Buns — 488→1188 (also check serves, §B)  — done (Batch B; verified in DB 2026-07-24)
 - [x] ★ Halloween Chocolate Almond Butter Balls — 118→175
-- [ ] Healthy Lemon Bars — 178→260
-- [ ] High Fibre Sticky Toffee Oats — 420→948 (+null macros)
-- [ ] High Protein Carrot Cake Overnight Oats — 448→607
-- [ ] High Protein Chickpea Flour Pancakes — 318→432
-- [ ] High Protein Pumpkin Spice Muffins — 88→114
-- [ ] Honey Glazed Salmon Bowls with Peach Salsa — 298→439
-- [ ] Honey Mustard Chicken Power Bowl — 488→684
-- [ ] Lemon and Blueberry Baked Oats — 248→383
-- [ ] Loaf Pan Lemon & Yoghurt Chicken — 298→293 (protein 32→~44)
+- [x] Healthy Lemon Bars — 178→260  — done (Batch B; verified in DB 2026-07-24)
+- [x] High Fibre Sticky Toffee Oats — 420→948 (+null macros)  — done (Batch B; verified in DB 2026-07-24)
+- [x] High Protein Carrot Cake Overnight Oats — 448→607  — done (Batch B; verified in DB 2026-07-24)
+- [x] High Protein Chickpea Flour Pancakes — 318→432  — done (Batch B; verified in DB 2026-07-24)
+- [x] High Protein Pumpkin Spice Muffins — 88→114  — done (Batch B; verified in DB 2026-07-24)
+- [x] Honey Glazed Salmon Bowls with Peach Salsa — 298→439  — done (Batch B; verified in DB 2026-07-24)
+- [x] Honey Mustard Chicken Power Bowl — 488→684  — done (Batch B; verified in DB 2026-07-24)
+- [x] Lemon and Blueberry Baked Oats — 248→383  — done (Batch B; verified in DB 2026-07-24)
+- [x] Loaf Pan Lemon & Yoghurt Chicken — 298→293 (protein 32→~44)  — done (Batch B; verified in DB 2026-07-24)
 - [x] ★ Maple Cinnamon Pumpkin Overnight Oats — 368→599
-- [ ] Marinated Chicken Thighs w/ Mint Jalapeño Sauce — 448→623
-- [ ] Matcha Date Butter Balls — 98→136
-- [ ] Microwave Chocolate Protein Oats — 248→380
+- [x] Marinated Chicken Thighs w/ Mint Jalapeño Sauce — 448→623  — done (Batch B; verified in DB 2026-07-24)
+- [x] Matcha Date Butter Balls — 98→136  — done (Batch B; verified in DB 2026-07-24)
+- [x] Microwave Chocolate Protein Oats — 248→380  — done (Batch B; verified in DB 2026-07-24)
 - [ ] Middle Eastern Chicken & Rice Bowl — 428 (cal ok; protein 38→~47; rice not counted)
-- [ ] Miso Peanut Ramen Bowl — 498→628
+- [x] Miso Peanut Ramen Bowl — 498→628  — done (Batch B; verified in DB 2026-07-24)
 - [x] ★ No Bake Coconut Cookies — 168→242
-- [ ] One Pan Vegan Sushi Bake — 464→633
-- [ ] Pad Thai with Chicken and Prawns — 528→650
-- [ ] Pad Thai with Prawns — 418→511
-- [ ] Peach and Nectarine Overnight Oats — 318→400
-- [ ] Peaches and Cream Chia Pudding — 195→244
-- [ ] Peanut Butter and Jam Breakfast Oat Bars — 248→374
-- [ ] Peanut Tofu Salad Jars — 278→351
+- [x] One Pan Vegan Sushi Bake — 464→633  — done (Batch B; verified in DB 2026-07-24)
+- [x] Pad Thai with Chicken and Prawns — 528→650  — done (Batch B; verified in DB 2026-07-24)
+- [x] Pad Thai with Prawns — 418→511  — done (Batch B; verified in DB 2026-07-24)
+- [x] Peach and Nectarine Overnight Oats — 318→400  — done (Batch B; verified in DB 2026-07-24)
+- [x] Peaches and Cream Chia Pudding — 195→244  — done (Batch B; verified in DB 2026-07-24)
+- [x] Peanut Butter and Jam Breakfast Oat Bars — 248→374  — done (Batch B; verified in DB 2026-07-24)
+- [x] Peanut Tofu Salad Jars — 278→351  — done (Batch B; verified in DB 2026-07-24)
 - [ ] Pho Gà - Vietnamese Chicken Pho — 501 (protein 20→higher; soup, fat renders)
 - [x] Phò Inspired Chicken Broth and Rice — DONE (already populated: @food_bylucy, serves 2, 581/36/85/10/4.5/31, full ingredients match Saffron's paste). NB: distinct from "Sticky Soy Chicken w/ Garlic Rice" (also @food_bylucy) — confirmed 2026-07-23, they are two different recipes.
-- [ ] Prawn Fried Rice — 428→551
-- [ ] Protein Packed Roasted Squash Pasta — 348→597
-- [ ] Pumpkin Bread — 238→257
-- [ ] Pumpkin Brookies — 348→532
-- [ ] Pumpkin Candy Apple Salad — 498→913 (portion-heavy single serving)
-- [ ] Pumpkin Cream Cheese Muffins — 298→496
+- [x] Prawn Fried Rice — 428→551  — done (Batch B; verified in DB 2026-07-24)
+- [x] Protein Packed Roasted Squash Pasta — 348→597  — done (Batch B; verified in DB 2026-07-24)
+- [x] Pumpkin Bread — 238→257  — done (Batch B; verified in DB 2026-07-24)
+- [x] Pumpkin Brookies — 348→532  — done (Batch B; verified in DB 2026-07-24)
+- [x] Pumpkin Candy Apple Salad — 498→913 (portion-heavy single serving)  — done (Batch B; verified in DB 2026-07-24)
+- [x] Pumpkin Cream Cheese Muffins — 298→496  — done (Batch B; verified in DB 2026-07-24)
 - [x] Raspberry Cheesecake Protein Bowl — 225→**285** (Batch M, 2026-07-24; all 6 macros)
 - [x] ★ Raspberry Chocolate Chip Baked Oatmeal — 468→750
-- [ ] Raspberry Coconut Chocolate Bars — 128→190
+- [x] Raspberry Coconut Chocolate Bars — 128→190  — done (Batch B; verified in DB 2026-07-24)
 - [x] Roast Chicken Rice Salad — DELETED as §C duplicate (survivor = Roast Chicken and Charred Corn Rice Salad, 488)
-- [ ] Roasted Butternut Squash and Carrot Soup — 188→307
+- [x] Roasted Butternut Squash and Carrot Soup — 188→307  — done (Batch B; verified in DB 2026-07-24)
 - [x] Roasted Cod on Sweet Potato — 347→**590** (Batch M, 2026-07-24; all 6 macros)
-- [ ] Salmon Crispy Rice Paper Bites — 198→275
-- [ ] Seared Miso Tuna Crispy Rice Bowl — 528→611
-- [ ] Simple Salmon Bowl — 488→561
-- [ ] Single Serve Double Chocolate Butter Cake — 278→357
+- [x] Salmon Crispy Rice Paper Bites — 198→275  — done (Batch B; verified in DB 2026-07-24)
+- [x] Seared Miso Tuna Crispy Rice Bowl — 528→611  — done (Batch B; verified in DB 2026-07-24)
+- [x] Simple Salmon Bowl — 488→561  — done (Batch B; verified in DB 2026-07-24)
+- [x] Single Serve Double Chocolate Butter Cake — recomputed to **358** (Batch N, 2026-07-24; full 6 macros, staple-grounded)
 - [x] Single Serve Sticky Date Pudding — 235→**316** (Batch M, 2026-07-24; carbs+cal recomputed, fibre/sugar filled)
-- [ ] Skillet Chicken Thighs with Mushroom Gravy — 318→418
+- [x] Skillet Chicken Thighs with Mushroom Gravy — recomputed to **425** (Batch N, 2026-07-24; full 6 macros, staple-grounded)
 - [x] ★ Snickers Overnight Oats — 412→534
-- [ ] Speedy Pad Thai Noodle Salad — 420→560 (+null macros)
-- [ ] Spicy Asian Noodles with Spinach & Chilli Crisp — 348→522
-- [ ] Spicy Tofu Bowl — 550→694 (+null macros)
-- [ ] Spicy Tuna Bowl — 448→573
-- [ ] Sticky Chicken, Gochujang & Coconut Broth on Sticky Rice — 646→813 (no rice; +nulls)
-- [ ] Sticky Soy Chicken w/ Garlic Rice in Spicy Broth — 618→1533 (check serves, §B — likely 2)
+- [x] Speedy Pad Thai Noodle Salad — 420→560 (+null macros)  — done (Batch B; verified in DB 2026-07-24)
+- [x] Spicy Asian Noodles with Spinach & Chilli Crisp — 348→522  — done (Batch B; verified in DB 2026-07-24)
+- [x] Spicy Tofu Bowl — 550→694 (+null macros)  — done (Batch B; verified in DB 2026-07-24)
+- [x] Spicy Tuna Bowl — 448→573  — done (Batch B; verified in DB 2026-07-24)
+- [x] Sticky Chicken, Gochujang & Coconut Broth on Sticky Rice — done (Batch B: 655, rice-excluded + light coconut)
+- [x] Sticky Soy Chicken w/ Garlic Rice in Spicy Broth — 618→1533 (check serves, §B — likely 2)  — done (Batch B; verified in DB 2026-07-24)
 - [x] ★ Sticky Toffee Chia Pudding — 378→462
 - [x] ★ Sticky Toffee Date Oats — 445→741
-- [ ] Summer Peach Chia Pudding — 388→589
-- [ ] Summer Salmon and Blackberry Salad — 398→564 (fix ingredients first, §D)
-- [ ] Sunflower Sesame Date Chocolate Bites — 108→156
+- [x] Summer Peach Chia Pudding — 388→589  — done (Batch B; verified in DB 2026-07-24)
+- [x] Summer Salmon and Blackberry Salad — 398→564 (fix ingredients first, §D)  — done (Batch B; verified in DB 2026-07-24)
+- [x] Sunflower Sesame Date Chocolate Bites — 108→156  — done (Batch B; verified in DB 2026-07-24)
 - [x] ★ Sweet Potato Chocolate Cake — 148→237
 - [x] ★ Sweet Potato Chocolate Chip Cookies — 138→211
 - [x] ★ Tahini Oat Chocolate Chip Bars — 198→315
-- [ ] Thai Chicken Noodle Soup — 189→300 (+null macros)
-- [ ] Thai Drunken Noodles (Pad Kee Mao) — 454→666 (+null macros)
+- [x] Thai Chicken Noodle Soup — 189→300 (+null macros)  — done (Batch B; verified in DB 2026-07-24)
+- [x] Thai Drunken Noodles (Pad Kee Mao) — 454→666 (+null macros)  — done (Batch B; verified in DB 2026-07-24)
 - [ ] Thai Red Curry Pot Roast Chicken — 548→1232 (whole-bird rendering uncertain)
-- [ ] The Easiest Soy Chicken — 448→583
-- [ ] Tuna Avocado Wrap — 448→644
-- [ ] Tuna Melt Sandwich — 548→733
-- [ ] Tuna Salad Meal Prep — 168→255
-- [ ] Vegan Chocolate Brownie Pancakes — 118→373
-- [ ] Vegan Chocolate Fudge Cake Oats — 298→417
+- [x] The Easiest Soy Chicken — 448→583  — done (Batch B; verified in DB 2026-07-24)
+- [x] Tuna Avocado Wrap — 448→644  — done (Batch B; verified in DB 2026-07-24)
+- [x] Tuna Melt Sandwich — 548→733  — done (Batch B; verified in DB 2026-07-24)
+- [x] Tuna Salad Meal Prep — 168→255  — done (Batch B; verified in DB 2026-07-24)
+- [x] Vegan Chocolate Brownie Pancakes — 118→373  — done (Batch B; verified in DB 2026-07-24)
+- [x] Vegan Chocolate Fudge Cake Oats — 298→417  — done (Batch B; verified in DB 2026-07-24)
 
 ## B. Recompute — over-stated (stored too high) &/or serving-count suspect
 
