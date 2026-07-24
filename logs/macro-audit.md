@@ -1133,6 +1133,8 @@ a stray entry, deletion). Reported back to Saffron.
   if serves 15 is right**. Old 312/24 was a larger-portion figure. Not written pending her serves
   preference (per-pancake vs per-stack). NB: distinct from "Protein Pancakes (Simple)" @mattsfitchef
   (§G) and "Chocolate Chip Protein Pancakes" @kylecarillet.
+  → **RESOLVED (Batch I):** Saffron chose **per pancake, serves 12** (not 15). 853 kcal ÷12 =
+  **71/4/7.5/2.7/1.2/3.8** per pancake. **§B now fully closed (14/14).**
 - **Sticky Soy Chicken with Garlic Rice in Spicy Broth** (`4f1e46fe…`) — she asked "Source?" and
   leaned "likely 2". Source = **@food_bylucy**. The existing 618 (serves 1) is a **large
   under-count**: 1 cup *dry* jasmine rice (~185g ≈ 666 kcal) + 2 tbsp neutral oil + 1 tbsp sesame

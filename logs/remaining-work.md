@@ -138,7 +138,7 @@ Stored values look like per-recipe totals or wrong serving counts. Recompute AND
 - [x] Fluffy Greek Yogurt Pancakes — Batch G, serves 3, 225/13/25/8/2.5/8.5 (full recipe supplied)
 - [x] Oat Flour Pancakes — Batch G, serves 12, 56/2.6/7.5/1.7/0.75/2.4 (full recipe supplied)
 - [x] Protein Brownie Bake — Batch H, recompute 246/16/26/10.5/5.5/12 (serves 2, from existing list)
-- [ ] Protein Pancakes — HELD (Batch H): source = "Personal Recipe Book" (no IG handle); serves 15 in DB (~15 small 1-tbsp pancakes), whole recipe ≈ 853/49 → ~57/pancake if 15 stands. Awaiting Saffron's serves call.
+- [x] Protein Pancakes — Batch I, per pancake, serves 15→12 per Saffron → 71/4/7.5/2.7/1.2/3.8
 - [x] Salmon Poke Bowl Meal Prep — Batch H, serves 2→1, 765/36/94/24/8/28 (full recipe supplied; kimchi excl, Greek yoghurt assumed)
 - [x] Sticky Miso Chicken Prep Boxes — Batch H, serves 3, 488/41.5/40.5/19/7/10.5 (full macros filled)
 - [x] Gluten Free Cinnamon Buns — Batch H→I, serves set to 12 (Saffron's final call), recompute 585/8/92/20.5/4.5/37.5 per bun (old 488 under-counted the 800g flour + honey + frosting)
@@ -243,7 +243,7 @@ Quick wins: recompute just fills the missing macro fields (cal/protein already c
 | Section | Count |
 |---|---|
 | A. Recalculate — under-counted | 111 (14 ★ done → **97 left**) |
-| B. Over-stated / serving-count | 14 (13 done, 1 HELD — Protein Pancakes awaits serves basis) |
+| B. Over-stated / serving-count | 14 (all done ✅) |
 | C. Duplicate rows | 3 |
 | D. Ingredient-list integrity | 4 (all done ✅ — Café Style resolved via the Batch C rename) |
 | E. Empty ingredient lists | 8 (all done) |
