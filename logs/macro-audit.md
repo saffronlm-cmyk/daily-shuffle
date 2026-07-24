@@ -1139,6 +1139,11 @@ a stray entry, deletion). Reported back to Saffron.
   oil alone ≈ 1150 kcal, whole recipe ≈ **1700 kcal**. So this needs a genuine recompute, not just
   a ÷2 of 618. At serves 2 → ~850/serving. Not written pending her confirming serves = 2 and that
   the rice is 1 cup dry (vs cooked) — both materially swing it.
+  → **RESOLVED (Batch I):** Saffron confirmed the **rice is cooked** (1 cup cooked ≈ 158g, not
+  185g dry — knocks ~460 kcal off) and asked to **bump the chicken to 2 breasts** and set
+  **serves 2**. Edited the ingredient list (1→2 chicken breasts) and recomputed: whole recipe
+  ≈ 1398 kcal ÷2 = **699/53.5/60/27/6/19**. Frying oil counted at ~1.5 tbsp absorbed (rest drains).
+  §B now 13/14 — only Protein Pancakes still held (serves basis).
 
 Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.
 

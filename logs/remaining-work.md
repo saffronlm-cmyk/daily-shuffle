@@ -142,7 +142,7 @@ Stored values look like per-recipe totals or wrong serving counts. Recompute AND
 - [x] Salmon Poke Bowl Meal Prep — Batch H, serves 2→1, 765/36/94/24/8/28 (full recipe supplied; kimchi excl, Greek yoghurt assumed)
 - [x] Sticky Miso Chicken Prep Boxes — Batch H, serves 3, 488/41.5/40.5/19/7/10.5 (full macros filled)
 - [x] Gluten Free Cinnamon Buns — Batch H→I, serves set to 12 (Saffron's final call), recompute 585/8/92/20.5/4.5/37.5 per bun (old 488 under-counted the 800g flour + honey + frosting)
-- [ ] Sticky Soy Chicken w/ Garlic Rice — HELD (Batch H): source = @food_bylucy; existing 618 (serves 1) is a big UNDER-count (1 cup dry jasmine rice + 3 tbsp oil not fully counted → whole recipe ≈ 1700). Needs a proper recompute + serves decision (she leaned "likely 2" → ~850/serving). Awaiting confirm.
+- [x] Sticky Soy Chicken w/ Garlic Rice — Batch I, RESOLVED: rice is COOKED (Saffron), chicken bumped to 2 breasts, serves 2 → 699/53.5/60/27/6/19. Ingredient list edited (1→2 breasts) per her instruction.
 
 ## C. Duplicate rows — dedupe (then correct the survivor)
 
@@ -243,7 +243,7 @@ Quick wins: recompute just fills the missing macro fields (cal/protein already c
 | Section | Count |
 |---|---|
 | A. Recalculate — under-counted | 111 (14 ★ done → **97 left**) |
-| B. Over-stated / serving-count | 14 (12 done, 2 HELD — Protein Pancakes + Sticky Soy Chicken await Saffron) |
+| B. Over-stated / serving-count | 14 (13 done, 1 HELD — Protein Pancakes awaits serves basis) |
 | C. Duplicate rows | 3 |
 | D. Ingredient-list integrity | 4 (all done ✅ — Café Style resolved via the Batch C rename) |
 | E. Empty ingredient lists | 8 (all done) |
