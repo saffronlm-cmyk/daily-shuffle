@@ -1081,6 +1081,52 @@ landed at 40/serving (audit's rough "→~31" discounted more; the line-item comp
 
 Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.
 
+---
+
+## Batch H — §B tranche 2: 4 written, 2 held for source/serves (2026-07-23) — WRITTEN
+
+Format: `kcal / protein / carbs / fat / fibre / sugar` per serving.
+
+| Recipe | serves | Before | After |
+|---|---|---|---|
+| Protein Brownie Bake | 2 | 318/22 | 246/16/26/10.5/5.5/12 (recompute from existing list) |
+| Salmon Poke Bowl Meal Prep | 2→1 | 573/47 (nulls) | 765/36/94/24/8/28 (full recipe, serves 1) |
+| Sticky Miso Chicken Prep Boxes | 3 | 520/50 (nulls) | 488/41.5/40.5/19/7/10.5 (all macros filled) |
+| Gluten Free Cinnamon Buns | 6→9 | 488/8 | 779/10/122/27.5/6/50 per bun |
+
+- **Protein Brownie Bake** already had its full ingredient list in the DB (soya yoghurt + oat
+  flour + vegan protein + cocoa + coconut sugar + 20g dark choc); just recomputed ÷2 → 246/16.
+  Old 318/22 was over-stated (only 20g protein powder in the batch).
+- **Salmon Poke Bowl** → serves 1 per Saffron (the whole tin + rice + ½ avocado is one bowl). 765
+  is a hearty single serving; carbs 94 driven by the sticky rice + sweet mirin/maple (used twice —
+  in the salmon mix and the cucumber pickle). Kimchi optional/excluded; Greek yoghurt assumed over
+  mayo. Old 573/47 at serves 2 was neither right.
+- **Sticky Miso Chicken Prep Boxes** — faithful compute of all three components (miso chicken +
+  brown-rice salad + edamame hummus + pumpkin-seed garnish) ÷3 = 488/41.5. Ran a touch above the
+  audit's ~428 (tahini + sesame oil + pumpkin seeds + edamame are calorie-dense).
+- **Gluten Free Cinnamon Buns** → serves 9 per Saffron ("let's go with 9"). ⚠ **Big jump (488 →
+  779/bun).** This is a faithful compute of the full stated quantities — 800g GF bread flour
+  (~2800 kcal) + 210g honey + 150g filling sugar + 90g powdered sugar + cream-cheese frosting +
+  coconut oil/milk ≈ ~7000 kcal whole batch ÷9. The old 488 significantly under-counted. Recipe
+  text says "cut into 6" but 800g flour ÷6 is an implausible bun (the audit flagged this). If the
+  batch actually yields 12, per bun ≈ 585. Flagged in the row's notes.
+
+**HELD — need Saffron's input (reported, not written):**
+- **Protein Pancakes** (`e1afaed0…`) — she asked "Source?". It has **no IG handle**; creator_name
+  is "Personal Recipe Book" (her own book). DB serves = 15 (recipe makes ~15 small ~1-tbsp
+  pancakes, egg-white-powder based). Whole-recipe compute ≈ 853 kcal / 49g protein → **~57/pancake
+  if serves 15 is right**. Old 312/24 was a larger-portion figure. Not written pending her serves
+  preference (per-pancake vs per-stack). NB: distinct from "Protein Pancakes (Simple)" @mattsfitchef
+  (§G) and "Chocolate Chip Protein Pancakes" @kylecarillet.
+- **Sticky Soy Chicken with Garlic Rice in Spicy Broth** (`4f1e46fe…`) — she asked "Source?" and
+  leaned "likely 2". Source = **@food_bylucy**. The existing 618 (serves 1) is a **large
+  under-count**: 1 cup *dry* jasmine rice (~185g ≈ 666 kcal) + 2 tbsp neutral oil + 1 tbsp sesame
+  oil alone ≈ 1150 kcal, whole recipe ≈ **1700 kcal**. So this needs a genuine recompute, not just
+  a ÷2 of 618. At serves 2 → ~850/serving. Not written pending her confirming serves = 2 and that
+  the rice is 1 cup dry (vs cooked) — both materially swing it.
+
+Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.
+
 **Batch E note corrections (caught while matching the rice-exclusion note convention):**
 - **Mediterranean Chicken & Rice Skillet** — Batch E wrote the macros rice-excluded but left
   `notes` null and the stale `carbs_not_stated/fat_not_stated` flags. Added the rice-exclusion

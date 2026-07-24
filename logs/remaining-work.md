@@ -137,12 +137,12 @@ Stored values look like per-recipe totals or wrong serving counts. Recompute AND
 - [x] Crispy Rice and Chicken Salad — Batch G, serves 2, 638/40/54/29/5.5/15 (full recipe supplied)
 - [x] Fluffy Greek Yogurt Pancakes — Batch G, serves 3, 225/13/25/8/2.5/8.5 (full recipe supplied)
 - [x] Oat Flour Pancakes — Batch G, serves 12, 56/2.6/7.5/1.7/0.75/2.4 (full recipe supplied)
-- [ ] Protein Brownie Bake — 318 → ~237
-- [ ] Protein Pancakes — 312 → ~52 (serves likely ~2-3, not 15)
-- [ ] Salmon Poke Bowl Meal Prep — 573/47 → ~400/14 (1 tin salmon; +null macros)
-- [ ] Sticky Miso Chicken Prep Boxes — 520/50 → ~428/37.6 (+null macros)
-- [ ] Gluten Free Cinnamon Buns — set serves to ~12 (800 g flour ÷6 is off)
-- [ ] Sticky Soy Chicken w/ Garlic Rice — set serves to 2 (then recompute ÷2)
+- [x] Protein Brownie Bake — Batch H, recompute 246/16/26/10.5/5.5/12 (serves 2, from existing list)
+- [ ] Protein Pancakes — HELD (Batch H): source = "Personal Recipe Book" (no IG handle); serves 15 in DB (~15 small 1-tbsp pancakes), whole recipe ≈ 853/49 → ~57/pancake if 15 stands. Awaiting Saffron's serves call.
+- [x] Salmon Poke Bowl Meal Prep — Batch H, serves 2→1, 765/36/94/24/8/28 (full recipe supplied; kimchi excl, Greek yoghurt assumed)
+- [x] Sticky Miso Chicken Prep Boxes — Batch H, serves 3, 488/41.5/40.5/19/7/10.5 (full macros filled)
+- [x] Gluten Free Cinnamon Buns — Batch H, serves 6→9 per Saffron, recompute 779/10/122/27.5/6/50 per bun (big jump — old 488 under-counted; ÷12 ≈ 585, flagged)
+- [ ] Sticky Soy Chicken w/ Garlic Rice — HELD (Batch H): source = @food_bylucy; existing 618 (serves 1) is a big UNDER-count (1 cup dry jasmine rice + 3 tbsp oil not fully counted → whole recipe ≈ 1700). Needs a proper recompute + serves decision (she leaned "likely 2" → ~850/serving). Awaiting confirm.
 
 ## C. Duplicate rows — dedupe (then correct the survivor)
 
@@ -243,7 +243,7 @@ Quick wins: recompute just fills the missing macro fields (cal/protein already c
 | Section | Count |
 |---|---|
 | A. Recalculate — under-counted | 111 (14 ★ done → **97 left**) |
-| B. Over-stated / serving-count | 14 (8 done in Batch G, 6 left) |
+| B. Over-stated / serving-count | 14 (12 done, 2 HELD — Protein Pancakes + Sticky Soy Chicken await Saffron) |
 | C. Duplicate rows | 3 |
 | D. Ingredient-list integrity | 4 (all done ✅ — Café Style resolved via the Batch C rename) |
 | E. Empty ingredient lists | 8 (all done) |
