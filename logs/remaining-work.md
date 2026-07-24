@@ -146,9 +146,11 @@ Stored values look like per-recipe totals or wrong serving counts. Recompute AND
 
 ## C. Duplicate rows — dedupe (then correct the survivor)
 
-- [ ] High Protein Salmon Potato Salad — **two identical rows**, both null macros → delete one, fill the other (~869/42/70/36)
-- [ ] Roast Chicken Rice Salad ≈ Roast Chicken and Charred Corn Rice Salad — near-identical, stored 398 vs 488 → reconcile / dedupe
-- [ ] Easy Chicken Traybake ≈ Chicken and Potato Traybake — same recipe → dedupe
+- [x] High Protein Salmon Potato Salad — Batch K: soft-deleted the identical dup (033408e6), filled the survivor (fff8f78d) → 895/44/80/45/19.5/13 (serves 2)
+- [ ] Roast Chicken Rice Salad ≈ Roast Chicken and Charred Corn Rice Salad — CONFIRMED duplicates (both @natsnourishments, identical ingredients/method). Awaiting Saffron's pick of which survives (2026-07-23).
+- [ ] Easy Chicken Traybake ≈ Chicken and Potato Traybake — CONFIRMED duplicates (both @natsnourishments, identical ingredients/method). Awaiting Saffron's pick of which survives (2026-07-23).
+
+**Also (not §C):** Marinated Fish Tacos (@recipe_tin) had null serves + null macros → Batch K set serves 3, filled 540/45/45/20/5/9.
 
 ## D. Ingredient-list integrity — fix ingredients BEFORE macros
 
@@ -249,7 +251,7 @@ existing cal/protein) for every recipe below, staple-grounded from the DB ingred
 |---|---|
 | A. Recalculate — under-counted | 111 (14 ★ done → **97 left**) |
 | B. Over-stated / serving-count | 14 (all done ✅) |
-| C. Duplicate rows | 3 |
+| C. Duplicate rows | 3 (1 done — salmon salad; 2 awaiting Saffron's dedupe pick) |
 | D. Ingredient-list integrity | 4 (all done ✅ — Café Style resolved via the Batch C rename) |
 | E. Empty ingredient lists | 8 (all done) |
 | F. Partial — need one quantity | 24 (all done ✅) |

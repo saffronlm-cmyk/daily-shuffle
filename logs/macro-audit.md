@@ -1196,3 +1196,30 @@ Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cach
 
 Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.
 
+
+---
+
+## Batch K — §C salmon-salad dedupe + Fish Tacos serves (2026-07-23) — WRITTEN
+
+- **High Protein Salmon Potato Salad** — two byte-identical `ready` rows (created 11:46 and
+  11:53 on 2026-07-01), both fully null. Soft-deleted the later dup (`033408e6…`,
+  `import_status='deleted'`), filled the survivor (`fff8f78d…`) → **895/44/80/45/19.5/13**
+  (serves 2). Calorie-dense: 400g crushed roast potatoes + generous olive oil, 200g hot-smoked
+  chilli salmon, whole avocado, 200g chickpeas, Greek-yoghurt/light-mayo dressing (audit est.
+  was ~869; the full-quantity compute lands a touch higher).
+- **Marinated Fish Tacos** (@recipe_tin) — had **null serves** and null protein/carbs/fat/
+  fibre/sugar (only cal 410 stored). Saffron set **serves 3**. Recomputed the full macros:
+  **540/45/45/20/5/9** per serving (600g white fish across 3; ~2 small tortillas each; most of
+  the 3 tbsp marinade oil drains off). Supersedes the old rough 410.
+
+**Confirmed duplicates, awaiting Saffron's pick (pulled for comparison, NOT yet deduped):**
+- **Roast Chicken Rice Salad** (`199a8e55…`, 398/32/42/12/6/6) ≈ **Roast Chicken and Charred
+  Corn Rice Salad** (`326278cf…`, 488/38/62/18/6/8) — both @natsnourishments, identical
+  ingredients (200g rice, 250g sweetcorn, 200g chicken, romaine, 3 tomatoes, same avocado
+  dressing) and method. The "Charred Corn" row is the fuller/more-accurate entry.
+- **Easy Chicken Traybake** (`60029cd9…`, 448/38/22/22/4/3) ≈ **Chicken and Potato Traybake**
+  (`93442c4f…`, 448/38/26/22/4/3) — both @natsnourishments, identical ingredients (2 legs +
+  3-4 thighs, 3 tbsp Flora, 500g baby potatoes, onion, 2 lemons, bay, stock, parsley, broccoli)
+  and method. Near-identical macros (carbs 22 vs 26).
+
+Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.
