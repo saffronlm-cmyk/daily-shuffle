@@ -1311,3 +1311,27 @@ Thai Red Curry Pot Roast Chicken (whole-bird rendering).
 library remains at 0 null macros.
 
 Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.
+
+---
+
+## Batch O — decision-gated §A items resolved with Saffron's calls (2026-07-24) — WRITTEN
+
+The 4 §A items Batch N left open needed Saffron's judgement (unstated chicken weights, "rice of
+choice" quantity, whole-bird/broth rendering). She gave calls on 3; written per serving,
+staple-grounded. Format `kcal/protein/carbs/fat/fibre/sugar`:
+
+| Recipe | serves | Before | After | Saffron's call |
+|---|---|---|---|---|
+| Middle Eastern Chicken & Rice Bowl | 4 | 428/38/8/26/1.5/3 | **658/48/41/33/3.5/4.5** | ½ cup cooked rice/serve; full recompute (2 lb thighs, mayo white sauce, sumac salad; cucumber/feta optional excl.) |
+| Pho Gà - Vietnamese Chicken Pho | 4 | 501/20/87/8/3.5/5 | **750/55/90/18/3.5/11** | "logical split of the remaining meat + carbs" — full edible thigh meat (~730 g cooked, bones+skin discarded) split evenly ÷4; broth fat skimmed; 360 g dried noodles ÷4 |
+| Thai Red Curry Pot Roast Chicken | 4 | 548/42/28/30/4/6 | **920/61/42/56/5.5/9** | count just the meat (~780 g cooked from the 1.8 kg bird); oil reduced 3 tbsp→~1 tbsp; full 400 ml coconut cream sauce + potatoes + beans; **jasmine rice excluded + noted** |
+
+`review_flags` cleared on all 3; a per-serving assumptions note appended to `notes` on Pho Gà +
+Thai Red Curry (rice-exclusion recorded on the latter per Saffron).
+
+**Still open (1):** Chicken and Potato Traybake — bone-in/skin-on legs+thighs with no stated
+weights; awaiting a cooked-meat-weight call. Everything else in §A–§G is done.
+
+**VERIFY:** read-back confirmed all 3 rows; ready library remains at 0 null macros.
+
+Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.

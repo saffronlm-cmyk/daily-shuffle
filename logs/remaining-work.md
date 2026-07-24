@@ -10,14 +10,14 @@ optional toppings included; precise after-values in `macro-audit.md`).
 
 ---
 
-## ▶ RESUME HERE (updated 2026-07-24, end of Batch N)
+## ▶ RESUME HERE (updated 2026-07-24, end of Batch O)
 
-**Effectively complete.** Every section is closed except **4 decision-gated §A items** that
-need Saffron's judgement (not a straight recompute).
+**Essentially complete — 1 item left.** Every section is closed except a single §A recipe
+whose macros hinge on unstated chicken weights.
 
 | Section | Status |
 |---|---|
-| A. Under-counted recalcs | **4 left** (all decision-gated — see below); the other ~107 done |
+| A. Under-counted recalcs | **1 left** (Chicken and Potato Traybake — see below); all others done |
 | B. Over-stated / serving-count | ✅ done (14/14) |
 | C. Duplicate rows | ✅ done (3/3) |
 | D. Ingredient-list integrity | ✅ done (4/4) |
@@ -25,45 +25,27 @@ need Saffron's judgement (not a straight recompute).
 | F. Partial — need one quantity | ✅ done (24/24) |
 | G. Macro-completeness fills | ✅ done (34/34) |
 
-**Batch N (2026-07-24)** reconciled §A against the live DB: 84 items the worklist still showed
-as `[ ]` had in fact been written by Batch B (just never ticked) and were verified + ticked;
-3 that genuinely still held their old value were recomputed and written (Single Serve Double
-Chocolate Butter Cake →358, Skillet Chicken Thighs w/ Mushroom Gravy →425, Basic Oat Flour
-Pancakes →160). That leaves only the 4 below.
+**The one remaining §A item — needs a weight call, not a straight recompute:**
+- **Chicken and Potato Traybake** (currently 448; §C survivor) — 2 chicken legs + "3–4" thighs,
+  bone-in/skin-on, **no weights given**, and how much skin/rendered fat is eaten is a judgement
+  call. Faithful compute lands ~614/37/26/39/3/3 if you count generous edible meat + all the
+  Flora/oil. Give a rough cooked-meat weight (or "just eyeball ~590") and it's a one-line write.
 
-**The 4 remaining §A items — need input, not a recompute:**
-- **Chicken and Potato Traybake** (448→~589) — §C survivor; the fat is undercounted but the
-  2 legs + "3–4" thighs are bone-in/skin-on with unstated weights, and how much skin/rendered
-  fat is eaten is a judgement call. Faithful compute lands ~614/37/26/39.
-- **Middle Eastern Chicken & Rice Bowl** (428) — "rice of choice" has no quantity (load-bearing).
-- **Pho Gà - Vietnamese Chicken Pho** (501) — 1.5 kg bone-in thighs simmered into broth;
-  meat-yield-per-bowl + fat-rendering genuinely uncertain.
-- **Thai Red Curry Pot Roast Chicken** (548→~1232) — whole 1.8 kg bird rendering uncertain.
-
-**How to do §A** (mechanical — mostly no input needed): for each unchecked `- [ ]` item below,
-pull its `ingredient_sections` from Supabase `recipes` (project `jsxcctrskkkxgdxfaduo`), recompute
-6 macros per serving staple-grounded (same method as Batches B–L in `macro-audit.md`), and write
-`calories/protein_g/carbs_g/fat_g/fibre_g/sugar_g` (+ clear resolved `review_flags`). Work in
-alphabetical batches of ~15–20; tick each line here and log the batch in `macro-audit.md`.
-
-**Handful that need Saffron's input / a judgement call, not a straight recompute:**
-- **Thai Red Curry Pot Roast Chicken** (548→1232) — whole-bird rendering uncertain.
-- **Pho Gà - Vietnamese Chicken Pho** (501) — 1.5kg bone-in thighs simmered into broth;
-  meat-yield-per-bowl + fat-rendering uncertain (soup, fat renders).
-- **Middle Eastern Chicken & Rice Bowl** (428) — "rice of choice" has no quantity (load-bearing).
-- **Basic Oat Flour Pancakes** (68→153) — check serving basis before writing.
-- **Chicken and Potato Traybake** (448→589) — §C survivor; optional fat recompute (skin-on
-  legs+thighs+Flora).
+### History (newest first)
+- **Batch O (2026-07-24)** — resolved 3 of the 4 decision-gated §A items with Saffron's calls:
+  Middle Eastern Chicken & Rice Bowl → **658** (½ cup cooked rice/serve), Pho Gà → **750**
+  (full edible meat split ÷4, broth fat skimmed), Thai Red Curry Pot Roast → **920** (meat only,
+  oil reduced, rice excluded + noted). Details in `macro-audit.md` (Batch O).
+- **Batch N (2026-07-24)** — reconciled §A against the live DB: 84 items the worklist still showed
+  as `[ ]` had in fact been written by Batch B (just never ticked) → verified + ticked; 3 that
+  genuinely still held their old value were recomputed (Single Serve Double Chocolate Butter Cake
+  →358, Skillet Chicken Thighs w/ Mushroom Gravy →425, Basic Oat Flour Pancakes →160).
+- **Batch M (2026-07-24)** — closed the last 3 null-macro §A rows (Raspberry Cheesecake Bowl →285,
+  Roasted Cod on Sweet Potato →590, Single Serve Sticky Date Pudding →316); library reached
+  **0 rows with any null macro**.
 
 Use the `recipe-db` skill for schema + non-destructive-write conventions. All work is data-only
-in Supabase `recipes` — no `index.html`/`sw.js` change, no cache bump. PR #48 tracks this stream.
-
-> **Batch M — 2026-07-24.** Closed the 3 §A recipes that were still carrying null macros
-> (`+null macros` in the list below): Raspberry Cheesecake Protein Bowl (→285), Roasted Cod on
-> Sweet Potato (→590), Single Serve Sticky Date Pudding (→316). After Batch M the `ready`
-> library has **0 rows with any null macro** — every remaining §A item below has a full 6-macro
-> set already; the open work is *correcting under-counts*, not filling gaps. Details in
-> `macro-audit.md` (Batch M).
+in Supabase `recipes` — no `index.html`/`sw.js` change, no cache bump.
 
 ---
 
@@ -126,7 +108,7 @@ in Supabase `recipes` — no `index.html`/`sw.js` change, no cache bump. PR #48 
 - [x] Marinated Chicken Thighs w/ Mint Jalapeño Sauce — 448→623  — done (Batch B; verified in DB 2026-07-24)
 - [x] Matcha Date Butter Balls — 98→136  — done (Batch B; verified in DB 2026-07-24)
 - [x] Microwave Chocolate Protein Oats — 248→380  — done (Batch B; verified in DB 2026-07-24)
-- [ ] Middle Eastern Chicken & Rice Bowl — 428 (cal ok; protein 38→~47; rice not counted)
+- [x] Middle Eastern Chicken & Rice Bowl — recomputed **658/48/41/33/3.5/4.5** (Batch O, 2026-07-24; ½ cup cooked rice/serve per Saffron)
 - [x] Miso Peanut Ramen Bowl — 498→628  — done (Batch B; verified in DB 2026-07-24)
 - [x] ★ No Bake Coconut Cookies — 168→242
 - [x] One Pan Vegan Sushi Bake — 464→633  — done (Batch B; verified in DB 2026-07-24)
@@ -136,7 +118,7 @@ in Supabase `recipes` — no `index.html`/`sw.js` change, no cache bump. PR #48 
 - [x] Peaches and Cream Chia Pudding — 195→244  — done (Batch B; verified in DB 2026-07-24)
 - [x] Peanut Butter and Jam Breakfast Oat Bars — 248→374  — done (Batch B; verified in DB 2026-07-24)
 - [x] Peanut Tofu Salad Jars — 278→351  — done (Batch B; verified in DB 2026-07-24)
-- [ ] Pho Gà - Vietnamese Chicken Pho — 501 (protein 20→higher; soup, fat renders)
+- [x] Pho Gà - Vietnamese Chicken Pho — recomputed **750/55/90/18/3.5/11** (Batch O, 2026-07-24; full edible meat split ÷4, broth fat skimmed)
 - [x] Phò Inspired Chicken Broth and Rice — DONE (already populated: @food_bylucy, serves 2, 581/36/85/10/4.5/31, full ingredients match Saffron's paste). NB: distinct from "Sticky Soy Chicken w/ Garlic Rice" (also @food_bylucy) — confirmed 2026-07-23, they are two different recipes.
 - [x] Prawn Fried Rice — 428→551  — done (Batch B; verified in DB 2026-07-24)
 - [x] Protein Packed Roasted Squash Pasta — 348→597  — done (Batch B; verified in DB 2026-07-24)
@@ -173,7 +155,7 @@ in Supabase `recipes` — no `index.html`/`sw.js` change, no cache bump. PR #48 
 - [x] ★ Tahini Oat Chocolate Chip Bars — 198→315
 - [x] Thai Chicken Noodle Soup — 189→300 (+null macros)  — done (Batch B; verified in DB 2026-07-24)
 - [x] Thai Drunken Noodles (Pad Kee Mao) — 454→666 (+null macros)  — done (Batch B; verified in DB 2026-07-24)
-- [ ] Thai Red Curry Pot Roast Chicken — 548→1232 (whole-bird rendering uncertain)
+- [x] Thai Red Curry Pot Roast Chicken — recomputed **920/61/42/56/5.5/9** (Batch O, 2026-07-24; meat only, oil reduced, rice excluded per Saffron)
 - [x] The Easiest Soy Chicken — 448→583  — done (Batch B; verified in DB 2026-07-24)
 - [x] Tuna Avocado Wrap — 448→644  — done (Batch B; verified in DB 2026-07-24)
 - [x] Tuna Melt Sandwich — 548→733  — done (Batch B; verified in DB 2026-07-24)
