@@ -1111,6 +1111,21 @@ Format: `kcal / protein / carbs / fat / fibre / sugar` per serving.
   text says "cut into 6" but 800g flour ÷6 is an implausible bun (the audit flagged this). If the
   batch actually yields 12, per bun ≈ 585. Flagged in the row's notes.
 
+**Update (2026-07-23, Batch I):** GF Cinnamon Buns yield changed again per Saffron — **serves
+12** (final): 585/8/92/20.5/4.5/37.5 per bun (whole batch ≈ 7000 kcal ÷12).
+
+**Recipe-identity check — Sticky Soy Chicken vs Phò Inspired (both @food_bylucy):** Saffron
+asked whether "Sticky Soy Chicken with Garlic Rice in Spicy Broth" is actually the "Pho Inspired
+Chicken Broth & Rice" recipe she pasted. **They are two different recipes, both by @food_bylucy.**
+The pasted recipe matches the *existing* DB row **"Phò Inspired Chicken Broth and Rice"**
+(`0195b252…`, serves 2, **581/36/85/10/4.5/31**, full ingredients already present and matching —
+so that §A item is DONE). It has a whole-spice broth (star anise/cardamom/cloves), fish sauce, a
+hoisin+miso+honey glazed chicken, ½ cup herb rice and bok choy. The **Sticky Soy Chicken**
+(`4f1e46fe…`) is genuinely different: a gochujang chicken-stock broth, oyster-sauce chicken, 1 cup
+garlic-fried jasmine rice and gai lan — no whole spices, no fish sauce. So the Phò paste does NOT
+resolve the Sticky Soy row; that row still needs its own serves/recompute decision (or, if it was
+a stray entry, deletion). Reported back to Saffron.
+
 **HELD — need Saffron's input (reported, not written):**
 - **Protein Pancakes** (`e1afaed0…`) — she asked "Source?". It has **no IG handle**; creator_name
   is "Personal Recipe Book" (her own book). DB serves = 15 (recipe makes ~15 small ~1-tbsp

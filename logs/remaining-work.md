@@ -81,7 +81,7 @@ optional toppings included; precise after-values in `macro-audit.md`). 53 recipe
 - [ ] Peanut Butter and Jam Breakfast Oat Bars — 248→374
 - [ ] Peanut Tofu Salad Jars — 278→351
 - [ ] Pho Gà - Vietnamese Chicken Pho — 501 (protein 20→higher; soup, fat renders)
-- [ ] Phò Inspired Chicken Broth and Rice — 352→468
+- [x] Phò Inspired Chicken Broth and Rice — DONE (already populated: @food_bylucy, serves 2, 581/36/85/10/4.5/31, full ingredients match Saffron's paste). NB: distinct from "Sticky Soy Chicken w/ Garlic Rice" (also @food_bylucy) — confirmed 2026-07-23, they are two different recipes.
 - [ ] Prawn Fried Rice — 428→551
 - [ ] Protein Packed Roasted Squash Pasta — 348→597
 - [ ] Pumpkin Bread — 238→257
@@ -141,7 +141,7 @@ Stored values look like per-recipe totals or wrong serving counts. Recompute AND
 - [ ] Protein Pancakes — HELD (Batch H): source = "Personal Recipe Book" (no IG handle); serves 15 in DB (~15 small 1-tbsp pancakes), whole recipe ≈ 853/49 → ~57/pancake if 15 stands. Awaiting Saffron's serves call.
 - [x] Salmon Poke Bowl Meal Prep — Batch H, serves 2→1, 765/36/94/24/8/28 (full recipe supplied; kimchi excl, Greek yoghurt assumed)
 - [x] Sticky Miso Chicken Prep Boxes — Batch H, serves 3, 488/41.5/40.5/19/7/10.5 (full macros filled)
-- [x] Gluten Free Cinnamon Buns — Batch H, serves 6→9 per Saffron, recompute 779/10/122/27.5/6/50 per bun (big jump — old 488 under-counted; ÷12 ≈ 585, flagged)
+- [x] Gluten Free Cinnamon Buns — Batch H→I, serves set to 12 (Saffron's final call), recompute 585/8/92/20.5/4.5/37.5 per bun (old 488 under-counted the 800g flour + honey + frosting)
 - [ ] Sticky Soy Chicken w/ Garlic Rice — HELD (Batch H): source = @food_bylucy; existing 618 (serves 1) is a big UNDER-count (1 cup dry jasmine rice + 3 tbsp oil not fully counted → whole recipe ≈ 1700). Needs a proper recompute + serves decision (she leaned "likely 2" → ~850/serving). Awaiting confirm.
 
 ## C. Duplicate rows — dedupe (then correct the survivor)
