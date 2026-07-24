@@ -1278,3 +1278,36 @@ Format: `kcal / protein / carbs / fat / fibre / sugar` per serving. Per-ingredie
 with any null macro** (library macro-completeness now 100%).
 
 Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.
+
+---
+
+## Batch N — §A reconciliation + final 3 under-count recomputes (2026-07-24) — WRITTEN
+
+Worked §A ("under-counted recalcs"), the last open bucket. Rather than recompute the ~90 lines
+the worklist still showed as `[ ]`, first **reconciled the worklist against the live DB**
+(compared each item's stored calories to its worklist "before" value). Result: **84 of them had
+already been written by Batch B (2026-07-22) and were simply never ticked** — verified off the
+old value and ticked in `remaining-work.md`. Only a handful still held their old figure.
+
+**Recomputed + written (3)** — full 6 macros/serving from `ingredient_sections`, staple-grounded,
+stored `serves` kept, optional toppings excluded. Format `kcal/protein/carbs/fat/fibre/sugar`:
+
+| Recipe | serves | Before | After |
+|---|---|---|---|
+| Single Serve Double Chocolate Butter Cake | 2 | 278/2.5/34/15/2/22 | **358/3/42.5/21/2/27** (butter+oil+chips undercounted; cleared `nutrition_incomplete`) |
+| Skillet Chicken Thighs with Mushroom Gravy | 4 | 318/32/8/18/1.5/2 | **425/36/11.5/27/2/4** (4 tbsp avocado oil counted faithfully; kept `serves_estimated`) |
+| Basic Oat Flour Pancakes | 2 | 68/3.5/8/2/0.8/1.5 | **160/9/18/6/2.5/3** (old 68 was simply wrong for serves 2; base only, toppings excl.) |
+
+**Already-done, ticked not rewritten (Batch B values confirmed live):** the other 84 §A items,
+incl. Sticky Chicken Gochujang (655, rice-excluded + light coconut — lands near its old 646 by
+coincidence, not un-done).
+
+**Left decision-gated (4)** — need Saffron's judgement, not a recompute, so NOT written:
+Chicken and Potato Traybake (bone-in/skin-on weights + fat-retention judgement; faithful compute
+~614), Middle Eastern Chicken & Rice Bowl (no rice qty), Pho Gà (broth meat-yield/fat rendering),
+Thai Red Curry Pot Roast Chicken (whole-bird rendering).
+
+**VERIFY:** read-back confirmed the 3 rows. §A now 4/111 open (all decision-gated); the ready
+library remains at 0 null macros.
+
+Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.
