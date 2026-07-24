@@ -14,7 +14,7 @@ optional toppings included; precise after-values in `macro-audit.md`). 53 recipe
 ## A. Recalculate — under-counted (stored too low). Biggest bucket; straight recompute+write.
 
 - [ ] 4 Ingredient Rice Cake Chocolate Bars — 165→266
-- [ ] Air Fryer Cinnamon Roll Oats — 398→616
+- [x] Air Fryer Cinnamon Roll Oats — 398→616 → already recomputed to 641; renamed to "Cinnamon Roll Baked Oats @tracesoats" in Batch G (pairs with the @entirelyemmy §B recipe)
 - [ ] Baked Middle Eastern Chicken Tray — 318→377
 - [ ] Basic Oat Flour Pancakes — 68→153 (check serving basis)
 - [x] ★ Blended Overnight Oats — 398→475
@@ -129,14 +129,14 @@ optional toppings included; precise after-values in `macro-audit.md`). 53 recipe
 
 Stored values look like per-recipe totals or wrong serving counts. Recompute AND decide serves.
 
-- [ ] Asian Chicken Salad w/ Cucumber & Seaweed — 461/50 → ~212/25 (2× high; +null macros)
-- [ ] Butternut Protein Brownie (butternut/egg-white) — 412/52 → ~110 (impossible protein)
-- [ ] Butternut Protein Brownie (pumpkin/egg-white) — 189 → ~98
-- [ ] Carrot Cake Loaf — 178/14.5 → ~100/7 (impossible protein)
-- [ ] Cinnamon Roll Baked Oats — 688 → ~515
-- [ ] Crispy Rice and Chicken Salad — 635 (cal ok) protein 51 → ~31
-- [ ] Fluffy Greek Yogurt Pancakes — 495 → ~193 (serves likely > 3)
-- [ ] Oat Flour Pancakes — 97 → ~53 (serves likely ~6, not 12)
+- [x] Asian Chicken Salad w/ Cucumber & Seaweed — Batch G, serves 2→1, 455/52/13/22/6.5/2.5 (full recipe supplied)
+- [x] Butternut Protein Brownie (butternut/egg-white) — Batch G, KEPT, recomputed 112/16/12/1.4/3.5/2 (serves 5)
+- [x] Butternut Protein Brownie (pumpkin/egg-white) — Batch G, DEDUPED (import_status='deleted')
+- [x] Carrot Cake Loaf — Batch G, serves 5, 104/7.5/13.5/2.5/2.5/4 (full recipe supplied; walnuts optional/excl)
+- [x] Cinnamon Roll Baked Oats — Batch G, split into @entirelyemmy (serves 10, 284) + @tracesoats (renamed from "Air Fryer Cinnamon Roll Oats", 641). See §A note.
+- [x] Crispy Rice and Chicken Salad — Batch G, serves 2, 638/40/54/29/5.5/15 (full recipe supplied)
+- [x] Fluffy Greek Yogurt Pancakes — Batch G, serves 3, 225/13/25/8/2.5/8.5 (full recipe supplied)
+- [x] Oat Flour Pancakes — Batch G, serves 12, 56/2.6/7.5/1.7/0.75/2.4 (full recipe supplied)
 - [ ] Protein Brownie Bake — 318 → ~237
 - [ ] Protein Pancakes — 312 → ~52 (serves likely ~2-3, not 15)
 - [ ] Salmon Poke Bowl Meal Prep — 573/47 → ~400/14 (1 tin salmon; +null macros)
@@ -243,7 +243,7 @@ Quick wins: recompute just fills the missing macro fields (cal/protein already c
 | Section | Count |
 |---|---|
 | A. Recalculate — under-counted | 111 (14 ★ done → **97 left**) |
-| B. Over-stated / serving-count | 14 |
+| B. Over-stated / serving-count | 14 (8 done in Batch G, 6 left) |
 | C. Duplicate rows | 3 |
 | D. Ingredient-list integrity | 4 (all done ✅ — Café Style resolved via the Batch C rename) |
 | E. Empty ingredient lists | 8 (all done) |

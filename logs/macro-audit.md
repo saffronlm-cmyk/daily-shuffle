@@ -1033,6 +1033,54 @@ from the §B "Oat Flour Pancakes" (id `25fe14ad…`, null ingredients, serves 12
 
 No DB write this pass beyond the doc ticks — §B awaits Saffron's pasted lists / dedupe decision.
 
+---
+
+## Batch G — §B recipes populated + Butternut Brownie dedupe + Cinnamon Roll pair (2026-07-23) — WRITTEN
+
+Saffron pasted the full ingredient lists + methods + serves for the 8 §B items (her in-app
+edits had never synced to Supabase — the known bug). Populated `ingredient_sections` +
+`method_steps` + serves + all 6 macros for each, computed the same staple-grounded way as
+Batches B–F. Format: `kcal / protein / carbs / fat / fibre / sugar` per serving.
+
+| Recipe | serves | Before | After |
+|---|---|---|---|
+| Asian Chicken Salad w/ Cucumber & Crispy Seaweed | 2→1 | 461/50 (nulls) | 455/52/13/22/6.5/2.5 |
+| Carrot Cake Loaf | 5 | 178/14.5 (empty) | 104/7.5/13.5/2.5/2.5/4 |
+| Cinnamon Roll Baked Oats @entirelyemmy | 5→10 | 688/14 (empty) | 284/8.5/36.5/13/4.8/19 |
+| Crispy Rice and Chicken Salad | 2 | 635/51 (empty) | 638/40/54/29/5.5/15 |
+| Fluffy Greek Yogurt Pancakes | 3 | 495/39 (empty) | 225/13/25/8/2.5/8.5 |
+| Oat Flour Pancakes | 12 | 97/8.2 (empty) | 56/2.6/7.5/1.7/0.75/2.4 |
+| Butternut Protein Brownie (butternut/egg-white) | 5 | 412/52 | 112/16/12/1.4/3.5/2 |
+
+**Serving-count corrections (the core §B problem — old figures were whole-recipe totals):**
+Asian Chicken Salad was serves 2 but is a single portion → serves 1 (455 ≈ old 461 total).
+Carrot Cake Loaf ÷5 gives 104/7.5 (old 14.5g protein/slice was impossible — 30g protein powder
+across the whole loaf). Cinnamon Roll @entirelyemmy → serves 10 (284/serving). Oat Flour
+Pancakes stay serves 12 per Saffron's "yields ~12 pancakes" (56/pancake; old 8.2g protein/pancake
+was impossible). Fluffy Greek Yogurt Pancakes ÷3 = 225.
+
+**Butternut Protein Brownie dedupe:** two near-identical rows (pumpkin-puree vs butternut-puree
+variants). Per Saffron, **kept the butternut/egg-white row** (`67a68e1c…`) — recomputed from its
+DB ingredient list to **112/16/12/1.4/3.5/2** (÷5; old 412/52 was a whole-recipe total) — and
+**soft-deleted the pumpkin/egg-white row** (`207e379e…`, `import_status='deleted'`). Only one
+"Butternut Protein Brownie" now shows, so no handle needed.
+
+**Cinnamon Roll Baked Oats — differentiated pair.** Saffron supplied two recipes both titled
+"Cinnamon Roll Baked Oats" and asked to add the IG handle to differentiate. They already existed
+as two separate rows: the §B row (`60244d3e…`, @entirelyemmy) → renamed **"Cinnamon Roll Baked
+Oats @entirelyemmy"** + full recipe (serves 10, oven-baked, 350F→175C converted). The @tracesoats
+recipe was already in the DB as **"Air Fryer Cinnamon Roll Oats"** (`064f61de…`, already at 641,
+a §A item) — renamed **"Cinnamon Roll Baked Oats @tracesoats"** (content unchanged; it's the same
+air-fried recipe). ⚠ Minor note: that row's DB oat base lists "2 tbsp cinnamon roll cookie butter"
+where Saffron's paste says "2 tbsp almond butter + cinnamon" — left the DB content (and 641
+macros) as-is; flag if she wants it switched to almond butter (would nudge macros down slightly).
+
+**Thigh/skin note (Crispy Rice and Chicken Salad):** 300g skin-on chicken thighs computed at
+~211 kcal/100g meat+skin; chicken fat is reused to crisp the rice so counted as consumed. Protein
+landed at 40/serving (audit's rough "→~31" discounted more; the line-item compute is 40).
+
+Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.
+
 **Batch E note corrections (caught while matching the rice-exclusion note convention):**
 - **Mediterranean Chicken & Rice Skillet** — Batch E wrote the macros rice-excluded but left
   `notes` null and the stale `carbs_not_stated/fat_not_stated` flags. Added the rice-exclusion
