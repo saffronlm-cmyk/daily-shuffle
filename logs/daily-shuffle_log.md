@@ -4,6 +4,148 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# Recipe Macro Corrections — Batches E–L (PR #48)
+**Date:** 2026-07-24
+**Project:** Daily Shuffle — recipe library macro audit (Supabase `recipes`)
+**Mode:** Rolling Log + GitHub Push
+**Status:** In Progress — §B/C/D/E/F/G all closed; only §A (93 under-count recomputes) remains
+
+---
+
+## Project Context
+Continuation of the recipe-macro-correction stream tracked in `logs/macro-audit.md` and
+`logs/remaining-work.md`. Follow-up to merged #46 (Batch B, all of §A's ★ items) and the
+open PR #47 (Batches C/D). This session opened a **new PR #48** on branch
+`claude/pr-47-outstanding-sections-ucxebb` (which was reset to PR #47's head
+`claude/remaining-work-clarification-uxc73y` at session start, then carried forward).
+All recipe data lives in Supabase `recipes` (project `jsxcctrskkkxgdxfaduo`); the only repo
+changes are the two log files. Data-only — no `index.html`/`sw.js`, no cache bump. Use the
+`recipe-db` skill for schema + non-destructive-write conventions.
+
+## Session Goal
+Work through the outstanding sections of `logs/remaining-work.md` (§B–§G, §C dedupes, §D/§E/§F
+stragglers) using details Saffron supplied turn-by-turn, writing corrected 6-macro per-serving
+values to Supabase. Leave a clean resume point for §A.
+
+## State Before This Session
+`remaining-work.md` had §D/§E/§F checkboxes stale (writes from Batches C/D never ticked), and
+§B/§C/§G untouched. `recipes` ≈ 338 rows. PR #47 body listed the outstanding work.
+
+## What Was Done
+Ten batches (E–L), each written to Supabase then logged in `macro-audit.md` and committed:
+
+- **Batch E** — §F "need one quantity" (10): Mediterranean Chicken & Rice Skillet, Harissa
+  Chicken w/ Roasted Veg & Feta, Honey Sesame Salmon Bowl, Instant Noodle Jars, Crispy GF Shrimp
+  Dumplings, GF Easy Pan Dumplings ×2, Double Roast Chicken, Green Goddess Chicken Prep Mix, PB
+  Banana French Toast. Open-decision estimates (tofu block 300g, ~15g dumpling coatings, Harissa
+  full compute, roast yield 52%, ~100g/thigh) later **confirmed by Saffron**.
+- **Batch F** — final 3 §F + Frozen Strawberry Raspberry PB Bites → **§F closed (24/24)**. Also
+  fixed 2 Batch E notes (Mediterranean Skillet had null notes; Honey Sesame said "with rice"
+  though computed rice-excluded).
+- **§D** — Café Style Jacket Potatoes: found it was ALREADY renamed to "Chicken and Bacon Caesar
+  Pasta Salad" in Batch C with the exact recipe Saffron re-supplied (541/59). No write; ticked.
+  **§D closed (4/4).**
+- **Batch G** — §B tranche 1 (8): populated Asian Chicken Salad (serves 1), Carrot Cake Loaf,
+  Cinnamon Roll Baked Oats @entirelyemmy (serves 10), Crispy Rice and Chicken Salad, Fluffy Greek
+  Yogurt Pancakes, Oat Flour Pancakes — all from full recipes Saffron pasted (her in-app edits
+  never synced to Supabase — the known bug). Deduped Butternut Protein Brownie (kept butternut/
+  egg-white 112/16, soft-deleted pumpkin variant). Renamed the existing "Air Fryer Cinnamon Roll
+  Oats" (@tracesoats) → "Cinnamon Roll Baked Oats @tracesoats" to pair with @entirelyemmy.
+- **Batch H** — §B tranche 2: Protein Brownie Bake (246/16), Salmon Poke Bowl (serves 1, 765),
+  Sticky Miso Chicken Prep Boxes (488/41.5), GF Cinnamon Buns (later serves 12). Held 2.
+- **Batch I** — resolved holds: GF Cinnamon Buns → serves 12 (585/bun); Protein Pancakes → per
+  pancake serves 12 (71); Sticky Soy Chicken w/ Garlic Rice → rice is COOKED + bumped to 2 chicken
+  breasts, serves 2 (699/53.5). Confirmed the "Pho Inspired" recipe Saffron pasted ≠ Sticky Soy —
+  it's the already-populated "Phò Inspired Chicken Broth and Rice" (581/36). **§B closed (14/14).**
+- **Batch J** — §G macro-completeness: filled all 34 (17 all-null, 17 fibre/sugar-only) +
+  Blueberry Protein Yoghurt Bowl (sugar). **§G closed (34/34).**
+- **Batch K** — deduped High Protein Salmon Potato Salad (soft-deleted identical dup, filled
+  survivor 895/44/80/45/19.5/13); Marinated Fish Tacos → serves 3, 540/45/45/20/5/9.
+- **Batch L** — §C traybake + rice-salad dedupes: kept "Roast Chicken and Charred Corn Rice
+  Salad" (488) + "Chicken and Potato Traybake" (448), soft-deleted the two duplicates.
+  **§C closed (3/3).**
+- Final commit: rewrote `remaining-work.md` intro into a ▶ RESUME HERE banner.
+
+Method throughout: pull `ingredient_sections` from Supabase, recompute per-serving 6 macros
+staple-grounded (staple_products values, light-coconut default, faithful listed quantities),
+write via `execute_sql`, verify with a read-back, tick the worklist, log the batch.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| Supabase `recipes` rows | ~55 rows updated + 5 soft-deleted (deduped) across Batches E–L | Modified | Supabase `jsxcctrskkkxgdxfaduo` |
+| logs/macro-audit.md | Batch E–L entries appended | Modified | /home/user/daily-shuffle/logs/ |
+| logs/remaining-work.md | §B–§G ticked; ▶ RESUME HERE banner added; counts refreshed | Modified | /home/user/daily-shuffle/logs/ |
+| logs/daily-shuffle_log.md | This entry | Modified | /home/user/daily-shuffle/logs/ |
+
+No `index.html`/`sw.js`/`manifest.json` change.
+
+## Decisions & Reasoning
+- **Rice-exclusion**: where a "rice/base to serve" line had no qty, computed WITHOUT it per
+  Saffron's standing instruction, adding a notes line "+~200 kcal / +44g carbs per 150g cooked
+  rice". Applied to Katsu, Thai Satay, Mediterranean Skillet, Honey Sesame, Chipotle Skillet, etc.
+- **Soft-delete over hard DELETE** for all dedupes: set `import_status='deleted'` (matches the
+  Batch C convention), never a destructive SQL DELETE.
+- **Cinnamon Roll pair naming**: Saffron gave two recipes both titled "Cinnamon Roll Baked Oats".
+  The @tracesoats one already existed as "Air Fryer Cinnamon Roll Oats" — renamed rather than
+  creating a duplicate. Flagged that its DB oat base says "cinnamon roll cookie butter" vs her
+  paste's "almond butter"; left as-is pending her call.
+- **Sticky Soy Chicken**: Saffron corrected two of my assumptions — rice is COOKED (not the 1 cup
+  dry I'd assumed, ~460 kcal less) and chicken → 2 breasts, serves 2. Edited the ingredient list
+  (1→2 breasts) per her explicit instruction (authorized edit to otherwise-read-only source).
+- **GF Cinnamon Buns**: recipe text says "cut into 6" but 800g flour ÷6 is an implausible bun;
+  Saffron chose serves 12 → 585/bun. Old 488 had under-counted the flour/honey/frosting.
+- **§G cal/protein trusted**: for the 34 fills, kept existing (audit-confirmed) cal/protein and
+  computed the missing fields; where a line-item compute exceeded stored cal, kept carbs/fat
+  roughly cal-consistent rather than inflating — fibre/sugar (the actually-missing fields)
+  computed directly.
+
+## Current State (end of session)
+§B, §C, §D, §E, §F, §G all fully closed and written to Supabase. `remaining-work.md` has a
+▶ RESUME HERE banner. **Only §A remains: 93 under-count recomputes** (18 already done). PR #48 is
+open (draft) on branch `claude/pr-47-outstanding-sections-ucxebb`, auto-watched.
+
+## Next Steps
+1. Start §A: pick the first unchecked `- [ ]` in §A of `remaining-work.md` (alphabetical, e.g.
+   "4 Ingredient Rice Cake Chocolate Bars — 165→266"), pull its `ingredient_sections` from
+   Supabase `recipes`, recompute 6 macros per serving staple-grounded (same method as Batches
+   B–L), write via `execute_sql`, clear resolved `review_flags`, read-back to verify.
+2. Work §A in alphabetical batches of ~15–20; tick each line in `remaining-work.md` and append a
+   batch entry to `macro-audit.md`; commit + push per batch on the same branch.
+3. Route the 5 judgement-call items to Saffron rather than naive-computing (see banner): Thai Red
+   Curry Pot Roast Chicken (whole-bird rendering), Pho Gà (soup fat-render/meat-yield), Middle
+   Eastern Chicken & Rice Bowl (rice qty missing), Basic Oat Flour Pancakes (serving basis),
+   Chicken and Potato Traybake (optional §C-survivor fat recompute).
+
+## Open Questions / Blockers
+- **Cinnamon Roll Baked Oats @tracesoats**: DB lists "cinnamon roll cookie butter" where Saffron's
+  paste says "almond butter + cinnamon" — flagged, left as-is (641 macros) pending her preference.
+- The app→DB sync bug remains unfixed (in-app edits to bundled recipes stay in localStorage, never
+  reach Supabase). This is why §B recipes came back with empty/null DB ingredient lists. Worth a
+  proper `index.html` fix at some point (noted in PR #47/#48 bodies).
+
+## Environment & Config Notes
+- Repo: `saffronlm-cmyk/daily-shuffle`. Branch: `claude/pr-47-outstanding-sections-ucxebb`
+  (reset at session start to origin/`claude/remaining-work-clarification-uxc73y`, PR #47's head).
+- PR **#48** (draft, auto-watched) carries all Batch E–L commits.
+- Supabase project `jsxcctrskkkxgdxfaduo`, table `recipes`. Writes via Supabase MCP `execute_sql`.
+  Commit signing: user.email must be `noreply@anthropic.com` (a stop-hook flags unverified commits).
+- No cache bump (data-only). Staple macros from `staple_products` (~167 rows).
+
+## Notes & Gotchas
+- **Do not naive-recompute deleted rows.** Five rows were soft-deleted this session
+  (`import_status='deleted'`): pumpkin Butternut Protein Brownie, one Salmon Potato Salad dup,
+  Roast Chicken Rice Salad, Easy Chicken Traybake, + earlier Batch C deletions. The §A worklist
+  lines for the deleted traybake/rice-salad were retitled "DELETED as §C duplicate".
+- **§A survivor exception**: "Chicken and Potato Traybake" (448, §C survivor) may still want the
+  §A fat recompute (skin-on legs+thighs+Flora ~589) — left flagged/unchecked in §A.
+- Faithful-quantity computes routinely land ABOVE the old rough stored values (full oils, skin-on
+  chicken, full mayo). This is expected — the old placeholders under-counted. Don't "correct"
+  downward without a reason.
+- Two recipes still can't be auto-done: Marinated Fish Tacos is now done (serves 3), but any other
+  null-serves recipe needs a serves count first.
+
 # Add Recipe — Chicken Mince Konjac Japchae
 **Date:** 2026-07-19
 **Project:** Daily Shuffle — recipe library (Supabase `recipes`)

@@ -811,3 +811,433 @@ Format: `kcal / protein / carbs / fat / fibre / sugar` per serving.
 
 Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.
 
+---
+
+## Batch C — §E empty-ingredient recipes populated + §D deletions (2026-07-23) — WRITTEN
+
+Saffron supplied the actual ingredient lists (pasted in chat — her in-app edits had stayed in
+local storage and never reached Supabase). For each, wrote **ingredient_sections (real
+strings) + method_steps + all 6 macros** to `recipes`. Computed per serving from the supplied
+lists the same way as Batch B.
+
+Format: `kcal / protein / carbs / fat / fibre / sugar` per serving.
+
+| Recipe | serves | Before | After |
+|---|---|---|---|
+| Apple Almond Yogurt Bowl | 1 | (empty/418) | 397/13.5/50.5/18.5/6.5/37 |
+| Blended Raspberry Protein Chia Pudding | 3 | (empty/268) | 283/22.5/22/12.5/14.5/3 |
+| Bounty Bar Overnight Oats | 1 | (empty/388) | 556/11/61.5/32.5/14/23.5 |
+| Strawberry Ice Cream | 3 | (empty/168) | 282/7/36/13/2/34.5 |
+| Vietnamese Noodles with Lemongrass Chicken | 4 | (empty/368) | 641/45.5/68/22/4.5/19 |
+| Quick Chinese Vegetable Soup (§D, protein was null) | 2 | (empty/108) | 196/11/23/6.5/3.5/10 |
+| Chicken and Bacon Caesar Pasta Salad (§D, + description) | 2 | (empty/601) | 541/59/47.5/12.5/2/5.5 |
+| Carrot Cake Baked Oats (salted caramel, serves 1) | 1 | (deleted/448) | 718/44/77.5/29/10/28.5 |
+
+The pre-existing macro values on these rows were rough placeholders; recomputes from the real
+lists supersede them (notably Bounty Bar +168 from 25 g melted chocolate + coconut yoghurt;
+Strawberry Ice Cream +114 from the 100 g white-chocolate coating; Vietnamese Noodles +273 from
+800 g thigh + 200 g dry vermicelli ÷4).
+
+**§D deletions:** `Brownie Batter Overnight Oats` and `California Rolls in a Bowl` set
+`import_status='deleted'` (were still `ready` despite being marked deleted on Saffron's side).
+
+**Second pass (2026-07-23, same batch):** Saffron supplied the three remaining lists. Written:
+`Quick Chinese Vegetable Soup` (196/11 — protein was null; wrote ingredients+method),
+`Chicken and Bacon Caesar Pasta Salad` (541/59 + ingredients+method+subtitle; recompute from
+the real list came in under the old 601/66 placeholder), and `Carrot Cake Baked Oats (salted
+caramel, serves 1)` (718/44 — full recipe with 30 g protein + PB + cream cheese + walnuts far
+exceeds the old 448 placeholder; **flipped `import_status='deleted'→'ready'`** so it now shows).
+
+- Note: `Quick Chinese Vegetable Soup` 196 is the faithful compute including low-sodium stock
+  (~60/serving) + the 2 tbsp fried-shallot topping (~40/serving); the source's "108 cal"
+  subtitle claim treats stock as ~0 and the toppings as optional garnish. Left as 196 pending
+  Saffron's preference.
+
+**Still empty-in-DB (§D renames, macros present but ingredient lists never synced from app):**
+`Summer Salad with Blackened Salmon` (398/36) and `Chilli Lime Shrimp and Veggie Bowl`
+(228/36, shrimp+marinade only, veg is a serving-suggestion per Saffron). Both render with no
+ingredients in the app until their lists are pasted in.
+
+**Note on app→DB sync:** in-app edits to bundled-library recipes persist to local storage, not
+the shared Supabase `recipes` table, so authored ingredients don't appear in the DB until
+written directly. Worth a proper fix in `index.html` at some point.
+
+Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.
+
+---
+
+## Batch D — §F "need one quantity" + remaining §D (2026-07-23) — WRITTEN
+
+Twelve recipes. Two kinds of work: (a) **rice-exclusion** recipes — recomputed from the
+existing DB ingredient lists **minus the unquantified rice line**, per Saffron's instruction
+("calculate without rice, note it's excluded"); (b) recipes where Saffron supplied or updated
+the list. Faithful compute of listed quantities (full mayo/sauce, skin-on chicken, listed
+oils) means several run well above the prior rough stored values — same pattern as Batch B.
+
+Format: `kcal / protein / carbs / fat / fibre / sugar` per serving.
+
+| Recipe | serves | Before | After |
+|---|---|---|---|
+| 30 Minute Bang Bang Chicken Bowls | 4 | 388 | 571/43.5/16.5/37.5/1.5/12 (rice excl) |
+| Bone Broth Smothered Chicken | 4 | 368 | 650/44/17/45/2.5/4.5 (rice excl; skin-on thigh) |
+| Brothy Miso Ginger Chicken and Rice | 3 | 485 | 555/40.5/29/32/1.5/18.5 (rice excl) |
+| Chili Honey Chicken Bowl | 2 | 488 | 667/44.5/47/37/7.5/35 (rice excl) |
+| Chipotle Chicken & Rice Skillet | 4 | 498 | 424/24.5/10/32.5/4/2.5 (rice excl) |
+| Creamy Thai Coconut Chicken Meatballs | 4 | 271 | 305/32.5/11.5/15/1.5/6 (rice excl; light coconut) |
+| Crispy Chilli Beef Protein Bowls | 4 | 484 | 437/28.5/28/23/5.5/16.5 (rice excl) |
+| Chilli Lime Shrimp and Veggie Bowl | 2 | 228 | 280/46/6.5/9/3/1 (+ingredients+method; veg excl; ~half marinade oil) |
+| Summer Salad with Blackened Salmon | 2 | 398 | 638/34.5/29/44.5/8.5/11 (+ingredients+method) |
+| Buffalo Chicken Wrap | 2 | 618 | 600/54.5/37.5/24/3/6.5 (per assembled wrap) |
+| Burger Bowl | 1 | 440 | 472/44/35.5/17/6/8 (qtys→weight) |
+| Caramel Rice Cake Strawberry Treat | 1 | 348 | 409/12/42.5/21.5/4.5/22 |
+
+Wrote ingredient_sections + method_steps for the two §D recipes (Chilli Lime Shrimp, Summer
+Salad — previously empty) and re-quantified Burger Bowl + Caramel Rice Cake. Rice-excluded
+recipes carry a note to add ~200 kcal / 44 g carbs per 150 g cooked rice.
+
+**Flagged to Saffron (written as computed, may adjust):**
+- **Chilli Lime Shrimp** — resolved to **280** (counts ~half the 2 tbsp marinade oil as
+  consumed; the rest drains off before griddling). Full-oil compute was 342.
+- **Chipotle Skillet protein 38→24.5** — computed "5 bone-in skin-on thighs" as ~480 g edible;
+  if the thighs are larger or skinless, protein should be higher.
+
+**Still outstanding on the §F list:** Crispy Gluten Free Shrimp Dumplings, Double Roast Chicken
+w/ Chicken Fat Rice, Frozen Strawberry Raspberry PB Bites, GF Easy Pan Dumplings (×2), Green
+Goddess Chicken Prep Mix, Harissa Chicken w/ Roasted Veg & Feta, Honey Sesame Salmon Bowl,
+Instant Noodle Jars, Mediterranean Chicken & Rice Skillet, Peanut Butter Banana French Toast,
+Peanut Butter Chicken Katsu Noodles, Stuffed Breakfast Chicken Sausage Pitas, Thai Style
+Chicken Satay. Plus §B, §C, §G, and the 2 §A eyeball / 2 §A flagged items.
+
+Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.
+
+---
+
+## Batch E — §F remaining "need one quantity" items (2026-07-23) — WRITTEN
+
+Ten recipes. Saffron supplied the missing quantity/decision for each (rice-exclusion notes,
+feta/mayo qty, full ingredient list for Green Goddess, whole-chicken weight range, small
+banana + 1 tbsp PB). Two items needed my own estimate where she was genuinely unsure (dumpling
+coatings, tofu block size) — written as computed and flagged below, same "easily adjusted"
+pattern as Chipotle Skillet/Chilli Lime Shrimp in Batch D. `Chipotle Chicken & Rice Skillet`
+was already resolved in Batch D (re-flagged by Saffron this round, but no change needed — rice
+was already excluded there). `Frozen Strawberry Raspberry PB Bites` deferred — full recipe
+relayed back to her since the "box" sizes for strawberries/raspberries are also unquantified.
+
+Format: `kcal / protein / carbs / fat / fibre / sugar` per serving.
+
+| Recipe | serves | Before | After |
+|---|---|---|---|
+| Mediterranean Chicken & Rice Skillet | 4 | 480/40 | 377/25.5/10/25.5/2/2 (rice excl; thigh weight assumed) |
+| Harissa Chicken with Roasted Veg and Feta | 1 | 555/53 | 943/56.5/84/43/17.5/29 (feta excl; thigh weight assumed) |
+| Honey Sesame Salmon Bowl | 2 | 488/36 | 463/32/10.5/32/0.5/9.5 (rice excl; mayo 1 tbsp) |
+| Instant Noodle Jars | 1 | 348/16 | 956/66/102/35/13/7 (tofu block assumed 300g; noodles 85g default) |
+| Crispy Gluten Free Shrimp Dumplings | 7 | 128/9 | 68/8/5.5/1.6/0.2/1 (rice-flour coating ~15g adhered assumed) |
+| GF Easy Pan Dumplings (No Wrappers) | 4 | null | 170/12/3.5/11.5/0.1/0.1 (coating flour ~15g adhered assumed) |
+| GF Easy Pan Dumplings (Pan-Fried) | 4 | null | 328/21/7/23.5/0.5/0.5 (potato-starch coating ~15g adhered assumed) |
+| Double Roast Chicken with Chicken Fat Rice | 8 | null | 534/44/30/25/0.6/2 (2×1.15kg raw chickens, ~52% roasted yield) |
+| Green Goddess Chicken Prep Mix | 2 | 280/24 (nulls) | 267/28/20/9.5/6.5/8.5 (full recipe supplied) |
+| Peanut Butter Banana French Toast | 1 | 488/18 | 627/19/76/29/5/26.5 (small banana ~100g, 1 tbsp PB, + maple syrup to serve) |
+
+**Flagged to Saffron — confirmed as written, no changes (2026-07-23):**
+- **Instant Noodle Jars → 956/66g protein** — full ~300g firm-tofu block assumption confirmed.
+- **Crispy GF Shrimp Dumplings / GF Easy Pan Dumplings (×2)** — ~15g adhered coating assumption
+  confirmed.
+- **Harissa Chicken with Roasted Veg and Feta → 943 kcal, up from 555** — faithful compute of
+  the full listed quantities (whole onion, whole pepper, ⅓ tin chickpeas, 2 bone-in skin-on
+  thighs, feta excluded) confirmed.
+- **Double Roast Chicken** — 52% raw-to-cooked-edible whole-roast-chicken yield assumption
+  confirmed.
+
+**Bone-in skin-on chicken thigh convention (Mediterranean Skillet, Harissa Chicken):** no
+per-thigh weight given, so used ~100g edible cooked meat+skin per thigh — same figure implied
+by the Chipotle Skillet compute in Batch D (480 g ÷ 5 thighs = 96 g). Flag and bump if thighs
+run bigger.
+
+**Doc hygiene:** `remaining-work.md` §D/§E/§F checkboxes were stale since Batch C/D (writes
+happened but the worklist was never ticked) — backfilled all of Batch C/D's completions plus
+this batch's in the same pass.
+
+Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.
+
+---
+
+## Batch F — final 3 §F "need one quantity" items + Batch E note fixes (2026-07-23) — WRITTEN
+
+Saffron supplied the last three §F quantities/decisions. Written faithfully, rice-excluded per
+her standing instruction where a "rice/base to serve" line was unquantified. This closes §F
+except the deferred Frozen Strawberry Raspberry PB Bites.
+
+Format: `kcal / protein / carbs / fat / fibre / sugar` per serving.
+
+| Recipe | serves | Before | After |
+|---|---|---|---|
+| Peanut Butter Chicken Katsu Noodles | 3 | 495/56 (incl rice) | 430/52/18/16/3.5/6 (rice excl; 150g cooked chicken breast/serving) |
+| Stuffed Breakfast Chicken Sausage Pitas | 1 | 289/29 (null carbs/fat) | 397/29/40/14/7/5 (full recipe; base w/o optional avocado) |
+| Thai Style Chicken Satay | 3 | 498/38 (incl rice) | 496/41.5/14/31/1.5/7.5 (rice excl; light coconut) |
+
+**Decisions applied:**
+- **Katsu** — "Rice of choice" excluded (note added: +200 kcal / +44g carbs per 150g cooked
+  rice); chicken assumed 150g cooked breast per serving per Saffron. The listed title says
+  "Noodles" but the ingredient list is a katsu peanut sauce over rice — computed the sauce +
+  chicken only.
+- **Stuffed Pitas** — full recipe supplied. Wrote the **base** stuffed pita (pita + 120g lean
+  chicken sausage meat + tomato/spinach/spring onion) without the optional ½-avocado dressing,
+  which is labelled "optional to serve". Avocado adds ~125 kcal / +10.5g fat / +9g carbs —
+  noted on the row. Chicken sausage meat assumed ~160 kcal/100g (lean); bump if using a
+  fattier banger.
+- **Thai Satay** — sticky rice excluded (note added); light coconut milk per project default;
+  600g raw thighs across 3 servings; small pickled-veg portion included, sauce fully counted.
+
+**Frozen Strawberry Raspberry PB Bites (serves 8) — 88 → 144/2.6/13.5/9/3.5/9.** Saffron
+supplied the missing quantities: 200g strawberries (¾ box), 150g raspberries (1 box), 8 tsp
+peanut butter, 100g dark chocolate chips (1 bag), plus the 1 tbsp chia and 1 tbsp coconut oil
+already listed. Firmed the `ingredient_sections` with these amounts (the vague "box"/"bag"/bare
+"Peanut butter" lines) and recomputed — the dark-chocolate coating (100g) and PB drive it well
+above the old 88 kcal placeholder. **This closes §F entirely** — all 24 items now written.
+
+---
+
+## §D Café Style resolution + §B sync-bug finding (2026-07-23) — Café done, §B BLOCKED
+
+**§D Café Style Jacket Potatoes → ALREADY DONE.** Saffron asked to rename "Café Style Jacket
+Potatoes with Chicken, Bacon & Sweetcorn" to "Chicken and Bacon Caesar Pasta Salad" and gave the
+corrected recipe + method. On checking the DB there is **no Café Style row** — it was already
+renamed to `Chicken and Bacon Caesar Pasta Salad` (id `d1ab3cbc…`) back in Batch C, and that row
+already holds exactly the recipe/method she re-supplied (100g pasta, 250g seasoned chicken breast,
+4 turkey bacon rashers, lettuce + the Greek-yoghurt/parmesan/anchovy Caesar dressing), macros
+**541/59/47.5/12.5/2/5.5**. A fresh recompute of her list lands ~553/63 — within assumption noise
+of the stored 541/59, so left as is. No DB write needed; ticked the stale §D checkbox. **§D now
+fully closed (4/4).**
+
+**§B is BLOCKED by the app→DB sync bug.** Saffron edited the §B recipes in-app ("adjusted in
+app", "edited – recalculate", "deleted one and reformatted the other"), but per the known bug
+those edits persist only to browser local storage, **not** Supabase. Pulled all 8 §B rows — the
+DB state does **not** reflect her edits:
+
+- **7 of 8 have entirely NULL/empty ingredient lists in the DB** — Asian Chicken Salad w/
+  Cucumber & Crispy Seaweed (461/50), Carrot Cake Loaf (178/14.5), Cinnamon Roll Baked Oats
+  (688/14), Crispy Rice and Chicken Salad (635/51), Fluffy Greek Yogurt Pancakes (495/39), Oat
+  Flour Pancakes (97/8.2, serves 12). **Cannot recompute** — no ingredients in the DB to compute
+  from. Need Saffron to paste the edited ingredient lists + confirmed serves for each.
+- **Butternut Protein Brownie ×2** — both rows still `ready` in the DB (her in-app deletion never
+  synced): `207e379e…` pumpkin-puree variant (189/25, serves 5) and `67a68e1c…` butternut-puree
+  variant (412/52, serves 5). These two *do* carry ingredient lists (structured qty/unit objects),
+  so a faithful recompute is possible: butternut variant ≈ **114/16/12.6/1.7/2.7/1.7** per serving,
+  pumpkin variant ≈ **101/15.4/9.2/1.4/3/2.5** per serving (both ÷5) — the old 412/52 & 189/25
+  were whole-recipe-ish totals, matching the audit's "→~110 / ~98". But since she "reformatted"
+  one in-app (may have changed quantities that didn't sync), holding the write until she confirms
+  which variant survives and whether the reformat changed the recipe.
+
+Note: the §A "Basic Oat Flour Pancakes" (id `9af1cd54…`, has ingredients) is a *different* row
+from the §B "Oat Flour Pancakes" (id `25fe14ad…`, null ingredients, serves 12).
+
+No DB write this pass beyond the doc ticks — §B awaits Saffron's pasted lists / dedupe decision.
+
+---
+
+## Batch G — §B recipes populated + Butternut Brownie dedupe + Cinnamon Roll pair (2026-07-23) — WRITTEN
+
+Saffron pasted the full ingredient lists + methods + serves for the 8 §B items (her in-app
+edits had never synced to Supabase — the known bug). Populated `ingredient_sections` +
+`method_steps` + serves + all 6 macros for each, computed the same staple-grounded way as
+Batches B–F. Format: `kcal / protein / carbs / fat / fibre / sugar` per serving.
+
+| Recipe | serves | Before | After |
+|---|---|---|---|
+| Asian Chicken Salad w/ Cucumber & Crispy Seaweed | 2→1 | 461/50 (nulls) | 455/52/13/22/6.5/2.5 |
+| Carrot Cake Loaf | 5 | 178/14.5 (empty) | 104/7.5/13.5/2.5/2.5/4 |
+| Cinnamon Roll Baked Oats @entirelyemmy | 5→10 | 688/14 (empty) | 284/8.5/36.5/13/4.8/19 |
+| Crispy Rice and Chicken Salad | 2 | 635/51 (empty) | 638/40/54/29/5.5/15 |
+| Fluffy Greek Yogurt Pancakes | 3 | 495/39 (empty) | 225/13/25/8/2.5/8.5 |
+| Oat Flour Pancakes | 12 | 97/8.2 (empty) | 56/2.6/7.5/1.7/0.75/2.4 |
+| Butternut Protein Brownie (butternut/egg-white) | 5 | 412/52 | 112/16/12/1.4/3.5/2 |
+
+**Serving-count corrections (the core §B problem — old figures were whole-recipe totals):**
+Asian Chicken Salad was serves 2 but is a single portion → serves 1 (455 ≈ old 461 total).
+Carrot Cake Loaf ÷5 gives 104/7.5 (old 14.5g protein/slice was impossible — 30g protein powder
+across the whole loaf). Cinnamon Roll @entirelyemmy → serves 10 (284/serving). Oat Flour
+Pancakes stay serves 12 per Saffron's "yields ~12 pancakes" (56/pancake; old 8.2g protein/pancake
+was impossible). Fluffy Greek Yogurt Pancakes ÷3 = 225.
+
+**Butternut Protein Brownie dedupe:** two near-identical rows (pumpkin-puree vs butternut-puree
+variants). Per Saffron, **kept the butternut/egg-white row** (`67a68e1c…`) — recomputed from its
+DB ingredient list to **112/16/12/1.4/3.5/2** (÷5; old 412/52 was a whole-recipe total) — and
+**soft-deleted the pumpkin/egg-white row** (`207e379e…`, `import_status='deleted'`). Only one
+"Butternut Protein Brownie" now shows, so no handle needed.
+
+**Cinnamon Roll Baked Oats — differentiated pair.** Saffron supplied two recipes both titled
+"Cinnamon Roll Baked Oats" and asked to add the IG handle to differentiate. They already existed
+as two separate rows: the §B row (`60244d3e…`, @entirelyemmy) → renamed **"Cinnamon Roll Baked
+Oats @entirelyemmy"** + full recipe (serves 10, oven-baked, 350F→175C converted). The @tracesoats
+recipe was already in the DB as **"Air Fryer Cinnamon Roll Oats"** (`064f61de…`, already at 641,
+a §A item) — renamed **"Cinnamon Roll Baked Oats @tracesoats"** (content unchanged; it's the same
+air-fried recipe). ⚠ Minor note: that row's DB oat base lists "2 tbsp cinnamon roll cookie butter"
+where Saffron's paste says "2 tbsp almond butter + cinnamon" — left the DB content (and 641
+macros) as-is; flag if she wants it switched to almond butter (would nudge macros down slightly).
+
+**Thigh/skin note (Crispy Rice and Chicken Salad):** 300g skin-on chicken thighs computed at
+~211 kcal/100g meat+skin; chicken fat is reused to crisp the rice so counted as consumed. Protein
+landed at 40/serving (audit's rough "→~31" discounted more; the line-item compute is 40).
+
+Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.
+
+---
+
+## Batch H — §B tranche 2: 4 written, 2 held for source/serves (2026-07-23) — WRITTEN
+
+Format: `kcal / protein / carbs / fat / fibre / sugar` per serving.
+
+| Recipe | serves | Before | After |
+|---|---|---|---|
+| Protein Brownie Bake | 2 | 318/22 | 246/16/26/10.5/5.5/12 (recompute from existing list) |
+| Salmon Poke Bowl Meal Prep | 2→1 | 573/47 (nulls) | 765/36/94/24/8/28 (full recipe, serves 1) |
+| Sticky Miso Chicken Prep Boxes | 3 | 520/50 (nulls) | 488/41.5/40.5/19/7/10.5 (all macros filled) |
+| Gluten Free Cinnamon Buns | 6→9 | 488/8 | 779/10/122/27.5/6/50 per bun |
+
+- **Protein Brownie Bake** already had its full ingredient list in the DB (soya yoghurt + oat
+  flour + vegan protein + cocoa + coconut sugar + 20g dark choc); just recomputed ÷2 → 246/16.
+  Old 318/22 was over-stated (only 20g protein powder in the batch).
+- **Salmon Poke Bowl** → serves 1 per Saffron (the whole tin + rice + ½ avocado is one bowl). 765
+  is a hearty single serving; carbs 94 driven by the sticky rice + sweet mirin/maple (used twice —
+  in the salmon mix and the cucumber pickle). Kimchi optional/excluded; Greek yoghurt assumed over
+  mayo. Old 573/47 at serves 2 was neither right.
+- **Sticky Miso Chicken Prep Boxes** — faithful compute of all three components (miso chicken +
+  brown-rice salad + edamame hummus + pumpkin-seed garnish) ÷3 = 488/41.5. Ran a touch above the
+  audit's ~428 (tahini + sesame oil + pumpkin seeds + edamame are calorie-dense).
+- **Gluten Free Cinnamon Buns** → serves 9 per Saffron ("let's go with 9"). ⚠ **Big jump (488 →
+  779/bun).** This is a faithful compute of the full stated quantities — 800g GF bread flour
+  (~2800 kcal) + 210g honey + 150g filling sugar + 90g powdered sugar + cream-cheese frosting +
+  coconut oil/milk ≈ ~7000 kcal whole batch ÷9. The old 488 significantly under-counted. Recipe
+  text says "cut into 6" but 800g flour ÷6 is an implausible bun (the audit flagged this). If the
+  batch actually yields 12, per bun ≈ 585. Flagged in the row's notes.
+
+**Update (2026-07-23, Batch I):** GF Cinnamon Buns yield changed again per Saffron — **serves
+12** (final): 585/8/92/20.5/4.5/37.5 per bun (whole batch ≈ 7000 kcal ÷12).
+
+**Recipe-identity check — Sticky Soy Chicken vs Phò Inspired (both @food_bylucy):** Saffron
+asked whether "Sticky Soy Chicken with Garlic Rice in Spicy Broth" is actually the "Pho Inspired
+Chicken Broth & Rice" recipe she pasted. **They are two different recipes, both by @food_bylucy.**
+The pasted recipe matches the *existing* DB row **"Phò Inspired Chicken Broth and Rice"**
+(`0195b252…`, serves 2, **581/36/85/10/4.5/31**, full ingredients already present and matching —
+so that §A item is DONE). It has a whole-spice broth (star anise/cardamom/cloves), fish sauce, a
+hoisin+miso+honey glazed chicken, ½ cup herb rice and bok choy. The **Sticky Soy Chicken**
+(`4f1e46fe…`) is genuinely different: a gochujang chicken-stock broth, oyster-sauce chicken, 1 cup
+garlic-fried jasmine rice and gai lan — no whole spices, no fish sauce. So the Phò paste does NOT
+resolve the Sticky Soy row; that row still needs its own serves/recompute decision (or, if it was
+a stray entry, deletion). Reported back to Saffron.
+
+**HELD — need Saffron's input (reported, not written):**
+- **Protein Pancakes** (`e1afaed0…`) — she asked "Source?". It has **no IG handle**; creator_name
+  is "Personal Recipe Book" (her own book). DB serves = 15 (recipe makes ~15 small ~1-tbsp
+  pancakes, egg-white-powder based). Whole-recipe compute ≈ 853 kcal / 49g protein → **~57/pancake
+  if serves 15 is right**. Old 312/24 was a larger-portion figure. Not written pending her serves
+  preference (per-pancake vs per-stack). NB: distinct from "Protein Pancakes (Simple)" @mattsfitchef
+  (§G) and "Chocolate Chip Protein Pancakes" @kylecarillet.
+  → **RESOLVED (Batch I):** Saffron chose **per pancake, serves 12** (not 15). 853 kcal ÷12 =
+  **71/4/7.5/2.7/1.2/3.8** per pancake. **§B now fully closed (14/14).**
+
+---
+
+## Batch J — §G macro-completeness fills, all 34 (2026-07-23) — WRITTEN
+
+Filled the missing macro fields on every §G recipe, keeping the existing (audit-confirmed)
+calories + protein and computing the null carbs/fat/fibre/sugar staple-grounded from each DB
+ingredient list. Two groups:
+
+- **17 with all four null** (carbs+fat+fibre+sugar): Cauliflower Cheese Gnocchi Bake, Chocolate
+  Chia Mousse, Creamy Mango & Coconut Cod Curry, Double Choc Fudge Cookie, Frozen Berry Breakfast
+  Crumble, Healthy Orange & Cashew Chicken, High Protein Chocolate Lava Pudding, Meal Prep Spicy
+  Tuna Quesadilla, Protein Berry Parfait, Protein Power BLT, Smoky Caramelised Red Pepper Orzo,
+  Spring Greens Carbonara, Sticky Mango Chicken Prep Bowls, Sticky Miso Chicken Bowl w/ Tahini
+  Broccoli, Sushi Salad, Thai Prawn Meatball Bowl, Tuna Chilli Crunch Salad.
+- **17 needing only fibre+sugar** (cal/protein/carbs/fat already present): Banh Cuon, Char Siu
+  Chicken, Chipotle Chicken Chop Bowl, Chocolate Banana Rice Paper Pie, High Protein Brownie Bowl,
+  High Protein Tiramisu Overnight Oats, High Protein Tuna Salad, Homemade Carrot Cake, Lemon &
+  Coconut Cake, Nandos Chicken Pasta Salad, Protein Pancakes (Simple), Rice Paper Kimchi Jeon with
+  Tuna, Rice Paper Pad See Ew with Shrimp, Spicy Chilli Rice Paper Wontons, Spicy Peanut Chicken
+  Noodles, Sweet Potato Beef Taco Bowl, Zesty + Spicy Chicken Fusion Bowl.
+
+Also filled **Blueberry Protein Yoghurt Bowl** (sugar-only gap, not on the §G list) → sugar 15.
+Cleared the resolved `*_not_stated` review_flags on all of them. Where a full line-item compute
+ran above the stored calories (several composed bowls), carbs/fat were kept roughly consistent
+with the trusted stored cal rather than inflating it — fibre/sugar (the actually-missing fields)
+computed directly from the ingredients.
+
+**Left untouched (not §G):** the two `High Protein Salmon Potato Salad` rows (§C dedupe — needs
+Saffron's call), `Marinated Fish Tacos` (serves + protein null — can't compute per-serving until
+serves is set), and 3 §A recompute items still carrying nulls (Raspberry Cheesecake Protein Bowl,
+Roasted Cod on Sweet Potato, Single Serve Sticky Date Pudding).
+
+**§G now fully closed (34/34).** Remaining open work: §A recomputes, §C dedupes (3).
+
+Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.
+- **Sticky Soy Chicken with Garlic Rice in Spicy Broth** (`4f1e46fe…`) — she asked "Source?" and
+  leaned "likely 2". Source = **@food_bylucy**. The existing 618 (serves 1) is a **large
+  under-count**: 1 cup *dry* jasmine rice (~185g ≈ 666 kcal) + 2 tbsp neutral oil + 1 tbsp sesame
+  oil alone ≈ 1150 kcal, whole recipe ≈ **1700 kcal**. So this needs a genuine recompute, not just
+  a ÷2 of 618. At serves 2 → ~850/serving. Not written pending her confirming serves = 2 and that
+  the rice is 1 cup dry (vs cooked) — both materially swing it.
+  → **RESOLVED (Batch I):** Saffron confirmed the **rice is cooked** (1 cup cooked ≈ 158g, not
+  185g dry — knocks ~460 kcal off) and asked to **bump the chicken to 2 breasts** and set
+  **serves 2**. Edited the ingredient list (1→2 chicken breasts) and recomputed: whole recipe
+  ≈ 1398 kcal ÷2 = **699/53.5/60/27/6/19**. Frying oil counted at ~1.5 tbsp absorbed (rest drains).
+  §B now 13/14 — only Protein Pancakes still held (serves basis).
+
+Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.
+
+**Batch E note corrections (caught while matching the rice-exclusion note convention):**
+- **Mediterranean Chicken & Rice Skillet** — Batch E wrote the macros rice-excluded but left
+  `notes` null and the stale `carbs_not_stated/fat_not_stated` flags. Added the rice-exclusion
+  note and cleared the resolved flags.
+- **Honey Sesame Salmon Bowl** — its `notes` still read "per serving from 2 **with rice**"
+  though Batch E computed it rice-**excluded** (463, carbs 10.5). Corrected the note to say rice
+  excluded (+200 kcal / +44g carbs per 150g) and dropped the resolved `nutrition_not_stated`
+  flag (kept `serves_estimated`).
+
+Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.
+
+
+---
+
+## Batch K — §C salmon-salad dedupe + Fish Tacos serves (2026-07-23) — WRITTEN
+
+- **High Protein Salmon Potato Salad** — two byte-identical `ready` rows (created 11:46 and
+  11:53 on 2026-07-01), both fully null. Soft-deleted the later dup (`033408e6…`,
+  `import_status='deleted'`), filled the survivor (`fff8f78d…`) → **895/44/80/45/19.5/13**
+  (serves 2). Calorie-dense: 400g crushed roast potatoes + generous olive oil, 200g hot-smoked
+  chilli salmon, whole avocado, 200g chickpeas, Greek-yoghurt/light-mayo dressing (audit est.
+  was ~869; the full-quantity compute lands a touch higher).
+- **Marinated Fish Tacos** (@recipe_tin) — had **null serves** and null protein/carbs/fat/
+  fibre/sugar (only cal 410 stored). Saffron set **serves 3**. Recomputed the full macros:
+  **540/45/45/20/5/9** per serving (600g white fish across 3; ~2 small tortillas each; most of
+  the 3 tbsp marinade oil drains off). Supersedes the old rough 410.
+
+**Confirmed duplicates, awaiting Saffron's pick (pulled for comparison, NOT yet deduped):**
+- **Roast Chicken Rice Salad** (`199a8e55…`, 398/32/42/12/6/6) ≈ **Roast Chicken and Charred
+  Corn Rice Salad** (`326278cf…`, 488/38/62/18/6/8) — both @natsnourishments, identical
+  ingredients (200g rice, 250g sweetcorn, 200g chicken, romaine, 3 tomatoes, same avocado
+  dressing) and method. The "Charred Corn" row is the fuller/more-accurate entry.
+- **Easy Chicken Traybake** (`60029cd9…`, 448/38/22/22/4/3) ≈ **Chicken and Potato Traybake**
+  (`93442c4f…`, 448/38/26/22/4/3) — both @natsnourishments, identical ingredients (2 legs +
+  3-4 thighs, 3 tbsp Flora, 500g baby potatoes, onion, 2 lemons, bay, stock, parsley, broccoli)
+  and method. Near-identical macros (carbs 22 vs 26).
+
+Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.
+
+---
+
+## Batch L — §C traybake + rice-salad dedupes (2026-07-23) — WRITTEN
+
+Saffron approved keeping the recommended survivors. Soft-deleted the two duplicate rows
+(`import_status='deleted'`); survivors already carry correct macros, no recompute needed.
+
+- **Roast Chicken Rice Salad** (`199a8e55…`, 398/32) → DELETED. Survivor: **Roast Chicken and
+  Charred Corn Rice Salad** (`326278cf…`, 488/38/62/18/6/8) — the fuller, more accurate row.
+- **Easy Chicken Traybake** (`60029cd9…`, 448/38) → DELETED. Survivor: **Chicken and Potato
+  Traybake** (`93442c4f…`, 448/38/26/22/4/3).
+
+**§C now fully closed (3/3).** Also tidied the §A worklist lines that referenced the deleted
+rows so a future §A pass doesn't recompute them. The surviving "Chicken and Potato Traybake"
+(448) may still merit the §A fat recompute (skin-on legs+thighs+Flora ~589) — left flagged in §A.
+
+Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.
