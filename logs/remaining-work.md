@@ -1,32 +1,60 @@
 # Remaining recipe edits — master worklist
 
-Everything still outstanding after the 39 already corrected (Batch A + Tier 1 + Tier 2
-tranche 1). Compiled from the library audit (`macro-audit.md`). Format for recalcs:
+Compiled from the library audit (`macro-audit.md`). Format for recalcs:
 `stored kcal → recompute estimate`. Defaults when firming: **light coconut** (unless recipe
 says otherwise), **cooked quinoa**, **85 g instant-noodle pack**. Estimates are audit-pass
-figures; each gets firmed to precise 6-macro per-serving values when you pick it.
+figures; each gets firmed to precise 6-macro per-serving values when written.
 
 ★ = was on the Tier 2 priority list — **all ★ now DONE** (written 2026-07-16, Batch A4, with
-optional toppings included; precise after-values in `macro-audit.md`). 53 recipes corrected so far.
+optional toppings included; precise after-values in `macro-audit.md`).
 
-> **Status update — 2026-07-24.** A live DB sweep shows this worklist is now largely stale:
-> the ready library (`import_status='ready'`, 307 rows) is at **100% macro-completeness — 0
-> rows with any null macro**. Section A was bulk-recomputed+written in Batch B (2026-07-22, 82
-> recipes); §G (34 macro-completeness fills) is fully populated (verified); §C duplicates are
-> resolved (dupes soft-`deleted`, survivors clean); §E empty-ingredient lists are populated.
-> Batch C (2026-07-24) closed the final 3 `+null macros` stragglers. **Genuinely outstanding
-> and decision-gated** (need Saffron's call / source data, not autonomous): §B serving-count
-> fixes, §D ingredient-list gaps (e.g. Café Style Jacket Potatoes), and the §A "eyeball /
-> uncertain" leftovers (Basic Oat Flour Pancakes serving basis; Thai Red Curry Pot Roast &
-> Pho Gà whole-bird/soup rendering; Middle Eastern Chicken & Rice Bowl rice qty). The
-> section boxes below are the original audit worklist and are **not** re-ticked wholesale.
+---
+
+## ▶ RESUME HERE (updated 2026-07-23, end of Batches E–L)
+
+**Only §A remains.** Every other section is fully closed:
+
+| Section | Status |
+|---|---|
+| A. Under-counted recalcs | **90 left** (21 done, incl. Batch M) ← the only open work |
+| B. Over-stated / serving-count | ✅ done (14/14) |
+| C. Duplicate rows | ✅ done (3/3) |
+| D. Ingredient-list integrity | ✅ done (4/4) |
+| E. Empty ingredient lists | ✅ done (8/8) |
+| F. Partial — need one quantity | ✅ done (24/24) |
+| G. Macro-completeness fills | ✅ done (34/34) |
+
+**How to do §A** (mechanical — mostly no input needed): for each unchecked `- [ ]` item below,
+pull its `ingredient_sections` from Supabase `recipes` (project `jsxcctrskkkxgdxfaduo`), recompute
+6 macros per serving staple-grounded (same method as Batches B–L in `macro-audit.md`), and write
+`calories/protein_g/carbs_g/fat_g/fibre_g/sugar_g` (+ clear resolved `review_flags`). Work in
+alphabetical batches of ~15–20; tick each line here and log the batch in `macro-audit.md`.
+
+**Handful that need Saffron's input / a judgement call, not a straight recompute:**
+- **Thai Red Curry Pot Roast Chicken** (548→1232) — whole-bird rendering uncertain.
+- **Pho Gà - Vietnamese Chicken Pho** (501) — 1.5kg bone-in thighs simmered into broth;
+  meat-yield-per-bowl + fat-rendering uncertain (soup, fat renders).
+- **Middle Eastern Chicken & Rice Bowl** (428) — "rice of choice" has no quantity (load-bearing).
+- **Basic Oat Flour Pancakes** (68→153) — check serving basis before writing.
+- **Chicken and Potato Traybake** (448→589) — §C survivor; optional fat recompute (skin-on
+  legs+thighs+Flora).
+
+Use the `recipe-db` skill for schema + non-destructive-write conventions. All work is data-only
+in Supabase `recipes` — no `index.html`/`sw.js` change, no cache bump. PR #48 tracks this stream.
+
+> **Batch M — 2026-07-24.** Closed the 3 §A recipes that were still carrying null macros
+> (`+null macros` in the list below): Raspberry Cheesecake Protein Bowl (→285), Roasted Cod on
+> Sweet Potato (→590), Single Serve Sticky Date Pudding (→316). After Batch M the `ready`
+> library has **0 rows with any null macro** — every remaining §A item below has a full 6-macro
+> set already; the open work is *correcting under-counts*, not filling gaps. Details in
+> `macro-audit.md` (Batch M).
 
 ---
 
 ## A. Recalculate — under-counted (stored too low). Biggest bucket; straight recompute+write.
 
 - [ ] 4 Ingredient Rice Cake Chocolate Bars — 165→266
-- [ ] Air Fryer Cinnamon Roll Oats — 398→616
+- [x] Air Fryer Cinnamon Roll Oats — 398→616 → already recomputed to 641; renamed to "Cinnamon Roll Baked Oats @tracesoats" in Batch G (pairs with the @entirelyemmy §B recipe)
 - [ ] Baked Middle Eastern Chicken Tray — 318→377
 - [ ] Basic Oat Flour Pancakes — 68→153 (check serving basis)
 - [x] ★ Blended Overnight Oats — 398→475
@@ -35,7 +63,7 @@ optional toppings included; precise after-values in `macro-audit.md`). 53 recipe
 - [ ] Caramelised Onion Rice with Tikka Cod — 488→578
 - [ ] Carrot Cake Meal Prep Baked Oats — 318→386
 - [ ] Chicken & Egg Breakfast Casserole — 228→315
-- [ ] Chicken and Potato Traybake — 448→589 (see dup, §C)
+- [ ] Chicken and Potato Traybake — 448→589 (§C survivor; may still want the §A fat recompute — skin-on legs+thighs+Flora)
 - [ ] Chicken Shawarma Crispy Rice Salad — 488→657
 - [ ] Chile Lime Chipotle Chicken — 338→392
 - [ ] Chili Crunch Ground Chicken Bowls — 398→498
@@ -59,7 +87,7 @@ optional toppings included; precise after-values in `macro-audit.md`). 53 recipe
 - [ ] Crispy Rice Paper Spring Rolls Without Frying — 198→412
 - [ ] Crispy Rice Tuna Salad — 418→494
 - [ ] Crispy Rosemary Chicken w/ Apple Beetroot Slaw — 412→742 (+null macros)
-- [ ] Easy Chicken Traybake — 448→589 (see dup, §C)
+- [x] Easy Chicken Traybake — DELETED as §C duplicate (survivor = Chicken and Potato Traybake)
 - [ ] Easy Chipotle Chicken & Corn Salsa — 338→425
 - [ ] Easy Tuna Salad Mix — 148→224
 - [ ] Fluffy Breakfast Carrot Cake Loaf — 250→330 (+null macros)
@@ -93,24 +121,24 @@ optional toppings included; precise after-values in `macro-audit.md`). 53 recipe
 - [ ] Peanut Butter and Jam Breakfast Oat Bars — 248→374
 - [ ] Peanut Tofu Salad Jars — 278→351
 - [ ] Pho Gà - Vietnamese Chicken Pho — 501 (protein 20→higher; soup, fat renders)
-- [ ] Phò Inspired Chicken Broth and Rice — 352→468
+- [x] Phò Inspired Chicken Broth and Rice — DONE (already populated: @food_bylucy, serves 2, 581/36/85/10/4.5/31, full ingredients match Saffron's paste). NB: distinct from "Sticky Soy Chicken w/ Garlic Rice" (also @food_bylucy) — confirmed 2026-07-23, they are two different recipes.
 - [ ] Prawn Fried Rice — 428→551
 - [ ] Protein Packed Roasted Squash Pasta — 348→597
 - [ ] Pumpkin Bread — 238→257
 - [ ] Pumpkin Brookies — 348→532
 - [ ] Pumpkin Candy Apple Salad — 498→913 (portion-heavy single serving)
 - [ ] Pumpkin Cream Cheese Muffins — 298→496
-- [x] Raspberry Cheesecake Protein Bowl — 225→**285** (Batch C, 2026-07-24; all 6 macros)
+- [x] Raspberry Cheesecake Protein Bowl — 225→**285** (Batch M, 2026-07-24; all 6 macros)
 - [x] ★ Raspberry Chocolate Chip Baked Oatmeal — 468→750
 - [ ] Raspberry Coconut Chocolate Bars — 128→190
-- [ ] Roast Chicken Rice Salad — 398→568 (see dup, §C)
+- [x] Roast Chicken Rice Salad — DELETED as §C duplicate (survivor = Roast Chicken and Charred Corn Rice Salad, 488)
 - [ ] Roasted Butternut Squash and Carrot Soup — 188→307
-- [x] Roasted Cod on Sweet Potato — 347→**590** (Batch C, 2026-07-24; all 6 macros)
+- [x] Roasted Cod on Sweet Potato — 347→**590** (Batch M, 2026-07-24; all 6 macros)
 - [ ] Salmon Crispy Rice Paper Bites — 198→275
 - [ ] Seared Miso Tuna Crispy Rice Bowl — 528→611
 - [ ] Simple Salmon Bowl — 488→561
 - [ ] Single Serve Double Chocolate Butter Cake — 278→357
-- [x] Single Serve Sticky Date Pudding — 235→**316** (Batch C, 2026-07-24; carbs+cal recomputed, fibre/sugar filled)
+- [x] Single Serve Sticky Date Pudding — 235→**316** (Batch M, 2026-07-24; carbs+cal recomputed, fibre/sugar filled)
 - [ ] Skillet Chicken Thighs with Mushroom Gravy — 318→418
 - [x] ★ Snickers Overnight Oats — 412→534
 - [ ] Speedy Pad Thai Noodle Salad — 420→560 (+null macros)
@@ -141,73 +169,75 @@ optional toppings included; precise after-values in `macro-audit.md`). 53 recipe
 
 Stored values look like per-recipe totals or wrong serving counts. Recompute AND decide serves.
 
-- [ ] Asian Chicken Salad w/ Cucumber & Seaweed — 461/50 → ~212/25 (2× high; +null macros)
-- [ ] Butternut Protein Brownie (butternut/egg-white) — 412/52 → ~110 (impossible protein)
-- [ ] Butternut Protein Brownie (pumpkin/egg-white) — 189 → ~98
-- [ ] Carrot Cake Loaf — 178/14.5 → ~100/7 (impossible protein)
-- [ ] Cinnamon Roll Baked Oats — 688 → ~515
-- [ ] Crispy Rice and Chicken Salad — 635 (cal ok) protein 51 → ~31
-- [ ] Fluffy Greek Yogurt Pancakes — 495 → ~193 (serves likely > 3)
-- [ ] Oat Flour Pancakes — 97 → ~53 (serves likely ~6, not 12)
-- [ ] Protein Brownie Bake — 318 → ~237
-- [ ] Protein Pancakes — 312 → ~52 (serves likely ~2-3, not 15)
-- [ ] Salmon Poke Bowl Meal Prep — 573/47 → ~400/14 (1 tin salmon; +null macros)
-- [ ] Sticky Miso Chicken Prep Boxes — 520/50 → ~428/37.6 (+null macros)
-- [ ] Gluten Free Cinnamon Buns — set serves to ~12 (800 g flour ÷6 is off)
-- [ ] Sticky Soy Chicken w/ Garlic Rice — set serves to 2 (then recompute ÷2)
+- [x] Asian Chicken Salad w/ Cucumber & Seaweed — Batch G, serves 2→1, 455/52/13/22/6.5/2.5 (full recipe supplied)
+- [x] Butternut Protein Brownie (butternut/egg-white) — Batch G, KEPT, recomputed 112/16/12/1.4/3.5/2 (serves 5)
+- [x] Butternut Protein Brownie (pumpkin/egg-white) — Batch G, DEDUPED (import_status='deleted')
+- [x] Carrot Cake Loaf — Batch G, serves 5, 104/7.5/13.5/2.5/2.5/4 (full recipe supplied; walnuts optional/excl)
+- [x] Cinnamon Roll Baked Oats — Batch G, split into @entirelyemmy (serves 10, 284) + @tracesoats (renamed from "Air Fryer Cinnamon Roll Oats", 641). See §A note.
+- [x] Crispy Rice and Chicken Salad — Batch G, serves 2, 638/40/54/29/5.5/15 (full recipe supplied)
+- [x] Fluffy Greek Yogurt Pancakes — Batch G, serves 3, 225/13/25/8/2.5/8.5 (full recipe supplied)
+- [x] Oat Flour Pancakes — Batch G, serves 12, 56/2.6/7.5/1.7/0.75/2.4 (full recipe supplied)
+- [x] Protein Brownie Bake — Batch H, recompute 246/16/26/10.5/5.5/12 (serves 2, from existing list)
+- [x] Protein Pancakes — Batch I, per pancake, serves 15→12 per Saffron → 71/4/7.5/2.7/1.2/3.8
+- [x] Salmon Poke Bowl Meal Prep — Batch H, serves 2→1, 765/36/94/24/8/28 (full recipe supplied; kimchi excl, Greek yoghurt assumed)
+- [x] Sticky Miso Chicken Prep Boxes — Batch H, serves 3, 488/41.5/40.5/19/7/10.5 (full macros filled)
+- [x] Gluten Free Cinnamon Buns — Batch H→I, serves set to 12 (Saffron's final call), recompute 585/8/92/20.5/4.5/37.5 per bun (old 488 under-counted the 800g flour + honey + frosting)
+- [x] Sticky Soy Chicken w/ Garlic Rice — Batch I, RESOLVED: rice is COOKED (Saffron), chicken bumped to 2 breasts, serves 2 → 699/53.5/60/27/6/19. Ingredient list edited (1→2 breasts) per her instruction.
 
 ## C. Duplicate rows — dedupe (then correct the survivor)
 
-- [ ] High Protein Salmon Potato Salad — **two identical rows**, both null macros → delete one, fill the other (~869/42/70/36)
-- [ ] Roast Chicken Rice Salad ≈ Roast Chicken and Charred Corn Rice Salad — near-identical, stored 398 vs 488 → reconcile / dedupe
-- [ ] Easy Chicken Traybake ≈ Chicken and Potato Traybake — same recipe → dedupe
+- [x] High Protein Salmon Potato Salad — Batch K: soft-deleted the identical dup (033408e6), filled the survivor (fff8f78d) → 895/44/80/45/19.5/13 (serves 2)
+- [x] Roast Chicken Rice Salad ≈ Roast Chicken and Charred Corn Rice Salad — Batch L: kept "Roast Chicken and Charred Corn Rice Salad" (488/38, fuller row), deleted "Roast Chicken Rice Salad" (199a8e55).
+- [x] Easy Chicken Traybake ≈ Chicken and Potato Traybake — Batch L: kept "Chicken and Potato Traybake" (448/38, carbs 26), deleted "Easy Chicken Traybake" (60029cd9).
+
+**Also (not §C):** Marinated Fish Tacos (@recipe_tin) had null serves + null macros → Batch K set serves 3, filled 540/45/45/20/5/9.
 
 ## D. Ingredient-list integrity — fix ingredients BEFORE macros
 
-- [ ] Café Style Jacket Potatoes with Chicken, Bacon & Sweetcorn — no potato/corn in ingredient list
-- [ ] Chilli Lime Shrimp and Veggie Bowl — no vegetables listed (title says "Veggie")
-- [ ] Summer Salmon and Blackberry Salad — no blackberries listed
-- [ ] Quick Chinese Vegetable Noodle Soup — no noodles listed (also serves null, §B)
+- [x] Café Style Jacket Potatoes with Chicken, Bacon & Sweetcorn — no potato/corn in ingredient list — RESOLVED: was already renamed to "Chicken and Bacon Caesar Pasta Salad" in Batch C with the correct Caesar recipe + method + macros (541/59). No separate Café Style row remains in the DB. Saffron re-confirmed the same recipe/method 2026-07-23.
+- [x] Chilli Lime Shrimp and Veggie Bowl — no vegetables listed (title says "Veggie") — Batch D, 280 (veg = serving suggestion, excl)
+- [x] Summer Salmon and Blackberry Salad — no blackberries listed — Batch D, 638 (written as "Summer Salad with Blackened Salmon")
+- [x] Quick Chinese Vegetable Noodle Soup — no noodles listed (also serves null, §B) — Batch C, 196
 
 ## E. Empty ingredient lists — populate ingredients, then compute
 
-- [ ] Apple Almond Yogurt Bowl
-- [ ] Blended Raspberry Protein Chia Pudding
-- [ ] Bounty Bar Overnight Oats
-- [ ] Brownie Batter Overnight Oats
-- [ ] California Rolls in a Bowl
-- [ ] Carrot Cake Baked Oats (serves 1)
-- [ ] Strawberry Ice Cream
-- [ ] Vietnamese Noodles with Lemongrass Chicken
+- [x] Apple Almond Yogurt Bowl — Batch C, 397
+- [x] Blended Raspberry Protein Chia Pudding — Batch C, 283
+- [x] Bounty Bar Overnight Oats — Batch C, 556
+- [x] Brownie Batter Overnight Oats — Batch C, deleted (`import_status='deleted'`)
+- [x] California Rolls in a Bowl — Batch C, deleted (`import_status='deleted'`)
+- [x] Carrot Cake Baked Oats (serves 1) — Batch C, 718 (un-deleted → ready)
+- [x] Strawberry Ice Cream — Batch C, 282
+- [x] Vietnamese Noodles with Lemongrass Chicken — Batch C, 641
 
 ## F. Partial — need ONE missing quantity from you, then computable
 
 Mostly "rice/base to serve" with no amount, or an unweighted key item.
 
-- [ ] 30 Minute Bang Bang Chicken Bowls — rice/cauli-rice base qty
-- [ ] Bone Broth Smothered Chicken — white rice qty
-- [ ] Brothy Miso Ginger Chicken and Rice — white rice qty
-- [ ] Buffalo Chicken Wrap — how much of the slaw/dressing is actually used
-- [ ] Burger Bowl — 13 of 16 ingredients unquantified
-- [ ] Caramel Rice Cake Strawberry Treat — PB / chocolate / yoghurt qty
-- [ ] Chili Honey Chicken Bowl — rice qty
-- [ ] Chipotle Chicken & Rice Skillet — rice qty
-- [ ] Creamy Thai Coconut Chicken Meatballs — rice qty (+null macros)
-- [ ] Crispy Chilli Beef Protein Bowls — rice qty
-- [ ] Crispy Gluten Free Shrimp Dumplings — glutinous-rice-flour wrapper qty
-- [ ] Double Roast Chicken with Chicken Fat Rice — 2 whole-chicken weights (stored null)
-- [ ] Frozen Strawberry Raspberry PB Bites — PB & "1 bag" chocolate qty
-- [ ] GF Easy Pan Dumplings (No Wrappers) — coating flour qty (stored null)
-- [ ] GF Easy Pan Dumplings (Pan-Fried) — shaping starch qty (stored null)
-- [ ] Green Goddess Chicken Prep Mix — protein 24→~35; fill null macros
-- [ ] Harissa Chicken with Roasted Veg and Feta — feta qty (+null macros)
-- [ ] Honey Sesame Salmon Bowl — rice & mayo qty
-- [ ] Instant Noodle Jars — tofu qty
-- [ ] Mediterranean Chicken & Rice Skillet — rice qty (stored protein looks high)
-- [ ] Peanut Butter Banana French Toast — PB & banana qty
-- [ ] Peanut Butter Chicken Katsu Noodles — rice & chicken qty
-- [ ] Stuffed Breakfast Chicken Sausage Pitas — sausage type; avocado optional (+null macros)
-- [ ] Thai Style Chicken Satay — rice qty
+- [x] 30 Minute Bang Bang Chicken Bowls — rice/cauli-rice base qty — Batch D, 571 (rice excl)
+- [x] Bone Broth Smothered Chicken — white rice qty — Batch D, 650 (rice excl)
+- [x] Brothy Miso Ginger Chicken and Rice — white rice qty — Batch D, 555 (rice excl)
+- [x] Buffalo Chicken Wrap — how much of the slaw/dressing is actually used — Batch D, 600
+- [x] Burger Bowl — 13 of 16 ingredients unquantified — Batch D, 472
+- [x] Caramel Rice Cake Strawberry Treat — PB / chocolate / yoghurt qty — Batch D, 409
+- [x] Chili Honey Chicken Bowl — rice qty — Batch D, 667 (rice excl)
+- [x] Chipotle Chicken & Rice Skillet — rice qty — Batch D, 424 (rice excl; protein 24.5 open decision, see macro-audit.md)
+- [x] Creamy Thai Coconut Chicken Meatballs — rice qty (+null macros) — Batch D, 305 (rice excl)
+- [x] Crispy Chilli Beef Protein Bowls — rice qty — Batch D, 437 (rice excl)
+- [x] Crispy Gluten Free Shrimp Dumplings — glutinous-rice-flour wrapper qty — Batch E, 68 (coating ~15g adhered assumed, confirmed)
+- [x] Double Roast Chicken with Chicken Fat Rice — 2 whole-chicken weights (stored null) — Batch E, 534 (1.15kg raw/chicken, ~52% roasted yield assumed, confirmed)
+- [x] Frozen Strawberry Raspberry PB Bites — PB & "1 bag" chocolate qty — Batch F, 144 (200g strawb / 150g rasp / 8 tsp PB / 100g dark choc; qtys supplied by Saffron)
+- [x] GF Easy Pan Dumplings (No Wrappers) — coating flour qty (stored null) — Batch E, 170 (coating ~15g adhered assumed, confirmed)
+- [x] GF Easy Pan Dumplings (Pan-Fried) — shaping starch qty (stored null) — Batch E, 328 (coating ~15g adhered assumed, confirmed)
+- [x] Green Goddess Chicken Prep Mix — protein 24→~35; fill null macros — Batch E, 267/28 (full recipe supplied)
+- [x] Harissa Chicken with Roasted Veg and Feta — feta qty (+null macros) — Batch E, 943 (feta excl per Saffron; thigh weight assumed, confirmed)
+- [x] Honey Sesame Salmon Bowl — rice & mayo qty — Batch E, 463 (rice excl; mayo 1 tbsp)
+- [x] Instant Noodle Jars — tofu qty — Batch E, 956 (tofu block assumed 300g, confirmed)
+- [x] Mediterranean Chicken & Rice Skillet — rice qty (stored protein looks high) — Batch E, 377 (rice excl; thigh weight assumed)
+- [x] Peanut Butter Banana French Toast — PB & banana qty — Batch E, 627 (small banana ~100g, 1 tbsp PB)
+- [x] Peanut Butter Chicken Katsu Noodles — rice & chicken qty — Batch F, 430 (rice excl; 150g cooked chicken breast/serving)
+- [x] Stuffed Breakfast Chicken Sausage Pitas — sausage type; avocado optional (+null macros) — Batch F, 397 (full recipe supplied; base w/o optional avocado)
+- [x] Thai Style Chicken Satay — rice qty — Batch F, 496 (rice excl; light coconut)
 
 ## G. Macro-completeness fills — calories/protein look right, but carbs/fat/fibre/sugar are null
 
@@ -216,40 +246,45 @@ DB (filled in parallel; row-by-row confirmed). Left un-ticked individually as th
 
 Quick wins: recompute just fills the missing macro fields (cal/protein already close).
 
-- [ ] Banh Cuon - Vietnamese Rice Paper Rolls (fibre/sugar)
-- [ ] Cauliflower Cheese Gnocchi Bake (carbs/fat/fibre/sugar)
-- [ ] Char Siu Chicken (fibre/sugar)
-- [ ] Chipotle Chicken Chop Bowl (fibre/sugar)
-- [ ] Chocolate Banana Rice Paper Pie (fibre/sugar)
-- [ ] Chocolate Chia Mousse (all macros)
-- [ ] Creamy Mango and Coconut Cod Curry (all macros)
-- [ ] Double Choc Fudge Cookie (all macros)
-- [ ] Frozen Berry Breakfast Crumble (all macros)
-- [ ] Healthy Orange & Cashew Chicken (all macros)
-- [ ] High Protein Brownie Bowl (fibre/sugar)
-- [ ] High Protein Chocolate Lava Pudding (all macros)
-- [ ] High Protein Tiramisu Overnight Oats (fibre/sugar)
-- [ ] High Protein Tuna Salad (fibre/sugar)
-- [ ] Homemade Carrot Cake (fibre/sugar)
-- [ ] Lemon and Coconut Cake (fibre/sugar)
-- [ ] Meal Prep Spicy Tuna Quesadilla (all macros)
-- [ ] Nandos Chicken Pasta Salad (fibre/sugar)
-- [ ] Protein Berry Parfait (all macros)
-- [ ] Protein Pancakes (Simple) (fibre/sugar)
-- [ ] Protein Power BLT (all macros)
-- [ ] Rice Paper Kimchi Jeon with Tuna (fibre/sugar)
-- [ ] Rice Paper Pad See Ew with Shrimp (fibre/sugar)
-- [ ] Smoky Caramelised Red Pepper Orzo (all macros)
-- [ ] Spicy Chilli Rice Paper Wontons with Shrimp (fibre/sugar)
-- [ ] Spicy Peanut Chicken Noodles (fibre/sugar)
-- [ ] Spring Greens Carbonara (all macros)
-- [ ] Sticky Mango Chicken Prep Bowls (all macros)
-- [ ] Sticky Miso Chicken Bowl w/ Tahini Broccoli (all macros)
-- [ ] Sushi Salad (all macros)
-- [ ] Sweet Potato Beef Taco Bowl (fibre/sugar)
-- [ ] Thai Prawn Meatball Bowl w/ Spicy Peanut Sauce (all macros)
-- [ ] Tuna Chilli Crunch Salad (all macros)
-- [ ] Zesty + Spicy Chicken Fusion Bowl (fibre/sugar)
+**✅ ALL 34 DONE — Batch J (2026-07-23).** Filled the missing carbs/fat/fibre/sugar (kept
+existing cal/protein) for every recipe below, staple-grounded from the DB ingredient lists.
+17 had all four null; 17 needed only fibre/sugar. Plus the Blueberry Protein Yoghurt Bowl
+(sugar-only gap, not on this list) filled in passing. See macro-audit.md Batch J.
+
+- [x] Banh Cuon - Vietnamese Rice Paper Rolls (fibre/sugar)
+- [x] Cauliflower Cheese Gnocchi Bake (carbs/fat/fibre/sugar)
+- [x] Char Siu Chicken (fibre/sugar)
+- [x] Chipotle Chicken Chop Bowl (fibre/sugar)
+- [x] Chocolate Banana Rice Paper Pie (fibre/sugar)
+- [x] Chocolate Chia Mousse (all macros)
+- [x] Creamy Mango and Coconut Cod Curry (all macros)
+- [x] Double Choc Fudge Cookie (all macros)
+- [x] Frozen Berry Breakfast Crumble (all macros)
+- [x] Healthy Orange & Cashew Chicken (all macros)
+- [x] High Protein Brownie Bowl (fibre/sugar)
+- [x] High Protein Chocolate Lava Pudding (all macros)
+- [x] High Protein Tiramisu Overnight Oats (fibre/sugar)
+- [x] High Protein Tuna Salad (fibre/sugar)
+- [x] Homemade Carrot Cake (fibre/sugar)
+- [x] Lemon and Coconut Cake (fibre/sugar)
+- [x] Meal Prep Spicy Tuna Quesadilla (all macros)
+- [x] Nandos Chicken Pasta Salad (fibre/sugar)
+- [x] Protein Berry Parfait (all macros)
+- [x] Protein Pancakes (Simple) (fibre/sugar)
+- [x] Protein Power BLT (all macros)
+- [x] Rice Paper Kimchi Jeon with Tuna (fibre/sugar)
+- [x] Rice Paper Pad See Ew with Shrimp (fibre/sugar)
+- [x] Smoky Caramelised Red Pepper Orzo (all macros)
+- [x] Spicy Chilli Rice Paper Wontons with Shrimp (fibre/sugar)
+- [x] Spicy Peanut Chicken Noodles (fibre/sugar)
+- [x] Spring Greens Carbonara (all macros)
+- [x] Sticky Mango Chicken Prep Bowls (all macros)
+- [x] Sticky Miso Chicken Bowl w/ Tahini Broccoli (all macros)
+- [x] Sushi Salad (all macros)
+- [x] Sweet Potato Beef Taco Bowl (fibre/sugar)
+- [x] Thai Prawn Meatball Bowl w/ Spicy Peanut Sauce (all macros)
+- [x] Tuna Chilli Crunch Salad (all macros)
+- [x] Zesty + Spicy Chicken Fusion Bowl (fibre/sugar)
 
 ---
 
@@ -257,13 +292,16 @@ Quick wins: recompute just fills the missing macro fields (cal/protein already c
 
 | Section | Count |
 |---|---|
-| A. Recalculate — under-counted | 111 (14 ★ done → **97 left**) |
-| B. Over-stated / serving-count | 14 |
-| C. Duplicate rows | 3 |
-| D. Ingredient-list integrity | 4 |
-| E. Empty ingredient lists | 8 |
-| F. Partial — need one quantity | 24 |
-| G. Macro-completeness fills | 34 |
+| A. Recalculate — under-counted | 111 (18 done → **93 left**) |
+| B. Over-stated / serving-count | 14 (all done ✅) |
+| C. Duplicate rows | 3 (all done ✅) |
+| D. Ingredient-list integrity | 4 (all done ✅ — Café Style resolved via the Batch C rename) |
+| E. Empty ingredient lists | 8 (all done) |
+| F. Partial — need one quantity | 24 (all done ✅) |
+| G. Macro-completeness fills | 34 (all done ✅ — Batch J) |
 
 Some recipes appear in two sections (e.g. a dedupe that also needs a recompute); net unique
 ≈ 190 of the ~310 ready recipes. The clean, fully-correct remainder needs nothing.
+
+**As of 2026-07-23 (Batches E–L): only §A remains — 93 under-count recomputes.** See the
+▶ RESUME HERE banner at the top for the method and the judgement-call exceptions.
