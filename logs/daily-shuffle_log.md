@@ -4,6 +4,107 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# PR #48 remaining work — Batch M: final 3 null-macro fills (library → 0 nulls)
+**Date:** 2026-07-24
+**Project:** Daily Shuffle — recipe library macros (Supabase `recipes`)
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete — data written, verified, draft PR #49 open
+
+---
+
+## Project Context
+Continuation of the recipe-macro correction stream (Batches A–F; see `logs/macro-audit.md`
+and PR #46/#47/#48). This is the **hand-patching** macro stream that writes 6-macro
+per-serving values directly to `recipes` — distinct from the blocked systematic "step 3"
+nutrition pipeline (which still waits on `ingredient_grams`/step 2). Task was "pick up PR #48
+remaining work." PR #48 (`claude/pr-47-outstanding-sections-ucxebb`) closed §F 24/24 and
+listed §B/§C/§G/§A-leftovers/§D as still outstanding.
+
+## Session Goal
+Continue PR #48's outstanding macro work on the designated branch
+`claude/pr-48-remaining-work-raln2k` (a **new** branch → new PR, since #48 is a separate head).
+
+## State Before This Session
+Worklist `logs/remaining-work.md` implied large outstanding buckets (§A 97, §B 14, §C 3,
+§E 8, §F 24, §G 34). **The worklist was badly stale.** A live DB sweep at session start showed
+the ready library (307 rows) was far more complete than the worklist recorded.
+
+## What Was Done
+1. **DB completeness sweep** — of 307 `import_status='ready'` recipes, only **3** still had any
+   null macro. §G (34) already fully populated (verified). §C dupes resolved (dupe rows
+   soft-`deleted`, survivors clean — e.g. High Protein Salmon Potato Salad, Roast Chicken Rice
+   Salad, Easy Chicken Traybake). §E empty lists all populated. This cleanup was done by Saffron
+   in parallel (noted in Batch B) — not this session.
+2. **Recomputed + wrote the 3 stragglers** (the §A "+null macros" recipes Batch B skipped), all
+   6 macros/serving from `ingredient_sections`, grounded in `staple_products`:
+   - Raspberry Cheesecake Protein Bowl (id `7495b06c…`): 225 → **285/31/16/10/4.5/10**
+   - Roasted Cod on Sweet Potato (id `ed533df0…`): 347 → **590/41/73/14.5/10.5/23**
+   - Single Serve Sticky Date Pudding (id `0a7f5180…`): 235 → **316/12/57/5.5/2.5/32**
+3. **Verified:** post-write sweep = 0/307 ready rows with any null macro (100% complete).
+4. Updated `logs/macro-audit.md` (new Batch M) and annotated stale `logs/remaining-work.md`.
+5. Committed (`6c05b6b`), pushed, opened **draft PR #49**, subscribed to its activity.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| Supabase `recipes` (3 rows) | Macro fills by id | Modified | Supabase `jsxcctrskkkxgdxfaduo` |
+| logs/macro-audit.md | Batch C entry + per-ingredient math | Modified | /home/user/daily-shuffle/logs/ |
+| logs/remaining-work.md | 3 ticks, §G resolved, 2026-07-24 status header | Modified | /home/user/daily-shuffle/logs/ |
+| scratchpad/null-macro-fills-review.md | Pre-write review sheet (working, not committed) | Created | session scratchpad |
+| logs/daily-shuffle_log.md | This entry | Modified | /home/user/daily-shuffle/logs/ |
+
+No `index.html`/`sw.js`/`manifest.json` change — data-only, **no cache bump** (per CLAUDE.md).
+
+## Decisions & Reasoning
+- **Picked the 3 null-macro rows as the deliverable** (vs. §B/§C/§D): they were the only
+  genuinely-outstanding, decision-free, fully-computable work. §C dedupes = destructive deletes
+  needing Saffron's call (recipe-db skill forbids autonomous DELETEs); §B = serve-count
+  decisions; §D/§A-leftovers = need source data / eyeball. So this closes the autonomous tail
+  cleanly and takes the library to 100% macro-completeness.
+- **Roasted Cod protein lowered 49.1 → 41**: recomputed calories hit the audit target (571);
+  at that calorie level the ingredient list (2 cod fillets ≈ 290 g) computes to ~41 g protein,
+  so the stored 49.1 was inconsistent. Faithful-to-ingredients wins over preserving a rough prior.
+- **Sticky Date Pudding recomputed all 6, not just the 2 nulls**: stored carbs (35) and cal
+  (235) were undercounted (date + flour + maple sum to ~57 g carbs / 316 kcal); protein/fat
+  were already right and kept.
+- **No `review_flags` added** to the 3 rows despite raspberry-qty / cream-cheese-type estimates:
+  every macro row in the library is an estimate and none carry the flag; adding it to just these
+  3 would be inconsistent noise. Estimates documented in the audit log instead (recipe-db rule 5
+  balanced against library-wide precedent).
+
+## Current State (end of session)
+Complete. `recipes` ready library at 0 null macros. Draft PR #49 open with the two log files.
+No app-code change. PR #49 subscribed for activity (no CI in this repo — `get_status` total_count=0).
+
+## Next Steps
+1. Saffron reviews/merges draft **PR #49**.
+2. Decision-gated remainder (future session, needs Saffron): **§B** serving-count fixes;
+   **§D** ingredient-list gaps (Café Style Jacket Potatoes has no potato/corn listed);
+   **§A** eyeball/uncertain leftovers — Basic Oat Flour Pancakes (serving basis), Thai Red
+   Curry Pot Roast & Pho Gà (whole-bird/soup fat-rendering), Middle Eastern Chicken & Rice
+   Bowl (rice qty).
+3. Also surfaced (not acted on): **three** `Carrot Cake Baked Oats` rows are all `ready`
+   (718/serves-1, 268/serves-1, 407/serves-4) — possible unintended duplicate; Saffron's call.
+
+## Open Questions / Blockers
+- Which of the 3 `Carrot Cake Baked Oats` rows (if any) is a dupe to soft-delete — Saffron's call.
+- Systematic nutrition "step 3" remains blocked on `ingredient_grams`/step 2 (unchanged).
+
+## Environment & Config Notes
+Repo `saffronlm-cmyk/daily-shuffle`, branch `claude/pr-48-remaining-work-raln2k`, draft PR **#49**
+(base `main`). Supabase project `jsxcctrskkkxgdxfaduo`, table `recipes` (307 ready of 338).
+Wrote by explicit `id` UPDATEs via Supabase MCP `execute_sql`. No cache bump.
+
+## Notes & Gotchas
+- **`logs/remaining-work.md` is stale** — do NOT trust its checkboxes. Trust a live DB sweep
+  (`select count(*) filter (where …is null)`). Its per-section boxes were left mostly un-ticked
+  on purpose; the 2026-07-24 status header at the top reconciles it against reality.
+- The macro hand-patching stream writes cal/protein/carbs/fat/fibre/sugar **directly** to
+  `recipes` — this is NOT the blocked step-3 pipeline; don't conflate them.
+- Recipe-db skill's review-CSV-before-write rule: honored via
+  `scratchpad/null-macro-fills-review.md`; only 3 rows (under the ~10-row bulk threshold).
+
 # Recipe Macro Corrections — Batches E–L (PR #48)
 **Date:** 2026-07-24
 **Project:** Daily Shuffle — recipe library macro audit (Supabase `recipes`)

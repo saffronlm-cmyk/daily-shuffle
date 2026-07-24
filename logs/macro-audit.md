@@ -1241,3 +1241,40 @@ rows so a future §A pass doesn't recompute them. The surviving "Chicken and Pot
 (448) may still merit the §A fat recompute (skin-on legs+thighs+Flora ~589) — left flagged in §A.
 
 Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.
+
+---
+
+## Batch M — final 3 null-macro §A fills; ready library reaches 0 nulls (2026-07-24) — WRITTEN
+
+Picked up the tail of PR #48's outstanding work. A fresh DB completeness sweep showed the
+`recipes` library had moved a long way since the worklist was written: of **307
+`import_status='ready'` rows, only 3 still carried any null macro** — the three §A recipes
+Batch B had explicitly skipped as "+null macros". Batches E–L (merged via PR #48) had since
+closed §B/§C/§D/§E/§G, so these three §A stragglers were the only remaining rows in the whole
+`ready` set still carrying a null macro. (§A itself still has ~90 under-count recalcs open.)
+
+Recomputed all 6 macros per serving from `ingredient_sections`, grounded in `staple_products`.
+Format: `kcal / protein / carbs / fat / fibre / sugar` per serving. Per-ingredient math in
+`scratchpad/null-macro-fills-review.md`.
+
+| Recipe | serves | Before | After |
+|---|---|---|---|
+| Raspberry Cheesecake Protein Bowl | 1 | 225/21/–/–/–/– | **285/31/16/10/4.5/10** |
+| Roasted Cod on Sweet Potato | 2 | 347/49.1/–/–/–/– | **590/41/73/14.5/10.5/23** |
+| Single Serve Sticky Date Pudding | 1 | 235/12/35/5/–/– | **316/12/57/5.5/2.5/32** |
+
+**Eyeball notes:**
+- **Roasted Cod** — recomputed calories land on the audit target (571); at that calorie level
+  the ingredient list computes to ~41 g protein per serve, so the stored 49.1 looked high and
+  was lowered to match the list (2 cod fillets ≈ 290 g).
+- **Sticky Date Pudding** — stored protein (12) and fat (5) were already right; carbs (35) and
+  calories (235) were undercounted (date + flour + maple), corrected to 57 / 316; fibre + sugar
+  filled. Caramel sauce (Biscoff + maple) counted; "sweetener" treated as non-nutritive.
+- **Raspberry Cheesecake Bowl** — 0% Greek + ½ scoop whey give ~31 g protein; the stored 21 was
+  undercounted. Raspberry quantity and whipped-cream-cheese type are estimates (flagged here,
+  not in the row, consistent with every other estimated macro row in the library).
+
+**VERIFY:** read-back confirmed all 3 rows; post-write completeness sweep = **0/307 ready rows
+with any null macro** (library macro-completeness now 100%).
+
+Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.
