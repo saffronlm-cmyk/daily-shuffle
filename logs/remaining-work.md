@@ -23,7 +23,7 @@ optional toppings included; precise after-values in `macro-audit.md`). 53 recipe
 - [ ] Caramelised Onion Rice with Tikka Cod — 488→578
 - [ ] Carrot Cake Meal Prep Baked Oats — 318→386
 - [ ] Chicken & Egg Breakfast Casserole — 228→315
-- [ ] Chicken and Potato Traybake — 448→589 (see dup, §C)
+- [ ] Chicken and Potato Traybake — 448→589 (§C survivor; may still want the §A fat recompute — skin-on legs+thighs+Flora)
 - [ ] Chicken Shawarma Crispy Rice Salad — 488→657
 - [ ] Chile Lime Chipotle Chicken — 338→392
 - [ ] Chili Crunch Ground Chicken Bowls — 398→498
@@ -47,7 +47,7 @@ optional toppings included; precise after-values in `macro-audit.md`). 53 recipe
 - [ ] Crispy Rice Paper Spring Rolls Without Frying — 198→412
 - [ ] Crispy Rice Tuna Salad — 418→494
 - [ ] Crispy Rosemary Chicken w/ Apple Beetroot Slaw — 412→742 (+null macros)
-- [ ] Easy Chicken Traybake — 448→589 (see dup, §C)
+- [x] Easy Chicken Traybake — DELETED as §C duplicate (survivor = Chicken and Potato Traybake)
 - [ ] Easy Chipotle Chicken & Corn Salsa — 338→425
 - [ ] Easy Tuna Salad Mix — 148→224
 - [ ] Fluffy Breakfast Carrot Cake Loaf — 250→330 (+null macros)
@@ -91,7 +91,7 @@ optional toppings included; precise after-values in `macro-audit.md`). 53 recipe
 - [ ] Raspberry Cheesecake Protein Bowl — 225→303 (+null macros)
 - [x] ★ Raspberry Chocolate Chip Baked Oatmeal — 468→750
 - [ ] Raspberry Coconut Chocolate Bars — 128→190
-- [ ] Roast Chicken Rice Salad — 398→568 (see dup, §C)
+- [x] Roast Chicken Rice Salad — DELETED as §C duplicate (survivor = Roast Chicken and Charred Corn Rice Salad, 488)
 - [ ] Roasted Butternut Squash and Carrot Soup — 188→307
 - [ ] Roasted Cod on Sweet Potato — 347→571 (+null macros)
 - [ ] Salmon Crispy Rice Paper Bites — 198→275
@@ -147,8 +147,8 @@ Stored values look like per-recipe totals or wrong serving counts. Recompute AND
 ## C. Duplicate rows — dedupe (then correct the survivor)
 
 - [x] High Protein Salmon Potato Salad — Batch K: soft-deleted the identical dup (033408e6), filled the survivor (fff8f78d) → 895/44/80/45/19.5/13 (serves 2)
-- [ ] Roast Chicken Rice Salad ≈ Roast Chicken and Charred Corn Rice Salad — CONFIRMED duplicates (both @natsnourishments, identical ingredients/method). Awaiting Saffron's pick of which survives (2026-07-23).
-- [ ] Easy Chicken Traybake ≈ Chicken and Potato Traybake — CONFIRMED duplicates (both @natsnourishments, identical ingredients/method). Awaiting Saffron's pick of which survives (2026-07-23).
+- [x] Roast Chicken Rice Salad ≈ Roast Chicken and Charred Corn Rice Salad — Batch L: kept "Roast Chicken and Charred Corn Rice Salad" (488/38, fuller row), deleted "Roast Chicken Rice Salad" (199a8e55).
+- [x] Easy Chicken Traybake ≈ Chicken and Potato Traybake — Batch L: kept "Chicken and Potato Traybake" (448/38, carbs 26), deleted "Easy Chicken Traybake" (60029cd9).
 
 **Also (not §C):** Marinated Fish Tacos (@recipe_tin) had null serves + null macros → Batch K set serves 3, filled 540/45/45/20/5/9.
 
@@ -251,7 +251,7 @@ existing cal/protein) for every recipe below, staple-grounded from the DB ingred
 |---|---|
 | A. Recalculate — under-counted | 111 (14 ★ done → **97 left**) |
 | B. Over-stated / serving-count | 14 (all done ✅) |
-| C. Duplicate rows | 3 (1 done — salmon salad; 2 awaiting Saffron's dedupe pick) |
+| C. Duplicate rows | 3 (all done ✅) |
 | D. Ingredient-list integrity | 4 (all done ✅ — Café Style resolved via the Batch C rename) |
 | E. Empty ingredient lists | 8 (all done) |
 | F. Partial — need one quantity | 24 (all done ✅) |

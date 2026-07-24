@@ -1223,3 +1223,21 @@ Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cach
   and method. Near-identical macros (carbs 22 vs 26).
 
 Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.
+
+---
+
+## Batch L — §C traybake + rice-salad dedupes (2026-07-23) — WRITTEN
+
+Saffron approved keeping the recommended survivors. Soft-deleted the two duplicate rows
+(`import_status='deleted'`); survivors already carry correct macros, no recompute needed.
+
+- **Roast Chicken Rice Salad** (`199a8e55…`, 398/32) → DELETED. Survivor: **Roast Chicken and
+  Charred Corn Rice Salad** (`326278cf…`, 488/38/62/18/6/8) — the fuller, more accurate row.
+- **Easy Chicken Traybake** (`60029cd9…`, 448/38) → DELETED. Survivor: **Chicken and Potato
+  Traybake** (`93442c4f…`, 448/38/26/22/4/3).
+
+**§C now fully closed (3/3).** Also tidied the §A worklist lines that referenced the deleted
+rows so a future §A pass doesn't recompute them. The surviving "Chicken and Potato Traybake"
+(448) may still merit the §A fat recompute (skin-on legs+thighs+Flora ~589) — left flagged in §A.
+
+Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.
