@@ -4,6 +4,96 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# Session close-out — macro-correction stream fully complete (Batches M–O)
+**Date:** 2026-07-24
+**Project:** Daily Shuffle — recipe library macros (Supabase `recipes`)
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete — §A–§G closed; library at 0 null macros; all PRs merged
+
+---
+
+## Project Context
+Wrap-up of the recipe macro-correction stream that ran across today's Batches M, N, and O
+(each has its own detailed entry below — see the Batch M / N / O entries dated 2026-07-24 for
+per-recipe math and reasoning; this entry is the consolidated "where it all landed" record).
+The stream corrected per-serving macros on the bundled Supabase `recipes` library that backs
+the live PWA. This is the **hand-patching** stream (writes 6 macros straight to `recipes`), not
+the blocked systematic step-3 pipeline (still waiting on `ingredient_grams` / PR #36).
+
+## Session Goal
+Pick up "PR #48 remaining work" and drive the macro-correction worklist to completion.
+
+## State Before This Session
+PR #48 (Batches E–L) had just merged to `main`, closing §B/§C/§D/§E/§F/§G. `remaining-work.md`
+claimed §A had ~90 open items. Ready library had a handful of null-macro rows.
+
+## What Was Done (arc of the whole session)
+1. **Batch M** — filled the last 3 null-macro §A rows (Raspberry Cheesecake Bowl →285, Roasted
+   Cod on Sweet Potato →590, Single Serve Sticky Date Pudding →316). Library reached 0 nulls.
+   → PR #49, merged.
+2. **Merge-conflict resolution** — PR #48 landed in `main` mid-session; resolved conflicts in all
+   3 log files (renamed my "Batch C" → "Batch M" to avoid colliding with main's Batch C).
+3. **PR cleanup** (on Saffron's "merge to main and delete conflicting PRs/branches") — merged
+   #49; closed **#47** (superseded by #48). Branch deletion **blocked** by egress policy.
+4. **Batch N** — reconciled §A against the live DB instead of trusting the worklist: **84 of ~90
+   "open" items were already written by Batch B and just never ticked** → verified + ticked. Only
+   3 genuinely needed recompute (Single Serve Double Choc Butter Cake →358, Skillet Chicken Thighs
+   w/ Mushroom Gravy →425, Basic Oat Flour Pancakes →160). → PR #50, merged.
+5. **Batch O** — resolved the final 4 decision-gated §A items with Saffron's per-recipe calls:
+   Middle Eastern Chicken & Rice Bowl →658 (½ cup rice/serve), Pho Gà →750 (full edible meat
+   split ÷4), Thai Red Curry Pot Roast →920 (meat only, oil reduced, rice excluded + noted),
+   Chicken and Potato Traybake →590 (eyeball). → PR #51, merged. **§A–§G now fully closed.**
+
+## Artifacts Produced / Modified
+Across the session (all merged to `main`):
+
+| File | What it is | Status |
+|------|------------|--------|
+| Supabase `recipes` | 10 rows rewritten (M:3, N:3, O:4) + flags cleared / notes appended | Modified |
+| logs/macro-audit.md | Batches M, N, O entries | Modified |
+| logs/remaining-work.md | All §A ticked; RESUME rewritten to COMPLETE | Modified |
+| logs/daily-shuffle_log.md | Batch M/N/O entries + this close-out | Modified |
+| scratchpad/reconcile.py, null-macro-fills-review.md | Working artifacts (not committed) | Created |
+
+No `index.html`/`sw.js`/`manifest.json` change all session — **no cache bump** (data-only).
+
+## Decisions & Reasoning
+- **Reconcile before recompute (the session's key move)**: comparing each §A item's stored
+  calories to its worklist "before" value revealed the worklist was stale, not the DB — saving
+  ~84 needless rewrites and avoiding divergence from Batch B's values.
+- **Followed Saffron's per-recipe calls exactly** for the 4 decision-gated items rather than my
+  own defaults (she chose full meat yield for pho, meat-only + reduced oil for the curry, etc.).
+- **Left the higher calorie results as computed** (pho 750, curry 920) — legitimate once full
+  meat/coconut cream are counted; the old 501/548 were undercounts.
+
+## Current State (end of session)
+**Done.** All 311 ready recipes carry a full 6-macro set (0 nulls). Every worklist section
+§A–§G is closed. PRs #49/#50/#51 merged; #47 closed. `main` @ fd75a59.
+
+## Next Steps
+1. Nothing required — the macro stream is complete. Optional loose ends Saffron may want later:
+   - Three `Carrot Cake Baked Oats` rows all `ready` (718/serves-1, 268/serves-1, 407/serves-4) —
+     possible unintended duplicate; her call which (if any) to soft-delete.
+   - 4 independent open PRs untouched: **#36** qty-normalisation (nutrition step 2 apply), **#14**
+     Apify quota/`--resume`, **#5** RLS lockdown, **#45** japchae log fix.
+   - Next real workstream is nutrition **step 2** (apply `ingredient_grams`, PR #36) → then step 3.
+
+## Open Questions / Blockers
+- Systematic step-3 nutrition still blocked on step 2 (`ingredient_grams`), unchanged.
+
+## Environment & Config Notes
+Repo `saffronlm-cmyk/daily-shuffle`; work branch `claude/pr-48-remaining-work-raln2k` (restarted
+from `origin/main` after each merge — its PRs #49/#50/#51 are all merged, so reused per the
+merged-PR workflow). Supabase `jsxcctrskkkxgdxfaduo`, table `recipes`. No cache bump this session.
+
+## Notes & Gotchas
+- **Trust the live DB, not the worklist checkboxes.** The whole §A "90 open" figure was stale;
+  always reconcile stored values against the DB before recomputing.
+- **Branch deletion is blocked in this environment** (git push --delete → 403 egress policy; no
+  `delete_branch` MCP tool). Stale merged `claude/*` branches must be cleared from the GitHub UI.
+- Rice-exclusion / meat-split assumptions for the pot recipes are recorded in each row's `notes`
+  (Thai curry, Pho Gà) — don't "recorrect" them; they reflect Saffron's explicit calls.
+
 # Batch O — 3 decision-gated §A recipes resolved with Saffron's calls
 **Date:** 2026-07-24
 **Project:** Daily Shuffle — recipe library macros (Supabase `recipes`)
