@@ -1,13 +1,46 @@
 # Remaining recipe edits — master worklist
 
-Everything still outstanding after the 39 already corrected (Batch A + Tier 1 + Tier 2
-tranche 1). Compiled from the library audit (`macro-audit.md`). Format for recalcs:
+Compiled from the library audit (`macro-audit.md`). Format for recalcs:
 `stored kcal → recompute estimate`. Defaults when firming: **light coconut** (unless recipe
 says otherwise), **cooked quinoa**, **85 g instant-noodle pack**. Estimates are audit-pass
-figures; each gets firmed to precise 6-macro per-serving values when you pick it.
+figures; each gets firmed to precise 6-macro per-serving values when written.
 
 ★ = was on the Tier 2 priority list — **all ★ now DONE** (written 2026-07-16, Batch A4, with
-optional toppings included; precise after-values in `macro-audit.md`). 53 recipes corrected so far.
+optional toppings included; precise after-values in `macro-audit.md`).
+
+---
+
+## ▶ RESUME HERE (updated 2026-07-23, end of Batches E–L)
+
+**Only §A remains.** Every other section is fully closed:
+
+| Section | Status |
+|---|---|
+| A. Under-counted recalcs | **93 left** (18 done) ← the only open work |
+| B. Over-stated / serving-count | ✅ done (14/14) |
+| C. Duplicate rows | ✅ done (3/3) |
+| D. Ingredient-list integrity | ✅ done (4/4) |
+| E. Empty ingredient lists | ✅ done (8/8) |
+| F. Partial — need one quantity | ✅ done (24/24) |
+| G. Macro-completeness fills | ✅ done (34/34) |
+
+**How to do §A** (mechanical — mostly no input needed): for each unchecked `- [ ]` item below,
+pull its `ingredient_sections` from Supabase `recipes` (project `jsxcctrskkkxgdxfaduo`), recompute
+6 macros per serving staple-grounded (same method as Batches B–L in `macro-audit.md`), and write
+`calories/protein_g/carbs_g/fat_g/fibre_g/sugar_g` (+ clear resolved `review_flags`). Work in
+alphabetical batches of ~15–20; tick each line here and log the batch in `macro-audit.md`.
+
+**Handful that need Saffron's input / a judgement call, not a straight recompute:**
+- **Thai Red Curry Pot Roast Chicken** (548→1232) — whole-bird rendering uncertain.
+- **Pho Gà - Vietnamese Chicken Pho** (501) — 1.5kg bone-in thighs simmered into broth;
+  meat-yield-per-bowl + fat-rendering uncertain (soup, fat renders).
+- **Middle Eastern Chicken & Rice Bowl** (428) — "rice of choice" has no quantity (load-bearing).
+- **Basic Oat Flour Pancakes** (68→153) — check serving basis before writing.
+- **Chicken and Potato Traybake** (448→589) — §C survivor; optional fat recompute (skin-on
+  legs+thighs+Flora).
+
+Use the `recipe-db` skill for schema + non-destructive-write conventions. All work is data-only
+in Supabase `recipes` — no `index.html`/`sw.js` change, no cache bump. PR #48 tracks this stream.
 
 ---
 
@@ -249,7 +282,7 @@ existing cal/protein) for every recipe below, staple-grounded from the DB ingred
 
 | Section | Count |
 |---|---|
-| A. Recalculate — under-counted | 111 (14 ★ done → **97 left**) |
+| A. Recalculate — under-counted | 111 (18 done → **93 left**) |
 | B. Over-stated / serving-count | 14 (all done ✅) |
 | C. Duplicate rows | 3 (all done ✅) |
 | D. Ingredient-list integrity | 4 (all done ✅ — Café Style resolved via the Batch C rename) |
@@ -259,3 +292,6 @@ existing cal/protein) for every recipe below, staple-grounded from the DB ingred
 
 Some recipes appear in two sections (e.g. a dedupe that also needs a recompute); net unique
 ≈ 190 of the ~310 ready recipes. The clean, fully-correct remainder needs nothing.
+
+**As of 2026-07-23 (Batches E–L): only §A remains — 93 under-count recomputes.** See the
+▶ RESUME HERE banner at the top for the method and the judgement-call exceptions.
