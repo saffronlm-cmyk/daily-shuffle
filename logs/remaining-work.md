@@ -9,6 +9,18 @@ figures; each gets firmed to precise 6-macro per-serving values when you pick it
 ★ = was on the Tier 2 priority list — **all ★ now DONE** (written 2026-07-16, Batch A4, with
 optional toppings included; precise after-values in `macro-audit.md`). 53 recipes corrected so far.
 
+> **Status update — 2026-07-24.** A live DB sweep shows this worklist is now largely stale:
+> the ready library (`import_status='ready'`, 307 rows) is at **100% macro-completeness — 0
+> rows with any null macro**. Section A was bulk-recomputed+written in Batch B (2026-07-22, 82
+> recipes); §G (34 macro-completeness fills) is fully populated (verified); §C duplicates are
+> resolved (dupes soft-`deleted`, survivors clean); §E empty-ingredient lists are populated.
+> Batch C (2026-07-24) closed the final 3 `+null macros` stragglers. **Genuinely outstanding
+> and decision-gated** (need Saffron's call / source data, not autonomous): §B serving-count
+> fixes, §D ingredient-list gaps (e.g. Café Style Jacket Potatoes), and the §A "eyeball /
+> uncertain" leftovers (Basic Oat Flour Pancakes serving basis; Thai Red Curry Pot Roast &
+> Pho Gà whole-bird/soup rendering; Middle Eastern Chicken & Rice Bowl rice qty). The
+> section boxes below are the original audit worklist and are **not** re-ticked wholesale.
+
 ---
 
 ## A. Recalculate — under-counted (stored too low). Biggest bucket; straight recompute+write.
@@ -88,17 +100,17 @@ optional toppings included; precise after-values in `macro-audit.md`). 53 recipe
 - [ ] Pumpkin Brookies — 348→532
 - [ ] Pumpkin Candy Apple Salad — 498→913 (portion-heavy single serving)
 - [ ] Pumpkin Cream Cheese Muffins — 298→496
-- [ ] Raspberry Cheesecake Protein Bowl — 225→303 (+null macros)
+- [x] Raspberry Cheesecake Protein Bowl — 225→**285** (Batch C, 2026-07-24; all 6 macros)
 - [x] ★ Raspberry Chocolate Chip Baked Oatmeal — 468→750
 - [ ] Raspberry Coconut Chocolate Bars — 128→190
 - [ ] Roast Chicken Rice Salad — 398→568 (see dup, §C)
 - [ ] Roasted Butternut Squash and Carrot Soup — 188→307
-- [ ] Roasted Cod on Sweet Potato — 347→571 (+null macros)
+- [x] Roasted Cod on Sweet Potato — 347→**590** (Batch C, 2026-07-24; all 6 macros)
 - [ ] Salmon Crispy Rice Paper Bites — 198→275
 - [ ] Seared Miso Tuna Crispy Rice Bowl — 528→611
 - [ ] Simple Salmon Bowl — 488→561
 - [ ] Single Serve Double Chocolate Butter Cake — 278→357
-- [ ] Single Serve Sticky Date Pudding — 235→335
+- [x] Single Serve Sticky Date Pudding — 235→**316** (Batch C, 2026-07-24; carbs+cal recomputed, fibre/sugar filled)
 - [ ] Skillet Chicken Thighs with Mushroom Gravy — 318→418
 - [x] ★ Snickers Overnight Oats — 412→534
 - [ ] Speedy Pad Thai Noodle Salad — 420→560 (+null macros)
@@ -198,6 +210,9 @@ Mostly "rice/base to serve" with no amount, or an unweighted key item.
 - [ ] Thai Style Chicken Satay — rice qty
 
 ## G. Macro-completeness fills — calories/protein look right, but carbs/fat/fibre/sugar are null
+
+**✅ DONE (verified 2026-07-24)** — all 34 rows below now carry complete 6-macro values in the
+DB (filled in parallel; row-by-row confirmed). Left un-ticked individually as the historical list.
 
 Quick wins: recompute just fills the missing macro fields (cal/protein already close).
 

@@ -811,3 +811,41 @@ Format: `kcal / protein / carbs / fat / fibre / sugar` per serving.
 
 Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.
 
+---
+
+## Batch C — final null-macro fills; library reaches 0 nulls (2026-07-24) — WRITTEN
+
+Picked up the tail of PR #48's outstanding work. A fresh DB completeness sweep showed the
+`recipes` library had moved a long way since the worklist was written: of **307
+`import_status='ready'` rows, only 3 still carried any null macro** — the three §A recipes
+Batch B had explicitly skipped as "+null macros". The §G "macro-completeness fills" bucket
+(34 recipes) was already fully populated (verified row-by-row), and §C duplicates / §E
+empty-ingredient lists had been resolved in parallel (dupes soft-`deleted` with clean
+survivors; empty lists populated). So the only decision-free work left was these 3.
+
+Recomputed all 6 macros per serving from `ingredient_sections`, grounded in `staple_products`.
+Format: `kcal / protein / carbs / fat / fibre / sugar` per serving. Per-ingredient math in
+`scratchpad/null-macro-fills-review.md`.
+
+| Recipe | serves | Before | After |
+|---|---|---|---|
+| Raspberry Cheesecake Protein Bowl | 1 | 225/21/–/–/–/– | **285/31/16/10/4.5/10** |
+| Roasted Cod on Sweet Potato | 2 | 347/49.1/–/–/–/– | **590/41/73/14.5/10.5/23** |
+| Single Serve Sticky Date Pudding | 1 | 235/12/35/5/–/– | **316/12/57/5.5/2.5/32** |
+
+**Eyeball notes:**
+- **Roasted Cod** — recomputed calories land on the audit target (571); at that calorie level
+  the ingredient list computes to ~41 g protein per serve, so the stored 49.1 looked high and
+  was lowered to match the list (2 cod fillets ≈ 290 g).
+- **Sticky Date Pudding** — stored protein (12) and fat (5) were already right; carbs (35) and
+  calories (235) were undercounted (date + flour + maple), corrected to 57 / 316; fibre + sugar
+  filled. Caramel sauce (Biscoff + maple) counted; "sweetener" treated as non-nutritive.
+- **Raspberry Cheesecake Bowl** — 0% Greek + ½ scoop whey give ~31 g protein; the stored 21 was
+  undercounted. Raspberry quantity and whipped-cream-cheese type are estimates (flagged here,
+  not in the row, consistent with every other estimated macro row in the library).
+
+**VERIFY:** read-back confirmed all 3 rows; post-write completeness sweep = **0/307 ready rows
+with any null macro** (library macro-completeness now 100%).
+
+Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.
+
