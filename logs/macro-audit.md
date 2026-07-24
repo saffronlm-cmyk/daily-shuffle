@@ -1335,3 +1335,8 @@ weights; awaiting a cooked-meat-weight call. Everything else in §A–§G is don
 **VERIFY:** read-back confirmed all 3 rows; ready library remains at 0 null macros.
 
 Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.
+
+**Addendum (Batch O close-out):** Chicken and Potato Traybake — the last open §A item — written
+at **590/37/26/37/3/3** (serves 4) on Saffron's "eyeball ~590" call (bone-in/skin-on 2 legs +
+3–4 thighs + Flora; faithful compute ~614, trimmed to 590). `review_flags` cleared. **§A–§G is
+now fully closed; the ready library carries a complete 6-macro set on every row (0 nulls).**

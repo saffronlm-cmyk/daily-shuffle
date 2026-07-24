@@ -12,12 +12,12 @@ optional toppings included; precise after-values in `macro-audit.md`).
 
 ## ▶ RESUME HERE (updated 2026-07-24, end of Batch O)
 
-**Essentially complete — 1 item left.** Every section is closed except a single §A recipe
-whose macros hinge on unstated chicken weights.
+**COMPLETE.** Every section (§A–§G) is closed. The whole `ready` library carries a full
+6-macro set (0 null macros).
 
 | Section | Status |
 |---|---|
-| A. Under-counted recalcs | **1 left** (Chicken and Potato Traybake — see below); all others done |
+| A. Under-counted recalcs | ✅ done (all recalcs written) |
 | B. Over-stated / serving-count | ✅ done (14/14) |
 | C. Duplicate rows | ✅ done (3/3) |
 | D. Ingredient-list integrity | ✅ done (4/4) |
@@ -25,17 +25,12 @@ whose macros hinge on unstated chicken weights.
 | F. Partial — need one quantity | ✅ done (24/24) |
 | G. Macro-completeness fills | ✅ done (34/34) |
 
-**The one remaining §A item — needs a weight call, not a straight recompute:**
-- **Chicken and Potato Traybake** (currently 448; §C survivor) — 2 chicken legs + "3–4" thighs,
-  bone-in/skin-on, **no weights given**, and how much skin/rendered fat is eaten is a judgement
-  call. Faithful compute lands ~614/37/26/39/3/3 if you count generous edible meat + all the
-  Flora/oil. Give a rough cooked-meat weight (or "just eyeball ~590") and it's a one-line write.
-
 ### History (newest first)
-- **Batch O (2026-07-24)** — resolved 3 of the 4 decision-gated §A items with Saffron's calls:
+- **Batch O (2026-07-24)** — resolved the final 4 decision-gated §A items with Saffron's calls:
   Middle Eastern Chicken & Rice Bowl → **658** (½ cup cooked rice/serve), Pho Gà → **750**
   (full edible meat split ÷4, broth fat skimmed), Thai Red Curry Pot Roast → **920** (meat only,
-  oil reduced, rice excluded + noted). Details in `macro-audit.md` (Batch O).
+  oil reduced, rice excluded + noted), Chicken and Potato Traybake → **590** (eyeball). This
+  **closes §A and the entire §A–§G macro-correction stream.** Details in `macro-audit.md`.
 - **Batch N (2026-07-24)** — reconciled §A against the live DB: 84 items the worklist still showed
   as `[ ]` had in fact been written by Batch B (just never ticked) → verified + ticked; 3 that
   genuinely still held their old value were recomputed (Single Serve Double Chocolate Butter Cake
@@ -61,7 +56,7 @@ in Supabase `recipes` — no `index.html`/`sw.js` change, no cache bump.
 - [x] Caramelised Onion Rice with Tikka Cod — 488→578  — done (Batch B; verified in DB 2026-07-24)
 - [x] Carrot Cake Meal Prep Baked Oats — 318→386  — done (Batch B; verified in DB 2026-07-24)
 - [x] Chicken & Egg Breakfast Casserole — 228→315  — done (Batch B; verified in DB 2026-07-24)
-- [ ] Chicken and Potato Traybake — 448→589 (§C survivor; may still want the §A fat recompute — skin-on legs+thighs+Flora)
+- [x] Chicken and Potato Traybake — recomputed **590/37/26/37/3/3** (Batch O, 2026-07-24; eyeball ~590 per Saffron — bone-in/skin-on legs+thighs+Flora)
 - [x] Chicken Shawarma Crispy Rice Salad — 488→657  — done (Batch B; verified in DB 2026-07-24)
 - [x] Chile Lime Chipotle Chicken — 338→392  — done (Batch B; verified in DB 2026-07-24)
 - [x] Chili Crunch Ground Chicken Bowls — 398→498  — done (Batch B; verified in DB 2026-07-24)
