@@ -169,3 +169,16 @@ engine lights up** — this is the payoff and the next design space:
   totals.
 - **Cost × nutrition**: cost per gram of protein / per kcal — bridges to the
   stashed macro/Track modules (`legacy/macro-calc.*`, `legacy/track.*`).
+
+## Future — other feature ideas (unscheduled)
+
+- **Recipe variant toggle**: the `recipes` table has no parent/variant
+  relationship (no `variant_of`/`parent_id` column) — a duplicated-and-altered
+  recipe (e.g. an ingredient swap with recalculated macros) is just another
+  standalone row, findable only by name, with no link back to the recipe it
+  came from. A `variant_of` column (nullable FK to `recipes.id`) would let the
+  app group variants under their base recipe — e.g. show them together in the
+  recipe modal/library, or let Shuffle/Tracker filtering treat "show variants"
+  as its own toggle instead of relying solely on `import_status`. Raised
+  2026-07-30 while duplicating the Glass & Konjac Chicken Japchae recipe into
+  an all-konjac version.
