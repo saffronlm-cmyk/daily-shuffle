@@ -151,6 +151,7 @@
   .type-snack { color: var(--green); }
   .type-lunch { color: #7ab8a0; }
   .type-sides { color: #c4956a; }
+  .type-sauce { color: var(--accent); }
   .card-name { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 10px; line-height: 1.3; }
   .card-tags { display: flex; flex-wrap: wrap; gap: 5px; }
   .card-tag { font-size: 11px; color: var(--text3); background: var(--bg); padding: 2px 7px; border-radius: 4px; }
@@ -1218,7 +1219,11 @@
               <label>Cuisine</label>
               <select id="f-cuisine">
                 <option value="comfort">Comfort</option>
-                <option value="asian">Asian</option>
+                <option value="asian">Asian (other/mixed)</option>
+                <option value="vietnamese">Vietnamese</option>
+                <option value="thai">Thai</option>
+                <option value="chinese">Chinese</option>
+                <option value="korean">Korean</option>
                 <option value="japanese">Japanese</option>
                 <option value="indian">Indian</option>
                 <option value="italian">Italian</option>
@@ -1387,13 +1392,14 @@ function setTheme(name) {
 // Recipes still store .cravings as a flat string[]; the taxonomy is purely a
 // presentation layer that groups chip rendering by category.
 const CRAVING_TAXONOMY = {
-  cuisine: ['asian','mexican','japanese','indian','italian','mediterranean','middleeastern','american','comfort'],
+  cuisine: ['asian','vietnamese','thai','chinese','korean','mexican','japanese','indian','italian','mediterranean','middleeastern','american','comfort'],
   texture: ['noodles','brothy','crunchy','creamy'],
   mood:    ['spicy','light','fresh','sweet','simple','healthy'],
   dietary: ['highprotein','lowcarb','glutenfree','dairyfree'],
+  dish:    ['salad','pancakes','bakery','soup','stirfry','curry','traybake','sandwich','bowl'],
 };
 const CRAVING_GROUP_LABELS = {
-  cuisine: 'Cuisine', texture: 'Texture', mood: 'Mood', dietary: 'Dietary',
+  cuisine: 'Cuisine', texture: 'Texture', mood: 'Mood', dietary: 'Dietary', dish: 'Dish Type',
 };
 // Flat list of every valid craving value (incl. legacy ones still on recipes
 // like chicken/beef/tofu which moved to the Protein chip group).
@@ -1404,7 +1410,8 @@ const ALL_CRAVINGS = [
   ]),
 ];
 const CRAVING_LABELS = {
-  asian:'🥢 Asian', mexican:'🌮 Mexican', japanese:'🍱 Japanese', indian:'🍛 Indian',
+  asian:'🥢 Asian', vietnamese:'🍜 Vietnamese', thai:'🌶 Thai', chinese:'🥡 Chinese', korean:'🌶 Korean',
+  mexican:'🌮 Mexican', japanese:'🍱 Japanese', indian:'🍛 Indian',
   italian:'🍝 Italian', mediterranean:'🫒 Mediterranean', middleeastern:'🫙 Middle Eastern',
   american:'🍔 American', comfort:'🏠 Comfort',
   noodles:'🍜 Noodles', brothy:'🫕 Brothy', crunchy:'🥨 Crunchy', creamy:'🥛 Creamy',
@@ -1413,6 +1420,9 @@ const CRAVING_LABELS = {
   highprotein:'💪 High-protein', lowcarb:'🥑 Low-carb',
   glutenfree:'🌾 GF', dairyfree:'🥛 DF',
   chicken:'🐓 Chicken', beef:'🥩 Beef', tofu:'🌱 Tofu',
+  salad:'🥗 Salad', pancakes:'🥞 Pancakes', bakery:'🍞 Bakery', soup:'🍲 Soup',
+  stirfry:'🥘 Stir-fry', curry:'🍛 Curry', traybake:'🍳 Traybake / One-pot',
+  sandwich:'🥪 Sandwich / Wrap', bowl:'🍚 Bowl',
 };
 
 // ─── PROTEIN CHIPS (Shuffle tab) ─────────────────────────────────────────────
@@ -1422,16 +1432,16 @@ const PROTEIN_LABELS = {
   fish:'🐟 Fish', proteinpowder:'🥤 Protein Powder', mixed:'🍱 Mixed', other:'🔀 Other',
 };
 
-const MEAL_TYPES = ['breakfast','lunch','dinner','sides','dessert','snack'];
+const MEAL_TYPES = ['breakfast','lunch','dinner','sides','dessert','snack','sauce'];
 const MEAL_TYPE_LABELS = {
   breakfast:'Breakfast', lunch:'Lunch', dinner:'Dinner',
-  sides:'🍟 Sides', dessert:'Dessert', snack:'☕ Snack',
+  sides:'🍟 Sides', dessert:'Dessert', snack:'☕ Snack', sauce:'🥣 Sauce',
 };
 
-const CARB_TYPES = ['none','rice','pasta','bread','potato','grain'];
+const CARB_TYPES = ['none','rice','pasta','bread','potato','grain','noodles','oats'];
 const CARB_TYPE_LABELS = {
   none:'— None', rice:'🍚 Rice', pasta:'🍝 Pasta', bread:'🥖 Bread',
-  potato:'🥔 Potato', grain:'🌾 Grain',
+  potato:'🥔 Potato', grain:'🌾 Grain', noodles:'🍜 Noodles', oats:'🥣 Oats',
 };
 
 // ─── RECIPE DATA ──────────────────────────────────────────────────────────────
@@ -2187,7 +2197,7 @@ function renderFilterBody(type) {
     case 'protein':
       return `<div style="display:flex;flex-wrap:wrap;gap:6px;width:100%">${_multiChipsHtml(filters.proteins, PLAN_PROTEINS, PROTEIN_LABELS, 'protein')}</div>`;
     case 'cuisine': {
-      const cuisines = ['comfort','asian','japanese','indian','italian','mexican','american','mediterranean','middleeastern','simple','other'];
+      const cuisines = ['comfort','asian','vietnamese','thai','chinese','korean','japanese','indian','italian','mexican','american','mediterranean','middleeastern','simple','other'];
       const labels = Object.fromEntries(cuisines.map(c => [c, `${CUISINE_EMOJI[c]||''} ${c.charAt(0).toUpperCase()+c.slice(1)}`]));
       return `<div style="display:flex;flex-wrap:wrap;gap:6px;width:100%">${_multiChipsHtml(filters.cuisines, cuisines, labels, 'cuisine')}</div>`;
     }
@@ -2249,9 +2259,9 @@ function setFilterRange(key, val) {
 }
 
 // ─── RENDER RECIPES ─────────────────────────────────────────────────────────
-const TYPE_LABELS = { breakfast:'Breakfast', lunch:'Lunch', dinner:'Dinner', sides:'Sides', dessert:'Dessert / Snack', snack:'Snack' };
-const TYPE_CLASSES = { breakfast:'type-breakfast', lunch:'type-lunch', dinner:'type-dinner', sides:'type-sides', dessert:'type-dessert', snack:'type-snack' };
-const CUISINE_EMOJI = { asian:'🥢', japanese:'🍱', indian:'🍛', italian:'🍝', mexican:'🌮', american:'🍔', mediterranean:'🫒', middleeastern:'🫙', comfort:'🏠', simple:'🍳', other:'🍴' };
+const TYPE_LABELS = { breakfast:'Breakfast', lunch:'Lunch', dinner:'Dinner', sides:'Sides', dessert:'Dessert / Snack', snack:'Snack', sauce:'Sauce' };
+const TYPE_CLASSES = { breakfast:'type-breakfast', lunch:'type-lunch', dinner:'type-dinner', sides:'type-sides', dessert:'type-dessert', snack:'type-snack', sauce:'type-sauce' };
+const CUISINE_EMOJI = { asian:'🥢', vietnamese:'🍜', thai:'🌶', chinese:'🥡', korean:'🌶', japanese:'🍱', indian:'🍛', italian:'🍝', mexican:'🌮', american:'🍔', mediterranean:'🫒', middleeastern:'🫙', comfort:'🏠', simple:'🍳', other:'🍴' };
 const PROTEIN_EMOJI = { chicken:'🐓', beef:'🥩', eggs:'🥚', tofu:'🌱', fish:'🐟', proteinpowder:'🥤', mixed:'🍱' };
 
 // ── 2026 redesign: strip emoji from chips/labels (editorial "no emoji" rule).
@@ -2611,7 +2621,11 @@ function openTagEditor(id) {
           <span class="tag-editor-sublabel">Cuisine</span>
           <select class="edit-meta-select" id="edit-cuisine">
             <option value="comfort" ${r.cuisine==='comfort'?'selected':''}>🏠 Comfort</option>
-            <option value="asian" ${r.cuisine==='asian'?'selected':''}>🥢 Asian</option>
+            <option value="asian" ${r.cuisine==='asian'?'selected':''}>🥢 Asian (other/mixed)</option>
+            <option value="vietnamese" ${r.cuisine==='vietnamese'?'selected':''}>🍜 Vietnamese</option>
+            <option value="thai" ${r.cuisine==='thai'?'selected':''}>🌶 Thai</option>
+            <option value="chinese" ${r.cuisine==='chinese'?'selected':''}>🥡 Chinese</option>
+            <option value="korean" ${r.cuisine==='korean'?'selected':''}>🌶 Korean</option>
             <option value="japanese" ${r.cuisine==='japanese'?'selected':''}>🍱 Japanese</option>
             <option value="indian" ${r.cuisine==='indian'?'selected':''}>🍛 Indian</option>
             <option value="italian" ${r.cuisine==='italian'?'selected':''}>🍝 Italian</option>
@@ -5395,10 +5409,10 @@ async function parseWithAI() {
 The JSON must have these fields (use null for anything not found):
 {
   "name": string,
-  "mealTypes": ["breakfast" | "lunch" | "dinner" | "sides" | "dessert" | "snack"],
-  "cuisine": "comfort" | "asian" | "japanese" | "indian" | "italian" | "mexican" | "american" | "mediterranean" | "middleeastern" | "simple" | "other",
+  "mealTypes": ["breakfast" | "lunch" | "dinner" | "sides" | "dessert" | "snack" | "sauce"],
+  "cuisine": "comfort" | "asian" | "vietnamese" | "thai" | "chinese" | "korean" | "japanese" | "indian" | "italian" | "mexican" | "american" | "mediterranean" | "middleeastern" | "simple" | "other",
   "proteinSource": "chicken" | "beef" | "eggs" | "tofu" | "fish" | "proteinpowder" | "mixed" | "other" | null,
-  "carbType": "rice" | "pasta" | "bread" | "potato" | "grain" | "none",
+  "carbType": "rice" | "pasta" | "bread" | "potato" | "grain" | "noodles" | "oats" | "none",
   "servings": number | null,
   "prepTime": string | null,
   "costTier": 1 | 2 | 3,
@@ -5407,7 +5421,7 @@ The JSON must have these fields (use null for anything not found):
   "method": [string],
   "tips": string | null,
   "storage": string | null,
-  "cravings": ["asian"|"mexican"|"comfort"|"spicy"|"brothy"|"noodles"|"light"|"healthy"|"simple"|"chicken"|"beef"|"tofu"|"sweet"|"fresh"],
+  "cravings": ["asian"|"vietnamese"|"thai"|"chinese"|"korean"|"mexican"|"comfort"|"spicy"|"brothy"|"noodles"|"light"|"healthy"|"simple"|"chicken"|"beef"|"tofu"|"sweet"|"fresh"|"salad"|"pancakes"|"bakery"|"soup"|"stirfry"|"curry"|"traybake"|"sandwich"|"bowl"],
   "notes": string | null,
   "instagramUrl": string | null,
   "nutrition": {"kcal": number, "protein": number, "carbs": number, "fat": number} | null
@@ -5416,7 +5430,8 @@ The JSON must have these fields (use null for anything not found):
 Rules:
 - All recipes are gluten-free, dairy-free, and banana-free by default. Flag any adaptations needed in notes.
 - mealTypes is an array — a recipe can fit multiple slots (e.g. ["lunch","dinner"]). Always include at least one.
-- carbType: identify the dominant carb if any (rice/pasta/bread/potato/grain), else "none".
+- carbType: identify the dominant carb if any (rice/pasta/bread/potato/grain/noodles/oats), else "none".
+- cuisine: use a specific country tag (vietnamese/thai/chinese/korean/japanese/indian) when the recipe is clearly from that cuisine; use "asian" only when it's ambiguous or a fusion/mixed Asian dish.
 - cravings: pick ONLY from the listed values. Descriptive mood/cuisine tags.
 - costTier: 1=cheap (under £5/serving), 2=moderate (£5-8), 3=pricier (over £8).
 - INGREDIENTS — split every ingredient into its parts, never combine them into one string:
