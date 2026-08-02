@@ -4,6 +4,158 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# Japchae recipe duplication (in-session, unsaved) + variant-toggle idea + soya milk staple
+**Date:** 2026-08-02
+**Project:** Daily Shuffle — recipe library (Supabase `recipes`) exploration, `staple_products`
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete — one PR merged (#53); one small direct DB write; one item left undone by design
+
+---
+
+## Project Context
+Unrelated to the macro-correction stream closed out in the 2026-07-24 entry below, and to the
+Asian cuisine tag expansion entry immediately below this one (also same-day, different session).
+This was a mixed session: (1) an explicitly non-persisted recipe-duplication exercise against the
+bundled Supabase project (`jsxcctrskkkxgdxfaduo`), (2) a resulting feature-idea note, and (3) an
+unrelated one-off staple addition.
+
+## Session Goal
+1. Pull "Glass & Konjac Chicken Japchae" and its sibling "Chicken Mince Konjac Japchae" from
+   `recipes` into the conversation so Saffron could duplicate and alter them (ingredient swap +
+   macro recalculation) without writing anything to the DB until she says so.
+2. Answer her follow-up questions about how such duplicates would surface in Shuffle/Tracker,
+   and how to represent them as "variants."
+3. (Unrelated, same session) add an unsweetened soya milk entry to `staple_products`.
+
+## State Before This Session
+Clean — prior session (2026-07-24) had closed out the macro-correction stream entirely; `main`
+had no open work relevant to this session's topics.
+
+## What Was Done
+1. **Pulled both japchae recipes read-only** via `execute_sql` (`select * from recipes where
+   name ilike '%japchae%' or ...`) — `b8bb9c91-b2d4-4ee7-877b-ea976d7a5a26` (Glass & Konjac
+   Chicken Japchae, serves 4) and `7670cb5c-e6ef-437e-bc3b-fd0780b4e19d` (Chicken Mince Konjac
+   Japchae, serves 5). Presented both in full (ingredients, method, macros) in chat.
+2. **Duplicated + altered both, in-session only** — per Saffron's explicit instruction ("nothing
+   needs to be stored before my say so"), no `INSERT`/`UPDATE` was run for either recipe. Applied:
+   replace the sweet potato glass noodles line with 200g konjac noodles, merged into the existing
+   konjac noodles line (1000g total in both recipes), scrubbed the glass-noodle mention from each
+   subtitle/notes field, and recalculated macros using generic per-100g reference values (sweet
+   potato glass noodles ≈351 kcal/85g carb dry; konjac noodles ≈7–9 kcal/100g, ~3g fibre, ~0 net
+   carb) applied as a delta against the original per-serving macros:
+   - Glass & Konjac Chicken Japchae (serves 4): 470→**~360** kcal, 66→**~40**g carb, fibre
+     14→**~15**g; protein/fat/sugar effectively unchanged.
+   - Chicken Mince Konjac Japchae (serves 5): 515→**~448** kcal, 50→**~34**g carb, fibre
+     9→**~10**g; protein/fat/sugar effectively unchanged.
+   Neither duplicate was ever written to Supabase — **this recalculated data only exists in that
+   conversation's transcript and is not persisted anywhere.** If Saffron wants these variants
+   saved, they need to be re-derived (the exact deltas are in this log entry) and inserted fresh.
+3. **Answered "how would these show up in Shuffle/Tracker"** by reading the actual fetch queries
+   in `index.html`: Shuffle's pool (`fetchCloudRecipes`, ~line 1511) only pulls
+   `import_status=eq.ready`; Tracker's recipe picker (`trkFetchRecipes`, ~line 6220) pulls
+   `import_status=in.(ready,review,custom)`. So `custom` rows are Tracker-only; `ready` rows are
+   both.
+4. **Answered "how would these show up as *variants*"** — checked the `recipes` schema via
+   `list_tables`: no `variant_of`/`parent_id` column exists. A duplicate is just another
+   standalone row with no link back to its source recipe. Confirmed with Saffron she wants to
+   keep these as `custom` for now (Tracker-only, not Shuffle-eligible) given the macros are
+   AI-recalculated estimates, not staple-grounded.
+5. **Logged the variant-toggle idea** as a new "Future — other feature ideas (unscheduled)"
+   section appended to `handoff.md` (previously only had the cost-aware-features future list).
+   Committed + pushed on `claude/japchae-recipe-duplicate-l3z9i5`, opened **draft PR #53**,
+   subscribed to its activity. CI showed `pending`/0 checks the whole time (repo has no CI beyond
+   the unrelated Supabase keep-alive) — nothing to fix. No review comments. Saffron marked it
+   ready for review herself; **merged** by her directly. Session unsubscribed automatically on
+   merge.
+   - Note: while this PR was open, a **second, unrelated** feature note ("multi-select
+     primary-cuisine idea") was appended to `handoff.md` by another PR (**#55**, merged after
+     #53, alongside **#54** "Expand Asian cuisine tags" — see that entry below). Neither was part
+     of this session — flagging so nobody attributes them here.
+6. **Added a new staple** (unrelated ask): `staple_products` had "Alpro Original soya milk"
+   (sweetened, 2.5g sugar/100ml) but nothing unsweetened. Inserted a new row, first as branded
+   ("Alpro Unsweetened soya milk") using generic Alpro-Unsweetened label values, then — per
+   Saffron's correction ("I want it unbranded and generic") — **updated in place** (same row,
+   `id c88bbbfe-f065-46c9-b917-f991f0142c47`) to rename to "Unsweetened soya milk" and swap
+   aliases to generic terms. Macros were left unchanged (they were already generic-label values,
+   not brand-specific): 33 kcal / 3.3g protein / 0.3g carb / 1.8g fat / 0.5g fibre / 0.3g sugar
+   per 100ml.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| `handoff.md` | Future-ideas section | Modified (variant-toggle bullet added) | repo root — merged via PR #53 |
+| Supabase `staple_products` | New staple row | Created then updated | row `c88bbbfe-f065-46c9-b917-f991f0142c47` |
+| Supabase `recipes` | Japchae duplicates | **Not created** — deliberately left unpersisted | N/A |
+| `logs/daily-shuffle_log.md` | This entry | Modified | repo root |
+
+No `index.html`/`sw.js`/`manifest.json` touched — no cache bump needed.
+
+## Decisions & Reasoning
+- **Kept the duplicates unpersisted per Saffron's explicit instruction**, even after later
+  discussing `import_status`/variant mechanics in detail — the discussion was exploratory, not
+  authorization to write. Only wrote to the DB when she gave a direct, unambiguous instruction
+  ("add unsweetened soya milk to my staples").
+- **Chose to merge the 200g konjac addition into the existing konjac-noodle line** (rather than
+  add a second line item) since "replace X with Y" reads as a net ingredient-quantity change, not
+  two separate konjac lines in the same recipe.
+- **Recalculated macros via generic-value deltas against the original per-serving figures**
+  rather than re-deriving the whole recipe from scratch — faster, and keeps everything else
+  (protein/fat/sugar, which the swap doesn't touch) anchored to the original AI estimate instead
+  of introducing new estimation error.
+- **`variant_of` proposed as nullable, not required** — documented as a future-feature note only,
+  not implemented; no schema migration was run this session.
+- **Named the new staple generically per direct correction** — first guess (branded "Alpro
+  Unsweetened") was wrong; fixed via `UPDATE` on the same row rather than delete+reinsert, since
+  the macros were already valid and only naming needed to change.
+
+## Current State (end of session)
+- PR #53: merged to `main`. Branch `claude/japchae-recipe-duplicate-l3z9i5` reset to `origin/main`
+  after the merge (per the merged-PR restart convention) so this log entry lands clean.
+- `staple_products`: "Unsweetened soya milk" row live and correct per Saffron's confirmation.
+- The two altered japchae recipes exist **only in this log entry and the closed conversation** —
+  not in the database, not in any file. Re-derive from §"What Was Done" item 2 above if resuming.
+
+## Next Steps
+1. If Saffron wants either/both altered japchae recipes actually saved: re-apply the swap
+   documented above (merge 200g into the konjac line, scrub subtitle glass-noodle mentions, use
+   the recalculated macros given) and `INSERT` into `recipes` with `import_status='custom'`
+   (Tracker-only) or `'ready'` (also Shuffle-eligible, her call) — nothing currently blocks this,
+   it just wasn't authorized this session.
+2. `variant_of` column is documented in `handoff.md` under "Future — other feature ideas
+   (unscheduled)" — no urgency, revisit whenever recipe-variant handling comes up again (note this
+   session's discovery that #54/#55 landed a *different* feature idea, "multi-select primary
+   cuisine," in the same handoff.md section — read both before adding a third).
+3. No other open threads from this session.
+
+## Open Questions / Blockers
+N/A — nothing blocking. The only "unfinished" item (the japchae variants) is unfinished by
+Saffron's explicit choice, not a blocker.
+
+## Environment & Config Notes
+- Repo: `saffronlm-cmyk/daily-shuffle`. Branch: `claude/japchae-recipe-duplicate-l3z9i5` (reset
+  from `origin/main` post-merge, per convention, before this log commit).
+- PR #53 (merged). Unrelated PRs #54/#55 also merged to `main` during this session's window by a
+  different session — visible in `git log` but not this session's work.
+- Supabase project: `jsxcctrskkkxgdxfaduo` (bundled `recipes`/`staple_products`/etc.).
+- No env vars or credentials touched.
+
+## Notes & Gotchas
+- **`recipes` has no variant/parent linkage** — don't assume duplicated recipes are discoverable
+  as a group; they're only findable by name, exactly like any other row.
+- **`import_status` is the only lever controlling Shuffle vs. Tracker visibility** (`ready` = both,
+  `custom`/`review` = Tracker only, anything else = neither). This is a coarser mechanism than a
+  true variant toggle would be — see the `handoff.md` note.
+- **The recalculated japchae macros are estimates layered on estimates** (original recipes were
+  already flagged "AI estimate"; this session's deltas used generic reference values, not
+  `staple_products` lookups) — if these ever get saved, consider flagging
+  `review_flags: quantities_estimated` rather than treating them as staple-grounded.
+- `handoff.md`'s "Future" area now holds two unrelated feature-idea sections appended by
+  different sessions in close succession (cost-aware features → variant toggle → multi-select
+  primary cuisine) — worth consolidating into a proper backlog file if it keeps growing.
+
+---
+
 # Asian cuisine tag expansion + recipe reclassification (cuisine, carb type, meal type, Dish Type)
 **Date:** 2026-08-02
 **Project:** Daily Shuffle — tagging taxonomy (`index.html` taxonomy code + Supabase `recipes` data)
