@@ -4,6 +4,191 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# Asian cuisine tag expansion + recipe reclassification (cuisine, carb type, meal type, Dish Type)
+**Date:** 2026-08-02
+**Project:** Daily Shuffle — tagging taxonomy (`index.html` taxonomy code + Supabase `recipes` data)
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete
+
+---
+
+## Project Context
+Saffron wanted the "Asian" cuisine tag split into country-specific variants (keeping
+"Asian" as the ambiguous/fusion catch-all), plus a handful of new tags across other
+taxonomies, and then wanted the *existing* recipe library retroactively reclassified
+into the new tags — not just the schema/UI support. First entry to touch the
+cuisine/cravings/meal-type/carb-type taxonomy in `index.html` since it was built; no
+prior log entry to cross-reference.
+
+## Session Goal
+1. Expand the cuisine taxonomy (dropdown, filter chip, Shuffle cravings group, AI
+   parser) with Vietnamese/Thai/Chinese/Korean as first-class values, plus carb types
+   `noodles`/`oats`, meal type `sauce`, and a new "Dish Type" cravings group (Salad,
+   Pancakes, Bakery, Soup, Stir-fry, Curry, Traybake/One-pot, Sandwich/Wrap, Bowl).
+2. Retroactively reclassify the ~327-row `recipes` table against all of the above.
+
+## State Before This Session
+`index.html`'s `cuisine` field only had comfort/asian/japanese/indian/italian/mexican/
+american/mediterranean/middleeastern/simple/other. `CARB_TYPES` had no noodles/oats.
+`MEAL_TYPES` had no sauce. `CRAVING_TAXONOMY` had no dish-type/format group at all —
+only cuisine/texture/mood/dietary. No recipes had ever been reclassified against any of
+this (it didn't exist yet).
+
+## What Was Done
+1. **Code (index.html + sw.js), PR #54, merged** — added vietnamese/thai/chinese/korean
+   to the cuisine dropdown (`#f-cuisine`, `#edit-cuisine`), `CUISINE_EMOJI`, the
+   "Cuisine" filter-panel array, and `CRAVING_TAXONOMY.cuisine`; added `noodles`/`oats`
+   to `CARB_TYPES`/`CARB_TYPE_LABELS`; added `sauce` to `MEAL_TYPES`/`MEAL_TYPE_LABELS`/
+   `TYPE_LABELS`/`TYPE_CLASSES` (+ new `.type-sauce` CSS rule); added a new `dish` group
+   to `CRAVING_TAXONOMY` (salad/pancakes/bakery/soup/stirfry/curry/traybake/sandwich/
+   bowl) with `CRAVING_GROUP_LABELS.dish = 'Dish Type'`; updated the AI recipe-parser
+   system prompt schema/rules to match all of the above. Ran the full `ship-check`
+   (JS parse 3/3, smoke test 5/5, `claude_md_drift.mjs` clean) and bumped `sw.js` CACHE
+   v36→v37 (one bump, this PR only).
+2. **Cuisine reclassification (Supabase `recipes.cuisine`), two passes**:
+   - Pass 1: reviewed all 86 recipes tagged `asian`, proposed a confident/unsure split
+     inline in chat, Saffron answered the 10 unsure ones directly → 34 reclassified
+     (6 vietnamese, 10 thai, 7 chinese, 5 korean, 6 japanese), 52 stayed `asian`.
+   - Pass 2: Saffron asked to see the remaining 52 — exported them as a CSV (path
+     `scratchpad/asian-cuisine-review.csv`, columns id/name/tags/craving_tags/
+     new_cuisine) via `SendUserFile`. She edited it in **Apple Numbers** and uploaded
+     the `.numbers` file back (not CSV) — parsed it by `pip install numbers-parser`
+     (not preinstalled; installs cleanly, no network issues) and reading
+     `doc.sheets[0].tables[0].rows(values_only=True)`. Normalised her answers
+     (strip/lowercase), all 52 mapped cleanly to a known cuisine value → 28 more
+     reclassified (14 chinese, 9 japanese, 3 thai, 2 vietnamese), 24 confirmed staying
+     `asian`. **Final: 62/86 originally-"asian" recipes now have a specific cuisine;
+     24 are the genuine catch-all.**
+3. **Carb type / meal type / Dish Type reclassification (Supabase, same session,
+   mechanical name-pattern matching, no CSV round-trip)** — for each new tag, ran a
+   `SELECT` to find candidates by `name ILIKE` patterns (+ existing `tags`/
+   `craving_tags` signals), manually eyeballed the candidate list for false positives,
+   then ran a matching `UPDATE`. Verified every category with a post-write count and a
+   spot-check read-back.
+   - `carb_type='noodles'`: 32 recipes (Pad Thai/Ramen/Pho/Laksa/noodle bowls).
+   - `carb_type='oats'`: 47 recipes (overnight/baked oats, oat-based pancakes/bars).
+   - `meal_types` gets `sauce`: only 2 recipes — **Chilli Oil**, **Nước Chấm (Huy Vu
+     dipping sauce)** — set to `ARRAY['sauce']` outright (both had been sitting on the
+     mismatched legacy value `'side'` singular, not the app's `'sides'` plural, so this
+     incidentally fixed that data-quality wrinkle for these 2 rows only — **did not**
+     do a wider `side`→`sides` sweep, out of scope). Two borderline condiment-tagged
+     recipes (**Garlic Cucumber Salad**, **Pickled Red Onions**) were flagged and
+     asked about explicitly — Saffron said leave both as-is (no `sauce` tag).
+   - `craving_tags` append (additive, a recipe can carry several): bakery 68, salad 34,
+     bowl 34, soup 17, pancakes 13, stirfry 7, curry 5, sandwich 6, traybake 2.
+4. **`handoff.md` note (PR #55, merged? — see Environment note below re: status)** —
+   captured the "convert primary `cuisine` field to multi-select" idea that came up
+   when Saffron asked whether multi-cuisine tagging was possible. Answer given: it
+   already partially exists — the Shuffle tab's Cravings "Cuisine" subgroup is already
+   multi-select and shares the same value set as the primary dropdown — so for now use
+   that for recipes spanning >1 cuisine; converting the *primary* `cuisine` column
+   itself to an array is logged as a future option, not done.
+5. **Branch-reset gotcha hit and handled**: PR #54 merged mid-session, so per the
+   environment's "restart from `main` after a merge" rule, `git fetch origin main` +
+   `git checkout -B <branch> origin/main` + `git stash pop` was used before the
+   `handoff.md` commit, rather than stacking on the now-merged history.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| index.html | Cuisine dropdown ×2, `CUISINE_EMOJI`, cuisine filter array, `CRAVING_TAXONOMY` (+dish group), `CRAVING_LABELS`, `CARB_TYPES`/`CARB_TYPE_LABELS`, `MEAL_TYPES`/`MEAL_TYPE_LABELS`, `TYPE_LABELS`/`TYPE_CLASSES`, AI parser prompt | Modified | repo root |
+| sw.js | `CACHE` v36→v37 | Modified | repo root |
+| handoff.md | New "Multi-select primary cuisine" future-idea entry | Modified | repo root |
+| Supabase `recipes` | `cuisine` (62 rows across 2 passes), `carb_type` (79 rows), `meal_types` (2 rows), `craving_tags` (186 row-tag-additions across 9 dish-type tags, some rows got >1) | Modified | project `jsxcctrskkkxgdxfaduo` |
+| scratchpad/asian-cuisine-review.csv | Pass-2 review export (id/name/tags/craving_tags/new_cuisine) | Created (not committed — scratchpad) | session scratchpad dir |
+
+## Decisions & Reasoning
+- **Kept "Asian" as a real, permanent value, not a migration artifact** — Saffron was
+  explicit it should stay for genuinely ambiguous/fusion dishes (crispy-rice-salad
+  trend bowls, generic peanut-noodle dishes, etc.), so the reclassification passes
+  deliberately left ~24 recipes on it rather than forcing a specific country.
+- **CSV → Numbers round-trip, not a second inline Q&A** — with 52 items left after
+  pass 1, a wall of AskUserQuestion prompts wasn't viable (tool caps at 4 questions);
+  exporting a fill-in-the-blank CSV and having her return whatever she has (in this
+  case Numbers, not CSV) was the right shape. `numbers-parser` handled the format with
+  zero friction once installed — worth remembering as the tool of choice if this
+  happens again.
+- **Only 2 recipes got the `sauce` meal type**, not every recipe whose name contains
+  "sauce"/"dressing" — a broad keyword match pulled in full dinner/lunch dishes that
+  merely *feature* a sauce (e.g. "Vietnamese Lettuce Wraps with Peanut Sauce"); those
+  correctly stayed on their existing meal type. Only recipes that ARE a condiment
+  (nothing else on the plate) got reclassified.
+- **Bakery dish-tag query needed exclusion patterns**, not a simple keyword OR — naive
+  `name ILIKE '%cake%'` also matches "pan-**cake**s", "rice **cake**s", and "fish**cake**s"
+  since the substring is embedded in unrelated words. Fixed with explicit
+  `NOT ILIKE '%pancake%'` / `%rice cake%` / `%fishcake%` plus exclusions for savory
+  "bake" dishes (gnocchi bake, enchilada bake, sushi bake, chicken traybake) that
+  aren't bakery items at all.
+- **Used `SELECT`-then-matching-`UPDATE` instead of manually transcribing UUID lists**
+  for the mechanical carb/meal/dish-type passes — after building each candidate list
+  and eyeballing it for false positives, the `UPDATE` re-runs the *same* WHERE
+  predicate rather than a hand-typed `id IN (...)` list, removing transcription-error
+  risk across ~80 rows.
+
+## Current State (end of session)
+**Done**, pending Saffron's confirmation that PR #54 and #55 review activity is
+settled (both were merged/open as of this entry — see Environment note). All 4 new
+taxonomy dimensions (cuisine variants, carb types, sauce meal type, Dish Type group)
+exist in the app AND have been retroactively applied across the existing recipe
+library. No further action needed unless she flags a miscategorized recipe.
+
+## Next Steps
+1. Nothing blocking. Optional future work (already logged in `handoff.md`, not
+   scheduled): convert the primary `cuisine` field from single-select to multi-select
+   if the two-parallel-systems (dropdown + Cravings chips) proves confusing in
+   practice.
+2. If Saffron wants further cuisine grain (e.g. splitting out Malaysian/Singaporean/
+   Hawaiian/Filipino, which currently have no matching option and default to `asian`
+   — see Quick Chicken Laksa, Singapore Chicken Noodles, the two poke bowls, One Pan
+   Vegan Sushi Bake), that's a clean follow-on using the same taxonomy-expansion +
+   reclassification pattern from this session.
+3. `Summer Salad with Blackened Salmon` is still tagged `asian` with no clear Asian
+   signal in the dish itself (flagged mid-session as a possible stray import tag,
+   never resolved either way) — worth a decision if it comes up again.
+
+## Open Questions / Blockers
+N/A — no blockers. The only loose thread is the optional Summer Salad w/ Blackened
+Salmon miscategorization flagged above, which isn't blocking anything.
+
+## Environment & Config Notes
+- Repo: `saffronlm-cmyk/daily-shuffle`. Branch: `claude/asian-cuisine-tags-expansion-cvdxj9`.
+- **PR #54** (index.html/sw.js taxonomy code) — merged to `main` (squash, commit
+  `1c81f90`) mid-session.
+- **PR #55** (`handoff.md` note) — opened as a draft after PR #54 merged (branch was
+  reset to fresh `main` first, per the "no stacking on merged history" rule); status as
+  of this log entry: check `gh`/GitHub MCP for current state before assuming it's still
+  open — it may have merged since.
+- Supabase project: `jsxcctrskkkxgdxfaduo` (the bundled recipe-library project, per
+  `recipe-db` skill). All writes were plain `execute_sql` UPDATEs against `recipes` —
+  no migration needed anywhere this session (`cuisine`, `carb_type`, `meal_types`,
+  `craving_tags` all have no `CHECK` constraints, confirmed via
+  `pg_constraint` before the first write).
+- `numbers-parser` (Python) was `pip install`-ed into the sandbox this session — not
+  present by default. Installs fine, no egress issues (PyPI, not the blocked
+  Apify/USDA hosts).
+
+## Notes & Gotchas
+- **`cuisine` (single-select dropdown) and the Cravings-tab "Cuisine" chip group are
+  two separate, parallel systems** that happen to share the same value vocabulary —
+  don't assume setting one sets the other. See `handoff.md`'s "Multi-select primary
+  cuisine" entry for the full explanation and the future unification option.
+- **The pre-existing `meal_type` singular value `'side'` (not `'sides'` plural) is a
+  latent data-quality bug** independent of this session's work — it doesn't match
+  `MEAL_TYPES`/`MEAL_TYPE_LABELS` keys in `index.html`, so any recipe still on it
+  renders with a raw, unstyled fallback label in the app. Only the 2 recipes touched
+  for the `sauce` reclassification (Chilli Oil, Nước Chấm) got fixed as a side effect;
+  a wider sweep was explicitly out of scope this session and has NOT been done.
+- **Keyword-substring tagging needs exclusion lists, not just inclusion lists** — see
+  the bakery/pancake/rice-cake collision above. If extending any of these dish-type
+  categories later (e.g. adding more cuisines or dish types), re-check for the same
+  class of substring collision before trusting a raw `ILIKE` count.
+- All data changes this session were to Supabase only — **no local backup exists**
+  beyond what's in this log and the chat transcript. If a reclassification needs
+  reverting, the before/after cuisine values for the 86 originally-`asian` recipes are
+  recoverable from this log's pass-1/pass-2 breakdown and the chat history, not from
+  any DB snapshot.
+
 # Session close-out — macro-correction stream fully complete (Batches M–O)
 **Date:** 2026-07-24
 **Project:** Daily Shuffle — recipe library macros (Supabase `recipes`)
