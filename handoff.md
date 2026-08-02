@@ -182,3 +182,19 @@ engine lights up** — this is the payoff and the next design space:
   as its own toggle instead of relying solely on `import_status`. Raised
   2026-07-30 while duplicating the Glass & Konjac Chicken Japchae recipe into
   an all-konjac version.
+
+- **Multi-select primary cuisine**: the `cuisine` column on `recipes` is a
+  single text value (one dropdown, one primary cuisine per recipe). The
+  Cravings tab already has a separate multi-select "Cuisine" chip group
+  (`CRAVING_TAXONOMY.cuisine` in `index.html`) sharing the same value set
+  (asian/vietnamese/thai/chinese/korean/japanese/indian/italian/
+  mediterranean/middleeastern/american/comfort) — for now, use that for
+  recipes that span more than one cuisine (e.g. a Thai-Korean fusion dish),
+  leaving the primary `cuisine` dropdown as the single dominant tag. If this
+  turns out to be confusing having two parallel systems, or if a recipe
+  genuinely needs multiple *primary* cuisines, the fix is: convert `cuisine`
+  to an array column, turn the dropdown into a chip picker (mirroring how
+  `mealTypes` already works), and update every place that reads `r.cuisine`
+  as a single string (card kicker/`CUISINE_EMOJI`, the "Cuisine" filter chip,
+  the AI recipe-parser schema). Raised 2026-08-01 during the Asian-cuisine
+  tag-variant expansion (Vietnamese/Thai/Chinese/Korean).
