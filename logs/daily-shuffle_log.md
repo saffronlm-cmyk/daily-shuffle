@@ -4,6 +4,190 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# Staple products: search UI, full rename to a new naming convention, collision resolution + AI model-change scoping
+**Date:** 2026-08-02
+**Project:** Daily Shuffle — Tracker staples (`staple_products` data + `index.html` UI) and the embedded-AI model choice
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete (both session tasks landed; one optional follow-up left open)
+
+---
+
+## Project Context
+Second session on 2026-08-02 — see the entry below for the same-day Asian-cuisine
+reclassification work, which is unrelated. This session covered two asks: (1) *scope*
+changing the model behind the app's embedded AI, and (2) rename the staple products,
+change the naming convention (especially branded goods), and add a search function.
+
+The `staple_products` table had reached 168 rows after the USDA expansion (see the
+2026-07-01 entry for the `usda_staples.py` pipeline) and had never had a naming pass —
+so it carried two clashing conventions and a set of silent data faults.
+
+## Session Goal
+1. Scope (not implement) moving the 5 in-browser Anthropic call sites off
+   `claude-haiku-4-5-20251001`.
+2. Add search to the staples manager + staple picker.
+3. Agree a naming convention, resolve name/alias collisions, and apply the renames.
+
+## State Before This Session
+- **`staple_products`**: 168 rows. ~120 lowercase USDA seeds ("almond butter"), ~48
+  Title-case curated rows using *three* different branded formats (brand-first
+  "Alpro Original soya milk"; product-first "Soya yoghurt — Lidl plain";
+  product-first-with-retailer "Dark chocolate 74% — Fin Carré (Lidl)").
+- **No search anywhere**: the manager rendered all 168 into a 240px scroll box; the
+  picker put all 168 into a flat `<select>`.
+- **7 exact name/alias collisions** and **13 groups sharing one USDA FDC record**, none
+  previously identified.
+- All 5 AI call sites parsing `data.content?.[0]?.text`.
+
+## What Was Done
+
+### 1. AI model-change scoping (deliverable: `ai-model-change-scope.md`, sent, not committed)
+Mapped all 5 call sites: `fetchMacroEstimate` (L3581, max_tokens 256),
+`generatePlanWithAI` (L3926, 512), `parseWithAI` (L5380, 2048),
+`trkRunBulkStaples` (L6390, 4096), `trkRunQuickAdd` (L6509, 1024).
+
+**Headline finding — the blocker, not the cost:** every site parses
+`data.content?.[0]?.text`. Adaptive thinking is **on by default on both Sonnet 5 and
+Opus 5**, so `content[0]` becomes a thinking block and `.text` is `undefined`. Verified
+each site's failure mode individually rather than assuming uniform silence:
+`fetchMacroEstimate` fails **silently** (catch returns null); the other four surface a
+*misleading* error ("Unexpected format from AI", "No products recognised", "No items
+recognised") that reads as model regression, not a shape change.
+
+Cost was ruled out as a decision driver — worst case (bulk staple paste, ~5k in/3k out)
+is ~2¢ Haiku vs ~4¢ Sonnet 5 vs ~10¢ Opus 5. Recommendation: **all five → Sonnet 5,
+thinking disabled, defensive parse** (~30 min), with thinking-on for `fetchMacroEstimate`
+as a later measurable experiment. Not implemented — the ask was to scope only.
+
+### 2. Staples search (PR #57, draft)
+Added `trkMatchStaples(q)` matching on **name or any alias**, shared by the manager
+(`trkRenderStapleList()`) and the picker (`trkRenderStaplePickOptions()`). Followed the
+existing recipe-picker idiom rather than a new pattern. Also fixed empty-result paths
+that had never existed: picker clears its macro preview instead of showing stale figures;
+`trkSubmitStaple` toasts "Pick a product" instead of a silent `return`; deleting in the
+manager re-renders only the list so the search box and half-filled add-product form
+survive.
+
+### 3. Collision analysis → two review CSVs → applied renames
+Wrote both review CSVs to scratchpad (per the 2026-08-02 Asian-cuisine precedent —
+review CSVs are **not** committed) and sent via `SendUserFile`. Saffron returned the
+collision CSV annotated; a second round settled the convention.
+
+**Applied to Supabase in three ordered steps** — aliases folded *first* (while old names
+still existed), then deletions, then renames.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| index.html | `trkMatchStaples`, `trkRenderStapleList`, `trkRenderStaplePickOptions`; empty-result handling in `trkStaplePreview`/`trkSubmitStaple`; manager + picker markup | Modified | repo root |
+| sw.js | `CACHE` v37→v38 | Modified | repo root |
+| logs/daily-shuffle_log.md | This entry | Modified | repo root |
+| Supabase `staple_products` | 158 renames, 5 deletions, alias re-pointing, 5 nutrition corrections, flag hygiene | Modified | project `jsxcctrskkkxgdxfaduo` |
+| ai-model-change-scope.md | Model-change scoping doc | Created (scratchpad, sent, not committed) | session scratchpad |
+| staple-collision-review.csv | 7 exact collisions + 13 shared-FDC groups, with proposed resolutions | Created (scratchpad, sent, not committed) | session scratchpad |
+| staple-rename-review.csv / -v2.csv | v1 (inverted convention) then v2 (final) rename plans | Created (scratchpad, sent, not committed) | session scratchpad |
+| gen_rename.py / gen_rename_v2.py | Generators for the above | Created (scratchpad) | session scratchpad |
+| staple_search_check.mjs | Ad-hoc Playwright test of the new search paths, 10/10 | Created (scratchpad, not committed) | session scratchpad |
+
+## Decisions & Reasoning
+
+- **Naming convention → `<Food name>[, <qualifier>][ — <Brand \| generic>]`.** Saffron
+  first picked "product-first, brand after em-dash", so I proposed mechanical inversion
+  (`Sugar, brown`, `Oil, sesame`). She pushed back asking *"should it be sugar, Brown?"*
+  — **and her instinct was right, mine was wrong.** Final rule: **do not invert the food
+  name**; the comma is only for a qualifier separating two rows of the *same* food
+  ("Peanut butter, smooth" vs "Peanut butter, crunchy"), and the dash is only for the
+  source. Test: you'd say "brown sugar" aloud, never "sugar, brown". The original
+  argument for inversion (alphabetical grouping) was obsoleted by the search shipped in
+  the same session. **This reversed ~25 proposed names.**
+- **`— generic` only where a branded twin exists**, not on all 120 USDA rows — chosen
+  over "on every USDA row" and over "`— USDA` everywhere". Keeps the tag informative
+  rather than noise ("Avocado — generic" tells you nothing).
+- **Defaults flipped to match how Saffron actually eats.** The bare terms "soy sauce"
+  and "protein powder" resolved to the USDA generics — which are *wheat-containing* soy
+  sauce and *whey* protein, for a coeliac, dairy-free user. Now `soy sauce` → **Emma
+  Basic GF** and `protein powder` → **Free Soul vegan**; the whey row was stripped of
+  *all* aliases (including the chocolate/vanilla flavour ones, which moved to Free Soul
+  since its label is universal across flavours) so it can't catch a generic mention.
+- **`chilli oil` row deleted, not relabelled.** Saffron asked to relabel it "sesame oil",
+  but it was already byte-identical to the existing `sesame oil` row (same FDC 171016),
+  so relabelling would have created a duplicate. Deleting achieves the same intent.
+- **3 of the 8 "needs nutrition" rows were left untouched.** When Saffron supplied
+  replacement figures, the diff showed **Tamari, Brown sugar and Red pepper flakes were
+  the *legitimate* owners of their USDA records** — their twins were the borrowers. My
+  original flagging was too broad. Applying the supplied figures would have *degraded*
+  them (rounder numbers, fibre zeroed). Values kept; flag cleared only.
+- **`Chicken stock` renamed to `Chicken stock cube`** rather than just re-numbered — the
+  figures changed from made-up stock (36 kcal/100 g) to cube (270 kcal/100 g), a ~7.5×
+  jump. Without "cube" in the name a 100 g log would be silently catastrophic.
+- **`usda_seed` stripped from the 5 re-sourced rows** — their figures are now brand-label
+  averages, so the provenance flag had become false.
+- **Review CSVs to scratchpad, not the repo** — follows the same-day Asian-cuisine
+  precedent; they're pre-review proposals, not the reviewed-decisions the root CSVs hold.
+
+## Current State (end of session)
+- **`staple_products`: 163 rows.** 0 lowercase names, 0 stale `(generic)` suffixes,
+  0 duplicate names, 0 `nutrition_unverified`, 5 `nutrition_estimated`, 113 `usda_seed`.
+- **PR #57** (`claude/ai-model-product-naming-1c1nd4`) open, draft, mergeable_state clean.
+  No CI on this repo (the keepalive is `main`-only), no review comments.
+- Model change **scoped only — no code written**.
+
+## Next Steps
+1. **Merge PR #57** (search) — verified, nothing outstanding.
+2. If proceeding with the model change: apply the defensive parse
+   `(data.content||[]).find(b=>b.type==='text')?.text` at index.html L3633, L4024, L5479,
+   L6426, L6561 — **this is worth landing even if the model doesn't change.** Then swap
+   the 5 model strings and add `thinking:{type:'disabled'}`. Must also update
+   `CLAUDE.md:113` and the `index.html:5596` comment, and bump `sw.js` CACHE.
+3. Optional: replace **Coconut sugar** carbs 100.0 g → ~94 g (see Gotchas).
+4. Optional: re-source the 5 `nutrition_estimated` rows from *her actual UK products* —
+   the current figures are US-leaning brand averages.
+
+## Open Questions / Blockers
+- **CLAUDE.md AI-features list is drifted, independent of this session.** It names
+  *"pantry item parsing"* (pantry now lives in `legacy/`, not loaded) and omits
+  `fetchMacroEstimate` and `generatePlanWithAI`, both live. `claude_md_drift.mjs` does
+  **not** catch this — it only checks mechanical cases. Fix when this area is next touched.
+- **No nutrition data can be sourced from an agent session.** Verified this session:
+  `api.nal.usda.gov` *and* `world.openfoodfacts.org` both return **403 connect_rejected**
+  at the egress gateway, and WebFetch hits the same policy. WebSearch works but returns
+  page snippets only — no per-100 g figures, and no FDC ID for provenance. Only
+  `api.anthropic.com` + package registries are allowlisted. Nutrition sourcing must be
+  `scripts/usda_staples.py` on Saffron's Mac, or label data pasted into chat.
+
+## Environment & Config Notes
+- Repo `saffronlm-cmyk/daily-shuffle`, branch `claude/ai-model-product-naming-1c1nd4`,
+  **PR #57** (draft).
+- `sw.js` CACHE **v37 → v38**.
+- Supabase project `jsxcctrskkkxgdxfaduo`, table `staple_products` (163 rows after).
+- Flags in play: `usda_seed`, `nutrition_estimated` (new this session),
+  `nutrition_unverified` (introduced then fully cleared), `high_sodium`.
+- The Supabase MCP server disconnected and reconnected mid-session under a new tool
+  prefix — re-search via ToolSearch if this happens again.
+
+## Notes & Gotchas
+- **Renaming staples could not orphan saved meals — verified, don't re-panic.**
+  `trkFindStapleId()` (L5773) resolves by name/alias but runs **only at save time**;
+  `trkResolveItemMacros` reads by `source_id`. Confirmed 0 dangling references post-write.
+- **Coconut sugar carries an internally inconsistent figure**, applied verbatim as
+  supplied: carbs **100.0 g/100 g** against 378 kcal. 100 g carbs ≈ 400 kcal, and 100 g
+  of carbs leaves no room for moisture/ash. ~94 g would be consistent. Left as-is
+  deliberately rather than silently overriding her data; the discrepancy is ~2.4 kcal at
+  her typical 10 g usage, so it is immaterial in practice. Noted in the row's `notes`.
+- **Gochugaru and Dark chocolate chips kept fibre carried over from their old USDA
+  records** (27.2 g and 6.5 g) — the supplied data had no fibre. Flagged in each row's
+  `notes`. Don't mistake these for verified figures.
+- **`Chicken stock cube` is per 100 g of CUBE.** A 10 g cube ≈ 1,000–1,700 mg sodium.
+  Never log it by volume of made-up stock.
+- **`staple_products` has no sodium column** — all sodium data from this session lives in
+  the `notes` text, not a queryable field.
+- Ad-hoc browser tests must seed `trkStaples` via `trkLoadStaples(true)` reading the
+  `ds_trk_staples` localStorage key. Setting `window.trkStaples` does **not** work —
+  it's a `let` binding at module scope and doesn't attach to `window`.
+
+---
+
 # Asian cuisine tag expansion + recipe reclassification (cuisine, carb type, meal type, Dish Type)
 **Date:** 2026-08-02
 **Project:** Daily Shuffle — tagging taxonomy (`index.html` taxonomy code + Supabase `recipes` data)
