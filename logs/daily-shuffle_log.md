@@ -4,6 +4,177 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# Nutrition corrections applied, `claudeText()` parse fix shipped, both PRs merged, low-estimate bug diagnosed
+**Date:** 2026-08-02
+**Project:** Daily Shuffle — `staple_products` nutrition data, the embedded-AI response-parse path, and the AI macro-estimate accuracy investigation
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete (one bug parked as possibly-resolved — see Open Questions)
+
+---
+
+## Project Context
+Direct continuation of the entry below (same day, same conversation). That entry covers
+the staples search UI, the 158-row rename, and the collision resolution; it also left
+**8 rows flagged `nutrition_unverified`** and the model change **scoped but not built**.
+This entry covers everything after that point. Read both together.
+
+## Session Goal
+1. Apply the nutrition data Saffron supplied for the 8 flagged staples.
+2. Recommend on the model change, and ship the prerequisite parse fix as its own PR.
+3. Merge both PRs to `main`.
+4. Diagnose the reported "AI nutrition estimates are wrong" problem.
+
+## State Before This Session
+Per the entry below: `staple_products` at 163 rows, renames applied, 8 rows flagged
+`nutrition_unverified`, PR #57 (staples search) open as a draft, model change scoped only.
+It had also been established that **no nutrition data can be sourced from an agent
+session** — USDA and Open Food Facts are both 403 at the egress gateway.
+
+## What Was Done
+
+### 1. Nutrition data applied — but only 5 of the 8 rows
+Saffron supplied figures for all 8 flagged products. **Diffing them against what was
+stored changed the answer: 3 didn't need changing at all.**
+
+**Tamari, Brown sugar and Red pepper flakes were the *legitimate* owners of their USDA
+records** — FDC 174278 is literally *"Soy sauce made from soy (tamari)"* and FDC 168833
+is *"Sugars, brown"*. Their **twins** were the borrowers (`soy sauce`/`dark soy sauce`
+from tamari; `coconut sugar` from brown sugar). The previous entry's flagging was too
+broad. Applying the supplied figures would have made those three *worse* — rounder
+numbers, and fibre zeroed (tamari 0.8 g, red pepper flakes 27.2 g). Values kept, flag
+cleared only.
+
+The 5 that genuinely changed: **Coconut sugar** (was brown sugar's figures),
+**Gochugaru** (was cayenne's), **Vanilla paste** (was vanilla *extract*, 12.7 → 65 g
+carbs), **Dark chocolate chips** (was the chocolate *bar*), and **Chicken stock**
+(36 → 270 kcal/100 g).
+
+`Chicken stock` was **renamed to `Chicken stock cube`** — the figures changed from
+made-up stock to cube, a ~7.5x jump, so without "cube" in the name a 100 g log would be
+silently catastrophic. Tagged `high_sodium` (~13,000 mg/100 g).
+
+`usda_seed` was **stripped from all 5** — their figures are brand-label averages now, so
+that provenance flag had become false. They carry `nutrition_estimated` instead.
+
+### 2. PR #58 — `claudeText()` parse fix
+Shipped separately from any model change because it's a correctness fix on its own.
+All five call sites parsed `data.content?.[0]?.text`, which holds on Haiku (no thinking
+blocks) but breaks on Sonnet 5 / Opus 5, where adaptive thinking is on by default and
+`content[0]` is a `thinking` block. Added `claudeText(data)` — finds the first `text`
+block — at top level of script block 1, so it's global in block 2 the same way
+`showToast()` already is. Unit-tested against 6 response shapes.
+
+### 3. Both PRs merged to `main`
+#57 first (`93bb7e5`), then #58 (`29008c3`). **The `sw.js` conflict predicted in the PR
+body did occur** — both branches changed line 6 from v37 (#57→v38, #58→v39). Resolved to
+**v39**. `index.html` auto-merged cleanly (different regions), and this was verified
+post-merge rather than assumed: 6 `claudeText` sites, 3 `trkMatchStaples` refs, 0
+old-style parses, 3/3 script blocks, 5/5 smoke, no CLAUDE.md drift.
+
+### 4. Low-estimate diagnosis (the substantive investigation)
+Saffron reported estimates skewed **low** in *both* `fetchMacroEstimate` and
+`trkRunQuickAdd`. That direction + both-paths combination was decisive — it ruled out
+two candidates and left two. Full write-up is now in `handoff.md`; summary in Open
+Questions below. By the end she judged it may already be resolved by the nutrition
+corrections in step 1 (which all push estimates *up*), so it was parked rather than fixed.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| index.html | `claudeText()` helper + all 5 call sites routed through it | Modified (merged, `29008c3`) | repo root |
+| sw.js | CACHE v37 → **v39** (v38 claimed by #57, conflict resolved on merge) | Modified (merged) | repo root |
+| handoff.md | New "AI nutrition estimates skewed low" entry — ruled-out causes, live suspects, the one-click test | Modified | repo root |
+| logs/daily-shuffle_log.md | This entry | Modified | repo root |
+| Supabase `staple_products` | 5 rows re-nutritioned + 1 renamed; 3 flag-cleared only; `usda_seed` stripped from the 5 | Modified | project `jsxcctrskkkxgdxfaduo` |
+
+## Decisions & Reasoning
+
+- **Only 5 of 8 nutrition rows updated.** Options were: apply all 8 as supplied, or diff
+  first. Diffing showed 3 would have been *degraded*. Verifying supplied data against
+  what's stored, rather than trusting the request, is what caught it.
+- **Parse fix shipped as its own PR, before any model change.** It changes nothing on
+  Haiku, so it can merge with zero risk, and it removes the tripwire ahead of time. Had
+  the model been swapped first, four of the five sites would have failed with messages
+  ("No products recognised", "Unexpected format from AI") that read as model regression —
+  a near-certain false rollback.
+- **CACHE resolved to v39, not v38.** The constant only has to *change* to bust the
+  cache; contiguity is not required, so skipping 38 on that line is harmless and avoids
+  renumbering a merged commit.
+- **`Chicken stock` renamed rather than just re-numbered.** A silent 7.5x change in what
+  "100 g" means is a data trap; the name now carries the warning.
+- **Model recommendation: Sonnet 5, not Opus 5.** Cost is immaterial at this volume
+  (~2¢ vs ~4¢ vs ~10¢ for the largest call). Opus 5's edge is long-horizon agentic work;
+  these are single-turn bounded extractions, which is Sonnet 5's sweet spot. Paying 5x
+  for an unexercised capability profile is a bad trade.
+- **Bug parked, not fixed.** Saffron's call — she believes the nutrition corrections may
+  have resolved it. Documented thoroughly in `handoff.md` instead, including the two
+  *ruled-out* causes so a future session doesn't re-derive them.
+
+## Current State (end of session)
+- `main` carries both merges. CACHE **v39**. JS parse 3/3, smoke 5/5, no CLAUDE.md drift.
+- `staple_products`: **164 rows** — 163 after this session's work, plus **Konjac noodles**,
+  which Saffron added herself via the app on 2026-08-03 and which already fits the new
+  naming convention unaided (a small signal the convention is self-sustaining).
+- 0 rows `nutrition_unverified`; 5 `nutrition_estimated`; 113 `usda_seed`.
+- Model change: **recommended and scoped, not implemented.** Parse-fix prerequisite done.
+
+## Next Steps
+1. **Confirm whether the low-estimate problem is actually gone.** Add a recipe and run a
+   Quick Add; compare against a hand-calculated figure. If gone, delete the `handoff.md`
+   entry. If not, go to step 2.
+2. If it persists on the **recipe** path: open a 4-serving recipe, hit re-estimate, and
+   check whether it lands ~4x low. That one click confirms or kills the double-division
+   hypothesis outright.
+3. Fix the `serves` fallback at `index.html` ~L4705 (`servings: supabaseRow.serves` has no
+   `|| 2`, unlike L1481) regardless of the above — it's a real bug affecting the 8
+   no-`serves` recipes, just not the one reported.
+4. Optional: the model swap itself (5 model strings + `thinking`/`max_tokens`). Must also
+   update `CLAUDE.md:113` and the `index.html` "claude-haiku call pattern" comment, and
+   bump CACHE.
+
+## Open Questions / Blockers
+- **The low-estimate bug is parked as possibly-resolved.** Full detail in `handoff.md`;
+  the short version: *ruled out* — the `serves` bug (skews high, recipe path only) and
+  truncated JSON (`trkParseJsonLoose` ends in a strict `JSON.parse`, so it throws rather
+  than dropping items). *Live suspects* — double division on the recipe path, and no room
+  to compute on both (measured: **~7,200 tokens** of staples injected into Quick Add,
+  **~4,400** into the recipe estimate, against `max_tokens` of 1024 and **256**).
+- **CLAUDE.md's AI-features list is still drifted** (carried over from the entry below,
+  not fixed): it names *"pantry item parsing"* (pantry lives in `legacy/`, not loaded) and
+  omits `fetchMacroEstimate` and `generatePlanWithAI`, both live. `claude_md_drift.mjs`
+  does not catch this class. Fix when this area is next touched.
+
+## Environment & Config Notes
+- Repo `saffronlm-cmyk/daily-shuffle`. Merged: **#57** (`93bb7e5`), **#58** (`29008c3`).
+- This entry's branch: `claude/ai-model-product-naming-1c1nd4`, **restarted from `main`**
+  after #57 merged, per the merged-PR-is-finished rule — so its new PR is a *new* PR.
+- `sw.js` CACHE **v39**. Supabase project `jsxcctrskkkxgdxfaduo`, `staple_products` 164 rows.
+- Both Supabase and GitHub MCP servers disconnected and reconnected mid-session, twice,
+  under changed tool prefixes — re-load via ToolSearch if tool calls start failing.
+
+## Notes & Gotchas
+- **Do not re-flag Tamari, Brown sugar or Red pepper flakes as needing nutrition.** They
+  are the correct owners of their USDA records. The rows that were borrowing from them
+  (`Soy sauce — generic`, `Dark soy sauce`, `Coconut sugar`) are the ones to scrutinise —
+  and note **`Dark soy sauce` still carries tamari's figures** and was never corrected,
+  because Saffron said to disregard the soy sauces in that group.
+- **`Coconut sugar` carries a knowingly inconsistent figure**: carbs **100.0 g/100 g**
+  against 378 kcal (100 g of carbs ≈ 400 kcal, and leaves no room for moisture/ash).
+  ~94 g would be consistent. Applied verbatim as supplied rather than silently overridden;
+  the discrepancy is ~2.4 kcal at typical 10 g usage. Recorded in the row's `notes`.
+- **`Gochugaru` and `Dark chocolate chips` kept fibre carried over from their old USDA
+  records** (27.2 g and 6.5 g) — the supplied data had none. Flagged in each row's `notes`.
+  Don't mistake those for verified figures.
+- **The staples context injected into Quick Add includes every row's full `notes` text**
+  (`trkBuildStapleContext`), which is why it is ~1.6x the size of the recipe-path context.
+  This session's long explanatory notes therefore have a direct token cost on every
+  Quick Add call — worth remembering before writing more prose into `notes`.
+- `sw.js` CACHE is at **v39**, not v38 — v38 was consumed by the #57/#58 conflict
+  resolution and never existed on `main`. Next bump is v40.
+
+---
+
 # Staple products: search UI, full rename to a new naming convention, collision resolution + AI model-change scoping
 **Date:** 2026-08-02
 **Project:** Daily Shuffle — Tracker staples (`staple_products` data + `index.html` UI) and the embedded-AI model choice
