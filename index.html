@@ -6186,31 +6186,43 @@ async function trkSubmitQuickCal(){
 function trkOpenStaplePick(){
   const meal = trkChooserMeal();
   if(!trkStaples.length){ trkModal(`<h3>No staples yet</h3><div class="trk-sub">Add products via the Staples button${trkHasCloud()?'':' (after adding Supabase credentials)'}.</div>`); return; }
-  const opts = trkStaples.map(s=>`<option value="${s.id}">${trkEsc(s.name)}</option>`).join('');
   trkModal(`
     <h3>Add from staple</h3>
     <div class="trk-field"><label>Meal</label><select id="trkMeal">${trkMealOptions(meal)}</select></div>
-    <div class="trk-field"><label>Product</label><select id="trkStapleSel" onchange="trkStaplePreview()">${opts}</select></div>
+    <div class="trk-field"><label>Search</label><input id="trkStaplePickFilter" placeholder="name or alias…" oninput="trkRenderStaplePickOptions()"></div>
+    <div class="trk-field"><label>Product</label><select id="trkStapleSel" onchange="trkStaplePreview()"></select></div>
     <div class="trk-field"><label>Quantity (in the product's own unit)</label><input id="trkStapleQty" type="number" step="any" value="" oninput="trkStaplePreview()" placeholder="how much?"></div>
     <div class="trk-sub" id="trkStaplePrev"></div>
     <button class="trk-btn" onclick="trkSubmitStaple()">Add</button>
   `);
+  trkRenderStaplePickOptions();
+}
+function trkRenderStaplePickOptions(){
+  const sel = document.getElementById('trkStapleSel'); if(!sel) return;
+  const filter = document.getElementById('trkStaplePickFilter');
+  const prev = sel.value;
+  const list = trkMatchStaples(filter ? filter.value : '');
+  sel.innerHTML = list.map(s=>`<option value="${s.id}">${trkEsc(s.name)}</option>`).join('');
+  // Keep the current pick selected if it survived the filter.
+  if(list.some(s=>String(s.id)===String(prev))) sel.value = prev;
   trkStaplePreview();
 }
 function trkStapleById(id){ return trkStaples.find(s=>String(s.id)===String(id)); }
 function trkStaplePreview(){
-  const s = trkStapleById(document.getElementById('trkStapleSel').value); if(!s) return;
+  const prevEl = document.getElementById('trkStaplePrev');
+  const s = trkStapleById(document.getElementById('trkStapleSel').value);
+  if(!s){ if(prevEl) prevEl.innerHTML = '<span style="color:var(--text3)">No matching products.</span>'; return; }
   const base = trkNum(s.serving_qty)||1;
   const qty = trkNum(document.getElementById('trkStapleQty').value);
   const f = qty>0 ? qty/base : 0;
-  const prev = document.getElementById('trkStaplePrev');
   const unitNote = `Base: ${trkRound1(s.serving_qty)} ${trkEsc(s.serving_unit)} = ${Math.round(trkNum(s.calories))}kcal · ${trkRound1(s.protein_g)}P ${trkRound1(s.carbs_g)}C ${trkRound1(s.fat_g)}F`;
-  prev.innerHTML = (qty>0)
+  prevEl.innerHTML = (qty>0)
     ? `→ <b>${Math.round(trkNum(s.calories)*f)} kcal</b> · ${trkRound1(trkNum(s.protein_g)*f)}P ${trkRound1(trkNum(s.carbs_g)*f)}C ${trkRound1(trkNum(s.fat_g)*f)}F ${trkRound1(trkNum(s.fibre_g)*f)}Fb<br><span style="color:var(--text3)">${unitNote}${s.notes?' · '+trkEsc(s.notes):''}</span>`
     : `<span style="color:var(--text3)">${unitNote}${s.notes?' · '+trkEsc(s.notes):''}</span>`;
 }
 async function trkSubmitStaple(){
-  const s = trkStapleById(document.getElementById('trkStapleSel').value); if(!s) return;
+  const s = trkStapleById(document.getElementById('trkStapleSel').value);
+  if(!s){ showToast('Pick a product'); return; }
   const base = trkNum(s.serving_qty)||1;
   const qty = trkNum(document.getElementById('trkStapleQty').value);
   if(qty<=0){ showToast('Enter a quantity'); return; }
@@ -6307,14 +6319,29 @@ async function trkOpenStaples(){
   await trkLoadStaples(true);
   trkRenderStaplesManager();
 }
-function trkRenderStaplesManager(){
-  const rows = trkStaples.length ? trkStaples.map(s=>`<div class="trk-staple-row">
+// Match staples on name or any alias — shared by the manager and the picker.
+function trkMatchStaples(q){
+  const s = (q||'').toLowerCase().trim();
+  if(!s) return trkStaples;
+  return trkStaples.filter(p =>
+    (p.name||'').toLowerCase().includes(s) ||
+    (p.aliases||[]).some(a => (a||'').toLowerCase().includes(s))
+  );
+}
+function trkRenderStapleList(){
+  const el = document.getElementById('trkStapleList'); if(!el) return;
+  const filter = document.getElementById('trkStapleFilter');
+  const list = trkMatchStaples(filter ? filter.value : '');
+  el.innerHTML = list.length ? list.map(s=>`<div class="trk-staple-row">
     <span class="nm">${trkEsc(s.name)}<br><span style="color:var(--text3);font-size:10px">${trkRound1(s.serving_qty)}${trkEsc(s.serving_unit)} · ${Math.round(trkNum(s.calories))}kcal ${trkRound1(s.protein_g)}P ${trkRound1(s.carbs_g)}C ${trkRound1(s.fat_g)}F</span></span>
-    <button onclick="trkDeleteStaple('${s.id}').then(trkRenderStaplesManager)" title="Delete">🗑</button>
-  </div>`).join('') : '<div class="trk-empty">No staples yet.</div>';
+    <button onclick="trkDeleteStaple('${s.id}').then(trkRenderStapleList)" title="Delete">🗑</button>
+  </div>`).join('') : `<div class="trk-empty">${trkStaples.length ? 'No matching products.' : 'No staples yet.'}</div>`;
+}
+function trkRenderStaplesManager(){
   trkModal(`<h3>Staple products</h3>
     <div class="trk-sub">Your most-used products with fixed nutrition. These power the AI quick-add.</div>
-    <div style="max-height:240px;overflow-y:auto;margin-bottom:14px">${rows}</div>
+    <div class="trk-field"><label>Search</label><input id="trkStapleFilter" placeholder="name or alias…" oninput="trkRenderStapleList()"></div>
+    <div id="trkStapleList" style="max-height:240px;overflow-y:auto;margin-bottom:14px"></div>
     <div style="display:flex;gap:8px;margin-bottom:14px"><button class="trk-btn sec" onclick="trkOpenBulkStaples()">Bulk paste a list</button></div>
     <h3 style="font-size:14px">Add a product</h3>
     <div class="trk-field"><label>Name</label><input id="trkSpName" placeholder="e.g. Lidl soya yoghurt"></div>
@@ -6324,6 +6351,7 @@ function trkRenderStaplesManager(){
     <div class="trk-field"><label>Aliases (comma-separated, optional)</label><input id="trkSpAlias" placeholder="pb, peanut butter"></div>
     <div class="trk-field"><label>Notes (optional)</label><input id="trkSpNotes" placeholder="e.g. 1 tbsp ≈ 8g"></div>
     <button class="trk-btn" onclick="trkSubmitStapleProduct()">Save product</button>`);
+  trkRenderStapleList();
 }
 async function trkSubmitStapleProduct(){
   const name = document.getElementById('trkSpName').value.trim(); if(!name){ showToast('Enter a name'); return; }
