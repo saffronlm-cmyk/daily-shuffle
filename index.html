@@ -3575,6 +3575,19 @@ function renderReceiptHistory() {
       }).join('');
 }
 
+// Pull the assistant's text out of a Messages API response.
+//
+// Do NOT index content[0] directly. A response's content array can lead with a
+// non-text block — most importantly a `thinking` block, which is emitted by
+// default on models with adaptive thinking (Sonnet 5, Opus 5). content[0].text
+// is then undefined and every caller silently parses an empty string, which
+// surfaces as "No products recognised" / "Unexpected format from AI" rather
+// than anything pointing at the response shape. Find the text block instead.
+function claudeText(data) {
+  const blocks = Array.isArray(data && data.content) ? data.content : [];
+  return blocks.find(b => b && b.type === 'text')?.text || '';
+}
+
 // Estimate per-serving macros from an ingredient list via Claude. Returns
 // {kcal,protein,carbs,fat} or null on any failure (no key, network, bad JSON).
 // Shared by the in-modal "Re-estimate" button and the Add-Recipe submit flow.
@@ -3630,7 +3643,7 @@ Rules:
     });
     if(!res.ok) return null;
     const data = await res.json();
-    const raw = data.content?.[0]?.text || '';
+    const raw = claudeText(data);
     const cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
     const parsed = JSON.parse(cleaned);
     const perServing = v => (v == null || isNaN(Number(v))) ? null : Math.round(Number(v) / n);
@@ -4021,7 +4034,7 @@ Exactly ${days} objects. Use null for slots not being planned.`;
     }
 
     const data = await res.json();
-    const raw = (data.content?.[0]?.text || '').trim()
+    const raw = claudeText(data).trim()
       .replace(/^```json\s*/,'').replace(/^```\s*/,'').replace(/\s*```$/,'');
 
     const parsed = JSON.parse(raw);
@@ -5476,7 +5489,7 @@ Rules:
     }
 
     const data = await res.json();
-    const raw = data.content?.[0]?.text || '';
+    const raw = claudeText(data);
 
     // Strip any accidental markdown fences
     const cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
@@ -6423,7 +6436,7 @@ Rules:
     });
     if(!res.ok){ const e = await res.json().catch(()=>({})); throw new Error(e.error?.message || ('API error '+res.status)); }
     const data = await res.json();
-    let raw = (data.content?.[0]?.text || '').replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/i,'').trim();
+    let raw = claudeText(data).replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/i,'').trim();
     const start = raw.indexOf('['), end = raw.lastIndexOf(']');
     if(start>=0 && end>start) raw = raw.slice(start, end+1);
     const items = trkParseJsonLoose(raw);
@@ -6558,7 +6571,7 @@ Rules:
     });
     if(!res.ok){ const e = await res.json().catch(()=>({})); throw new Error(e.error?.message || ('API error '+res.status)); }
     const data = await res.json();
-    let raw = (data.content?.[0]?.text || '').replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/i,'').trim();
+    let raw = claudeText(data).replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/i,'').trim();
     const start = raw.indexOf('['), end = raw.lastIndexOf(']');
     if(start>=0 && end>start) raw = raw.slice(start, end+1);
     const items = trkParseJsonLoose(raw);
