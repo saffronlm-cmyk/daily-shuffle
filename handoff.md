@@ -198,3 +198,50 @@ engine lights up** — this is the payoff and the next design space:
   as a single string (card kicker/`CUISINE_EMOJI`, the "Cuisine" filter chip,
   the AI recipe-parser schema). Raised 2026-08-01 during the Asian-cuisine
   tag-variant expansion (Vietnamese/Thai/Chinese/Korean).
+
+- **AI nutrition estimates skewed low (possibly already resolved — re-check
+  before investigating)**: on 2026-08-02 Saffron reported that macro estimates
+  came out consistently *low* in both `fetchMacroEstimate` (Add Recipe /
+  "Re-estimate") and `trkRunQuickAdd` (Tracker → Quick add with AI). By the end
+  of that session she thought it may have resolved itself — plausibly because
+  the same session corrected several staples that had been carrying another
+  product's figures (Vanilla paste 12.7 → 65 g carbs; Chicken stock 36 →
+  270 kcal/100 g as a cube), and re-pointed the bare terms "soy sauce" and
+  "protein powder" at her GF/vegan products instead of the wheat/whey generics.
+  Those all push estimates *up*, which fits. **Confirm it's actually gone
+  before spending time here.**
+
+  If it persists, two ruled-out causes and two live suspects, so nobody
+  re-treads the ground:
+
+  - *Ruled out — the `serves` fallback bug.* `index.html` maps recipes in two
+    places and they disagree: L1481 `servings: row.serves || 2` has a fallback,
+    the Supabase-row mapper (`servings: supabaseRow.serves`, ~L4705) does not,
+    so a null `serves` leaves it undefined and the call site defaults to 1,
+    making the per-serving divide a no-op. Real bug, still worth fixing, but it
+    skews estimates **high**, and only on the recipe path — so it is not this.
+  - *Ruled out — truncated JSON.* `trkParseJsonLoose` ends in a strict
+    `JSON.parse`, so a cut-off array throws and surfaces as "No items
+    recognised". It cannot silently drop items.
+  - *Suspect 1 — double division (recipe path only).* The comment above
+    `fetchMacroEstimate` records that the model "often returns whole-recipe
+    totals despite being asked for per-serving". The prompt was then rewritten
+    to demand the TOTAL, with the code dividing by servings itself. If the model
+    has since flipped back to returning per-serving, it gets divided twice —
+    which would make estimates low by *exactly* the serves count. **Test: open a
+    4-serving recipe, re-estimate, check whether it lands ~4x low.** That single
+    check confirms or kills this hypothesis.
+  - *Suspect 2 — no room to compute.* Measured 2026-08-02: the staples block
+    injected into every call is **~7,200 tokens** for Quick Add (all products
+    *with* their full `notes`) and **~4,400 tokens** for the recipe estimate
+    (no notes). The model then does ~20 unit conversions and a summation with
+    `max_tokens` of **1024** and **256** respectively, and no thinking — i.e.
+    one-shot mental arithmetic over a long product list. Quick Add has no
+    servings divide, so if it is still low, this (plus the prompt's "if quantity
+    is vague, assume a sensible serving" line, which Haiku reads conservatively)
+    is the likely mechanism.
+
+  Fix if confirmed: raise `max_tokens`, enable thinking, and make the
+  total-vs-per-serving contract unambiguous. See the model-change scoping in the
+  2026-08-02 log entry — note the `claudeText()` helper (PR #58) is already in
+  place, so a model swap no longer breaks response parsing. Raised 2026-08-02.
