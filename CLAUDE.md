@@ -20,15 +20,20 @@ Single user (Saffron), no auth, deployed as static files.
 - **`legacy/`** — verbatim-lifted tabs stashed during the foundations restructure
   (Track/Food Log, Pantry, Discover/Edamam, Wellness, Macro Calculator). Not loaded by the
   live app. See `legacy/README.md` for source line refs and the re-grafting checklist.
-- **`scripts/`** — two standalone Python 3 pipelines (stdlib only, no `pip install`),
+- **`scripts/`** — three standalone Python 3 pipelines (stdlib only, no `pip install`),
   plus the Node smoke test (below):
   - **Price-book**: `price_pricebook.py` (CSV → Apify scrape → filled CSV) →
     `csv_to_seed.py` (patches `seedPriceBook()` in `index.html`). Input: `pricebook.csv`.
   - **Nutrition staples**: `usda_staples.py` (`staple_candidates*.csv` → USDA FDC →
     `staple_report.csv`, reviewed then applied to Supabase `staple_products` via MCP).
-  - Both are **build-only, run locally by Saffron** — the sandbox egress gateway blocks
-    `api.apify.com` and `api.nal.usda.gov` (confirmed 403 `connect_rejected`). Never run
-    them from an agent session; she runs them on her Mac and pastes results back.
+  - Those two are **build-only, run locally by Saffron** — the sandbox egress gateway
+    blocks `api.apify.com` and `api.nal.usda.gov` (confirmed 403 `connect_rejected`).
+    Never run them from an agent session; she runs them on her Mac and pastes results back.
+  - **Quantity normalisation**: `normalise_quantities.py` (recipes JSON dump →
+    `quantity_review.csv` + `ingredient_grams_updates.json`) — the apply script for
+    nutrition step 2. Unlike the two above it needs **no external network**, so it does
+    run in an agent session, on a `recipes` dump pulled via Supabase MCP. Present but
+    **not yet run against live data** — see the workstream section below.
   - See `scripts/README.md` for flags (`--dry-run`, `--probe`, `--sample`) and gotchas.
   - **`smoke_test.mjs`** — headless-browser smoke test (Playwright/Chromium, runs fine
     in the sandbox, fully offline). `node scripts/smoke_test.mjs`. See the `smoke-test`
@@ -101,10 +106,11 @@ Single user (Saffron), no auth, deployed as static files.
 
 1. **Staple macros** (done) — `staple_products` expanded to ~167 rows via
    `usda_staples.py` + manual review.
-2. **Quantity normalisation** (approved, **not applied**) — ruleset in
-   `quantity-normalisation-plan.md`. Applying it means: new non-destructive
-   `ingredient_grams` jsonb column on `recipes`, skip the 8 no-`serves` recipes
-   (flag `serves_missing`), emit a pre-write review CSV first.
+2. **Quantity normalisation** (approved, script written, **not applied**) — ruleset in
+   `quantity-normalisation-plan.md`, implemented by `scripts/normalise_quantities.py`
+   (merged 2026-08-04, has never been run against live data). Applying it means: new
+   non-destructive `ingredient_grams` jsonb column on `recipes`, skip the 8 no-`serves`
+   recipes (flag `serves_missing`), emit a pre-write review CSV first.
 3. **Bulk nutrition re-population** (blocked) — **must not run until step 2 is applied.**
 
 ## AI features
@@ -153,7 +159,9 @@ recipe quick-add, bulk staple paste import, tracker AI quick-add.
 - For any bulk read/write against the Supabase tables, use the **`recipe-db`** skill —
   it holds the schema map and the non-destructive-write conventions.
 - Generated/local-only files are gitignored: `pricebook.filled.csv`, `price_report.md`,
-  `scripts/seed_snippet.js`, `scripts/staple_report*.csv`, `index.html.bak`.
+  `scripts/seed_snippet.js`, `scripts/staple_report*.csv`, `index.html.bak`, and the
+  quantity-normalisation outputs (`quantity_review*.csv`, `recipes_dump.json`,
+  `ingredient_grams_updates.json`).
 
 ---
 
