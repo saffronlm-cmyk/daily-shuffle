@@ -4,6 +4,161 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# PR backlog cleared — 6 merged including a split of the 2-month-old RLS PR; open-PR count 6 → 0
+**Date:** 2026-08-03
+**Project:** Daily Shuffle — repo hygiene (PR backlog), plus a full outstanding-work inventory
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete
+
+---
+
+## Project Context
+Third and final entry from the 2026-08-02/03 conversation — see the two entries below for
+the staples rename + search work and the nutrition corrections + parse fix. This entry is
+almost entirely repo hygiene: Saffron asked to "merge PRs to main", which surfaced **five
+stale PRs from earlier sessions** nobody had closed out, going back to 2026-05-30.
+
+## Session Goal
+Merge the open PRs, and enumerate what's actually left outstanding on the project.
+
+## State Before This Session
+`main` carried PRs #57 and #58 (merged in the entry below). PR #59 (session log +
+`handoff.md` bug note) was open as a draft. **Unnoticed until now: five further PRs were
+also open** — #5, #14, #36, #45, #56.
+
+## What Was Done
+
+### 1. Scope check before merging anything
+"Merge PRs to main" was ambiguous once six PRs turned out to be open rather than one.
+Merged **#59** immediately (unambiguously this session's work), then **stopped** and
+test-merged the other five locally against current `main` to produce real information —
+conflicts, file lists, ages — before asking. Saffron chose "all five, but split #5".
+
+### 2. PR #5 split — the one that needed judgement
+Opened 2026-05-30, still not a draft, bundling **two unrelated changes**:
+
+- **KEPT** — `index.html`: `flattenIngredientSections` skips null/blank ingredient items.
+  Verified against `main` that this was **still needed** (no such filter existed), so
+  recipes whose ingredient text was lost on import were still rendering a literal `"null"`
+  line per item, two months on.
+- **DROPPED** — `supabase/migrations/20260530092223_enable_rls_recipes_readonly_user_library_rw.sql`.
+  Checked `pg_policies` against the live project first: `recipes` currently grants anon
+  **SELECT + INSERT + UPDATE**. The migration documents anon *read-only*, which is simply
+  not the live state — and applying it would break in-app recipe add/edit/soft-delete
+  syncing. CLAUDE.md also says not to change RLS in passing. Removed from the branch and
+  the reason recorded in the merge commit rather than merged as a dormant footgun.
+
+### 3. The other four
+- **#14** (2026-06-25) — `price_pricebook.py` quota detection + `--resume`. Clean, merged.
+- **#45** (2026-07-19) — log correction only. Clean, merged.
+- **#56** (2026-08-02) — log conflict. Merged after resolution.
+- **#36** (2026-07-01) — log conflict; payload is `scripts/normalise_quantities.py`.
+  **Verified before merging that it lands no data**: stdlib-only, zero network or DB calls,
+  so the nutrition step-2 gate is untouched. Also confirmed `claude_md_drift.mjs` stayed
+  clean with the new script present (9 scripts, all documented).
+
+### 4. Log-conflict resolution method
+Both conflicts were purely prepend-ordering — each branch and `main` had added entries at
+the top. Everything in #56's conflict was dated **2026-08-02**, so date alone couldn't
+order them; used **the PRs each entry describes** instead. The japchae entry covers PR #53
+and the Asian-cuisine entry above it covers #54/#55, so japchae slots below it. For #36,
+"Ruleset Applied" sits above "§6 Decisions Signed Off" because sign-off precedes apply.
+Resolved by script (extract entry, insert at anchor) rather than by hand, then verified
+zero conflict markers and 23 intact headings.
+
+### 5. Outstanding-work inventory
+Saffron asked what else is open. Produced a full inventory — reproduced in Next Steps and
+Open Questions below so it doesn't have to be re-derived.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| index.html | `isBlank` null-ingredient filter in `flattenIngredientSections` (from #5) | Modified (merged, `2cd36be`) | repo root |
+| sw.js | CACHE v39 → **v40** (#5 is an app-code change) | Modified (merged) | repo root |
+| scripts/normalise_quantities.py | Nutrition step-2 apply script — lands unused | Added (merged, `cc615a5`) | scripts/ |
+| scripts/price_pricebook.py | Apify quota detection + `--resume` | Modified (merged, `61a9a92`) | scripts/ |
+| scripts/README.md, .gitignore | Updated alongside #36 | Modified (merged) | repo root / scripts/ |
+| logs/daily-shuffle_log.md | 2 conflict resolutions + this entry | Modified | repo root |
+| supabase/migrations/…enable_rls_recipes_readonly….sql | RLS lockdown migration | **Deleted before merge** — see Decisions | was on branch `claude/recipe-null-supabase-GnoDV` |
+
+## Decisions & Reasoning
+
+- **Merged #59 first, then paused to ask.** Options were: merge all six, merge only #59,
+  or ask. "Merge PRs to main" plural could reasonably mean either, and five of the six
+  were months-old work from other sessions with real risk in at least one. Splitting it —
+  land the unambiguous one, gather concrete data on the rest, then ask — meant progress
+  without an irreversible guess.
+- **Test-merged all five locally before asking.** Turned "shall I merge these?" into a
+  question with a table attached: which merge clean, which conflict, on what files. Cost
+  ~30 seconds and made the decision answerable in one reply.
+- **Dropped #5's RLS migration rather than merging or closing the whole PR.** Options:
+  merge whole (ships a footgun), close whole (loses a live bug fix), or split. Checked the
+  live policies first, which showed the migration contradicts reality — so splitting was
+  clearly right rather than a judgement call.
+- **Merged #36 despite the nutrition step-2 gate.** The gate is about *writing
+  `ingredient_grams`*, not about the script existing. Verified no network/DB calls, so
+  merging changes nothing operationally and gets the script out of a stale branch.
+- **Ordered conflicting log entries by the PRs they describe, not by date.** Every entry
+  in #56's conflict was 2026-08-02; PR numbers gave a total order where dates gave a tie.
+
+## Current State (end of session)
+- **0 open PRs** (was 6).
+- `main` verified after all merges: 3/3 script blocks, **5/5 smoke**, no CLAUDE.md drift,
+  0 conflict markers in the log, 23 log headings intact.
+- CACHE **v40**. `staple_products` 164 rows, unchanged this session — **no database writes
+  were made at any point**.
+
+## Next Steps
+1. **Confirm the low-estimate bug is actually gone** (see `handoff.md`) — add a recipe,
+   run a Quick Add, compare against a hand-calculated figure. If gone, delete the note.
+2. **Fix the `serves` fallback**: `index.html` ~L4705 `servings: supabaseRow.serves` lacks
+   the `|| 2` that L1481 has. Real bug, affects the 8 no-`serves` recipes.
+3. **Correct `Dark soy sauce`** — it still carries tamari's figures (shared FDC 174278).
+   Never fixed because Saffron said to disregard the soy sauces in that collision group.
+4. **Fix CLAUDE.md's AI-features list** (details in Open Questions).
+5. Nutrition step 2: run `scripts/normalise_quantities.py` (now on `main`), review its CSV,
+   then populate `ingredient_grams`. Step 3 stays blocked until that lands.
+
+## Open Questions / Blockers
+- **CLAUDE.md's AI-features list is wrong in three ways**, enumerated this session by
+  diffing the doc against the five live `api.anthropic.com` call sites. It names
+  **"pantry item parsing"**, which is dead (Pantry lives in `legacy/`, not loaded), and
+  omits **`fetchMacroEstimate`** (recipe macro estimation) and **`generatePlanWithAI`**
+  (Shuffle-tab plan generation). `claude_md_drift.mjs` does not catch this class — it only
+  checks tabs, script files, root data files, canonicalise copies and sw.js hosts.
+  Notably `fetchMacroEstimate` is the feature Saffron reported as producing bad numbers,
+  and it isn't in the docs at all.
+- Still parked, unchanged: the low-estimate bug (`handoff.md`), the 5
+  `nutrition_estimated` staples sourced from US-leaning brand averages, and `Coconut
+  sugar`'s knowingly-inconsistent 100.0 g carbs.
+- `MONETIZATION.md` remains an untouched separate track with its own gates.
+
+## Environment & Config Notes
+- Repo `saffronlm-cmyk/daily-shuffle`. Merged this session: **#59** `6cad58c`,
+  **#5** `2cd36be`, **#14** `61a9a92`, **#45** `1d107f0`, **#56** `af6e9b4`, **#36** `cc615a5`.
+- This entry's branch: `claude/ai-model-product-naming-1c1nd4`, restarted from `main` again
+  after #59 merged (second restart of the same branch name this conversation).
+- `sw.js` CACHE **v40**. Next bump is v41.
+- All five stale PRs were **drafts except #5** and had to be un-drafted before merging —
+  `merge_pull_request` returns `405 Pull Request is still a draft` otherwise.
+
+## Notes & Gotchas
+- **Do not resurrect the dropped RLS migration** without re-checking `pg_policies` first.
+  As of 2026-08-03 `recipes` grants anon SELECT + INSERT + UPDATE, and the app depends on
+  those writes for custom recipes. The migration's read-only policy would break them.
+- **`sw.js` has never had a v38.** It was consumed resolving the #57/#58 conflict and never
+  landed on `main`: the sequence is v37 → v39 (#58) → v40 (#5). Don't "fix" the gap.
+- **The five stale PRs had base SHAs up to 2 months old**, yet only two conflicted, both on
+  the log file. `index.html` auto-merged cleanly in #5 despite the age gap — but that is
+  luck, not a guarantee; always verify the merged result rather than trusting a clean
+  auto-merge (checked here: `isBlank` present, 6 `claudeText` sites, 3 `trkMatchStaples`).
+- When a log-file conflict has entries sharing one date, order by the **PR numbers the
+  entries describe**. This will recur — the log is the single most conflict-prone file in
+  the repo because every session prepends to it.
+
+---
+
 # Nutrition corrections applied, `claudeText()` parse fix shipped, both PRs merged, low-estimate bug diagnosed
 **Date:** 2026-08-02
 **Project:** Daily Shuffle — `staple_products` nutrition data, the embedded-AI response-parse path, and the AI macro-estimate accuracy investigation
