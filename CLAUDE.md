@@ -111,8 +111,20 @@ Single user (Saffron), no auth, deployed as static files.
 
 In-browser calls direct to `https://api.anthropic.com/v1/messages` using the user's own
 key (`ds_api_key` in `localStorage`, set via Settings), model `claude-haiku-4-5-20251001`,
-header `anthropic-dangerous-direct-browser-access: true`. Used for: pantry item parsing,
-recipe quick-add, bulk staple paste import, tracker AI quick-add.
+header `anthropic-dangerous-direct-browser-access: true`. Five live call sites, all
+sharing the `claudeText()` response-parsing helper:
+
+| Function | Where | What it does |
+|---|---|---|
+| `parseWithAI` | Add Recipe | Parses pasted text / a screenshot into a recipe |
+| `fetchMacroEstimate` | Add Recipe submit + "Re-estimate" | Estimates macros from the ingredient list. Asks for **whole-recipe totals** and divides by `servings` in JS — do not also ask the model to divide |
+| `generatePlanWithAI` | Shuffle | Generates a meal plan |
+| `trkRunQuickAdd` | Tracker | Free-text "what I ate" → structured entries |
+| `trkRunBulkStaples` | Tracker | Bulk staple paste import |
+
+`fetchMacroEstimate` and `trkRunQuickAdd` inject the user's `staple_products` into the
+prompt so her verified figures win over generic estimates. Pantry item parsing is **not**
+live — it moved to `legacy/pantry.js` in the foundations restructure.
 
 ## Dev workflow
 

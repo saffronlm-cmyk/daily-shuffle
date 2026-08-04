@@ -214,12 +214,20 @@ engine lights up** — this is the payoff and the next design space:
   If it persists, two ruled-out causes and two live suspects, so nobody
   re-treads the ground:
 
-  - *Ruled out — the `serves` fallback bug.* `index.html` maps recipes in two
-    places and they disagree: L1481 `servings: row.serves || 2` has a fallback,
-    the Supabase-row mapper (`servings: supabaseRow.serves`, ~L4705) does not,
-    so a null `serves` leaves it undefined and the call site defaults to 1,
-    making the per-serving divide a no-op. Real bug, still worth fixing, but it
-    skews estimates **high**, and only on the recipe path — so it is not this.
+  - *Ruled out — the `serves` fallback bug. **Fixed 2026-08-04**, and the
+    original description of it was wrong on two counts.* `supabaseRow.serves`
+    was built as `parseInt(f-servings) || 1`, so it could never be null —
+    adding `|| 2` at ~L4705 would have been dead code. And it was **4**
+    no-`serves` recipes in Supabase, not 8, none of which came through that
+    path. The real defect was next door: the Add-Recipe form hardcoded
+    `value="1"`, and when `parseWithAI` could not determine a serving count it
+    returned `null`, which `prefillForm`'s `set()` skips — so the field
+    silently stayed 1, macros were divided by 1, and whole-recipe totals got
+    stored labelled per-serving. Now unified on the app's existing convention
+    (`unknown serves ⇒ 2`, as at L1481) across the form default, the reset, the
+    two `addRecipe` reads, the local-object mirror and `buildRecipeRow`. Either
+  way it skewed estimates **high**, and only on the recipe path — so it was
+    never the cause of the low estimates.
   - *Ruled out — truncated JSON.* `trkParseJsonLoose` ends in a strict
     `JSON.parse`, so a cut-off array throws and surfaces as "No items
     recognised". It cannot silently drop items.
@@ -240,6 +248,13 @@ engine lights up** — this is the payoff and the next design space:
     servings divide, so if it is still low, this (plus the prompt's "if quantity
     is vague, assume a sensible serving" line, which Haiku reads conservatively)
     is the likely mechanism.
+
+  **Still unconfirmed as of 2026-08-04** — settling it needs a live API call
+  with Saffron's own `ds_api_key`, which no agent session has. Run the 4×
+  test above (one recipe) plus one Quick Add against a hand-calculated figure;
+  those two data points separate suspect 1 from suspect 2. Note the staple
+  corrections landed since (incl. `Dark soy sauce` on 2026-08-04) all push
+  estimates *up*, so re-test before investigating.
 
   Fix if confirmed: raise `max_tokens`, enable thinking, and make the
   total-vs-per-serving contract unambiguous. See the model-change scoping in the
