@@ -186,3 +186,42 @@ sandbox** — `api.nal.usda.gov` is blocked at the sandbox's own egress gateway
 (confirmed via both `curl` and WebFetch returning a 403 `connect_rejected`
 before ever reaching USDA), the same restriction that already applies to
 `api.apify.com` above.
+
+---
+
+## `normalise_quantities.py` — ingredient quantity normalisation (nutrition step 2)
+
+Applies the ruleset in `quantity-normalisation-plan.md` (§3) to turn every
+ingredient line into a **gram weight + provenance flag** (`qty_source`), for the
+whole recipe. Feeds the step-3 bulk nutrition pass (which then divides by
+`serves`).
+
+Unlike the USDA/Apify scripts this one needs **no external network** — it runs
+in the Claude Code sandbox on a JSON dump of the `recipes` table pulled via the
+Supabase MCP channel (not sandbox-blocked). Stdlib only.
+
+```
+# 1. dump id/serves/ingredient_sections for the 317 non-deleted recipes with
+#    serves (via Supabase MCP execute_sql -> a JSON file; the 8 no-serves
+#    recipes are skipped per the §6 sign-off and flagged serves_missing)
+# 2. run:
+python3 scripts/normalise_quantities.py recipes_dump.json quantity_review.csv ingredient_grams_updates.json
+```
+
+Outputs (git-ignored):
+- `quantity_review.csv` — one row per ingredient line (`recipe_id, section, sec,
+  item, original, name, grams, qty_source, detail`) for human spot-check
+  **before** the live write.
+- `ingredient_grams_updates.json` — one object per recipe
+  (`{id, ingredient_grams:[{sec,item,name,grams,qty_source,detail,group?}], add_flags}`),
+  written into a new `recipes.ingredient_grams` jsonb column after review.
+
+`qty_source` vocabulary (high→low confidence): `stated` · `converted` ·
+`defaulted` · `to_taste` · `garnish` · `estimated` · `unresolved`. Any recipe
+with an `estimated`/`unresolved` line also gets `review_flags += quantities_estimated`.
+
+Keyword matching is word-boundary prefix (`\b` + term) so `oil` doesn't match
+"b**oil**ing" while `strawberr` still matches "strawberries". The gram tables
+(density classes, per-piece counts, vague defaults, bare-serving fallbacks) live
+at the top of the file and were tuned over several passes against the real
+corpus — see the plan doc for the source-of-truth rationale.
