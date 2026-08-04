@@ -4,6 +4,133 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# CLAUDE.md drift audit run manually — 3 judgement-level drifts from PR #36, all invisible to the drift script
+**Date:** 2026-08-04
+**Project:** Daily Shuffle — doc accuracy (CLAUDE.md weekly audit)
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete (PR #61 open as draft)
+
+---
+
+## Project Context
+The weekly CLAUDE.md accuracy audit — a scheduled routine (trigger
+`trig_012FVP34K8kH664FDZayj6Lb`, "Weekly CLAUDE.md drift audit (daily-shuffle)", cron
+`0 7 * * 1`, last fired 2026-08-03). It pairs a mechanical script
+(`scripts/claude_md_drift.mjs`) with a judgement-level review of the week's merges. See
+the 2026-08-03 entry below for the PR-backlog session that merged the commits this audit
+reviewed.
+
+## Session Goal
+Saffron asked to run the drift-detection task manually rather than wait for Monday's
+firing. Identify her meaning, run the audit end-to-end, and ship any fixes.
+
+## State Before This Session
+`main` at `b4535e7`. The routine last fired 2026-08-03 at 07:07 UTC — *before* PR #36 was
+merged (`cc615a5`, 2026-08-04 06:24 BST), so the newest merge on `main` had never been
+audited. Branch `claude/claude-md-drift-detection-pbgymc` existed on origin but was
+identical to `main` (zero commits ahead).
+
+## What Was Done
+
+### 1. Identified the task from the trigger list
+"The CLAUDE.md drift detection task" was ambiguous between the script and the routine.
+Listed the account's triggers and found the weekly routine, whose stored prompt is the
+actual three-step procedure. Followed that prompt, with one deviation: it says to create
+`claude/claude-md-refresh-YYYYMMDD`, but this session had a designated branch
+(`claude/claude-md-drift-detection-pbgymc`), so the work went there instead.
+
+### 2. Mechanical check — clean, and that's the interesting part
+`node scripts/claude_md_drift.mjs` passed all five checks (5 tabs, 9 scripts, 13 root
+files, 5 `canonicalise()` copies, 3 sw.js hosts). But `normalise_quantities.py` — merged
+the day before — was **not mentioned in CLAUDE.md at all**. The script's rule 2 accepts a
+`scripts/` file documented in `scripts/README.md` **or** CLAUDE.md, and #36 documented it
+in the README only. Not a bug (the rule is deliberate — most script detail belongs in the
+README), but it means a new script can land with CLAUDE.md's own prose about `scripts/`
+left wrong, and only the judgement pass catches it.
+
+### 3. Judgement-level review — 3 drifts, all from `cc615a5` (PR #36)
+- **"two standalone Python 3 pipelines"** → there are now three. Added a
+  quantity-normalisation bullet, and split the "Both are build-only, run locally by
+  Saffron" sentence to "Those two", because `normalise_quantities.py` is genuinely
+  different: stdlib-only with **no external network**, so it *can* run in an agent session
+  on a Supabase-MCP dump. Leaving it under the blanket "never run these from an agent
+  session" rule would have mis-instructed the session that eventually applies step 2.
+- **Nutrition step 2** read "approved, **not applied**" with no hint the apply script now
+  exists — a future session would have re-derived or rewritten it. Now "approved, script
+  written, **not applied**", naming the script and stating it has never been run against
+  live data. The step-2 → step-3 gate is deliberately unchanged.
+- **gitignore list** omitted the script's three outputs.
+
+### 4. Verified accurate, no edit (recorded so the next audit doesn't re-check)
+sw.js network-first + 3 passthrough hosts; AI features (`api.anthropic.com/v1/messages`,
+`claude-haiku-4-5-20251001`, direct-browser header) — `29008c3` only changed response
+*parsing*, not any documented fact; tabs; Supabase tables/conventions; `ds_*` key
+families; `canonicalise()` sync list. `93bb7e5` (staples search), `1c81f90` (cuisine tags)
+and `2cd36be` (null-ingredient filter) are UI changes touching no documented fact.
+
+Re-ran the drift script after editing — still clean.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| CLAUDE.md | scripts/ overview (2→3 pipelines + network-access split), step-2 status, gitignore list | Modified (`839ffc5`) | repo root |
+| logs/daily-shuffle_log.md | This entry | Modified | logs/ |
+
+## Decisions & Reasoning
+- **Used the designated session branch, not the routine's `claude/claude-md-refresh-*`
+  name**: the session's branch instruction is explicit and the routine's naming is
+  incidental to what it produces. Same content either way.
+- **Did not "fix" the drift script to require CLAUDE.md mentions for scripts/ files**:
+  that would force every script's detail into CLAUDE.md and fight the README split the
+  repo already uses. The routine's judgement pass is the right layer for this. Noted here
+  as a known limitation rather than patched.
+- **Did not change the step-2 → step-3 gate**: the script existing is not the same as the
+  ruleset being applied. The 2026-08-03 entry verified #36 lands no data. Wording moved to
+  "script written, not applied" and no further.
+- **No sw.js cache bump**: doc-only change, per CLAUDE.md's own rule.
+- **Recorded no version numbers in CLAUDE.md**: the routine prompt forbids it (read
+  `CACHE` from `sw.js` — currently v40 — never from a doc). The dated reference to #36's
+  merge is a historical fact, not a live value.
+
+## Current State (end of session)
+Branch `claude/claude-md-drift-detection-pbgymc` pushed, one commit ahead of `main`
+(CLAUDE.md) plus this log commit. **PR #61** open as a draft. No PR CI exists in this repo
+(only the `main`-scheduled Supabase keep-alive), so nothing to wait on; no review comments.
+A ~60-minute self check-in is armed (`trig_01CqYGUGiqxuNfN4qqpxuxXe`) and will re-arm
+silently until the PR is merged or closed.
+
+## Next Steps
+1. Merge PR #61 (draft; doc-only, no CI to wait for).
+2. Next Monday's routine firing (2026-08-10 07:00 UTC) will re-audit — nothing to prepare.
+3. Unchanged from 2026-08-03: nutrition step 2 is still unapplied. The apply session must
+   dump `id/serves/ingredient_sections` for the 317 non-deleted recipes with `serves` via
+   Supabase MCP, run `python3 scripts/normalise_quantities.py recipes_dump.json
+   quantity_review.csv ingredient_grams_updates.json`, review the CSV, *then* write the
+   `ingredient_grams` jsonb column. Step 3 stays blocked until that's done.
+
+## Open Questions / Blockers
+- Should `claude_md_drift.mjs` gain a check that a new `scripts/` file also appears in
+  CLAUDE.md when CLAUDE.md states a count of pipelines? Deliberately not done this session
+  (see Decisions). Worth 10 minutes if this drift recurs.
+
+## Environment & Config Notes
+Repo `saffronlm-cmyk/daily-shuffle`, branch `claude/claude-md-drift-detection-pbgymc`,
+PR #61. No cache bump (sw.js untouched, still v40). No credentials in play. Routine trigger
+IDs: weekly audit `trig_012FVP34K8kH664FDZayj6Lb`; this session's PR check-in
+`trig_01CqYGUGiqxuNfN4qqpxuxXe`.
+
+## Notes & Gotchas
+- **A clean `claude_md_drift.mjs` run does not mean CLAUDE.md is accurate.** It checks five
+  mechanical inventories only. All three drifts this session passed it. Don't let
+  `ship-check`'s green drift line stand in for reading the doc.
+- The routine's stored prompt says to end quietly with no branch/commit/PR **only if
+  nothing is stale**. Something was stale here, so the PR is correct behaviour, not noise.
+- `normalise_quantities.py` is now the one script in `scripts/` that an agent session may
+  run. Don't re-generalise the "never run these from an agent session" rule back over it.
+
+---
+
 # PR backlog cleared — 6 merged including a split of the 2-month-old RLS PR; open-PR count 6 → 0
 **Date:** 2026-08-03
 **Project:** Daily Shuffle — repo hygiene (PR backlog), plus a full outstanding-work inventory
