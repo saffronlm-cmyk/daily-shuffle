@@ -304,6 +304,11 @@ def match_score(product, candidate_name):
 # ---------------------------------------------------------------------------
 # Apify call.
 # ---------------------------------------------------------------------------
+class ApifyQuotaExceeded(Exception):
+    """Raised when Apify reports the account's monthly usage hard limit is hit.
+    Once this fires, every subsequent call will also fail, so the run must
+    stop instead of logging the rest of the products as false 'no match'."""
+
 def run_actor(actor_id, payload, token, timeout=180):
     """
     Calls the 'run-sync-get-dataset-items' endpoint, which starts the actor,
@@ -438,6 +443,9 @@ def main():
                     help="results to request per store per product")
     ap.add_argument("--sample", type=int, default=0,
                     help="only process the first N products (0 = all)")
+    ap.add_argument("--resume", action="store_true",
+                    help="skip products already priced in an existing --out "
+                         "file, instead of re-querying (re-spending) on them")
     ap.add_argument("--token", default=os.environ.get("APIFY_TOKEN", ""))
     ap.add_argument("--price-per-1000", type=float, default=0.0,
                     help="actor's $ per 1000 results, for the cost estimate")
@@ -470,9 +478,39 @@ def main():
         products = dict(list(products.items())[:args.sample])
 
     n_products = len(products)
-    n_queries = n_products * len(ACTORS)
+    priced = {}      # product -> {"store","qty","base","price",...}
+
+    if args.resume and os.path.exists(args.out):
+        _, prev_rows = load_rows(args.out)
+        carried = 0
+        for r in prev_rows:
+            product = (r.get(COL_PROD) or "").strip()
+            if product not in products or product in priced:
+                continue
+            price_raw = (r.get(COL_PRICE) or "").strip()
+            if not price_raw:
+                continue
+            try:
+                priced[product] = {
+                    "store": (r.get(COL_STORE) or "").strip(),
+                    "qty": float(r.get(COL_QTY) or 0),
+                    "base": (r.get(COL_UNIT) or "").strip(),
+                    "price": float(price_raw),
+                    "name": "(carried over from previous run)",
+                    "score": 1.0,
+                }
+                carried += 1
+            except ValueError:
+                continue
+        if carried:
+            print(f"--resume: carrying forward {carried} already-priced "
+                  f"product(s) from {args.out}; not re-querying them.")
+            products = {p: g for p, g in products.items() if p not in priced}
+    n_queries = len(products) * len(ACTORS)
     est_results = n_queries * args.max_items
-    print(f"Products to price : {n_products}")
+    print(f"Products to price : {n_products}"
+          + (f"  ({len(products)} remaining after --resume)"
+             if args.resume and len(products) != n_products else ""))
     print(f"Stores per product: {len(ACTORS)}  ({', '.join(ACTORS)})")
     print(f"Total queries     : {n_queries}")
     print(f"Max results pulled: ~{est_results}")
@@ -492,35 +530,48 @@ def main():
                  "Use --dry-run to preview without a token.")
 
     # --- price every product ----------------------------------------------
-    priced = {}      # product -> {"store","qty","base","price",...}
-    no_match = []    # products with nothing usable
-    for i, product in enumerate(products, 1):
+    no_match = []       # products that got real results but none confident
+    not_attempted = []  # products skipped because quota ran out mid-run
+    quota_msg = None
+    remaining = list(products)
+    for i, product in enumerate(remaining, 1):
         term = search_term(product)
         category = products[product].get("category", "")
         per_store = {}
-        for store, actor in ACTORS.items():
-            try:
-                results = run_actor(actor, build_actor_input(term, args.max_items),
-                                    args.token)
-            except urllib.error.HTTPError as e:
-                body = e.read().decode("utf-8", "replace")[:200]
-                print(f"  [{store}] HTTP {e.code} for {term!r}: {body}")
-                continue
-            except Exception as e:  # noqa: BLE001
-                print(f"  [{store}] error for {term!r}: {e}")
-                continue
-            pick = best_result_for_store(results, product, category)
-            if pick:
-                per_store[store] = pick
+        try:
+            for store, actor in ACTORS.items():
+                try:
+                    results = run_actor(actor, build_actor_input(term, args.max_items),
+                                        args.token)
+                except urllib.error.HTTPError as e:
+                    body = e.read().decode("utf-8", "replace")[:300]
+                    if e.code == 403 and ("actor-disabled" in body
+                                           or "hard limit" in body.lower()):
+                        raise ApifyQuotaExceeded(body) from None
+                    print(f"  [{store}] HTTP {e.code} for {term!r}: {body[:200]}")
+                    continue
+                except Exception as e:  # noqa: BLE001
+                    print(f"  [{store}] error for {term!r}: {e}")
+                    continue
+                pick = best_result_for_store(results, product, category)
+                if pick:
+                    per_store[store] = pick
+        except ApifyQuotaExceeded as e:
+            quota_msg = str(e)
+            not_attempted = remaining[i - 1:]
+            print(f"\nApify quota exhausted on {product!r}: {quota_msg[:200]}")
+            print(f"Stopping early -- {len(not_attempted)} product(s) not "
+                  f"attempted this run.")
+            break
         choice = cheapest_across(per_store)
         if choice:
             store, pick = choice
             priced[product] = {"store": store, **pick}
-            print(f"[{i}/{n_products}] {product}: £{pick['price']} "
+            print(f"[{i}/{len(remaining)}] {product}: £{pick['price']} "
                   f"@ {store} ({pick['qty']:g}{pick['base']})")
         else:
             no_match.append(product)
-            print(f"[{i}/{n_products}] {product}: no confident match")
+            print(f"[{i}/{len(remaining)}] {product}: no confident match")
 
     # --- write the filled CSV ---------------------------------------------
     for r in rows:
@@ -543,7 +594,25 @@ def main():
         f.write(f"# Price book fill report\n\n")
         f.write(f"- Products priced: **{len(priced)}** / {n_products}\n")
         f.write(f"- No confident match: **{len(no_match)}**\n")
-        f.write(f"- Low-confidence picks (eyeball these): **{len(low_conf)}**\n\n")
+        f.write(f"- Low-confidence picks (eyeball these): **{len(low_conf)}**\n")
+        if not_attempted:
+            f.write(f"- **Not attempted (Apify quota exhausted): "
+                    f"{len(not_attempted)}** -- re-run with `--resume` once "
+                    f"your quota resets/upgrades; these are NOT real "
+                    f"mismatches.\n")
+        f.write("\n")
+        if quota_msg:
+            f.write(f"## Apify quota exhausted\n\n"
+                    f"Run stopped early because Apify reported the account's "
+                    f"monthly usage hard limit was hit:\n\n```\n{quota_msg}\n"
+                    f"```\n\nRe-run with `--resume` after upgrading/waiting "
+                    f"for reset to pick up where this left off without "
+                    f"re-querying already-priced products.\n\n")
+        if not_attempted:
+            f.write("## Not attempted (quota exhausted, not real mismatches)\n\n")
+            for p in sorted(not_attempted):
+                f.write(f"- {p}\n")
+            f.write("\n")
         if low_conf:
             f.write("## Low-confidence picks\n\n")
             for p, d in sorted(low_conf.items()):
@@ -557,7 +626,9 @@ def main():
 
     print(f"\nWrote {args.out} and {args.report}")
     print(f"Priced {len(priced)}/{n_products} products; "
-          f"{len(no_match)} unmatched; {len(low_conf)} low-confidence.")
+          f"{len(no_match)} unmatched; {len(low_conf)} low-confidence"
+          + (f"; {len(not_attempted)} not attempted (quota exhausted -- "
+             f"re-run with --resume)." if not_attempted else "."))
 
 if __name__ == "__main__":
     main()
