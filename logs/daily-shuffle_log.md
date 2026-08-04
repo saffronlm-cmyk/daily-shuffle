@@ -1083,11 +1083,16 @@ recipe's field conventions:
   `protein_source='chicken'`, `cuisine='korean'`, `carb_type='none'` (matches the
   sibling — konjac-based), `serves=5`, `cost_tier='2'`, `prep_cook_time='35 minutes'`,
   `craving_tags=['savoury','highprotein','glutenfree','asian','comfort','healthy']`.
-- **Macros are an AI estimate** (flagged in `notes`, same as the sibling): per serve
-  cal 590 / protein 46 / carbs 47 / fat 13 / fibre 9 / sugar 15. Derived by hand-summing
-  ingredient macros (chicken mince 5% ≈ 172 kcal·20 g P/100 g dominates; konjac ≈ 0;
-  glass noodles + brown sugar + sweet chilli drive carbs/sugar) and dividing by 5. Rough
-  — not from the nutrition pipeline (step 3 is still blocked).
+- **Macros are an estimate** (flagged in `notes`). **Corrected mid-session** after
+  Saffron asked whether they drew from `staple_products` — the first pass (590/46/47/13/
+  9/15) was a hand guess that did NOT. Recomputed grounded in `staple_products` where
+  available and updated the row to per serve **cal 515 / protein 51 / carbs 50 / fat 13
+  / fibre 9 / sugar 14**. Grounded items: chicken mince 5% (135 kcal·22 g P/100 g — the
+  hand guess had over-used ~172, hence the −75 kcal calorie drop), GF reduced-salt soy
+  (Emma Basic), fish sauce, brown sugar, carrot, red onion, garlic granules, sesame oil,
+  rice vinegar. Still generic (not in staples): konjac noodles, sweet potato glass
+  noodles, mushrooms, cornstarch, sweet chilli sauce, MSG. Not from the nutrition
+  pipeline (step 3 still blocked); ≈ ±10% on calories, protein tightest.
 - id / created_at / updated_at left to defaults (`gen_random_uuid()`, `now()`).
 - New id: `7670cb5c-e6ef-437e-bc3b-fd0780b4e19d`.
 
