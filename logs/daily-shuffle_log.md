@@ -4,155 +4,358 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
-# Japchae recipe duplication (in-session, unsaved) + variant-toggle idea + soya milk staple
+# Nutrition corrections applied, `claudeText()` parse fix shipped, both PRs merged, low-estimate bug diagnosed
 **Date:** 2026-08-02
-**Project:** Daily Shuffle — recipe library (Supabase `recipes`) exploration, `staple_products`
+**Project:** Daily Shuffle — `staple_products` nutrition data, the embedded-AI response-parse path, and the AI macro-estimate accuracy investigation
 **Mode:** Rolling Log + GitHub Push
-**Status:** Complete — one PR merged (#53); one small direct DB write; one item left undone by design
+**Status:** Complete (one bug parked as possibly-resolved — see Open Questions)
 
 ---
 
 ## Project Context
-Unrelated to the macro-correction stream closed out in the 2026-07-24 entry below, and to the
-Asian cuisine tag expansion entry immediately below this one (also same-day, different session).
-This was a mixed session: (1) an explicitly non-persisted recipe-duplication exercise against the
-bundled Supabase project (`jsxcctrskkkxgdxfaduo`), (2) a resulting feature-idea note, and (3) an
-unrelated one-off staple addition.
+Direct continuation of the entry below (same day, same conversation). That entry covers
+the staples search UI, the 158-row rename, and the collision resolution; it also left
+**8 rows flagged `nutrition_unverified`** and the model change **scoped but not built**.
+This entry covers everything after that point. Read both together.
 
 ## Session Goal
-1. Pull "Glass & Konjac Chicken Japchae" and its sibling "Chicken Mince Konjac Japchae" from
-   `recipes` into the conversation so Saffron could duplicate and alter them (ingredient swap +
-   macro recalculation) without writing anything to the DB until she says so.
-2. Answer her follow-up questions about how such duplicates would surface in Shuffle/Tracker,
-   and how to represent them as "variants."
-3. (Unrelated, same session) add an unsweetened soya milk entry to `staple_products`.
+1. Apply the nutrition data Saffron supplied for the 8 flagged staples.
+2. Recommend on the model change, and ship the prerequisite parse fix as its own PR.
+3. Merge both PRs to `main`.
+4. Diagnose the reported "AI nutrition estimates are wrong" problem.
 
 ## State Before This Session
-Clean — prior session (2026-07-24) had closed out the macro-correction stream entirely; `main`
-had no open work relevant to this session's topics.
+Per the entry below: `staple_products` at 163 rows, renames applied, 8 rows flagged
+`nutrition_unverified`, PR #57 (staples search) open as a draft, model change scoped only.
+It had also been established that **no nutrition data can be sourced from an agent
+session** — USDA and Open Food Facts are both 403 at the egress gateway.
 
 ## What Was Done
-1. **Pulled both japchae recipes read-only** via `execute_sql` (`select * from recipes where
-   name ilike '%japchae%' or ...`) — `b8bb9c91-b2d4-4ee7-877b-ea976d7a5a26` (Glass & Konjac
-   Chicken Japchae, serves 4) and `7670cb5c-e6ef-437e-bc3b-fd0780b4e19d` (Chicken Mince Konjac
-   Japchae, serves 5). Presented both in full (ingredients, method, macros) in chat.
-2. **Duplicated + altered both, in-session only** — per Saffron's explicit instruction ("nothing
-   needs to be stored before my say so"), no `INSERT`/`UPDATE` was run for either recipe. Applied:
-   replace the sweet potato glass noodles line with 200g konjac noodles, merged into the existing
-   konjac noodles line (1000g total in both recipes), scrubbed the glass-noodle mention from each
-   subtitle/notes field, and recalculated macros using generic per-100g reference values (sweet
-   potato glass noodles ≈351 kcal/85g carb dry; konjac noodles ≈7–9 kcal/100g, ~3g fibre, ~0 net
-   carb) applied as a delta against the original per-serving macros:
-   - Glass & Konjac Chicken Japchae (serves 4): 470→**~360** kcal, 66→**~40**g carb, fibre
-     14→**~15**g; protein/fat/sugar effectively unchanged.
-   - Chicken Mince Konjac Japchae (serves 5): 515→**~448** kcal, 50→**~34**g carb, fibre
-     9→**~10**g; protein/fat/sugar effectively unchanged.
-   Neither duplicate was ever written to Supabase — **this recalculated data only exists in that
-   conversation's transcript and is not persisted anywhere.** If Saffron wants these variants
-   saved, they need to be re-derived (the exact deltas are in this log entry) and inserted fresh.
-3. **Answered "how would these show up in Shuffle/Tracker"** by reading the actual fetch queries
-   in `index.html`: Shuffle's pool (`fetchCloudRecipes`, ~line 1511) only pulls
-   `import_status=eq.ready`; Tracker's recipe picker (`trkFetchRecipes`, ~line 6220) pulls
-   `import_status=in.(ready,review,custom)`. So `custom` rows are Tracker-only; `ready` rows are
-   both.
-4. **Answered "how would these show up as *variants*"** — checked the `recipes` schema via
-   `list_tables`: no `variant_of`/`parent_id` column exists. A duplicate is just another
-   standalone row with no link back to its source recipe. Confirmed with Saffron she wants to
-   keep these as `custom` for now (Tracker-only, not Shuffle-eligible) given the macros are
-   AI-recalculated estimates, not staple-grounded.
-5. **Logged the variant-toggle idea** as a new "Future — other feature ideas (unscheduled)"
-   section appended to `handoff.md` (previously only had the cost-aware-features future list).
-   Committed + pushed on `claude/japchae-recipe-duplicate-l3z9i5`, opened **draft PR #53**,
-   subscribed to its activity. CI showed `pending`/0 checks the whole time (repo has no CI beyond
-   the unrelated Supabase keep-alive) — nothing to fix. No review comments. Saffron marked it
-   ready for review herself; **merged** by her directly. Session unsubscribed automatically on
-   merge.
-   - Note: while this PR was open, a **second, unrelated** feature note ("multi-select
-     primary-cuisine idea") was appended to `handoff.md` by another PR (**#55**, merged after
-     #53, alongside **#54** "Expand Asian cuisine tags" — see that entry below). Neither was part
-     of this session — flagging so nobody attributes them here.
-6. **Added a new staple** (unrelated ask): `staple_products` had "Alpro Original soya milk"
-   (sweetened, 2.5g sugar/100ml) but nothing unsweetened. Inserted a new row, first as branded
-   ("Alpro Unsweetened soya milk") using generic Alpro-Unsweetened label values, then — per
-   Saffron's correction ("I want it unbranded and generic") — **updated in place** (same row,
-   `id c88bbbfe-f065-46c9-b917-f991f0142c47`) to rename to "Unsweetened soya milk" and swap
-   aliases to generic terms. Macros were left unchanged (they were already generic-label values,
-   not brand-specific): 33 kcal / 3.3g protein / 0.3g carb / 1.8g fat / 0.5g fibre / 0.3g sugar
-   per 100ml.
+
+### 1. Nutrition data applied — but only 5 of the 8 rows
+Saffron supplied figures for all 8 flagged products. **Diffing them against what was
+stored changed the answer: 3 didn't need changing at all.**
+
+**Tamari, Brown sugar and Red pepper flakes were the *legitimate* owners of their USDA
+records** — FDC 174278 is literally *"Soy sauce made from soy (tamari)"* and FDC 168833
+is *"Sugars, brown"*. Their **twins** were the borrowers (`soy sauce`/`dark soy sauce`
+from tamari; `coconut sugar` from brown sugar). The previous entry's flagging was too
+broad. Applying the supplied figures would have made those three *worse* — rounder
+numbers, and fibre zeroed (tamari 0.8 g, red pepper flakes 27.2 g). Values kept, flag
+cleared only.
+
+The 5 that genuinely changed: **Coconut sugar** (was brown sugar's figures),
+**Gochugaru** (was cayenne's), **Vanilla paste** (was vanilla *extract*, 12.7 → 65 g
+carbs), **Dark chocolate chips** (was the chocolate *bar*), and **Chicken stock**
+(36 → 270 kcal/100 g).
+
+`Chicken stock` was **renamed to `Chicken stock cube`** — the figures changed from
+made-up stock to cube, a ~7.5x jump, so without "cube" in the name a 100 g log would be
+silently catastrophic. Tagged `high_sodium` (~13,000 mg/100 g).
+
+`usda_seed` was **stripped from all 5** — their figures are brand-label averages now, so
+that provenance flag had become false. They carry `nutrition_estimated` instead.
+
+### 2. PR #58 — `claudeText()` parse fix
+Shipped separately from any model change because it's a correctness fix on its own.
+All five call sites parsed `data.content?.[0]?.text`, which holds on Haiku (no thinking
+blocks) but breaks on Sonnet 5 / Opus 5, where adaptive thinking is on by default and
+`content[0]` is a `thinking` block. Added `claudeText(data)` — finds the first `text`
+block — at top level of script block 1, so it's global in block 2 the same way
+`showToast()` already is. Unit-tested against 6 response shapes.
+
+### 3. Both PRs merged to `main`
+#57 first (`93bb7e5`), then #58 (`29008c3`). **The `sw.js` conflict predicted in the PR
+body did occur** — both branches changed line 6 from v37 (#57→v38, #58→v39). Resolved to
+**v39**. `index.html` auto-merged cleanly (different regions), and this was verified
+post-merge rather than assumed: 6 `claudeText` sites, 3 `trkMatchStaples` refs, 0
+old-style parses, 3/3 script blocks, 5/5 smoke, no CLAUDE.md drift.
+
+### 4. Low-estimate diagnosis (the substantive investigation)
+Saffron reported estimates skewed **low** in *both* `fetchMacroEstimate` and
+`trkRunQuickAdd`. That direction + both-paths combination was decisive — it ruled out
+two candidates and left two. Full write-up is now in `handoff.md`; summary in Open
+Questions below. By the end she judged it may already be resolved by the nutrition
+corrections in step 1 (which all push estimates *up*), so it was parked rather than fixed.
 
 ## Artifacts Produced / Modified
 
 | File | What it is | Status | Location |
 |------|------------|--------|----------|
-| `handoff.md` | Future-ideas section | Modified (variant-toggle bullet added) | repo root — merged via PR #53 |
-| Supabase `staple_products` | New staple row | Created then updated | row `c88bbbfe-f065-46c9-b917-f991f0142c47` |
-| Supabase `recipes` | Japchae duplicates | **Not created** — deliberately left unpersisted | N/A |
-| `logs/daily-shuffle_log.md` | This entry | Modified | repo root |
-
-No `index.html`/`sw.js`/`manifest.json` touched — no cache bump needed.
+| index.html | `claudeText()` helper + all 5 call sites routed through it | Modified (merged, `29008c3`) | repo root |
+| sw.js | CACHE v37 → **v39** (v38 claimed by #57, conflict resolved on merge) | Modified (merged) | repo root |
+| handoff.md | New "AI nutrition estimates skewed low" entry — ruled-out causes, live suspects, the one-click test | Modified | repo root |
+| logs/daily-shuffle_log.md | This entry | Modified | repo root |
+| Supabase `staple_products` | 5 rows re-nutritioned + 1 renamed; 3 flag-cleared only; `usda_seed` stripped from the 5 | Modified | project `jsxcctrskkkxgdxfaduo` |
 
 ## Decisions & Reasoning
-- **Kept the duplicates unpersisted per Saffron's explicit instruction**, even after later
-  discussing `import_status`/variant mechanics in detail — the discussion was exploratory, not
-  authorization to write. Only wrote to the DB when she gave a direct, unambiguous instruction
-  ("add unsweetened soya milk to my staples").
-- **Chose to merge the 200g konjac addition into the existing konjac-noodle line** (rather than
-  add a second line item) since "replace X with Y" reads as a net ingredient-quantity change, not
-  two separate konjac lines in the same recipe.
-- **Recalculated macros via generic-value deltas against the original per-serving figures**
-  rather than re-deriving the whole recipe from scratch — faster, and keeps everything else
-  (protein/fat/sugar, which the swap doesn't touch) anchored to the original AI estimate instead
-  of introducing new estimation error.
-- **`variant_of` proposed as nullable, not required** — documented as a future-feature note only,
-  not implemented; no schema migration was run this session.
-- **Named the new staple generically per direct correction** — first guess (branded "Alpro
-  Unsweetened") was wrong; fixed via `UPDATE` on the same row rather than delete+reinsert, since
-  the macros were already valid and only naming needed to change.
+
+- **Only 5 of 8 nutrition rows updated.** Options were: apply all 8 as supplied, or diff
+  first. Diffing showed 3 would have been *degraded*. Verifying supplied data against
+  what's stored, rather than trusting the request, is what caught it.
+- **Parse fix shipped as its own PR, before any model change.** It changes nothing on
+  Haiku, so it can merge with zero risk, and it removes the tripwire ahead of time. Had
+  the model been swapped first, four of the five sites would have failed with messages
+  ("No products recognised", "Unexpected format from AI") that read as model regression —
+  a near-certain false rollback.
+- **CACHE resolved to v39, not v38.** The constant only has to *change* to bust the
+  cache; contiguity is not required, so skipping 38 on that line is harmless and avoids
+  renumbering a merged commit.
+- **`Chicken stock` renamed rather than just re-numbered.** A silent 7.5x change in what
+  "100 g" means is a data trap; the name now carries the warning.
+- **Model recommendation: Sonnet 5, not Opus 5.** Cost is immaterial at this volume
+  (~2¢ vs ~4¢ vs ~10¢ for the largest call). Opus 5's edge is long-horizon agentic work;
+  these are single-turn bounded extractions, which is Sonnet 5's sweet spot. Paying 5x
+  for an unexercised capability profile is a bad trade.
+- **Bug parked, not fixed.** Saffron's call — she believes the nutrition corrections may
+  have resolved it. Documented thoroughly in `handoff.md` instead, including the two
+  *ruled-out* causes so a future session doesn't re-derive them.
 
 ## Current State (end of session)
-- PR #53: merged to `main`. Branch `claude/japchae-recipe-duplicate-l3z9i5` reset to `origin/main`
-  after the merge (per the merged-PR restart convention) so this log entry lands clean.
-- `staple_products`: "Unsweetened soya milk" row live and correct per Saffron's confirmation.
-- The two altered japchae recipes exist **only in this log entry and the closed conversation** —
-  not in the database, not in any file. Re-derive from §"What Was Done" item 2 above if resuming.
+- `main` carries both merges. CACHE **v39**. JS parse 3/3, smoke 5/5, no CLAUDE.md drift.
+- `staple_products`: **164 rows** — 163 after this session's work, plus **Konjac noodles**,
+  which Saffron added herself via the app on 2026-08-03 and which already fits the new
+  naming convention unaided (a small signal the convention is self-sustaining).
+- 0 rows `nutrition_unverified`; 5 `nutrition_estimated`; 113 `usda_seed`.
+- Model change: **recommended and scoped, not implemented.** Parse-fix prerequisite done.
 
 ## Next Steps
-1. If Saffron wants either/both altered japchae recipes actually saved: re-apply the swap
-   documented above (merge 200g into the konjac line, scrub subtitle glass-noodle mentions, use
-   the recalculated macros given) and `INSERT` into `recipes` with `import_status='custom'`
-   (Tracker-only) or `'ready'` (also Shuffle-eligible, her call) — nothing currently blocks this,
-   it just wasn't authorized this session.
-2. `variant_of` column is documented in `handoff.md` under "Future — other feature ideas
-   (unscheduled)" — no urgency, revisit whenever recipe-variant handling comes up again (note this
-   session's discovery that #54/#55 landed a *different* feature idea, "multi-select primary
-   cuisine," in the same handoff.md section — read both before adding a third).
-3. No other open threads from this session.
+1. **Confirm whether the low-estimate problem is actually gone.** Add a recipe and run a
+   Quick Add; compare against a hand-calculated figure. If gone, delete the `handoff.md`
+   entry. If not, go to step 2.
+2. If it persists on the **recipe** path: open a 4-serving recipe, hit re-estimate, and
+   check whether it lands ~4x low. That one click confirms or kills the double-division
+   hypothesis outright.
+3. Fix the `serves` fallback at `index.html` ~L4705 (`servings: supabaseRow.serves` has no
+   `|| 2`, unlike L1481) regardless of the above — it's a real bug affecting the 8
+   no-`serves` recipes, just not the one reported.
+4. Optional: the model swap itself (5 model strings + `thinking`/`max_tokens`). Must also
+   update `CLAUDE.md:113` and the `index.html` "claude-haiku call pattern" comment, and
+   bump CACHE.
 
 ## Open Questions / Blockers
-N/A — nothing blocking. The only "unfinished" item (the japchae variants) is unfinished by
-Saffron's explicit choice, not a blocker.
+- **The low-estimate bug is parked as possibly-resolved.** Full detail in `handoff.md`;
+  the short version: *ruled out* — the `serves` bug (skews high, recipe path only) and
+  truncated JSON (`trkParseJsonLoose` ends in a strict `JSON.parse`, so it throws rather
+  than dropping items). *Live suspects* — double division on the recipe path, and no room
+  to compute on both (measured: **~7,200 tokens** of staples injected into Quick Add,
+  **~4,400** into the recipe estimate, against `max_tokens` of 1024 and **256**).
+- **CLAUDE.md's AI-features list is still drifted** (carried over from the entry below,
+  not fixed): it names *"pantry item parsing"* (pantry lives in `legacy/`, not loaded) and
+  omits `fetchMacroEstimate` and `generatePlanWithAI`, both live. `claude_md_drift.mjs`
+  does not catch this class. Fix when this area is next touched.
 
 ## Environment & Config Notes
-- Repo: `saffronlm-cmyk/daily-shuffle`. Branch: `claude/japchae-recipe-duplicate-l3z9i5` (reset
-  from `origin/main` post-merge, per convention, before this log commit).
-- PR #53 (merged). Unrelated PRs #54/#55 also merged to `main` during this session's window by a
-  different session — visible in `git log` but not this session's work.
-- Supabase project: `jsxcctrskkkxgdxfaduo` (bundled `recipes`/`staple_products`/etc.).
-- No env vars or credentials touched.
+- Repo `saffronlm-cmyk/daily-shuffle`. Merged: **#57** (`93bb7e5`), **#58** (`29008c3`).
+- This entry's branch: `claude/ai-model-product-naming-1c1nd4`, **restarted from `main`**
+  after #57 merged, per the merged-PR-is-finished rule — so its new PR is a *new* PR.
+- `sw.js` CACHE **v39**. Supabase project `jsxcctrskkkxgdxfaduo`, `staple_products` 164 rows.
+- Both Supabase and GitHub MCP servers disconnected and reconnected mid-session, twice,
+  under changed tool prefixes — re-load via ToolSearch if tool calls start failing.
 
 ## Notes & Gotchas
-- **`recipes` has no variant/parent linkage** — don't assume duplicated recipes are discoverable
-  as a group; they're only findable by name, exactly like any other row.
-- **`import_status` is the only lever controlling Shuffle vs. Tracker visibility** (`ready` = both,
-  `custom`/`review` = Tracker only, anything else = neither). This is a coarser mechanism than a
-  true variant toggle would be — see the `handoff.md` note.
-- **The recalculated japchae macros are estimates layered on estimates** (original recipes were
-  already flagged "AI estimate"; this session's deltas used generic reference values, not
-  `staple_products` lookups) — if these ever get saved, consider flagging
-  `review_flags: quantities_estimated` rather than treating them as staple-grounded.
-- `handoff.md`'s "Future" area now holds two unrelated feature-idea sections appended by
-  different sessions in close succession (cost-aware features → variant toggle → multi-select
-  primary cuisine) — worth consolidating into a proper backlog file if it keeps growing.
+- **Do not re-flag Tamari, Brown sugar or Red pepper flakes as needing nutrition.** They
+  are the correct owners of their USDA records. The rows that were borrowing from them
+  (`Soy sauce — generic`, `Dark soy sauce`, `Coconut sugar`) are the ones to scrutinise —
+  and note **`Dark soy sauce` still carries tamari's figures** and was never corrected,
+  because Saffron said to disregard the soy sauces in that group.
+- **`Coconut sugar` carries a knowingly inconsistent figure**: carbs **100.0 g/100 g**
+  against 378 kcal (100 g of carbs ≈ 400 kcal, and leaves no room for moisture/ash).
+  ~94 g would be consistent. Applied verbatim as supplied rather than silently overridden;
+  the discrepancy is ~2.4 kcal at typical 10 g usage. Recorded in the row's `notes`.
+- **`Gochugaru` and `Dark chocolate chips` kept fibre carried over from their old USDA
+  records** (27.2 g and 6.5 g) — the supplied data had none. Flagged in each row's `notes`.
+  Don't mistake those for verified figures.
+- **The staples context injected into Quick Add includes every row's full `notes` text**
+  (`trkBuildStapleContext`), which is why it is ~1.6x the size of the recipe-path context.
+  This session's long explanatory notes therefore have a direct token cost on every
+  Quick Add call — worth remembering before writing more prose into `notes`.
+- `sw.js` CACHE is at **v39**, not v38 — v38 was consumed by the #57/#58 conflict
+  resolution and never existed on `main`. Next bump is v40.
+
+---
+
+# Staple products: search UI, full rename to a new naming convention, collision resolution + AI model-change scoping
+**Date:** 2026-08-02
+**Project:** Daily Shuffle — Tracker staples (`staple_products` data + `index.html` UI) and the embedded-AI model choice
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete (both session tasks landed; one optional follow-up left open)
+
+---
+
+## Project Context
+Second session on 2026-08-02 — see the entry below for the same-day Asian-cuisine
+reclassification work, which is unrelated. This session covered two asks: (1) *scope*
+changing the model behind the app's embedded AI, and (2) rename the staple products,
+change the naming convention (especially branded goods), and add a search function.
+
+The `staple_products` table had reached 168 rows after the USDA expansion (see the
+2026-07-01 entry for the `usda_staples.py` pipeline) and had never had a naming pass —
+so it carried two clashing conventions and a set of silent data faults.
+
+## Session Goal
+1. Scope (not implement) moving the 5 in-browser Anthropic call sites off
+   `claude-haiku-4-5-20251001`.
+2. Add search to the staples manager + staple picker.
+3. Agree a naming convention, resolve name/alias collisions, and apply the renames.
+
+## State Before This Session
+- **`staple_products`**: 168 rows. ~120 lowercase USDA seeds ("almond butter"), ~48
+  Title-case curated rows using *three* different branded formats (brand-first
+  "Alpro Original soya milk"; product-first "Soya yoghurt — Lidl plain";
+  product-first-with-retailer "Dark chocolate 74% — Fin Carré (Lidl)").
+- **No search anywhere**: the manager rendered all 168 into a 240px scroll box; the
+  picker put all 168 into a flat `<select>`.
+- **7 exact name/alias collisions** and **13 groups sharing one USDA FDC record**, none
+  previously identified.
+- All 5 AI call sites parsing `data.content?.[0]?.text`.
+
+## What Was Done
+
+### 1. AI model-change scoping (deliverable: `ai-model-change-scope.md`, sent, not committed)
+Mapped all 5 call sites: `fetchMacroEstimate` (L3581, max_tokens 256),
+`generatePlanWithAI` (L3926, 512), `parseWithAI` (L5380, 2048),
+`trkRunBulkStaples` (L6390, 4096), `trkRunQuickAdd` (L6509, 1024).
+
+**Headline finding — the blocker, not the cost:** every site parses
+`data.content?.[0]?.text`. Adaptive thinking is **on by default on both Sonnet 5 and
+Opus 5**, so `content[0]` becomes a thinking block and `.text` is `undefined`. Verified
+each site's failure mode individually rather than assuming uniform silence:
+`fetchMacroEstimate` fails **silently** (catch returns null); the other four surface a
+*misleading* error ("Unexpected format from AI", "No products recognised", "No items
+recognised") that reads as model regression, not a shape change.
+
+Cost was ruled out as a decision driver — worst case (bulk staple paste, ~5k in/3k out)
+is ~2¢ Haiku vs ~4¢ Sonnet 5 vs ~10¢ Opus 5. Recommendation: **all five → Sonnet 5,
+thinking disabled, defensive parse** (~30 min), with thinking-on for `fetchMacroEstimate`
+as a later measurable experiment. Not implemented — the ask was to scope only.
+
+### 2. Staples search (PR #57, draft)
+Added `trkMatchStaples(q)` matching on **name or any alias**, shared by the manager
+(`trkRenderStapleList()`) and the picker (`trkRenderStaplePickOptions()`). Followed the
+existing recipe-picker idiom rather than a new pattern. Also fixed empty-result paths
+that had never existed: picker clears its macro preview instead of showing stale figures;
+`trkSubmitStaple` toasts "Pick a product" instead of a silent `return`; deleting in the
+manager re-renders only the list so the search box and half-filled add-product form
+survive.
+
+### 3. Collision analysis → two review CSVs → applied renames
+Wrote both review CSVs to scratchpad (per the 2026-08-02 Asian-cuisine precedent —
+review CSVs are **not** committed) and sent via `SendUserFile`. Saffron returned the
+collision CSV annotated; a second round settled the convention.
+
+**Applied to Supabase in three ordered steps** — aliases folded *first* (while old names
+still existed), then deletions, then renames.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| index.html | `trkMatchStaples`, `trkRenderStapleList`, `trkRenderStaplePickOptions`; empty-result handling in `trkStaplePreview`/`trkSubmitStaple`; manager + picker markup | Modified | repo root |
+| sw.js | `CACHE` v37→v38 | Modified | repo root |
+| logs/daily-shuffle_log.md | This entry | Modified | repo root |
+| Supabase `staple_products` | 158 renames, 5 deletions, alias re-pointing, 5 nutrition corrections, flag hygiene | Modified | project `jsxcctrskkkxgdxfaduo` |
+| ai-model-change-scope.md | Model-change scoping doc | Created (scratchpad, sent, not committed) | session scratchpad |
+| staple-collision-review.csv | 7 exact collisions + 13 shared-FDC groups, with proposed resolutions | Created (scratchpad, sent, not committed) | session scratchpad |
+| staple-rename-review.csv / -v2.csv | v1 (inverted convention) then v2 (final) rename plans | Created (scratchpad, sent, not committed) | session scratchpad |
+| gen_rename.py / gen_rename_v2.py | Generators for the above | Created (scratchpad) | session scratchpad |
+| staple_search_check.mjs | Ad-hoc Playwright test of the new search paths, 10/10 | Created (scratchpad, not committed) | session scratchpad |
+
+## Decisions & Reasoning
+
+- **Naming convention → `<Food name>[, <qualifier>][ — <Brand \| generic>]`.** Saffron
+  first picked "product-first, brand after em-dash", so I proposed mechanical inversion
+  (`Sugar, brown`, `Oil, sesame`). She pushed back asking *"should it be sugar, Brown?"*
+  — **and her instinct was right, mine was wrong.** Final rule: **do not invert the food
+  name**; the comma is only for a qualifier separating two rows of the *same* food
+  ("Peanut butter, smooth" vs "Peanut butter, crunchy"), and the dash is only for the
+  source. Test: you'd say "brown sugar" aloud, never "sugar, brown". The original
+  argument for inversion (alphabetical grouping) was obsoleted by the search shipped in
+  the same session. **This reversed ~25 proposed names.**
+- **`— generic` only where a branded twin exists**, not on all 120 USDA rows — chosen
+  over "on every USDA row" and over "`— USDA` everywhere". Keeps the tag informative
+  rather than noise ("Avocado — generic" tells you nothing).
+- **Defaults flipped to match how Saffron actually eats.** The bare terms "soy sauce"
+  and "protein powder" resolved to the USDA generics — which are *wheat-containing* soy
+  sauce and *whey* protein, for a coeliac, dairy-free user. Now `soy sauce` → **Emma
+  Basic GF** and `protein powder` → **Free Soul vegan**; the whey row was stripped of
+  *all* aliases (including the chocolate/vanilla flavour ones, which moved to Free Soul
+  since its label is universal across flavours) so it can't catch a generic mention.
+- **`chilli oil` row deleted, not relabelled.** Saffron asked to relabel it "sesame oil",
+  but it was already byte-identical to the existing `sesame oil` row (same FDC 171016),
+  so relabelling would have created a duplicate. Deleting achieves the same intent.
+- **3 of the 8 "needs nutrition" rows were left untouched.** When Saffron supplied
+  replacement figures, the diff showed **Tamari, Brown sugar and Red pepper flakes were
+  the *legitimate* owners of their USDA records** — their twins were the borrowers. My
+  original flagging was too broad. Applying the supplied figures would have *degraded*
+  them (rounder numbers, fibre zeroed). Values kept; flag cleared only.
+- **`Chicken stock` renamed to `Chicken stock cube`** rather than just re-numbered — the
+  figures changed from made-up stock (36 kcal/100 g) to cube (270 kcal/100 g), a ~7.5×
+  jump. Without "cube" in the name a 100 g log would be silently catastrophic.
+- **`usda_seed` stripped from the 5 re-sourced rows** — their figures are now brand-label
+  averages, so the provenance flag had become false.
+- **Review CSVs to scratchpad, not the repo** — follows the same-day Asian-cuisine
+  precedent; they're pre-review proposals, not the reviewed-decisions the root CSVs hold.
+
+## Current State (end of session)
+- **`staple_products`: 163 rows.** 0 lowercase names, 0 stale `(generic)` suffixes,
+  0 duplicate names, 0 `nutrition_unverified`, 5 `nutrition_estimated`, 113 `usda_seed`.
+- **PR #57** (`claude/ai-model-product-naming-1c1nd4`) open, draft, mergeable_state clean.
+  No CI on this repo (the keepalive is `main`-only), no review comments.
+- Model change **scoped only — no code written**.
+
+## Next Steps
+1. **Merge PR #57** (search) — verified, nothing outstanding.
+2. If proceeding with the model change: apply the defensive parse
+   `(data.content||[]).find(b=>b.type==='text')?.text` at index.html L3633, L4024, L5479,
+   L6426, L6561 — **this is worth landing even if the model doesn't change.** Then swap
+   the 5 model strings and add `thinking:{type:'disabled'}`. Must also update
+   `CLAUDE.md:113` and the `index.html:5596` comment, and bump `sw.js` CACHE.
+3. Optional: replace **Coconut sugar** carbs 100.0 g → ~94 g (see Gotchas).
+4. Optional: re-source the 5 `nutrition_estimated` rows from *her actual UK products* —
+   the current figures are US-leaning brand averages.
+
+## Open Questions / Blockers
+- **CLAUDE.md AI-features list is drifted, independent of this session.** It names
+  *"pantry item parsing"* (pantry now lives in `legacy/`, not loaded) and omits
+  `fetchMacroEstimate` and `generatePlanWithAI`, both live. `claude_md_drift.mjs` does
+  **not** catch this — it only checks mechanical cases. Fix when this area is next touched.
+- **No nutrition data can be sourced from an agent session.** Verified this session:
+  `api.nal.usda.gov` *and* `world.openfoodfacts.org` both return **403 connect_rejected**
+  at the egress gateway, and WebFetch hits the same policy. WebSearch works but returns
+  page snippets only — no per-100 g figures, and no FDC ID for provenance. Only
+  `api.anthropic.com` + package registries are allowlisted. Nutrition sourcing must be
+  `scripts/usda_staples.py` on Saffron's Mac, or label data pasted into chat.
+
+## Environment & Config Notes
+- Repo `saffronlm-cmyk/daily-shuffle`, branch `claude/ai-model-product-naming-1c1nd4`,
+  **PR #57** (draft).
+- `sw.js` CACHE **v37 → v38**.
+- Supabase project `jsxcctrskkkxgdxfaduo`, table `staple_products` (163 rows after).
+- Flags in play: `usda_seed`, `nutrition_estimated` (new this session),
+  `nutrition_unverified` (introduced then fully cleared), `high_sodium`.
+- The Supabase MCP server disconnected and reconnected mid-session under a new tool
+  prefix — re-search via ToolSearch if this happens again.
+
+## Notes & Gotchas
+- **Renaming staples could not orphan saved meals — verified, don't re-panic.**
+  `trkFindStapleId()` (L5773) resolves by name/alias but runs **only at save time**;
+  `trkResolveItemMacros` reads by `source_id`. Confirmed 0 dangling references post-write.
+- **Coconut sugar carries an internally inconsistent figure**, applied verbatim as
+  supplied: carbs **100.0 g/100 g** against 378 kcal. 100 g carbs ≈ 400 kcal, and 100 g
+  of carbs leaves no room for moisture/ash. ~94 g would be consistent. Left as-is
+  deliberately rather than silently overriding her data; the discrepancy is ~2.4 kcal at
+  her typical 10 g usage, so it is immaterial in practice. Noted in the row's `notes`.
+- **Gochugaru and Dark chocolate chips kept fibre carried over from their old USDA
+  records** (27.2 g and 6.5 g) — the supplied data had no fibre. Flagged in each row's
+  `notes`. Don't mistake these for verified figures.
+- **`Chicken stock cube` is per 100 g of CUBE.** A 10 g cube ≈ 1,000–1,700 mg sodium.
+  Never log it by volume of made-up stock.
+- **`staple_products` has no sodium column** — all sodium data from this session lives in
+  the `notes` text, not a queryable field.
+- Ad-hoc browser tests must seed `trkStaples` via `trkLoadStaples(true)` reading the
+  `ds_trk_staples` localStorage key. Setting `window.trkStaples` does **not** work —
+  it's a `let` binding at module scope and doesn't attach to `window`.
 
 ---
 
@@ -340,6 +543,158 @@ Salmon miscategorization flagged above, which isn't blocking anything.
   reverting, the before/after cuisine values for the 86 originally-`asian` recipes are
   recoverable from this log's pass-1/pass-2 breakdown and the chat history, not from
   any DB snapshot.
+
+# Japchae recipe duplication (in-session, unsaved) + variant-toggle idea + soya milk staple
+**Date:** 2026-08-02
+**Project:** Daily Shuffle — recipe library (Supabase `recipes`) exploration, `staple_products`
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete — one PR merged (#53); one small direct DB write; one item left undone by design
+
+---
+
+## Project Context
+Unrelated to the macro-correction stream closed out in the 2026-07-24 entry below, and to the
+Asian cuisine tag expansion entry immediately below this one (also same-day, different session).
+This was a mixed session: (1) an explicitly non-persisted recipe-duplication exercise against the
+bundled Supabase project (`jsxcctrskkkxgdxfaduo`), (2) a resulting feature-idea note, and (3) an
+unrelated one-off staple addition.
+
+## Session Goal
+1. Pull "Glass & Konjac Chicken Japchae" and its sibling "Chicken Mince Konjac Japchae" from
+   `recipes` into the conversation so Saffron could duplicate and alter them (ingredient swap +
+   macro recalculation) without writing anything to the DB until she says so.
+2. Answer her follow-up questions about how such duplicates would surface in Shuffle/Tracker,
+   and how to represent them as "variants."
+3. (Unrelated, same session) add an unsweetened soya milk entry to `staple_products`.
+
+## State Before This Session
+Clean — prior session (2026-07-24) had closed out the macro-correction stream entirely; `main`
+had no open work relevant to this session's topics.
+
+## What Was Done
+1. **Pulled both japchae recipes read-only** via `execute_sql` (`select * from recipes where
+   name ilike '%japchae%' or ...`) — `b8bb9c91-b2d4-4ee7-877b-ea976d7a5a26` (Glass & Konjac
+   Chicken Japchae, serves 4) and `7670cb5c-e6ef-437e-bc3b-fd0780b4e19d` (Chicken Mince Konjac
+   Japchae, serves 5). Presented both in full (ingredients, method, macros) in chat.
+2. **Duplicated + altered both, in-session only** — per Saffron's explicit instruction ("nothing
+   needs to be stored before my say so"), no `INSERT`/`UPDATE` was run for either recipe. Applied:
+   replace the sweet potato glass noodles line with 200g konjac noodles, merged into the existing
+   konjac noodles line (1000g total in both recipes), scrubbed the glass-noodle mention from each
+   subtitle/notes field, and recalculated macros using generic per-100g reference values (sweet
+   potato glass noodles ≈351 kcal/85g carb dry; konjac noodles ≈7–9 kcal/100g, ~3g fibre, ~0 net
+   carb) applied as a delta against the original per-serving macros:
+   - Glass & Konjac Chicken Japchae (serves 4): 470→**~360** kcal, 66→**~40**g carb, fibre
+     14→**~15**g; protein/fat/sugar effectively unchanged.
+   - Chicken Mince Konjac Japchae (serves 5): 515→**~448** kcal, 50→**~34**g carb, fibre
+     9→**~10**g; protein/fat/sugar effectively unchanged.
+   Neither duplicate was ever written to Supabase — **this recalculated data only exists in that
+   conversation's transcript and is not persisted anywhere.** If Saffron wants these variants
+   saved, they need to be re-derived (the exact deltas are in this log entry) and inserted fresh.
+3. **Answered "how would these show up in Shuffle/Tracker"** by reading the actual fetch queries
+   in `index.html`: Shuffle's pool (`fetchCloudRecipes`, ~line 1511) only pulls
+   `import_status=eq.ready`; Tracker's recipe picker (`trkFetchRecipes`, ~line 6220) pulls
+   `import_status=in.(ready,review,custom)`. So `custom` rows are Tracker-only; `ready` rows are
+   both.
+4. **Answered "how would these show up as *variants*"** — checked the `recipes` schema via
+   `list_tables`: no `variant_of`/`parent_id` column exists. A duplicate is just another
+   standalone row with no link back to its source recipe. Confirmed with Saffron she wants to
+   keep these as `custom` for now (Tracker-only, not Shuffle-eligible) given the macros are
+   AI-recalculated estimates, not staple-grounded.
+5. **Logged the variant-toggle idea** as a new "Future — other feature ideas (unscheduled)"
+   section appended to `handoff.md` (previously only had the cost-aware-features future list).
+   Committed + pushed on `claude/japchae-recipe-duplicate-l3z9i5`, opened **draft PR #53**,
+   subscribed to its activity. CI showed `pending`/0 checks the whole time (repo has no CI beyond
+   the unrelated Supabase keep-alive) — nothing to fix. No review comments. Saffron marked it
+   ready for review herself; **merged** by her directly. Session unsubscribed automatically on
+   merge.
+   - Note: while this PR was open, a **second, unrelated** feature note ("multi-select
+     primary-cuisine idea") was appended to `handoff.md` by another PR (**#55**, merged after
+     #53, alongside **#54** "Expand Asian cuisine tags" — see that entry below). Neither was part
+     of this session — flagging so nobody attributes them here.
+6. **Added a new staple** (unrelated ask): `staple_products` had "Alpro Original soya milk"
+   (sweetened, 2.5g sugar/100ml) but nothing unsweetened. Inserted a new row, first as branded
+   ("Alpro Unsweetened soya milk") using generic Alpro-Unsweetened label values, then — per
+   Saffron's correction ("I want it unbranded and generic") — **updated in place** (same row,
+   `id c88bbbfe-f065-46c9-b917-f991f0142c47`) to rename to "Unsweetened soya milk" and swap
+   aliases to generic terms. Macros were left unchanged (they were already generic-label values,
+   not brand-specific): 33 kcal / 3.3g protein / 0.3g carb / 1.8g fat / 0.5g fibre / 0.3g sugar
+   per 100ml.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| `handoff.md` | Future-ideas section | Modified (variant-toggle bullet added) | repo root — merged via PR #53 |
+| Supabase `staple_products` | New staple row | Created then updated | row `c88bbbfe-f065-46c9-b917-f991f0142c47` |
+| Supabase `recipes` | Japchae duplicates | **Not created** — deliberately left unpersisted | N/A |
+| `logs/daily-shuffle_log.md` | This entry | Modified | repo root |
+
+No `index.html`/`sw.js`/`manifest.json` touched — no cache bump needed.
+
+## Decisions & Reasoning
+- **Kept the duplicates unpersisted per Saffron's explicit instruction**, even after later
+  discussing `import_status`/variant mechanics in detail — the discussion was exploratory, not
+  authorization to write. Only wrote to the DB when she gave a direct, unambiguous instruction
+  ("add unsweetened soya milk to my staples").
+- **Chose to merge the 200g konjac addition into the existing konjac-noodle line** (rather than
+  add a second line item) since "replace X with Y" reads as a net ingredient-quantity change, not
+  two separate konjac lines in the same recipe.
+- **Recalculated macros via generic-value deltas against the original per-serving figures**
+  rather than re-deriving the whole recipe from scratch — faster, and keeps everything else
+  (protein/fat/sugar, which the swap doesn't touch) anchored to the original AI estimate instead
+  of introducing new estimation error.
+- **`variant_of` proposed as nullable, not required** — documented as a future-feature note only,
+  not implemented; no schema migration was run this session.
+- **Named the new staple generically per direct correction** — first guess (branded "Alpro
+  Unsweetened") was wrong; fixed via `UPDATE` on the same row rather than delete+reinsert, since
+  the macros were already valid and only naming needed to change.
+
+## Current State (end of session)
+- PR #53: merged to `main`. Branch `claude/japchae-recipe-duplicate-l3z9i5` reset to `origin/main`
+  after the merge (per the merged-PR restart convention) so this log entry lands clean.
+- `staple_products`: "Unsweetened soya milk" row live and correct per Saffron's confirmation.
+- The two altered japchae recipes exist **only in this log entry and the closed conversation** —
+  not in the database, not in any file. Re-derive from §"What Was Done" item 2 above if resuming.
+
+## Next Steps
+1. If Saffron wants either/both altered japchae recipes actually saved: re-apply the swap
+   documented above (merge 200g into the konjac line, scrub subtitle glass-noodle mentions, use
+   the recalculated macros given) and `INSERT` into `recipes` with `import_status='custom'`
+   (Tracker-only) or `'ready'` (also Shuffle-eligible, her call) — nothing currently blocks this,
+   it just wasn't authorized this session.
+2. `variant_of` column is documented in `handoff.md` under "Future — other feature ideas
+   (unscheduled)" — no urgency, revisit whenever recipe-variant handling comes up again (note this
+   session's discovery that #54/#55 landed a *different* feature idea, "multi-select primary
+   cuisine," in the same handoff.md section — read both before adding a third).
+3. No other open threads from this session.
+
+## Open Questions / Blockers
+N/A — nothing blocking. The only "unfinished" item (the japchae variants) is unfinished by
+Saffron's explicit choice, not a blocker.
+
+## Environment & Config Notes
+- Repo: `saffronlm-cmyk/daily-shuffle`. Branch: `claude/japchae-recipe-duplicate-l3z9i5` (reset
+  from `origin/main` post-merge, per convention, before this log commit).
+- PR #53 (merged). Unrelated PRs #54/#55 also merged to `main` during this session's window by a
+  different session — visible in `git log` but not this session's work.
+- Supabase project: `jsxcctrskkkxgdxfaduo` (bundled `recipes`/`staple_products`/etc.).
+- No env vars or credentials touched.
+
+## Notes & Gotchas
+- **`recipes` has no variant/parent linkage** — don't assume duplicated recipes are discoverable
+  as a group; they're only findable by name, exactly like any other row.
+- **`import_status` is the only lever controlling Shuffle vs. Tracker visibility** (`ready` = both,
+  `custom`/`review` = Tracker only, anything else = neither). This is a coarser mechanism than a
+  true variant toggle would be — see the `handoff.md` note.
+- **The recalculated japchae macros are estimates layered on estimates** (original recipes were
+  already flagged "AI estimate"; this session's deltas used generic reference values, not
+  `staple_products` lookups) — if these ever get saved, consider flagging
+  `review_flags: quantities_estimated` rather than treating them as staple-grounded.
+- `handoff.md`'s "Future" area now holds two unrelated feature-idea sections appended by
+  different sessions in close succession (cost-aware features → variant toggle → multi-select
+  primary cuisine) — worth consolidating into a proper backlog file if it keeps growing.
+
+---
 
 # Session close-out — macro-correction stream fully complete (Batches M–O)
 **Date:** 2026-07-24
@@ -880,11 +1235,16 @@ recipe's field conventions:
   `protein_source='chicken'`, `cuisine='korean'`, `carb_type='none'` (matches the
   sibling — konjac-based), `serves=5`, `cost_tier='2'`, `prep_cook_time='35 minutes'`,
   `craving_tags=['savoury','highprotein','glutenfree','asian','comfort','healthy']`.
-- **Macros are an AI estimate** (flagged in `notes`, same as the sibling): per serve
-  cal 590 / protein 46 / carbs 47 / fat 13 / fibre 9 / sugar 15. Derived by hand-summing
-  ingredient macros (chicken mince 5% ≈ 172 kcal·20 g P/100 g dominates; konjac ≈ 0;
-  glass noodles + brown sugar + sweet chilli drive carbs/sugar) and dividing by 5. Rough
-  — not from the nutrition pipeline (step 3 is still blocked).
+- **Macros are an estimate** (flagged in `notes`). **Corrected mid-session** after
+  Saffron asked whether they drew from `staple_products` — the first pass (590/46/47/13/
+  9/15) was a hand guess that did NOT. Recomputed grounded in `staple_products` where
+  available and updated the row to per serve **cal 515 / protein 51 / carbs 50 / fat 13
+  / fibre 9 / sugar 14**. Grounded items: chicken mince 5% (135 kcal·22 g P/100 g — the
+  hand guess had over-used ~172, hence the −75 kcal calorie drop), GF reduced-salt soy
+  (Emma Basic), fish sauce, brown sugar, carrot, red onion, garlic granules, sesame oil,
+  rice vinegar. Still generic (not in staples): konjac noodles, sweet potato glass
+  noodles, mushrooms, cornstarch, sweet chilli sauce, MSG. Not from the nutrition
+  pipeline (step 3 still blocked); ≈ ±10% on calories, protein tightest.
 - id / created_at / updated_at left to defaults (`gen_random_uuid()`, `now()`).
 - New id: `7670cb5c-e6ef-437e-bc3b-fd0780b4e19d`.
 
