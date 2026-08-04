@@ -1,0 +1,1342 @@
+# Macro corrections & library audit log
+
+Running record of recipe macro recalculations (per serving). Macros recomputed from
+ingredient lists using standard USDA-equivalent values; calories rounded to nearest whole,
+macros to nearest 0.5 g. See `scratchpad/macro-corrections-review.md`-style breakdowns for
+per-ingredient math on the manually-corrected batch.
+
+Format: `kcal / protein_g / carbs_g / fat_g / fibre_g / sugar_g`.
+
+---
+
+## Batch A — manual corrections from Saffron's supplied ingredient lists (2026-07-16) — WRITTEN
+
+10 recipes, ingredient lists provided in chat, confirmed per-recipe, written to Supabase.
+
+| Recipe | serves | Before | After | Notes |
+|---|---|---|---|---|
+| XL Gluten Free Rice Paper Dumplings | 4 | 228/20/18/7/1.5/2 | **256/21/15.5/12.5/1.5/2** | fat up (chicken + sesame oil) |
+| Mango Yogurt Bites | 7 | 80/–/–/–/–/– | **70/2/8.5/3.5/0.5/8** | mini white choc bar = 25 g; ingredient_sections was empty (nulls) |
+| Chocolate Date Cake | 9 | 198/4.5/32/5/2.5/18 | **253/5.5/51/5/4.5/32** | 2 eggs; 15 medjool dates ≈ 360 g |
+| Green Goddess Salad | 3 | 188/4.5/22/10/6/12 | **388/11/37.5/24.5/11.5/18** | 60 ml olive oil badly undercounted before |
+| Carrot Cake Baked Oats | 2→**4** | 312/14/48/8.5/5.5/18 | **407/18/54.5/14.5/7/18** | serves changed 2→4; nuts 30 g |
+| Boiled Egg Chocolate Mousse | 4 | 138/16/16/6/2.5/12 | **290/18/29.5/15/7/19** | 8 whole eggs = 42 g fat, was undercounted |
+| Vietnamese Lettuce Wraps w/ Peanut Sauce | 3 | 248/16/28/8.5/3.5/8 | **460/36.5/51/14.5/6.5/15.5** | prawns/noodles/peanut; pickle brine excluded |
+| Vietnamese Chicken & Noodle Bowls | 4 | 498/38/48/12/5/8 | **592/39/75/14.5/4/10** | 270 g dry noodles drives carbs |
+| Vegan Tahini Brownies | 9 | 265/4.5/30/15/3/18 | **292/6/36.5/16/4.5/22.5** | closest to old estimate |
+| Vegan Protein Waffles | null→**2** | 198/9.5/22/8.5/2/4 | **463/29/46/18/3/9.5** | serves set null→2 |
+
+Quantity assumptions & overrides that shaped these are documented in the review sheet
+(leafy-produce `=Xg` annotations were water-density and overstated; corrected to realistic
+weights).
+
+---
+
+## Batch A2 — Tier 1 normalisation corrections (2026-07-16) — WRITTEN
+
+First tranche of audit-derived corrections applied. 15 highest-severity recipes from the
+normalisation-priority list (biggest stored-vs-recompute gaps, driven by unweighted
+oils/nut butters/tahini/coconut/dry-noodle/date quantities). Assumptions confirmed by
+Saffron: **coconut milk = light**, **quinoa = cooked**, **instant noodle pack = 85 g**.
+(Coconut *cream* left full-fat — it's a distinct ingredient.)
+
+| Recipe | serves | Before | After |
+|---|---|---|---|
+| Quick Chicken Laksa | 2 | 488/30/42/22/2.5/4 | **897/41/58/52/2/3** |
+| Crispy Rice Salad with Miso Tofu | 2 | 488/35/42/22/6.5/8 | **916/38/78/50.5/6.5/12** |
+| Peanut Butter Chicken Coconut Noodles | 2 | 485/44/52/18/3/4 | **913/42/89/35/3/6** |
+| Ultimate Christmas Pasta Salad | 2 | 548/36/46/24/3/8 | **933/45.5/72.5/44/4/10** |
+| Pad See Ew with Beef | 2 | 388/44/42/14/3.5/5 | **864/41.5/92/33/3.5/5** |
+| Crispy Tempeh Rice and Cucumber Salad | 2 | 488/20/48/24/4/8 | **852/30.5/67.5/52.5/4/9** |
+| Thai Glass Noodle Salad with Prawns | 2 | 448/28/44/18/3/8 | **834/33.5/75/41.5/3/9** |
+| Green Goddess Pasta Salad | 3 | 398/22/44/14/6/4 | **795/44/82/32.5/6/5** |
+| Sweet Potato and Kale with Tahini Dressing | 2 | 488/14/58/22/12/8 | **488/11.5/50/28.5/9/8** (cooked quinoa) |
+| Pumpkin Spice Olive Oil Cake | 10 | 388/6/32/28/3/22 | **673/11.5/48/50/5/26** |
+| Spicy Tom Kha Soup with Tofu | 2 | 288/12/18/20/3.5/7 | **415/17.5/15.5/28/3.5/7** (light coconut) |
+| Coconut Prawn Curry | 4 | 228/28/8/10/1.5/4 | **375/53/13/12.5/2/5.5** (light coconut) |
+| Steamed Rice Paper Dumplings with Shrimp | 4 | 198/18/16/8/1/3 | **444/26/39/19/1.5/3** |
+| Date Tahini Bites with Sunflower Sesame Crust | 12 | 128/2.5/18/6/1.8/14 | **278/6.5/30/16.5/4/21** |
+| Sweet and Salty Date Caramel Oat Cookie Slice | 16 | 148/1.5/22/6/1.5/14 | **276/2.75/49/9/2.5/16** |
+
+Verified read-back: all 15 rows updated. `ingredient_sections` untouched (raw source of truth).
+Tier 2 candidates (~28) tracked in `logs/normalisation-priority.md`.
+
+---
+
+## Batch A3 — Tier 2 normalisation corrections, tranche 1 (2026-07-16) — WRITTEN
+
+14 Tier 2 recipes Saffron selected from `normalisation-priority.md`. Same confirmed defaults
+(light coconut where unspecified, cooked quinoa, 85 g noodle pack). Two per-recipe calls she
+confirmed: Golden Coconut Chicken Curry computed **without rice** (rice is "to serve", no qty)
+and coconut *cream* kept full-fat; Miso Soy Chicken kept **full-fat coconut milk** (recipe
+specifies it explicitly, overriding the light default).
+
+| Recipe | serves | Before | After |
+|---|---|---|---|
+| Cosmic Brownie Overnight Oats | 1 | 488/28/48/20/9/16 | **696/35/72/34/18/31.5** |
+| Golden Coconut Chicken Curry | 4 | 488/34/22/32/6/6 | **624/31/15/49/3/2.5** (no rice, full cream) |
+| Miso Soy Chicken with Coconut Lime Rice | 4 | 578/38/52/22/1.5/8 | **776/33/74/35.5/1.5/10** (full-fat coconut) |
+| Garlic Miso Somen Noodles | 2 | 378/18/52/12/4/6 | **608/22/86.5/16.5/3.5/6** |
+| Pad See Ew | 2 | 488/28/58/16/3/5 | **713/27/93/26.5/2.5/3.5** |
+| Pad Thai Inspired Saucy Chicken Noodles | 5 | 525/28/62/18/3.5/14 | **725/35/89.5/25/4/17.5** |
+| Sweet Potato Olive Oil Cake | 10 | 268/4.5/26/17/2.5/16 | **451/7.5/35/32/4/20** |
+| Fiery Chilli Prawn Linguine | 3 | 337/24/42/9/3/8 | **578/36/90.5/6/6/12** |
+| Chocolate Zucchini Bread | 8 | 268/7/16/21/3.5/10 | **394/10/33.5/26.5/5/24** |
+| Peanut Noodle Stir Fry | 3 | 398/18/44/18/7/8 | **668/46/52.5/36/9/17** |
+| Maple Sriracha Tofu Protein Bowl | 3 | 428/18/46/18/8/10 | **698/40.5/72.5/32/11.5/24** |
+| Chicken Tikka Masala | 4 | 448/32/10/30/2/6 | **652/36/18/47.5/2/5** |
+| Cinnamon Roll Date Cake | 9 | 248/3.5/42/8/1.5/28 | **417/3/81/10/3/61** |
+| Toffee Pecan Apple Crumble | 6 | 318/3/44/16/5/28 | **526/6.5/71.5/27/9.5/42** |
+
+Verified read-back: all 14 rows updated. `ingredient_sections` untouched. **Corrected-recipe
+total now 39** (10 Batch A + 15 Tier 1 + 14 Tier 2 tranche 1). Remaining Tier 2 (14) still open
+in `normalisation-priority.md`.
+
+---
+
+## Batch A4 — Tier 2 normalisation, tranche 2 (final Tier 2) (2026-07-16) — WRITTEN
+
+The remaining 14 Tier 2 recipes (mostly overnight-oats / baked-oat / dessert families).
+Saffron said **include all optional toppings** — so these figures fold in every listed topping
+(Raspberry fold-ins; Sticky Toffee Date sauce; Halloween Balls +optional protein powder; Sticky
+Toffee Chia +caramel topping; Blended OO +yoghurt/protein/choc-flake topping). This clears the
+whole Tier 2 list.
+
+| Recipe | serves | Before | After (toppings in) |
+|---|---|---|---|
+| Raspberry Chocolate Chip Baked Oatmeal | 1 | 468/14/58/20/8/14 | **776/24/95.5/35.5/18/32.5** |
+| Sticky Toffee Date Oats | 1 | 445/12/66/16/9/28 | **778/21/127/22/14.5/68** |
+| Chocolate Chia Overnight Oats | 1 | 502/38/42/18/5.5/15 | **692/48/71/26/11.5/30** |
+| Snickers Overnight Oats | 1 | 412/12/52/18/7.5/14 | **535/15.5/66/25/12/21** |
+| Sweet Potato Chocolate Chip Cookies | 12 | 138/3.5/11/10/1.5/6.5 | **211/5/14/15.5/3/8.5** |
+| Tahini Oat Chocolate Chip Bars | 9 | 198/5.5/18/13/2/9 | **315/8/26.5/20.5/4/14.5** |
+| Sweet Potato Chocolate Cake | 8 | 148/2/16/8.5/2/10 | **237/3/28/12/6/13** |
+| No Bake Coconut Cookies | 20 | 168/3/22/8.5/2/14 | **242/4.5/27.5/14/2.5/16** |
+| Halloween Chocolate Almond Butter Balls | 12 | 118/3.5/8/8.5/1.5/5 | **175/7/11.5/12.5/3/6.5** (+protein powder) |
+| Chocolate Tahini Brownies | 9 | 178/5.5/12/13/2.5/8.5 | **272/7/24.5/19/4.5/15** |
+| Sticky Toffee Chia Pudding | 2 | 378/6.5/48/18/7.5/30 | **708/13/96/35/12/68** (+caramel) |
+| Maple Cinnamon Pumpkin Overnight Oats | 1 | 368/16/44/14/6.5/16 | **596/27/63/27.5/10.5/23.5** |
+| Blended Overnight Oats | 1 | 398/32/36/12/6.5/6 | **617/50/58/19.5/10/15** (+topping) |
+| Blueberry, Lemon and Coconut Overnight Oats | 1 | 332/17/42/8/8.5/14 | **437/22/55/15.5/13/12.5** |
+
+Verified read-back: all 14 rows updated. `ingredient_sections` untouched. **Corrected-recipe
+total now 53** (10 Batch A + 15 Tier 1 + 28 Tier 2). Tier 2 list fully cleared. Broader
+worklist tracked in `remaining-work.md`.
+
+---
+
+## Read-only library audit (no writes)
+
+Goal: sweep the whole `recipes` library (import_status='ready'), recompute macros where
+ingredient quantities are explicit enough to audit, and flag which stored values are
+materially off. **No DB writes** — this is a worklist, not an application.
+
+- **Auditable now** = ingredient_sections populated with parseable quantities (weights,
+  volumes, or standard-countable units) AND serves present.
+- **Deferred** = missing/vague quantities, empty ingredient lists, or null serves — these
+  need quantity normalisation (workstream step 2) or a human decision first.
+- Processed 10 at a time; each batch recorded below.
+
+### Batch B (2026-07-16) — recipes 1–10 alphabetically (read-only, no writes)
+
+Verdicts: ✅OK (within ~15%) · ⚠OFF (recommend correction) · ◐PARTIAL (a qty missing) · ⛔DEFERRED.
+
+| Recipe | serves | Stored | Recompute (per serving) | Verdict |
+|---|---|---|---|---|
+| 30 Minute Bang Bang Chicken Bowls | 4 | 388/34/12/23/0.5/8 | protein ≈45 (rice base unquantified) | ◐ protein low; needs rice qty |
+| 4 Ingredient Date Balls | 12 | 68/1.5/14/0.5/1.2/10 | ~77/1.9/15.5/1/1.75/9 | ✅ minor |
+| 4 Ingredient Rice Cake Chocolate Bars | 4 | 165/4.3/20/8.8/1.7/9 | **~266/5.5/30/15/2/18.5** | ⚠ OFF (~+60%) |
+| Air Fryer Cinnamon Roll Oats | 1 | 398/20/46/16/5/8 | **~616/17/73/28/7/32** | ⚠ OFF (cookie butter est.) |
+| Air Fryer Spring Rolls | 4 | 451/25/34/25/3.2/4.5 | ~534/26/35.5/30.5/… | ✅ within ~18% (pork fat) |
+| Apple Almond Yogurt Bowl | 1 | 418/16/48/18/5.5/34 | — | ⛔ ingredient list empty (nulls) |
+| Asian Chicken Salad w/ Cucumber & Seaweed | 2 | 461/50.1/null/null/null/null | **~212/25/4.5/10.5/2.5/1** | ⚠ OFF (~2× + null macros) |
+| Baked Middle Eastern Chicken Tray | 4 | 318/36/5/16/0.8/2.5 | **~377/58/7/16/1/2.5** | ⚠ OFF (protein low) |
+| Banh Cuon - Vietnamese Rice Paper Rolls | 1 | 570/30/70/20/null/null | ~583/26/58/25/…/… | ✅ close; fibre/sugar null |
+| Basic Oat Flour Pancakes | 2 | 68/3.5/8/2/0.8/1.5 | **~153/9/18/5/2.5/1.5** | ⚠ OFF (wrong serving basis?) |
+
+- Auditable this batch: 9/10 (Apple Almond Yogurt Bowl deferred — empty list).
+- Recommend-correction: 5 (Rice Cake Bars, Cinnamon Roll Oats, Asian Chicken Salad,
+  Middle Eastern Tray, Oat Flour Pancakes). Bang Bang partial (needs rice qty).
+- Recurring data gaps surfaced: several recipes have `null` carbs/fat/fibre/sugar even
+  where calories/protein exist (Asian Chicken Salad, Banh Cuon).
+
+### Batch C (2026-07-16) — next 10 alphabetically ("BBQ…" → "Buffalo…") (read-only)
+
+| Recipe | serves | Stored | Recompute (per serving) | Verdict |
+|---|---|---|---|---|
+| BBQ Chicken Stuffed Sweet Potatoes | 4 | 378/32/46/6/6/18 | ~320/30/37/5/5.5/7.5 | ✅ close (sugar high in stored) |
+| Blended Overnight Oats | 1 | 398/32/36/12/6.5/6 | **~475/36/48/14/9.5/8** | ⚠ OFF low; topping unquantified |
+| Blended Raspberry Protein Chia Pudding | 3 | 268/25/24/7.5/9/10 | — | ⛔ ingredient list empty (nulls) |
+| Blueberry Cheesecake Yogurt Bowl | 1 | 318/24/42/5/1.5/28 | ~314/24/37/7.5/1.5/21 | ✅ good match |
+| Blueberry, Lemon & Coconut Overnight Oats | 1 | 332/17/42/8/8.5/14 | **~437/22/55/15/13/12** | ⚠ OFF low (chia+coconut) |
+| Bone Broth Smothered Chicken | 4 | 368/38/6/21/0.5/1 | ~649/44/9/47/1/2 (no rice) | ◐ rice qty missing; fat undercount (skin-on) |
+| Bounty Bar Overnight Oats | 1 | 388/6/42/21/7/18 | — | ⛔ ingredient list empty (nulls) |
+| Brothy Miso Ginger Chicken and Rice | 3 | 485/38/42/17/2.5/8 | ~509/46/24.5/23/1.5/13 (no rice) | ◐ rice qty missing; protein higher |
+| Brownie Batter Overnight Oats | 4 | 198/13/26/6/7.5/8 | — | ⛔ ingredient list empty (nulls) |
+| Buffalo Chicken Wrap | 2 | 618/48/38/28/3/8 | ~880/59/55/44.5/…/… (all slaw) | ◐ "1 bag" slaw + portion ambiguous |
+
+- Fully auditable: 4/10 (2 OK, 2 OFF-low). Partial (unquantified base): 3. Deferred (empty): 3.
+- Patterns: overnight-oats entries often have unpopulated ingredient lists; "cooked white
+  rice for serving" (no qty) recurs on chicken-and-rice mains; skin-on vs skinless thigh is
+  a big fat swing.
+
+**Running totals through Batch C:** ~30 of 310 ready recipes covered (10 written + 20 audited).
+
+### Batch D (2026-07-16) — next 20 alphabetically ("Burger…" → "Chicken Shawarma…") (read-only)
+
+| Recipe | serves | Stored | Recompute (per serving) | Verdict |
+|---|---|---|---|---|
+| Burger Bowl | 1 | 440/50/30/10/–/– | — | ◐ only 2/16 ingredients have qty |
+| Butternut Peanut Butter Protein Mug Cake | 1 | 248/22/22/8.5/4.5/8 | ~247/21/26/7/4/6 | ✅ great match |
+| Butternut Protein Brownie (butternut/egg-white) | 5 | 412/52/38/6/–/– | **~110/15.5/12.5/1.5/3/1.5** | ⚠ stored wildly high (impossible protein) |
+| Butternut Protein Brownie (pumpkin/egg-white) | 5 | 189/25/16/3/–/– | **~98/15/9.5/1.5/2.8/2.5** | ⚠ stored ~2× |
+| Butternut Squash Mac and Cheese | 4 | 348/12/52/11/5.5/10 | **~542/21/79/17/7/10** | ⚠ stored low (squash size a swing) |
+| Café Style Jacket Potatoes (Chicken/Bacon/Corn) | 4 | 601/66/61/12/–/– | — | ◐ ingredient list incomplete (no potato/corn listed) |
+| California Rolls in a Bowl | 2 | 505/14/80/15/11/18 | — | ⛔ ingredient list empty (nulls) |
+| Caramel Rice Cake Strawberry Treat | 1 | 348/14/37/12/3.8/16 | — | ◐ PB/choc/yoghurt no qty |
+| Caramelised Onion Rice with Tikka Cod | 2 | 488/45/52/8/9/12 | **~578/48.5/83/4.5/15/15** | ⚠ carbs low (rice+chickpea+peas) |
+| Carrot Cake Baked Oats (serves 4) | 4 | 407/18/54.5/14.5/7/18 | (Batch A) | ✅ already corrected |
+| Carrot Cake Baked Oats (serves 1) | 1 | 268/8.5/46/5/5.5/14 | — | ⛔ ingredient list empty (nulls) |
+| Carrot Cake Loaf | 5 | 178/14.5/16/6.5/2.8/7 | **~100/7/12.5/2.5/2/3.5** | ⚠ stored ~2× (protein impossible) |
+| Carrot Cake Meal Prep Baked Oats | 5 | 318/16/46/7/5/20 | ~386/22/53/10/6.5/13 | ⚠ protein/cal low |
+| Carrot Cake Overnight Oats | 1 | 298/10/48/7/6/14 | ~328/12/49/9.5/7.5/11 | ✅ close (toppings unquantified) |
+| Cauliflower Cheese Gnocchi Bake | 3 | 360/19/null/null/null/null | ~401/18/56/11/7/… | ✅ close; carbs/fat/fibre/sugar null |
+| Char Siu Chicken | 2 | 689/42/79/22/–/– | ~686/42.5/78/21/…/… | ✅ great match; fibre/sugar null |
+| Chicken & Egg Breakfast Casserole | 8 | 228/20/12/11/2/4 | ~315/21.5/15/18.5/2.5/4.5 | ⚠ fat/cal low (avo oil+eggs+cheese) |
+| Chicken and Potato Traybake | 4 | 448/38/26/22/4/3 | ~589/34/25/37/…/… | ⚠ fat low (skin-on legs+thighs+marg) |
+| Chicken Pad Thai | 4 | 555/50/47/18/3.5/10 | ~549/54/44.5/15/…/… | ✅ great match |
+| Chicken Shawarma Crispy Rice Salad | 4 | 488/30/34/26/3.5/6 | **~657/32.5/43/40/…/…** | ⚠ fat/cal low (tahini + multiple ¼-cup oils) |
+
+- Fully auditable: 14/20 (6 ✅ OK, 8 ⚠ OFF). Partial: 3. Deferred (empty): 2. Already-done: 1.
+- Standouts: protein-powder bakes (both Butternut Brownies, Carrot Cake Loaf) carry
+  **impossibly high** stored protein/calories — likely per-recipe totals miscounted as
+  per-serving. Oil/tahini-heavy dishes (Shawarma Salad, Breakfast Casserole, Traybake)
+  are consistently **under**-counted on fat.
+- Recurring: `null` carbs/fat/fibre/sugar on several (Cauliflower Gnocchi, Char Siu,
+  Burger Bowl, Café Jacket Potatoes, both Butternut Brownies).
+
+**Running totals through Batch D:** ~50 of 310 ready recipes covered (10 written + ~39 audited).
+
+### Batch E (2026-07-16) — next 20 alphabetically ("Chicken Shawarma Sheet Pan…" → "Chocolate Date PB Squares…") (read-only)
+
+| Recipe | serves | Stored | Recompute (per serving) | Verdict |
+|---|---|---|---|---|
+| Chicken Shawarma Sheet Pan Dinner | 4 | 398/36/10/22/2/4 | ~372/44/12/14/…/… | ✅ close (tray "Olive oil" qty unstated → fat uncertain) |
+| Chicken Spring Roll Bowl | 2 | 623/47/69/18/4.5/6 | ~613/47/64/18/…/… | ✅ great match |
+| Chicken Tikka Masala | 4 | 448/32/10/30/2/6 | **~646/36/17/47/…/…** | ⚠ fat/cal low (oil+80g butter+cream) |
+| Chile Lime Chipotle Chicken | 4 | 338/38/4/18/0.5/1.5 | ~392/57/2.5/15/…/… | ⚠ protein low (1134g thigh ÷4) |
+| Chili Crunch Ground Chicken Bowls | 4 | 398/28/44/10/2/10 | **~498/24/56/20/…/…** | ⚠ fat/carbs low |
+| Chili Honey Chicken Bowl | 2 | 488/38/42/18/5/28 | ~601/46/43/27/5.5/33 (no rice) | ◐ rice qty missing; fat/protein look low |
+| Chilli Lime Shrimp and Veggie Bowl | 2 | 228/36/5/8/1/1 | — | ◐ ingredient list has no veggies (title mismatch); marinade oil uncertain |
+| Chilli Oil | 50 | 88/0.2/0.5/10/0.2/0.1 | ~85/0.1/0.4/9.4/…/… | ✅ great match |
+| Chipotle Chicken & Rice Skillet | 4 | 498/38/32/28/2/3 | ~374/22/4/28/…/… (no rice) | ◐ rice qty missing (in title); protein gap |
+| Chipotle Chicken Chop Bowl | 1 | 352/36/42/3/–/– | ~350/32/42/3/…/… | ✅ great match; fibre/sugar null |
+| Choc, PB and Raspberry Overnight Oats | 1 | 388/18/44/14/10/12 | **~496/26/54/20/17/11** | ⚠ low (chia+PB+protein) |
+| Chocolate Baked Oats | 1 | 388/28/42/8/6/8 | ~414/33/51/9/6.4/14 | ✅ close (protein scoop swing) |
+| Chocolate Banana Rice Paper Pie | 5 | 172/2.8/33.2/3.9/–/– | ~166/3.8/30.6/3.7/…/… | ✅ great match; fibre/sugar null |
+| Chocolate Blueberry Baked Oatmeal | 1 | 248/8/42/5/6/10 | ~288/10/45/8/7.6/10 | ✅ close (toppings unquantified) |
+| Chocolate Chia Mousse | 3 | 263/12/null/null/null/null | ~211/12/17/11.6/5.5/6 | ✅ protein matches; null macros to fill; cal swings on yoghurt type |
+| Chocolate Chia Overnight Oats | 1 | 502/38/42/18/5.5/15 | **~689/46/71/26/11/25** | ⚠ low (choc shell+oats+protein) |
+| Chocolate Chip Protein Pancakes | 3 | 398/28/36/12/3/6 | ~368/24/38/12.7/2.3/5 | ✅ close |
+| Chocolate Covered Pumpkin Bites | 12 | 148/5.5/12/9.5/1.5/7 | ~127/3.8/13/6.85/1.4/9.7 | ✅ close (choc-chip cup a swing) |
+| Chocolate Date Cake | 9 | 253/5.5/51/5/4.5/32 | (Batch A) | ✅ already corrected |
+| Chocolate Date Peanut Butter Squares | 12 | 128/2.5/18/6.5/1.5/13 | ~165/2.6/28.5/6.25/2.9/23 | ⚠ carbs/sugar low (15-date weight swing) |
+
+- Fully auditable: 16/20 (10 ✅ OK/close, 6 ⚠ OFF). Partial: 3. Already-done: 1.
+- Patterns holding: **chicken curries/skillets under-counted on fat** (Tikka Masala worst —
+  oil+butter+cream); **overnight-oats/chia recipes under-counted** (chia+PB+protein weight);
+  "rice/cauli rice of choice" (no qty) keeps appearing on bowls/skillets, including two where
+  it's literally in the title ("& Rice Skillet"). Data-quality one-offs: Chilli Lime Shrimp
+  "Veggie" Bowl lists no vegetables.
+
+**Running totals through Batch E:** ~70 of 310 ready recipes covered (10 written + ~58 audited).
+
+### Batch F (2026-07-16) — next 20 alphabetically ("Chocolate Hazelnut…" → "Cottage Cheese Pancakes") (read-only)
+
+Dessert/baked-goods-heavy stretch. Nut-butter / oil / maple / date / protein-powder weights
+are calorie-dense and were consistently under-counted → unusually high OFF rate this batch.
+
+| Recipe | serves | Stored | Recompute (per serving) | Verdict |
+|---|---|---|---|---|
+| Chocolate Hazelnut Cookie Dough Balls | 15 | 128/3.5/8/9.5/1.5/5 | ~177/5/14/12/…/… | ⚠ low (cashew butter+maple; choc chips unquantified) |
+| Chocolate Peanut Butter Protein Cookie Dough | 4 | 228/14/14/14/3/5 | ~257/21/10/15.5/…/… | ⚠ protein low |
+| Chocolate Protein Chia Seed Pudding | 6 | 96/9.5/7.8/3.3/3.2/9.5 | ~116/11/9.7/4.4/4/2.75 | ✅ close (toppings excluded) |
+| Chocolate Protein Yogurt Bowl | 1 | 468/42/32/18/5/10 | ~521/49/34.5/22/5/17 | ✅ close |
+| Chocolate Raspberry Baked Protein Oats | 6 | 168/15/17/5.5/6.2/7 | ~210/12.7/26/6.5/4.7/12.5 | ⚠ carbs/sugar low (dates) |
+| Chocolate Rice Cake Strawberry Treat | 1 | 352/14/38/12/3.8/17 | ~316/12.5/33.5/16/4/13 | ✅ close (fully gram-spec'd) |
+| Chocolate Strawberry Baked Oats | 1 | 405/29/48/9/6.5/10 | ~487/38/59/13.5/9/14 | ⚠ low |
+| Chocolate Sweet Potato Mug Cake | 1 | 298/9.5/38/12/3.5/22 | ~270/11/28/13.4/3/13 | ✅ close |
+| Chocolate Tahini Brownies (≠ Vegan Tahini) | 9 | 178/5.5/12/13/2.5/8.5 | **~273/7/24.5/18.8/4.4/14.8** | ⚠ low (1 cup tahini + ½ cup maple) |
+| Chocolate Zucchini Bread | 8 | 268/7/16/21/3.5/10 | **~395/10/34/26.6/5/24** | ⚠ low (almond flour+choc+coconut sugar) |
+| Chopped Jalapeño Cheddar Chicken Salad | 3 | 185/24/8/6/1.5/6 | ~253/32/11/8.7/1.7/5.7 | ⚠ protein low |
+| Cinnamon Buckwheat Smoothie | 1 | 398/14/58/11/6.5/22 | ~498/26/68/16.5/9/23 | ⚠ protein/cal low |
+| Cinnamon Roll Baked Oats | 5 | 688/14/82/36/7/42 | ~515/15/60/25/6/25 | ⚠ stored HIGH (rare over-estimate) |
+| Cinnamon Roll Date Cake | 9 | 248/3.5/42/8/1.5/28 | **~417/3/80.5/10/2.5/60.7** | ⚠ carbs/sugar big undercount (dates+3 sugars+glaze) |
+| Coconut Prawn Curry | 4 | 228/28/8/10/1.5/4 | **~453/53/13/21/2/5.5** | ⚠ big undercount (1kg prawns + coconut milk) |
+| Coffee Protein Ice Cream Affogato | 1 | 175/20/null/null/null/null | ~321/50/13/7.4/…/… | ⚠ protein low (1 cup yog + 1.25 scoops) + nulls |
+| Cookie Dough Caramel Bars | 12 | 188/3.5/20/11/2.5/12 | ~224/3.5/26.6/13/2.5/16.8 | ⚠ carbs/cal a bit high (choc chips unquantified) |
+| Copycat Nando's Peri Peri Chicken Burgers | 4 | 518/40/38/22/2/6 | ~772/43/38/47.5/…/… | ⚠ fat high (½ cup mayo+oils; some marinade discarded) |
+| Cosmic Brownie Overnight Oats | 1 | 488/28/48/20/9/16 | ~695/35/72/34/…/… | ⚠ low (chia+PB+choc; opt protein extra) |
+| Cottage Cheese Pancakes | 3 | 218/16/18/8/1.5/8 | ~328/24/28/12.8/1.7/9.3 | ⚠ low (eggs+cottage cheese+oats) |
+
+- Fully auditable: 20/20. ✅ close: 4. ⚠ off: 16 (mostly under-counts; Cinnamon Roll Baked
+  Oats is the one over-estimate).
+- Takeaway: the **dessert/baked-goods segment is systematically under-estimated** — the AI
+  passes seem to have missed or under-weighted nut butters, oils, maple/dates. When you decide
+  what to fix, this alphabetic band (and the oats/smoothie/mug-cake families generally) is the
+  highest-yield place to start.
+
+**Running totals through Batch F:** ~90 of 310 ready recipes covered (10 written + ~78 audited).
+
+### Batch G (2026-07-16) — next 20 alphabetically ("Creamy Cucumber…" → "Double Choc Fudge Cookie") (read-only)
+
+| Recipe | serves | Stored | Recompute (per serving) | Verdict |
+|---|---|---|---|---|
+| Creamy Cucumber Avocado Broccoli Salad | 4 | 375/9/25/29/8.5/5 | ~344/7/19/28/7.5/3 | ✅ close |
+| Creamy Mango and Coconut Cod Curry | 2 | 380/34/null/null/null/null | ~397/34/…/…/…/… (light coconut) | ✅ protein matches; cal swings on coconut type; null macros |
+| Creamy Peanut Miso Ramen | 4 | 528/18/44/34/5.5/8 | ~998/23/100/52.5/…/… | ⚠ likely low (400g dry noodles + PB+tahini+coconut; noodle/coconut assumptions swing) |
+| Creamy Thai Coconut Chicken Meatballs | 4 | 271/28/null/null/null/null | ~338/29.5/…/… (no rice) | ◐ rice to serve unquantified; protein matches; null macros |
+| Crispy Bang Bang Chicken | 1 | 427/42/44/9/–/– | ~539/41/56/15/…/… | ⚠ cal/carbs/fat low (cornflour+egg+sauces; frying oil extra) |
+| Crispy Chicken Dumplings | 2 | 459/29/50/15/1.5/2 | ~482/27/55/15/…/… | ✅ close |
+| Crispy Chicken Rice Paper Dumplings | 2 | 358/26/24/18/2/8 | ~450/25/37/19.7/…/… | ⚠ carbs/cal low |
+| Crispy Chilli Beef Protein Bowls | 4 | 484/31/35/20/null/null | ~421/27/25/21.5 (no rice) | ◐ rice unquantified; close once rice added |
+| Crispy Gluten Free Shrimp Dumplings | 7 | 128/9/14/3/0.8/2 | — | ◐ wrapper flour has no qty |
+| Crispy Quinoa Edamame Salad | 2 | 413/17/46/20/14/9 | ~377/13/33/21/10/4.5 | ✅ close |
+| Crispy Rice and Chicken Salad | 2 | 635/51/44/29/–/– | ~627/36/52/28.5/…/… | ⚠ cal matches but stored protein over-stated (300g chicken+2 eggs ≈ 31/serving) |
+| Crispy Rice Paper Spring Rolls Without Frying | 4 | 198/7/32/3.5/2.5/3 | ~412/10/81/3/…/… | ⚠ carbs undercount (24 rice-paper sheets) |
+| Crispy Rice Salad with Miso Tofu | 2 | 488/35/42/22/6.5/8 | ~916/38/78/50.5/…/… | ⚠ fat/carbs low (sesame oil+avo+50g sesame seeds) |
+| Crispy Rice Tuna Salad | 2 | 418/26/44/16/3/4 | ~494/19/57.5/19/…/… | ⚠ carbs/cal high; mayo/yogurt qty missing |
+| Crispy Rosemary Chicken w/ Apple Beetroot Slaw | 2 | 412/38/null/null/null/null | ~742/62/82/15.6/…/… | ⚠ high (100g panko+flour+feta; breading adherence uncertain) + nulls |
+| Crispy Tempeh Rice and Cucumber Salad | 2 | 488/20/48/24/4/8 | ~852/30.5/67.5/52.5/…/… | ⚠ low (sesame oil+peanuts+plant mayo) |
+| Dak Gomtang (Korean Chicken Soup) | 3 | 410/32/44/9/1/5 | ~406/23/35/17/…/… | ✅ cal matches; protein/fat swing on skin-on leg yield |
+| Date Me Greek Yogurt Bowl | 1 | 248/18/38/3/2.5/30 | ~271/21/43/2.4/3.2/32 | ✅ close |
+| Date Tahini Bites w/ Sunflower Sesame Crust | 12 | 128/2.5/18/6/1.8/14 | **~278/6.5/30/16.8/4.2/20.8** | ⚠ big undercount (2 cups seeds + tahini) |
+| Double Choc Fudge Cookie | 1 | 356/41.8/null/null/null/null | ~365/41/40/7.4/…/… | ✅ cal/protein match; null macros to fill |
+| Fully auditable: 17/20 (7 ✅, 10 ⚠). Partial: 3 (rice/wrapper qty). ||||
+
+- Recurring: seed/nut/oil-dense salads under-counted (Miso Tofu, Tempeh, Date Tahini Bites);
+  "rice to serve" unquantified again (Thai Meatballs, Chilli Beef). One likely **over**-stated
+  protein (Crispy Rice & Chicken Salad — cal matches but protein ~+60%).
+- `null` macros to fill: Mango Cod Curry, Thai Meatballs, Chilli Beef, Rice&Chicken Salad,
+  Rosemary Chicken, Dak Gomtang(part), Double Choc Cookie.
+
+**Running totals through Batch G:** ~110 of 310 ready recipes covered (10 written + ~98 audited).
+
+### Batch H (2026-07-16) — next 30 alphabetically ("Double Roast Chicken…" → "Harissa Chicken…") (read-only)
+
+| Recipe | serves | Stored | Recompute (per serving) | Verdict |
+|---|---|---|---|---|
+| Double Roast Chicken with Chicken Fat Rice | 8 | null×6 | ~600–650/…/… (rough) | ◐ stored all null; "2 whole chickens" size approx |
+| Easy Chicken Traybake | 4 | 448/38/22/22/4/3 | ~589/34/25/37/…/… | ⚠ fat undercount (dup of "Chicken and Potato Traybake") |
+| Easy Chipotle Chicken & Corn Salsa | 6 | 338/38/8/17/1/3 | ~425/48/18/15.5/…/… | ⚠ protein/cal low (1.36kg thigh) |
+| Easy Curry Noodles with Crispy Beef | 3 | 528/22/42/31/3.5/5 | ~614/15/52/34.7/…/… | ✅ borderline (noodle/coconut swing) |
+| Easy Poke Salad Bowl | 1 | 558/37/67/16/6/5 | ~617/38.7/63/20/…/… | ✅ close |
+| Easy Tuna Salad Mix | 3 | 148/26/6/4/1.5/3 | ~224/32/13/5/…/… | ⚠ protein/cal low (425g can ÷3; mayo unquantified) |
+| Egg White Protein Oats | 1 | 285/30.5/28/5.5/3.8/14 | ~305/22.6/39/6.6/7/13.3 | ✅ close (stored protein looks high vs ingredients) |
+| Fiery Chilli Prawn Linguine | 3 | 337/24/42/9/3/8 | ~578/35.6/91/4.4/…/… | ⚠ carbs undercount (300g dry pasta) |
+| Fluffy Breakfast Carrot Cake Loaf | 10 | 250/5/null/null/null/null | ~330/6.3/33/20/…/… | ⚠ fat/cal low (150ml olive oil) + nulls |
+| Fluffy Greek Yogurt Pancakes | 3 | 495/39/56/10/–/– | ~193/13.6/26/3.5/…/… | ⚠ stored WAY over-stated (protein impossible) |
+| Fluffy Vegan Protein Pancakes | 2 | 288/18/38/5/2.5/5 | ~339/14.3/56.5/4.2/…/… | ⚠ carbs/cal high (100g flour) |
+| Frozen Berry Breakfast Crumble | 6 | 265/8/null/null/null/null | ~279/9.2/42/9.3/5.8/15 | ✅ close + nulls to fill |
+| Frozen Strawberry Raspberry PB Bites | 8 | 88/1.5/8/5.5/1.5/5 | — | ◐ "peanut butter" & "1 bag choc" unquantified |
+| Garlic Cucumber Salad | 2 | 38/1.5/6/1.5/1/3 | ~64/1.3/7.4/3.15/1/2.5 | ⚠ minor (chili-crisp oil; tiny absolute) |
+| Garlic Miso Somen Noodles | 2 | 378/18/52/12/4/6 | ~608/21.5/86.5/16.8/…/… | ⚠ carbs undercount (200g dry somen) |
+| GF Easy Pan Dumplings (No Wrappers) | 4 | null×6 | — | ◐ coating flour no qty; stored null |
+| GF Easy Pan Dumplings (Pan-Fried) | 4 | null×6 | — | ◐ shaping starch no qty; stored null |
+| Giant Rice Cake Snickers Wagon Wheel | 1 | 488/14/44/30/4/22 | ~630/16/61/40.6/…/… | ⚠ undercount (PB+peanuts+choc) |
+| Glass & Konjac Chicken Japchae | 4 | 470/37/66/7/14/12.5 | ~473/38.8/65.8/6.8/14/13 | ✅ great match |
+| Glowing Skin Soup | 4 | 148/2.5/22/6.5/4/12 | ~242/2.75/14.8/17/…/… | ⚠ fat undercount (olive oil+coconut cream) |
+| Gluten Free Cinnamon Buns | 6 | 488/8/78/16/3/36 | ~1188/…/193/… | ⚠ big undercount OR serves >6 (800g flour) |
+| Gochujang Prawn Noodle Soup | 2 | 338/20/48/8/3.5/5 | ~418/25.5/51.5/9.5/…/… | ✅ borderline (udon nest weight swing) |
+| Golden Coconut Chicken Curry | 4 | 488/34/22/32/6/6 | ~624/30/12.5/48.7 (no rice) | ⚠ fat undercount (coconut cream+oil); rice missing |
+| Greek Chicken Gyros Protein Filling | 2 | 200/25/12/5/2/6 | ~202/28/13.6/3.5/…/… | ✅ great match |
+| Greek Yogurt Raspberry Blueberry Bake | 1 | 278/18/34/6/2.5/26 | ~322/25/42.7/5.8/…/… | ✅ close (berries unquantified) |
+| Green Goddess Chicken Prep Mix | 2 | 280/24/null/null/null/null | ~287/35.5/14/9.5/…/… | ◐ cal matches; protein low; null macros |
+| Green Goddess Pasta Salad | 3 | 398/22/44/14/6/4 | ~795/43.7/82/32.7/…/… | ⚠ big undercount (1 box pasta + feta + oil) |
+| Green Goddess Salad | 3 | 388/11/37.5/24.5/11.5/18 | (Batch A) | ✅ already corrected |
+| Halloween Chocolate Almond Butter Balls | 12 | 118/3.5/8/8.5/1.5/5 | ~175/7.1/11.7/12.7/…/… | ⚠ undercount (almond butter+almonds) |
+| Harissa Chicken with Roasted Veg and Feta | 1 | 555/53/null/null/null/null | ~755/65/61/23/…/… | ◐ feta qty; protein ~matches; null macros |
+
+- Fully auditable: 23/30 (8 ✅, 15 ⚠). Partial: 6. Already-done: 1.
+- Notables: **Fluffy Greek Yogurt Pancakes** is over-stated (stored 495 vs ~193 — protein
+  impossible). **GF Cinnamon Buns** likely serves more than 6 (800g flour). Six recipes have
+  `null` calories/macros needing values regardless (Double Roast Chicken, both GF Pan
+  Dumplings, Carrot Loaf, Green Goddess Prep, Harissa Chicken). Coconut-milk "light or full"
+  and dry-noodle weights remain the biggest single swing factors.
+
+**Running totals through Batch H:** ~140 of 310 ready recipes covered (10 written + ~128 audited).
+
+### Batch I (2026-07-16) — next 30 alphabetically ("Healthy Grass Fed…" → "Matcha Date Butter Balls") (read-only)
+
+| Recipe | serves | Stored | Recompute (per serving) | Verdict |
+|---|---|---|---|---|
+| Healthy Grass Fed Gelatin Chocolate Mousse | 4 | 118/12/10/3.5/1.5/7 | ~75/8.3/9.7/1.4/…/7 | ✅ borderline (yoghurt-fat swing) |
+| Healthy Lemon Bars | 9 | 178/4.5/12/14/1.5/8 | ~260/7.4/18.9/17.9/3.3/11.4 | ⚠ low (almond flour+coconut oil+maple) |
+| Healthy Orange & Cashew Chicken | 2 | 600/50/null/null/null/null | ~595/45/46/19.5/…/… | ✅ cal/protein match + nulls |
+| High Fibre Sticky Toffee Oats | 1 | 420/23/null/null/null/null | ~948/24/141/37/…/… | ⚠ low (base alone >stored; toppings est.) |
+| High Protein Asian Crispy Rice Salad | 4 | 382/12/60/12/4/3 | ~336/8.2/54.6/9.3/…/… | ✅ close |
+| High Protein Brownie Bowl | 2 | 130/11/21/1/–/– | ~139/7.8/24.3/1.8/…/… | ✅ close |
+| High Protein Carrot Cake Overnight Oats | 1 | 448/36/44/11/7.5/14 | ~607/51/59/19/13/… | ⚠ low (chia+protein+milk) |
+| High Protein Chicken Enchilada Bake | 4 | 328/42/18/12/4/6 | ~350/34/11.6/16.8/…/… | ✅ close (cheese swing) |
+| High Protein Chickpea Flour Pancakes | 2 | 318/28/32/5/4.5/8 | ~432/42/41/8.75/…/… | ⚠ low (2-3 scoops protein + chickpea flour) |
+| High Protein Chocolate Lava Pudding | 1 | 464/53.4/null/null/null/null | ~494/54/38/19.5/…/… | ✅ cal/protein match + nulls |
+| High Protein Chocolate Loaf | 10 | 118/9/12/3.5/2/3 | ~138/10.1/17.4/4.1/…/… | ✅ close (choc chips unquantified) |
+| High Protein Pumpkin Spice Muffins | 12 | 88/5.5/12/2/1.5/4 | ~114/7.1/16.7/2.3/…/… | ⚠ mild low (2 cups oats) |
+| High Protein Salmon Potato Salad | 2 | null×6 | ~869/42/70/36/…/… | ◐ stored all null; would fill ~869/42/70/36 |
+| High Protein Salmon Potato Salad (DUP) | 2 | null×6 | (identical) | ◐ exact duplicate row of the above |
+| High Protein Tiramisu Overnight Oats | 1 | 438/45/46/7/–/– | ~474/45/53/11/…/… | ✅ close + nulls |
+| High Protein Tuna Salad | 6 | 157/20/8/5/–/– | ~180/23.5/9.7/4.8/…/… | ✅ close + nulls |
+| Homemade Carrot Cake | 10 | 97/8.4/9/3/–/– | ~117/9.2/9.9/3.6/…/… | ✅ close + nulls |
+| Honey Glazed Salmon Bowls with Peach Salsa | 4 | 298/24/16/16/3/10 | ~439/28.7/23/24/…/… | ⚠ fat/cal low (salmon+avocado+oil) |
+| Honey Mustard Chicken Power Bowl | 4 | 488/34/44/18/9/10 | ~684/35.8/58/33.5/…/… | ⚠ fat/carbs low (¼-cup oil dressing+2 avo+quinoa) |
+| Honey Sesame Salmon Bowl | 2 | 488/36/44/18/2/8 | ~371/24.5/10/22.5 (no rice) | ◐ rice + mayo qty missing |
+| Instant Noodle Jars | 1 | 348/16/48/8/5/4 | ~458 (tofu unquantified) | ◐ tofu has no qty |
+| Lemon and Blueberry Baked Oats | 4 | 248/16/36/4/4.5/12 | ~383/25.5/51.7/8.1/…/… | ⚠ low (200g oats+80g protein) |
+| Lemon and Coconut Cake | 10 | 153/12.8/13.9/6.1/–/– | ~155/13.3/11.5/6/…/… | ✅ great match + nulls |
+| Loaf Pan Lemon & Yoghurt Chicken | 5 | 298/32/5/16/0.8/2.5 | ~293/44/4/9/…/… | ⚠ cal matches but protein low (1.1kg thigh); fat swings on skin |
+| Mango Yogurt Bites | 7 | 70/2/8.5/3.5/0.5/8 | (Batch A) | ✅ already corrected |
+| Maple Cinnamon Pumpkin Overnight Oats | 1 | 368/16/44/14/6.5/16 | ~599/27/63/27.5/10/16 | ⚠ low (pecans+chia+collagen) |
+| Maple Sriracha Tofu Protein Bowl | 3 | 428/18/46/18/8/10 | ~698/40/69/32/…/… | ⚠ big undercount (450g tofu+avo+oils; protein 18→~40) |
+| Marinated Chicken Thighs w/ Mint Jalapeño Sauce | 2 | 448/38/6/30/1/2 | ~623/30/7.5/52/…/… | ⚠ fat high (3 tbsp marinade oil partly discarded) |
+| Marinated Fish Tacos | null | 410/null/null/null/null | — | ◐ serves is null — can't divide; needs serving count |
+| Matcha Date Butter Balls | 12 | 98/0.5/12/6/0.8/11 | ~136/0.5/18/7.8/…/15.8 | ⚠ carbs/cal high (12 dates) |
+
+- Fully auditable: 24/30 (11 ✅, 13 ⚠). Partial: 5. Already-done: 1.
+- **Data-integrity finds:** (a) "High Protein Salmon Potato Salad" exists **twice, identical**,
+  both with null macros — a de-dupe candidate; (b) "Marinated Fish Tacos" has **`serves = null`**
+  (like Vegan Protein Waffles did) so it can't be divided until a count is set.
+- Same themes: tofu/salmon/oil/nut-butter mains under-counted; the well-specified protein-bake
+  family (Choc Loaf, Lemon & Coconut Cake, Homemade Carrot Cake, Tuna Salad) matches closely.
+
+**Running totals through Batch I:** ~170 of 310 ready recipes covered (10 written + ~158 audited).
+
+### Batch J (2026-07-16) — next 30 alphabetically ("Mayak Korean…" → "Peanutty Chicken Salad") (read-only)
+
+Noodle / Pad-Thai / peanut-sauce heavy stretch → dry-noodle weights + peanut butter + oils
+drive a very high under-count rate.
+
+| Recipe | serves | Stored | Recompute (per serving) | Verdict |
+|---|---|---|---|---|
+| Mayak Korean Marinated Eggs | 4 | 108/10/5/6/0.5/3 | ~85–138 (marinade absorption) | ✅ borderline (most marinade discarded) |
+| Meal Prep Spicy Tuna Quesadilla | 2 | 345/28/null/null/null/null | ~343/27.5/39/7.7/…/… | ✅ cal/protein match + nulls |
+| Mediterranean Chicken & Rice Skillet | 4 | 480/40/null/null/null/null | ~345/21.7/5/24 (no rice) | ◐ rice unquantified; protein looks high in stored |
+| Microwave Chocolate Protein Oats | 1 | 248/21.5/22/8.5/5.5/6 | ~380/34.5/37/13/…/… | ⚠ low (20g cocoa+protein+choc) |
+| Middle Eastern Chicken & Rice Bowl | 4 | 428/38/8/26/1.5/3 | ~422/47/5/22 (no rice) | ⚠ protein low (907g thigh); rice not in stored either |
+| Miến Gà - Vietnamese Glass Noodle Chicken Soup | 4 | 445/34/38/16/2.2/4 | ~ (fat renders out) | ✅ borderline (skin fat skimmed + garlic-oil drizzle discarded) |
+| Miso Peanut Ramen Bowl | 4 | 498/18/44/30/4/8 | ~628/24/51/36.6/…/… | ⚠ low (coconut+tofu+PB+noodles) |
+| Miso Soy Chicken with Coconut Lime Rice | 4 | 578/38/52/22/1.5/8 | ~776/38/62.5/35.3/…/… | ⚠ fat/cal low (coconut milk rice + oil) |
+| Muffin Top Pumpkin Protein Cookies | 10 | 148/7/12/8.5/2/6.5 | ~148/6.1/13.1/8.6/…/… | ✅ great match |
+| Nandos Chicken Pasta Salad | 1 | 418/49/42/7/–/– | ~493/49/46/12/…/… | ✅ close (protein exact; fat higher) |
+| No Bake Coconut Cookies | 20 | 168/3/22/8.5/2/14 | ~242/4.6/27.6/13.8/…/… | ⚠ low (coconut oil+PB+choc) |
+| Oat Flour Pancakes | 12 | 97/8.2/10.5/2.8/1.2/5.5 | ~53/2.65/7.6/1.3/…/… | ⚠ stored over-stated (protein impossible; serves likely ~6) |
+| One Pan Vegan Sushi Bake | 3 | 464/16/65/16/7/3 | ~633/23.3/64.3/25.7/…/… | ⚠ fat/cal low (mayo+avo+tofu+edamame) |
+| Pad Kra Pao - Thai Basil Chicken | 2 | 597/44/63/19/1.8/4.5 | ~581/41/48.5/21/…/… | ✅ close |
+| Pad See Ew - Thai Stir Fried Noodles | 2 | 488/28/58/16/3/5 | ~713/27/93/26.5/…/… | ⚠ carbs/fat low (200g dry noodles+3 tbsp oil) |
+| Pad See Ew with Beef | 2 | 388/44/42/14/3.5/5 | ~864/41.5/92/33/…/… | ⚠ big undercount (200g dry noodles) |
+| Pad Thai Inspired Saucy Chicken Noodles | 5 | 525/28/62/18/3.5/14 | ~729/33/83/24.8/…/… | ⚠ carbs/fat low (397g noodles+coconut sugar) |
+| Pad Thai with Chicken and Prawns | 4 | 528/30/62/18/4/14 | ~650/40/75/23.75/…/… | ⚠ low |
+| Pad Thai with Prawns | 2 | 418/28/48/14/5/10 | ~511/27.5/65/11.5/…/… | ⚠ carbs low (120g noodles) |
+| Peach and Nectarine Overnight Oats | 1 | 318/10/54/6/7.5/16 | ~400/12/58/11/…/… | ⚠ base alone > stored (fat) |
+| Peaches and Cream Chia Pudding | 2 | 195/5.5/32/6/7/20 | ~244/8.75/29.5/11.5/…/… | ⚠ fat low (4 tbsp chia) |
+| Peanut Butter and Jam Breakfast Oat Bars | 4 | 248/6.5/42/5.5/7/16 | ~374/11.1/62/9.75/…/… | ⚠ low (200g oats+PB+banana) |
+| Peanut Butter Banana French Toast | 1 | 488/18/58/18/5/24 | ~611/22/66/23/…/… | ◐ PB & banana amounts unstated |
+| Peanut Butter Chicken Coconut Noodles | 2 | 485/44/52/18/3/4 | ~913/42/89/35/…/… | ⚠ big undercount (200g noodles+coconut cream+PB) |
+| Peanut Butter Chicken Katsu Noodles | 3 | 495/56/60/11/4/8 | — | ◐ rice + chicken amounts unquantified |
+| Peanut Butter Cup Overnight Oats | 1 | 448/28/38/18/4/8 | ~518/35/49/18.5/…/… | ✅ close (fat matches; PB-cup size varies) |
+| Peanut Butter Protein Balls | 16 | 148/6.5/14/8/1.8/6 | ~171/6.6/18.4/8.6/…/… | ✅ close |
+| Peanut Noodle Stir Fry | 3 | 398/18/44/18/7/8 | ~665/45/41/35.3/…/… | ⚠ big undercount (½ cup PB+450g tofu) |
+| Peanut Tofu Salad Jars | 4 | 278/18/28/8/5.5/6 | ~351/28.8/22.5/13.75/…/… | ⚠ protein/fat low (454g tofu; quinoa unquantified) |
+| Peanutty Chicken Salad | 1 | 544/62/22/23/6.5/6 | ~534/61/22/21/…/… | ✅ great match |
+| Fully auditable: 27/30 (9 ✅, 18 ⚠). Partial: 3. ||||
+
+- Very high under-count rate driven by **dry-noodle weights** (200–400g dry noodles per recipe)
+  + **peanut butter / coconut** in the Pad Thai / peanut-noodle family. Third over-statement
+  found: **Oat Flour Pancakes** (serves 12 — protein/cal impossible; likely serves ~6).
+- Clean matches on the gram-specified ones (Muffin Top Cookies, Peanutty Chicken Salad,
+  Pad Kra Pao, Meal Prep Tuna Quesadilla).
+
+**Running totals through Batch J:** ~200 of 310 ready recipes covered (10 written + ~188 audited).
+
+### Batch K (2026-07-16) — next 30 alphabetically ("Pho Gà…" → "Raspberry Chocolate Chip Baked Oatmeal") (read-only)
+
+| Recipe | serves | Stored | Recompute (per serving) | Verdict |
+|---|---|---|---|---|
+| Pho Gà - Vietnamese Chicken Pho | 4 | 501/20/87/8/3.5/5 | (soup, fat rendered) | ⚠ protein low (1.5kg thigh); carbs/noodles match |
+| Phò Inspired Chicken Broth and Rice | 2 | 352/30/46/5/3/12 | ~468/25/63.5/4/…/… | ⚠ carbs/cal high (rice+hoisin+honey) |
+| Pickled Red Onions | 8 | 12/0.2/2.5/0/0.3/1.5 | ~5.5 + absorbed brine | ✅ plausible (brine discarded) |
+| Pistachio Tiramisu Oats | 1 | 318/25/28/11/2.5/14 | ~283/22/28/8.6/…/… | ✅ close |
+| Prawn Fried Rice | 2 | 428/30/56/10/2/1 | ~551/32.5/55/19/…/… | ⚠ fat low (4 eggs + oil) |
+| Protein Berry Parfait | 1 | 265/30/null/null/null/null | ~230/35/18/2.1/…/… | ✅ cal/protein close + nulls |
+| Protein Brownie (Pumpkin) | 3 | 198/23.5/18/5.5/4.2/6 | ~236/25/28/5.3/…/… | ✅ close |
+| Protein Brownie (Sweet Potato) | 3 | 173/13.9/16.8/5.1/3.5/7.5 | ~156/11/23.3/3.7/…/… | ✅ close |
+| Protein Brownie Bake | 2 | 318/22/24/14/4.5/9 | ~237/16/27/9/…/… | ⚠ stored higher than recompute |
+| Protein Oatmeal Breakfast Cookies | 8 | 158/8.5/16/6.5/2/8 | ~162/9.5/18.3/6.25/…/… | ✅ close |
+| Protein Packed Roasted Squash Pasta | 4 | 348/14/52/9/6/6 | ~597/18.2/89/17/…/… | ⚠ low (300g pasta+squash+2×oil) |
+| Protein Pancakes | 15 | 312/24/28/11/5/8 | ~52/3/6.9/1.5/…/… | ⚠ stored MASSIVELY over-stated (serves likely ~2-3) |
+| Protein Pancakes (Simple) | 2 | 331/37/25/10/–/– | ~334/27.9/35/8.5/…/… | ✅ cal match (protein/carbs swing on scoops) |
+| Protein Power BLT | 1 | 500/43/null/null/null/null | ~503/52/45/9.2/…/… | ✅ cal match + nulls |
+| Protein Pumpkin Chocolate Chip Muffins | 12 | 118/4.5/18/4/1.5/8 | ~143/3.8/23.3/4/…/… | ✅ close (brown-sugar-sub swing) |
+| Pumpkin Bread | 10 | 238/3.5/34/10/1.5/20 | ~257/3.9/43.3/8.5/…/37 | ⚠ carbs/sugar low (maple+glaze) |
+| Pumpkin Brookies | 12 | 348/5/28/26/3/18 | ~532/5.5/53.3/35.9/…/… | ⚠ low (2×⅔-cup olive oil batches) |
+| Pumpkin Candy Apple Salad | 1 | 498/7.5/62/24/7/38 | ~913/16/104/52/…/… | ⚠ low (2 apples+almond butter+granola; portion-heavy) |
+| Pumpkin Chocolate Chip Cookies | 2 | 168/5.5/18/10/3/10 | ~163/4.5/16.6/10.25/…/… | ✅ great match |
+| Pumpkin Cream Cheese Muffins | 6 | 298/7/22/21/3.5/12 | ~496/10.8/41/32.7/…/… | ⚠ low (cream cheese+almond flour+oil) |
+| Pumpkin Donuts | 8 | 88/1.5/16/1.5/1.8/6 | ~97/1.7/20.7/0.9/…/… | ✅ close |
+| Pumpkin Pecan Pancakes | null | 148/4/18/7.5/2.5/3.5 | — | ◐ serves is null — can't divide |
+| Pumpkin Protein Muffins | 9 | 162/12/18/5.5/3.8/6.5 | ~139/8.5/15.2/4.9/…/… | ✅ close |
+| Pumpkin Protein Mug Cake | 1 | 318/28/18/12/2.5/6 | ~283/30/13/6.9/…/… | ✅ close |
+| Pumpkin Season Baked Oats | 1 | 288/12/44/7/4.5/14 | ~348/14.5/49.5/9.8/…/… | ✅ close (toppings unquantified) |
+| Pumpkin Spice Olive Oil Cake | 10 | 388/6/32/28/3/22 | ~673/11.7/48/50/…/… | ⚠ big undercount (3.5c almond flour+oils+maple) |
+| Quick Chicken Laksa | 2 | 488/30/42/22/2.5/4 | ~1092/42/55/72/…/… | ⚠ big undercount (instant noodles+oil+coconut+chicken) |
+| Quick Chinese Vegetable Noodle Soup | null | 108/null/null/null/null | — | ◐ serves null; ingredient list has no noodles despite title |
+| Raspberry Cheesecake Protein Bowl | 1 | 225/21/null/null/null/null | ~303/32/18.5/12/…/… | ⚠ protein/cal high (cream cheese+yog+protein) + nulls |
+| Raspberry Chocolate Chip Baked Oatmeal | 1 | 468/14/58/20/8/14 | ~750/24/92/34/…/… | ⚠ low (¾c oats+sunbutter+chia) |
+
+- Fully auditable: 28/30 (14 ✅, 14 ⚠). Partial: 2 (both serves null).
+- **4th over-statement:** Protein Pancakes (serves 15 — protein/cal ~6× too high; likely serves 2-3).
+- **Data-integrity:** Pumpkin Pecan Pancakes & Quick Chinese Veg Noodle Soup both have
+  `serves = null`; the latter also has **no noodles listed** despite being a "noodle soup".
+- The well-specified protein-brownie/cookie family (both Protein Brownies, Oatmeal Cookies,
+  Pumpkin Choc Chip Cookies, Donuts) matches closely; the olive-oil-heavy cakes/brookies and
+  coconut-noodle laksa are the big under-counts.
+
+**Running totals through Batch K:** ~230 of 310 ready recipes covered (10 written + ~218 audited).
+
+### Batch L (2026-07-16) — next 30 alphabetically ("Raspberry Coconut…" → "Spicy Chilli Rice Paper Wontons") (read-only)
+
+| Recipe | serves | Stored | Recompute (per serving) | Verdict |
+|---|---|---|---|---|
+| Raspberry Coconut Chocolate Bars | 10 | 128/1.5/14/8/2.5/10 | ~190/2.1/21/13.1/…/… | ⚠ low (choc chips+coconut) |
+| Rice Cakes w/ Nut Butter, Strawberries & Choc | 1 | 239/4.6/20.2/15.9/1.5/6.5 | ~252/6.1/28.3/13.8/…/… | ✅ close |
+| Rice Paper Kimchi Jeon with Tuna | 2 | 349/26/49/5/–/– | ~349/25/47.5/6/…/… | ✅ great match + nulls |
+| Rice Paper Pad See Ew with Shrimp | 1 | 542/51/68/7/–/– | ~546/57/62/7/…/… | ✅ great match + nulls |
+| Roast Chicken and Charred Corn Rice Salad | 2 | 488/38/62/18/6/8 | ~568/38/55/17/…/… | ✅ close |
+| Roast Chicken Breast | 4 | 185/35/1/4.5/0/0.5 | ~203/36.75/0.5/5.3/…/… | ✅ great match (brine discarded) |
+| Roast Chicken Crispy Rice Salad w/ Tahini Miso | 6 | 705/51/58/28/3/8 | ~664/46.3/46.3/27/…/… | ✅ close |
+| Roast Chicken Rice Salad | 2 | 398/32/42/12/6/6 | ~568/38/55/17/…/… | ⚠ near-dup of Charred Corn Rice Salad; under-counted + inconsistent stored |
+| Roasted Butternut Squash and Carrot Soup | 4 | 188/3/28/8/5/12 | ~307/3.75/31.3/19.25/…/… | ⚠ fat low (coconut milk+2-3 tbsp oil) |
+| Roasted Cod on Sweet Potato | 2 | 347/49.1/null/null/null/null | ~571/41.6/64.7/14.75/…/… | ⚠ cal low (600g sweet potato) + nulls |
+| Salmon Crispy Rice Paper Bites | 3 | 198/22/14/7/1.5/4 | ~275/17/22.7/10.7/…/… | ⚠ low (salmon+rice paper+honey) |
+| Salmon Poke Bowl Meal Prep | 2 | 573/47/null/null/null/null | ~400/14/32.5/18.5/…/… | ⚠ stored protein over-stated (1 tin salmon ≈ 33g total) |
+| Saucy Shredded Chicken Tacos | 6 | 278/30/10/12/0.5/5 | ~310/37.5/13.3/10/…/… | ✅ close (tortillas to-serve excluded) |
+| Seared Miso Tuna Crispy Rice Bowl | 2 | 528/43/50/17/–/– | ~611/38/48/28.5/…/… | ⚠ fat high (multiple sesame oil + seeds) |
+| Shrimp Avocado and Greens with Lemony Tahini | 4 | 234/20/8/14/4.5/2 | ~260/23.25/7.25/16/…/… | ✅ close |
+| Simple Honey Date Cake | 9 | 228/3.5/38/7/1.5/25 | ~255/3/45.7/7.8/1.5/30.2 | ✅ close |
+| Simple Salmon Bowl | 1 | 488/36/42/20/2/4 | ~561/28/40/28/…/… | ⚠ fat high (salmon+mayo) |
+| Singapore Chicken Noodles | 4 | 388/24/38/16/2.5/4 | ~359/15.5/26/20.25/…/… | ✅ borderline (cal close; protein/carb swing) |
+| Single Serve Baked French Toast | 1 | 388/18/48/12/3.5/18 | ~417/19/52/11.6/…/… | ✅ close |
+| Single Serve Double Chocolate Butter Cake | 2 | 278/2.5/34/15/2/22 | ~357/2.8/42/21/…/… | ⚠ low (butter+oil+brown sugar) |
+| Single Serve Sticky Date Pudding | 1 | 235/12/35/5/–/– | ~335/12/55/5/…/… | ⚠ carbs/cal high (date+flour+maple) |
+| Single Serve Vegan Chocolate Mug Cake | 1 | 248/4.5/28/12/3/14 | ~272/4/28/10.5/…/… | ✅ close |
+| Skillet Chicken Thighs with Mushroom Gravy | 4 | 318/32/8/18/1.5/2 | ~418/42.75/8.75/21.75/…/… | ⚠ protein low (780g thighs+4 tbsp oil) |
+| Smashed Broccoli Salad w/ Greek Yogurt Dressing | 4 | 325/12/21/25/7.5/4 | ~371/9.25/19/29.25/…/… | ✅ close |
+| Smoky Caramelised Red Pepper Orzo | 2 | 353/12/null/null/null/null | ~359 base (no optional prawns/feta) | ✅ base matches + nulls |
+| Smoky Chicken Tacos with Roasted Corn Salsa | 4 | 348/33/16/18/4/4 | ~372/36.75/18/16.25/…/… | ✅ close |
+| Snickers Overnight Oats | 1 | 412/12/52/18/7.5/14 | ~534/15.4/66/25/…/… | ⚠ low (30g choc+peanuts+PB) |
+| Speedy Pad Thai Noodle Salad | 1 | 420/32/null/null/null/null | ~560/38/69/11/…/… | ⚠ cal/carbs low + nulls |
+| Spicy Asian Noodles with Spinach & Chilli Crisp | 2 | 348/10/46/16/4/4 | ~522/9/65/23/…/… | ⚠ low (tahini+chilli crisp+sesame oil) |
+| Spicy Chilli Rice Paper Wontons with Shrimp | 1 | 516/34/68/11/–/– | ~478/37/58/8/…/… | ✅ close + nulls |
+
+- Fully auditable: 30/30 (16 ✅, 14 ⚠). No blockers this batch.
+- **Duplicate:** "Roast Chicken Rice Salad" ≈ "Roast Chicken and Charred Corn Rice Salad"
+  (same ingredients) but stored 398 vs 488 — inconsistent; de-dupe candidate.
+- **Over-statement:** Salmon Poke Bowl Meal Prep (protein 47 vs ~14 — 1 tin salmon can't yield that).
+- Rice-paper dishes (Kimchi Jeon, Pad See Ew, Pad See Ew Shrimp) match beautifully — they're
+  gram-specified. Salmon/oil bowls and dessert bars remain under-counted.
+
+**Running totals through Batch L:** ~260 of 310 ready recipes covered (10 written + ~248 audited).
+
+### Batch M (2026-07-16) — next 30 alphabetically ("Spicy Peanut Chicken Noodles…" → "Tahini Oat Chocolate Chip Bars") (read-only)
+
+| Recipe | serves | Stored | Recompute (per serving) | Verdict |
+|---|---|---|---|---|
+| Spicy Peanut Chicken Noodles | 2 | 676/50/60/26/–/– | ~701/48.5/45.5/34/…/… | ✅ close (udon weight swing) |
+| Spicy Tofu Bowl | 1 | 550/36/null/null/null/null | ~694/33/60/33/…/… | ⚠ fat/cal high (1.5 tbsp sesame oil) + nulls |
+| Spicy Tom Kha Soup with Tofu | 2 | 288/12/18/20/3.5/7 | ~663/17.5/15.5/56/…/… | ⚠ fat big undercount (400ml coconut milk) |
+| Spicy Tuna Bowl | 1 | 448/36/44/14/3.5/4 | ~573/36/46/23/…/… | ⚠ fat high (mayo+chilli oil) |
+| Spring Greens Carbonara | 2 | 460/22/null/null/null/null | ~514/30.6/70/12.2/…/… | ✅ cal close + nulls |
+| Steamed Rice Paper Dumplings with Shrimp | 4 | 198/18/16/8/1/3 | ~444/26/38.75/19/…/… | ⚠ big undercount (15-20 sheets + ¼c avocado oil) |
+| Sticky Chicken, Gochujang & Coconut Broth on Sticky Rice | 2 | 646/41/null/null/null/null | ~813/46.5/37.5/47.5 (no rice) | ⚠ fat/cal low (coconut milk); rice missing |
+| Sticky Lemon Sesame Garlic Prawns | 2 | 428/30/52/10/3/8 | ~350/24/42.5/6.5/…/… | ✅ borderline (stored a bit higher) |
+| Sticky Mango Chicken Prep Bowls | 2 | 400/38/null/null/null/null | ~367/40.5/27.5/7/…/… | ✅ cal/protein close + nulls |
+| Sticky Miso Chicken Bowl w/ Tahini Broccoli | 2 | 480/40/null/null/null/null | ~569/51/52.5/11/…/… | ✅ cal reasonable + nulls |
+| Sticky Miso Chicken Prep Boxes | 3 | 520/50/null/null/null/null | ~428/37.6/30/13.3/…/… | ⚠ stored protein high; cal lower + nulls |
+| Sticky Soy Chicken w/ Garlic Rice in Spicy Broth | 1 | 618/44/72/14/3/8 | ~1533/60/165/50/…/… | ⚠ big discrepancy (1 cup dry rice+2 oils; likely serves 2) |
+| Sticky Toffee Chia Pudding | 2 | 378/6.5/48/18/7.5/30 | ~462 base / ~707 w/ caramel | ⚠ undercount (coconut yog+dates) |
+| Sticky Toffee Date Oats | 1 | 445/12/66/16/9/28 | ~741/16/112/17/…/… | ⚠ low (¾c oats+dates+2×maple+nut butter) |
+| Strawberry Ice Cream | 3 | 168/4.5/22/7.5/1/18 | — | ⛔ ingredient list empty (nulls) |
+| Stuffed Breakfast Chicken Sausage Pitas | 1 | 289/29/null/null/null/null | ~392 (no avocado) | ◐ sausage macros vary; avocado optional; nulls |
+| Summer Peach Chia Pudding | 1 | 388/5/42/22/9.5/28 | ~589/10/46/41/…/… | ⚠ fat low (130ml coconut milk+chia) |
+| Summer Salmon and Blackberry Salad | 2 | 398/36/14/24/6/6 | ~564/25.5/15/40/…/… | ⚠ fat low (avo+salmon+2 tbsp sesame oil); NO blackberries in ingredients |
+| Sunflower Sesame Date Chocolate Bites | 12 | 108/2/12/6.5/1.5/9 | ~156/3.1/17.4/9.8/…/… | ⚠ low (seeds+choc) |
+| Sushi Salad | 2 | 452/35/null/null/null/null | ~478/37.5/45/14/…/… | ✅ cal/protein match + nulls |
+| Sweet and Salty Date Caramel Oat Cookie Slice | 16 | 148/1.5/22/6/1.5/14 | ~276/2.75/48.8/9.2/…/… | ⚠ big undercount (oats+flour+honey+450g dates) |
+| Sweet Potato and Kale with Tahini Dressing | 2 | 488/14/58/22/12/8 | ~674/18.5/82/31.5/…/… | ⚠ low (150g quinoa dry/cooked ambiguous) |
+| Sweet Potato Beef Taco Bowl | 4 | 458/40/43.6/14.8/–/– | ~515/39.7/32.5/23/…/… | ✅ protein exact (fat swings on beef) + nulls |
+| Sweet Potato Blondies | 12 | 198/4/22/11/2.5/12 | ~202/4.1/19.2/12.4/…/… | ✅ great match |
+| Sweet Potato Chicken Enchilada Skillet | 4 | 328/26/38/7/9/8 | ~295/22/30/7.25/…/… | ✅ close |
+| Sweet Potato Chocolate Cake | 8 | 148/2/16/8.5/2/10 | ~237/2.8/27.75/12/…/… | ⚠ low (300g dark chocolate total) |
+| Sweet Potato Chocolate Chip Cookies | 12 | 138/3.5/11/10/1.5/6.5 | ~211/4.8/14.2/15.5/…/… | ⚠ low (2 cups almond flour+coconut oil) |
+| Sweet Potato Olive Oil Cake | 10 | 268/4.5/26/17/2.5/16 | ~452/7.7/35/32.2/…/… | ⚠ big undercount (oil+almond flour+maple+caramel) |
+| Sweet Potato Toast w/ Avocado & Tofu Scramble | 4 | 248/12/22/14/6.5/5 | ~294/14.25/18.75/17.5/…/… | ✅ close |
+| Tahini Oat Chocolate Chip Bars | 9 | 198/5.5/18/13/2/9 | ~315/8.1/26.7/20.3/…/… | ⚠ low (almond flour+tahini+maple) |
+
+- Fully auditable: 28/30 (10 ✅, 18 ⚠). Partial: 1. Deferred (empty): 1 (Strawberry Ice Cream).
+- **Data-integrity:** Summer Salmon and Blackberry Salad has **no blackberries** in its
+  ingredient list; Sticky Soy Chicken w/ Garlic Rice (serves 1) has 1 cup dry rice + 2 oil
+  additions → recompute 1533 vs stored 618, strongly suggesting it should be **serves 2**.
+- The almond-flour / olive-oil / coconut-milk dessert & soup families continue to under-count
+  hard; gram-specified bakes (Sweet Potato Blondies) still nail it.
+
+**Running totals through Batch M:** ~290 of 310 ready recipes covered (10 written + ~278 audited).
+
+### Batch N (2026-07-16) — final 29 alphabetically ("Thai Chicken Noodle Soup" → "Zesty + Spicy Chicken Fusion Bowl") (read-only)
+
+| Recipe | serves | Stored | Recompute (per serving) | Verdict |
+|---|---|---|---|---|
+| Thai Chicken Noodle Soup | 4 | 189/17/null/null/null/null | ~300/25/30/3.75/…/… | ⚠ cal/protein low + nulls |
+| Thai Drunken Noodles (Pad Kee Mao) | 2 | 454/null/null/null/null/null | ~666/27.5/92.5/17.5/…/… | ⚠ cal low (200g dry noodles) + nulls |
+| Thai Glass Noodle Salad with Prawns | 2 | 448/28/44/18/3/8 | ~834/33.5/75/41.5/…/… | ⚠ big undercount (150g vermicelli+pork+peanut oil) |
+| Thai Prawn Meatball Bowl w/ Spicy Peanut Sauce | 2 | 332/24/null/null/null/null | ~354/25/31/9.5/…/… | ✅ cal/protein match + nulls |
+| Thai Red Curry Pot Roast Chicken | 4 | 548/42/28/30/4/6 | ~1232/57/40/90 (all-in) | ⚠ fat/cal low (whole bird + coconut cream; rendering uncertain) |
+| Thai Style Chicken Satay | 3 | 498/38/42/22/2.5/7 | ~465/43/10/27.6 (no rice) | ◐ rice unquantified; fat a bit high (coconut+PB) |
+| The Easiest Soy Chicken | 3 | 448/38/42/14/4/2 | ~583/42.3/76.7/9/…/… | ⚠ carbs low (1.5 cups dry rice) |
+| Tiramisu Inspired Rice Cake Tower | 1 | 348/40/28/5/1.5/6 | ~359/41/33.5/6.3/…/… | ✅ great match |
+| Toffee Pecan Apple Crumble | 6 | 318/3/44/16/5/28 | ~527/6.5/71.3/27.2/…/… | ⚠ low (apples+dates+oats+pecans+2×coconut oil) |
+| Tuna Avocado Wrap | 1 | 448/38/28/18/5/4 | ~644/35/43/36/…/… | ⚠ fat low (mayo+pesto+avocado) |
+| Tuna Chilli Crunch Salad | 1 | 390/33/null/null/null/null | ~393/31/20/16/…/… | ✅ cal/protein match + nulls |
+| Tuna Gnocchi Bake | 3 | 388/28/52/8/4/6 | ~463/28.7/64.7/6/…/… | ✅ close (protein exact) |
+| Tuna Melt Sandwich | 1 | 548/42/44/22/5/5 | ~733/45/51/34/…/… | ⚠ fat low (avocado+mayo+cheddar+hummus) |
+| Tuna Salad Meal Prep | 4 | 168/26/4/6/0.5/2 | ~255/32/8.25/9.5/…/… | ⚠ protein/cal low (4 cans tuna+mayo) |
+| Turkey Burgers | 4 | 178/28/2/7/0.3/0.5 | ~180/28.8/1.5/5.95/…/… | ✅ great match |
+| Turkey Taco Scramble | 4 | 450/46/24.5/19/3.5/4 | ~472/42.75/25/19.4/…/… | ✅ close |
+| Tuscan-Style Chicken Meatballs & Baby Mushrooms | 4 | 298/26/14/16/2.5/5 | ~359/29.75/15/12/…/… | ✅ close (mince-fat swing) |
+| Ultimate Christmas Pasta Salad | 2 | 548/36/46/24/3/8 | ~933/45.5/72.5/44/…/… | ⚠ big undercount (bacon+stilton+walnuts) |
+| Vegan Blueberry Protein Pancakes w/ Sticky Toffee | null | 142/8.5/18/4/2/5 | — | ◐ serves is null — can't divide |
+| Vegan Chocolate Brownie Pancakes | 2 | 118/4/18/3.5/3/5 | ~373/11.2/62/11.1/…/… | ⚠ stored under-stated (100g flour alone > stored) |
+| Vegan Chocolate Cake Baked Oats | 1 | 368/18/48/11/5.5/8 | ~392/17/51/10/…/… | ✅ close |
+| Vegan Chocolate Fudge Cake Oats | 1 | 298/26/24/9/4/3 | ~417/28/35/9/…/… | ⚠ cal/carbs high (toppings) |
+| Vegan Protein Waffles | 2 | 463/29/46/18/3/9.5 | (Batch A) | ✅ already corrected |
+| Vegan Tahini Brownies | 9 | 292/6/36.5/16/4.5/22.5 | (Batch A) | ✅ already corrected |
+| Vietnamese Chicken & Noodle Bowls | 4 | 592/39/75/14.5/4/10 | (Batch A) | ✅ already corrected |
+| Vietnamese Lettuce Wraps with Peanut Sauce | 3 | 460/36.5/51/14.5/6.5/15.5 | (Batch A) | ✅ already corrected |
+| Vietnamese Noodles with Lemongrass Chicken | 4 | 368/32/36/9/3.5/10 | — | ⛔ ingredient list empty (nulls) |
+| XL Gluten Free Rice Paper Dumplings | 4 | 256/21/15.5/12.5/1.5/2 | (Batch A) | ✅ already corrected |
+| Zesty + Spicy Chicken Fusion Bowl | 4 | 600/45/25/32/null/null | ~504/47.5/22.5/26.25 (no rice) | ✅ close (rice unquantified) + nulls |
+
+- Fully auditable: 21/29 (9 ✅, 12 ⚠). Partial: 2. Empty: 1. Already-done (Batch A): 5.
+- **`SELECT` returned only 29 rows past "Tahini Oat…" → this is the end of the library.**
+
+---
+
+## SWEEP COMPLETE — consolidated summary (2026-07-16)
+
+**Coverage:** all ~310 `import_status='ready'` recipes reviewed across Batches A–N.
+- **10 corrected & written** to Supabase (Batch A, from Saffron's supplied ingredient lists).
+- **~255 read-only audited** with a recompute + verdict.
+- **~40 not auditable** (empty ingredient lists, null `serves`, or too many unquantified items).
+
+**Headline pattern — stored estimates skew LOW.** Of the auditable recipes, the clear
+majority are under-counted, and the error is systematic: **oils (¼-cup dressings, 2-3 tbsp
+cooking oil), nut/seed butters, tahini, coconut milk/cream (full tins), dry noodle/pasta/rice
+weights, dates, and almond flour** were repeatedly missed or under-weighted. Calorie-dense
+desserts/bakes, oats/smoothies, and coconut-noodle/curry dishes are the worst-affected
+families and the highest-yield place to start a correction pass.
+
+**Recipes that consistently MATCHED** were the ones with explicit gram weights per ingredient
+(rice-paper dumplings, protein brownies/cookies, Turkey Burgers, gram-spec'd bakes) — evidence
+that accuracy tracks quantity precision, i.e. **applying quantity-normalisation (workstream
+step 2) would fix most of this at the root.**
+
+**Over-statements (stored too HIGH — rarer, ~8):** Fluffy Greek Yogurt Pancakes, Oat Flour
+Pancakes, Protein Pancakes, both Butternut Protein Brownies, Salmon Poke Bowl Meal Prep,
+Crispy Rice & Chicken Salad, Cinnamon Roll Baked Oats. Several look like per-recipe totals or
+wrong serving counts stored as per-serving.
+
+**Serving-count issues:** `serves = null` on Marinated Fish Tacos, Pumpkin Pecan Pancakes,
+Quick Chinese Veg Noodle Soup, Vegan Blueberry Protein Pancakes (Vegan Protein Waffles already
+fixed). Likely-wrong counts: GF Cinnamon Buns (800g flour ÷6 → probably 12+), Sticky Soy
+Chicken w/ Garlic Rice (÷1 → probably 2), Oat Flour Pancakes / Protein Pancakes / Fluffy Greek
+Pancakes (÷12/÷15/÷3 all too high).
+
+**Duplicate rows:** "High Protein Salmon Potato Salad" (×2, identical, both null macros);
+"Roast Chicken Rice Salad" ≈ "Roast Chicken and Charred Corn Rice Salad" (inconsistent stored).
+
+**Ingredient-list integrity gaps:** Café Style Jacket Potatoes (no potato/corn listed),
+Chilli Lime Shrimp "Veggie" Bowl (no veg), Summer Salmon and "Blackberry" Salad (no
+blackberries), Quick Chinese Vegetable "Noodle" Soup (no noodles). Plus many rows with `null`
+carbs/fat/fibre/sugar even where calories/protein exist.
+
+**Empty ingredient lists (can't audit until populated):** Apple Almond Yogurt Bowl, California
+Rolls in a Bowl, Bounty Bar Overnight Oats, Brownie Batter Overnight Oats, Blended Raspberry
+Protein Chia Pudding, Carrot Cake Baked Oats (serves 1), Strawberry Ice Cream, Vietnamese
+Noodles with Lemongrass Chicken.
+
+**Recommended next step:** nothing was written in the audit (per instruction). When ready,
+the highest-value action is to **apply quantity-normalisation (step 2) then bulk-recompute
+(step 3)** rather than hand-patching; short of that, prioritise the dessert/bake + oats +
+coconut-curry families and the serving-count/duplicate fixes above.
+
+**Running totals — SWEEP COMPLETE:** ~310/310 ready recipes reviewed (10 written + ~255 audited + ~45 not-auditable/already-done).
+
+---
+
+## Batch B — Section A bulk recompute+write (2026-07-22) — WRITTEN
+
+Worked the whole of **§A "Recalculate — under-counted"** from `logs/remaining-work.md`, in
+9 sweeps of ~10, computing precise 6-macro per-serving values from each recipe's
+`ingredient_sections` against `staple_products` + standard USDA-equivalent values. **82
+recipes recomputed and written** to `recipes` (calories, protein_g, carbs_g, fat_g, fibre_g,
+sugar_g). Method validated against the audit-pass estimates: the large majority landed within
+~10% of the `→` estimate; where they diverged the reason is recorded below. Saffron made her
+own manual edits (§B/C/D/E/F worklist) in parallel during this run.
+
+**Locked defaults applied:** light coconut (unless recipe says otherwise), cooked quinoa, UK
+250 ml cup, 85 g instant-noodle pack. Computation scripts saved in the session scratchpad
+(`sweep2.mjs`…`sweep9.mjs`, staples table in `macrocalc.mjs`).
+
+Format: `kcal / protein / carbs / fat / fibre / sugar` per serving.
+
+| Recipe | serves | Before kcal | After |
+|---|---|---|---|
+| 4 Ingredient Rice Cake Chocolate Bars | 4 | 165 | 278/5/30.5/15/2/18 |
+| Air Fryer Cinnamon Roll Oats | 1 | 398 | 641/17.5/76.5/31/8/34.5 |
+| Baked Middle Eastern Chicken Tray | 4 | 318 | 463/55.5/10.5/23.5/2.5/3.5 |
+| Butternut Squash Mac and Cheese | 4 | 348 | 525/20/76/17.5/5.5/14 |
+| Caramelised Onion Rice with Tikka Cod | 2 | 488 | 638/48.5/93/8/14/25 |
+| Carrot Cake Meal Prep Baked Oats | 5 | 318 | 395/20.5/57.5/12/6.5/20 |
+| Chicken & Egg Breakfast Casserole | 8 | 228 | 317/24/15/17.5/2.5/4 |
+| Chicken Shawarma Crispy Rice Salad | 4 | 488 | 686/31/42/46/4/9 |
+| Chile Lime Chipotle Chicken | 4 | 338 | 482/55/7.5/27/2.5/2 |
+| Chili Crunch Ground Chicken Bowls | 4 | 398 | 469/30.5/52/15/2.5/11.5 |
+| Choc, PB and Raspberry Overnight Oats | 1 | 388 | 488/26.5/59.5/18.5/18.5/11.5 |
+| Chocolate Date Peanut Butter Squares | 12 | 128 | 161/2.5/26/6/2.5/20 |
+| Chocolate Hazelnut Cookie Dough Balls | 15 | 128 | 199/4.5/16.5/13.5/2/10 |
+| Chocolate Peanut Butter Protein Cookie Dough | 4 | 228 | 274/22.5/12/16/4/5.5 |
+| Chocolate Raspberry Baked Protein Oats | 6 | 168 | 192/13.5/25/5.5/6/11.5 |
+| Chocolate Strawberry Baked Oats | 1 | 405 | 487/39/65/12.5/15/20 |
+| Chopped Jalapeño Cheddar Chicken Salad (×2 dup rows) | 3 | 185 | 263/31.5/11.5/9.5/2/7 |
+| Cinnamon Buckwheat Smoothie | 1 | 398 | 506/25/69/16/9/24.5 |
+| Coffee Protein Ice Cream Affogato | 1 | 175 | 297/55/11.5/3/1.5/9 |
+| Cookie Dough Caramel Bars | 12 | 188 | 267/4.5/31/14.5/3.5/21.5 |
+| Copycat Nando's Peri Peri Chicken Burgers | 4 | 518 | 788/46/41/48/4.5/7.5 |
+| Cottage Cheese Pancakes | 3 | 218 | 351/24/34/13.5/2.5/14 |
+| Creamy Peanut Miso Ramen | 4 | 528 | 876/26/106.5/41/6.5/11 (light coconut) |
+| Crispy Bang Bang Chicken | 1 | 427 | 536/43/53.5/15/1/26 |
+| Crispy Chicken Rice Paper Dumplings | 2 | 358 | 435/33/43/16/2.5/14 |
+| Crispy Rice Paper Spring Rolls Without Frying | 4 | 198 | 396/10.5/81/4.5/5.5/7.5 |
+| Crispy Rice Tuna Salad | 2 | 418 | 480/19/52/21.5/3.5/3 |
+| Crispy Rosemary Chicken w/ Apple Beetroot & Horseradish Slaw | 2 | 412 | 755/62.5/90.5/17.5/13/28 |
+| Easy Chipotle Chicken & Corn Salsa | 6 | 338 | 476/46/18/26/4/5 |
+| Easy Tuna Salad Mix | 3 | 148 | 200/21/9/9/3/4 |
+| Fluffy Breakfast Carrot Cake Loaf | 10 | 250 | 328/6.5/33/20/4/16 |
+| Fluffy Vegan Protein Pancakes | 2 | 288 | 349/13.5/62.5/4/3.5/10.5 |
+| Garlic Cucumber Salad | 2 | 38 | 49/2/5.5/2.5/1.5/2.5 |
+| Giant Rice Cake Snickers Wagon Wheel | 1 | 488 | 694/17.5/65/42/7.5/34.5 |
+| Glowing Skin Soup | 4 | 148 | 242/4/19.5/18/3.5/7 |
+| Healthy Lemon Bars | 9 | 178 | 245/7.5/17/16.5/2.5/12 |
+| High Fibre Sticky Toffee Oats | 1 | 420 | 889/25/127/36.5/16/77 |
+| High Protein Carrot Cake Overnight Oats | 1 | 448 | 642/51/62/23/14.5/24.5 |
+| High Protein Chickpea Flour Pancakes | 2 | 318 | 443/44/50.5/9/7.5/16.5 |
+| High Protein Pumpkin Spice Muffins | 12 | 88 | 120/7.5/18/2.5/2.5/5.5 |
+| Honey Glazed Salmon Bowls with Peach Salsa | 4 | 298 | 466/29.5/29/27/5/20 |
+| Honey Mustard Chicken Power Bowl | 4 | 488 | 685/36.5/59.5/35/13/13.5 |
+| Lemon and Blueberry Baked Oats | 4 | 248 | 370/26.5/52.5/7.5/7/14.5 |
+| Loaf Pan Lemon & Yoghurt Chicken | 5 | 298 | 361/43/8.5/18/2/2.5 |
+| Marinated Chicken Thighs with Mint Jalapeño Sauce | 2 | 448 | 811/44.5/13.5/65/3.5/4.5 |
+| Matcha Date Butter Balls | 12 | 98 | 136/0.5/13.5/9.5/1/12 |
+| Microwave Chocolate Protein Oats | 1 | 248 | 389/35.5/46/12/15/12.5 |
+| Miso Peanut Ramen Bowl | 4 | 498 | 576/21/48.5/35.5/3.5/8.5 (full-fat, per recipe) |
+| One Pan Vegan Sushi Bake | 3 | 464 | 665/29/75/31/16.5/7 |
+| Pad Thai with Chicken and Prawns | 4 | 528 | 651/33.5/73.5/26/4.5/16.5 |
+| Pad Thai with Prawns | 2 | 418 | 540/30.5/76/13.5/7/15 |
+| Peach and Nectarine Overnight Oats | 1 | 318 | 394/17.5/59/12/12/12 (base, opt. toppings excl.) |
+| Peaches and Cream Chia Pudding | 2 | 195 | 247/8.5/30/11.5/9.5/18 (base, opt. toppings excl.) |
+| Peanut Butter and Jam Breakfast Oat Bars | 4 | 248 | 402/12/68.5/11/14/20.5 |
+| Peanut Tofu Salad Jars | 4 | 278 | 424/35/43/15.5/11.5/12 (quinoa qty est.) |
+| Phò Inspired Chicken Broth and Rice | 2 | 352 | 581/36/85/10/4.5/31 |
+| Prawn Fried Rice | 2 | 428 | 583/32.5/49.5/27.5/1.5/3 |
+| Protein Packed Roasted Squash Pasta | 4 | 348 | 620/21/97.5/19/10.5/10 |
+| Pumpkin Bread | 10 | 238 | 261/4/42/9/2.5/27.5 |
+| Pumpkin Brookies | 12 | 348 | 558/6/53/36.5/4/31.5 |
+| Pumpkin Candy Apple Salad | 1 | 498 | 1002/17/112/57/17/70 (portion-heavy 1-serve) |
+| Pumpkin Cream Cheese Muffins | 6 | 298 | 502/11.5/41/32.5/5/20 |
+| Raspberry Coconut Chocolate Bars | 10 | 128 | 212/2/21/13.5/4/15 |
+| Roasted Butternut Squash and Carrot Soup | 4 | 188 | 233/4/30.5/13/5.5/8.5 (light coconut) |
+| Salmon Crispy Rice Paper Bites | 3 | 198 | 259/17/24/11/1/7 |
+| Seared Miso Tuna Crispy Rice Bowl | 2 | 528 | 740/48/61/35/10.5/8 (sesame-heavy) |
+| Simple Salmon Bowl | 1 | 488 | 566/32.5/40.5/29.5/2.5/2.5 |
+| Speedy Pad Thai Noodle Salad | 1 | 420 | 588/41.5/76/13.5/7.5/16 |
+| Spicy Asian Noodles with Spinach and Chilli Crisp | 2 | 348 | 533/15.5/63/25/6/5 |
+| Spicy Tofu Bowl | 1 | 550 | 734/35.5/70/36.5/5.5/19 |
+| Spicy Tuna Bowl | 1 | 448 | 538/37/57/18/6.5/11 |
+| Sticky Chicken, Gochujang & Coconut Broth on Sticky Rice | 2 | 646 | 655/48.5/60/26.5/3/42 (light coconut, rice not counted) |
+| Summer Peach Chia Pudding | 1 | 388 | 463/8.5/62/24/13.5/42 (light coconut) |
+| Sunflower Sesame Date Chocolate Bites | 12 | 108 | 154/3/17/9/2.5/13 |
+| Thai Chicken Noodle Soup | 4 | 189 | 339/27.5/47/5.5/5.5/12 |
+| Thai Drunken Noodles (Pad Kee Mao) | 2 | 454 | 707/29/95.5/23/4/7 |
+| The Easiest Soy Chicken | 3 | 448 | 656/44/80/17.5/3/2.5 |
+| Tuna Avocado Wrap | 1 | 448 | 652/33/54.5/33.5/9.5/7.5 |
+| Tuna Melt Sandwich | 1 | 548 | 760/44/71.5/34/11/6 |
+| Tuna Salad Meal Prep | 4 | 168 | 228/24/7/11/0.5/4 |
+| Vegan Chocolate Brownie Pancakes | 2 | 118 | 381/11.5/63/11.5/6.5/15.5 |
+| Vegan Chocolate Fudge Cake Oats | 1 | 298 | 428/33/49/12.5/8/14 |
+
+**Skipped / flagged back to Saffron (not written):**
+- **Middle Eastern Chicken & Rice Bowl** — "rice of choice" has no quantity (load-bearing);
+  belongs in §F. Not written.
+- **Pho Gà - Vietnamese Chicken Pho** — 1.5 kg bone-in skin-on thighs simmered into broth;
+  meat-yield-per-bowl and fat-rendering are genuinely uncertain (doc's own "soup, fat renders"
+  flag). Not written.
+- Also excluded per the pre-agreed hand-off list: the 2 §C traybake/rice-salad dups, the 2 §B
+  serve-count fixes (GF Cinnamon Buns, Sticky Soy Chicken w/ Garlic Rice), Summer Salmon &
+  Blackberry Salad (§D), Basic Oat Flour Pancakes + Thai Red Curry Pot Roast Chicken (eyeball).
+
+**Divergences worth an eyeball (written as computed, faithful to ingredient list):**
+- **Chicken-thigh weight cases** running above the audit estimate because the recipe states a
+  full 2.5–3 lb thigh weight for the serving count: Baked ME Chicken Tray (463), Chile Lime
+  Chipotle Chicken (482), Loaf Pan Lemon & Yoghurt Chicken (361), Easy Chipotle Chicken & Corn
+  Salsa (476).
+- **Marinated Chicken Thighs w/ Mint Jalapeño (811)** — bone-in skin-on thigh + 4 tbsp oil ÷2;
+  all marinade oil counted as consumed. Bump down if discounting oil retention.
+- **Light-coconut default** pulled these under their (full-fat-assuming) estimates: Creamy
+  Peanut Miso Ramen, Roasted Butternut & Carrot Soup, Sticky Chicken Gochujang Broth, Summer
+  Peach Chia. Switch any to full-fat on request.
+
+**Latent duplicate rows surfaced (not in §C, flagged for dedupe):**
+- **Chopped Jalapeño Cheddar Chicken Salad** — two identical rows; both updated to 263 to stay
+  consistent, but the dedupe (which survives) is Saffron's call.
+- **Loaf Pan Lemon & Yoghurt Chicken** ≈ **Baked Middle Eastern Chicken Tray** — identical
+  ingredient list, different serves (5 vs 4); likely the same recipe.
+
+Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.
+
+---
+
+## Batch C — §E empty-ingredient recipes populated + §D deletions (2026-07-23) — WRITTEN
+
+Saffron supplied the actual ingredient lists (pasted in chat — her in-app edits had stayed in
+local storage and never reached Supabase). For each, wrote **ingredient_sections (real
+strings) + method_steps + all 6 macros** to `recipes`. Computed per serving from the supplied
+lists the same way as Batch B.
+
+Format: `kcal / protein / carbs / fat / fibre / sugar` per serving.
+
+| Recipe | serves | Before | After |
+|---|---|---|---|
+| Apple Almond Yogurt Bowl | 1 | (empty/418) | 397/13.5/50.5/18.5/6.5/37 |
+| Blended Raspberry Protein Chia Pudding | 3 | (empty/268) | 283/22.5/22/12.5/14.5/3 |
+| Bounty Bar Overnight Oats | 1 | (empty/388) | 556/11/61.5/32.5/14/23.5 |
+| Strawberry Ice Cream | 3 | (empty/168) | 282/7/36/13/2/34.5 |
+| Vietnamese Noodles with Lemongrass Chicken | 4 | (empty/368) | 641/45.5/68/22/4.5/19 |
+| Quick Chinese Vegetable Soup (§D, protein was null) | 2 | (empty/108) | 196/11/23/6.5/3.5/10 |
+| Chicken and Bacon Caesar Pasta Salad (§D, + description) | 2 | (empty/601) | 541/59/47.5/12.5/2/5.5 |
+| Carrot Cake Baked Oats (salted caramel, serves 1) | 1 | (deleted/448) | 718/44/77.5/29/10/28.5 |
+
+The pre-existing macro values on these rows were rough placeholders; recomputes from the real
+lists supersede them (notably Bounty Bar +168 from 25 g melted chocolate + coconut yoghurt;
+Strawberry Ice Cream +114 from the 100 g white-chocolate coating; Vietnamese Noodles +273 from
+800 g thigh + 200 g dry vermicelli ÷4).
+
+**§D deletions:** `Brownie Batter Overnight Oats` and `California Rolls in a Bowl` set
+`import_status='deleted'` (were still `ready` despite being marked deleted on Saffron's side).
+
+**Second pass (2026-07-23, same batch):** Saffron supplied the three remaining lists. Written:
+`Quick Chinese Vegetable Soup` (196/11 — protein was null; wrote ingredients+method),
+`Chicken and Bacon Caesar Pasta Salad` (541/59 + ingredients+method+subtitle; recompute from
+the real list came in under the old 601/66 placeholder), and `Carrot Cake Baked Oats (salted
+caramel, serves 1)` (718/44 — full recipe with 30 g protein + PB + cream cheese + walnuts far
+exceeds the old 448 placeholder; **flipped `import_status='deleted'→'ready'`** so it now shows).
+
+- Note: `Quick Chinese Vegetable Soup` 196 is the faithful compute including low-sodium stock
+  (~60/serving) + the 2 tbsp fried-shallot topping (~40/serving); the source's "108 cal"
+  subtitle claim treats stock as ~0 and the toppings as optional garnish. Left as 196 pending
+  Saffron's preference.
+
+**Still empty-in-DB (§D renames, macros present but ingredient lists never synced from app):**
+`Summer Salad with Blackened Salmon` (398/36) and `Chilli Lime Shrimp and Veggie Bowl`
+(228/36, shrimp+marinade only, veg is a serving-suggestion per Saffron). Both render with no
+ingredients in the app until their lists are pasted in.
+
+**Note on app→DB sync:** in-app edits to bundled-library recipes persist to local storage, not
+the shared Supabase `recipes` table, so authored ingredients don't appear in the DB until
+written directly. Worth a proper fix in `index.html` at some point.
+
+Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.
+
+---
+
+## Batch D — §F "need one quantity" + remaining §D (2026-07-23) — WRITTEN
+
+Twelve recipes. Two kinds of work: (a) **rice-exclusion** recipes — recomputed from the
+existing DB ingredient lists **minus the unquantified rice line**, per Saffron's instruction
+("calculate without rice, note it's excluded"); (b) recipes where Saffron supplied or updated
+the list. Faithful compute of listed quantities (full mayo/sauce, skin-on chicken, listed
+oils) means several run well above the prior rough stored values — same pattern as Batch B.
+
+Format: `kcal / protein / carbs / fat / fibre / sugar` per serving.
+
+| Recipe | serves | Before | After |
+|---|---|---|---|
+| 30 Minute Bang Bang Chicken Bowls | 4 | 388 | 571/43.5/16.5/37.5/1.5/12 (rice excl) |
+| Bone Broth Smothered Chicken | 4 | 368 | 650/44/17/45/2.5/4.5 (rice excl; skin-on thigh) |
+| Brothy Miso Ginger Chicken and Rice | 3 | 485 | 555/40.5/29/32/1.5/18.5 (rice excl) |
+| Chili Honey Chicken Bowl | 2 | 488 | 667/44.5/47/37/7.5/35 (rice excl) |
+| Chipotle Chicken & Rice Skillet | 4 | 498 | 424/24.5/10/32.5/4/2.5 (rice excl) |
+| Creamy Thai Coconut Chicken Meatballs | 4 | 271 | 305/32.5/11.5/15/1.5/6 (rice excl; light coconut) |
+| Crispy Chilli Beef Protein Bowls | 4 | 484 | 437/28.5/28/23/5.5/16.5 (rice excl) |
+| Chilli Lime Shrimp and Veggie Bowl | 2 | 228 | 280/46/6.5/9/3/1 (+ingredients+method; veg excl; ~half marinade oil) |
+| Summer Salad with Blackened Salmon | 2 | 398 | 638/34.5/29/44.5/8.5/11 (+ingredients+method) |
+| Buffalo Chicken Wrap | 2 | 618 | 600/54.5/37.5/24/3/6.5 (per assembled wrap) |
+| Burger Bowl | 1 | 440 | 472/44/35.5/17/6/8 (qtys→weight) |
+| Caramel Rice Cake Strawberry Treat | 1 | 348 | 409/12/42.5/21.5/4.5/22 |
+
+Wrote ingredient_sections + method_steps for the two §D recipes (Chilli Lime Shrimp, Summer
+Salad — previously empty) and re-quantified Burger Bowl + Caramel Rice Cake. Rice-excluded
+recipes carry a note to add ~200 kcal / 44 g carbs per 150 g cooked rice.
+
+**Flagged to Saffron (written as computed, may adjust):**
+- **Chilli Lime Shrimp** — resolved to **280** (counts ~half the 2 tbsp marinade oil as
+  consumed; the rest drains off before griddling). Full-oil compute was 342.
+- **Chipotle Skillet protein 38→24.5** — computed "5 bone-in skin-on thighs" as ~480 g edible;
+  if the thighs are larger or skinless, protein should be higher.
+
+**Still outstanding on the §F list:** Crispy Gluten Free Shrimp Dumplings, Double Roast Chicken
+w/ Chicken Fat Rice, Frozen Strawberry Raspberry PB Bites, GF Easy Pan Dumplings (×2), Green
+Goddess Chicken Prep Mix, Harissa Chicken w/ Roasted Veg & Feta, Honey Sesame Salmon Bowl,
+Instant Noodle Jars, Mediterranean Chicken & Rice Skillet, Peanut Butter Banana French Toast,
+Peanut Butter Chicken Katsu Noodles, Stuffed Breakfast Chicken Sausage Pitas, Thai Style
+Chicken Satay. Plus §B, §C, §G, and the 2 §A eyeball / 2 §A flagged items.
+
+Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.
+
+---
+
+## Batch E — §F remaining "need one quantity" items (2026-07-23) — WRITTEN
+
+Ten recipes. Saffron supplied the missing quantity/decision for each (rice-exclusion notes,
+feta/mayo qty, full ingredient list for Green Goddess, whole-chicken weight range, small
+banana + 1 tbsp PB). Two items needed my own estimate where she was genuinely unsure (dumpling
+coatings, tofu block size) — written as computed and flagged below, same "easily adjusted"
+pattern as Chipotle Skillet/Chilli Lime Shrimp in Batch D. `Chipotle Chicken & Rice Skillet`
+was already resolved in Batch D (re-flagged by Saffron this round, but no change needed — rice
+was already excluded there). `Frozen Strawberry Raspberry PB Bites` deferred — full recipe
+relayed back to her since the "box" sizes for strawberries/raspberries are also unquantified.
+
+Format: `kcal / protein / carbs / fat / fibre / sugar` per serving.
+
+| Recipe | serves | Before | After |
+|---|---|---|---|
+| Mediterranean Chicken & Rice Skillet | 4 | 480/40 | 377/25.5/10/25.5/2/2 (rice excl; thigh weight assumed) |
+| Harissa Chicken with Roasted Veg and Feta | 1 | 555/53 | 943/56.5/84/43/17.5/29 (feta excl; thigh weight assumed) |
+| Honey Sesame Salmon Bowl | 2 | 488/36 | 463/32/10.5/32/0.5/9.5 (rice excl; mayo 1 tbsp) |
+| Instant Noodle Jars | 1 | 348/16 | 956/66/102/35/13/7 (tofu block assumed 300g; noodles 85g default) |
+| Crispy Gluten Free Shrimp Dumplings | 7 | 128/9 | 68/8/5.5/1.6/0.2/1 (rice-flour coating ~15g adhered assumed) |
+| GF Easy Pan Dumplings (No Wrappers) | 4 | null | 170/12/3.5/11.5/0.1/0.1 (coating flour ~15g adhered assumed) |
+| GF Easy Pan Dumplings (Pan-Fried) | 4 | null | 328/21/7/23.5/0.5/0.5 (potato-starch coating ~15g adhered assumed) |
+| Double Roast Chicken with Chicken Fat Rice | 8 | null | 534/44/30/25/0.6/2 (2×1.15kg raw chickens, ~52% roasted yield) |
+| Green Goddess Chicken Prep Mix | 2 | 280/24 (nulls) | 267/28/20/9.5/6.5/8.5 (full recipe supplied) |
+| Peanut Butter Banana French Toast | 1 | 488/18 | 627/19/76/29/5/26.5 (small banana ~100g, 1 tbsp PB, + maple syrup to serve) |
+
+**Flagged to Saffron — confirmed as written, no changes (2026-07-23):**
+- **Instant Noodle Jars → 956/66g protein** — full ~300g firm-tofu block assumption confirmed.
+- **Crispy GF Shrimp Dumplings / GF Easy Pan Dumplings (×2)** — ~15g adhered coating assumption
+  confirmed.
+- **Harissa Chicken with Roasted Veg and Feta → 943 kcal, up from 555** — faithful compute of
+  the full listed quantities (whole onion, whole pepper, ⅓ tin chickpeas, 2 bone-in skin-on
+  thighs, feta excluded) confirmed.
+- **Double Roast Chicken** — 52% raw-to-cooked-edible whole-roast-chicken yield assumption
+  confirmed.
+
+**Bone-in skin-on chicken thigh convention (Mediterranean Skillet, Harissa Chicken):** no
+per-thigh weight given, so used ~100g edible cooked meat+skin per thigh — same figure implied
+by the Chipotle Skillet compute in Batch D (480 g ÷ 5 thighs = 96 g). Flag and bump if thighs
+run bigger.
+
+**Doc hygiene:** `remaining-work.md` §D/§E/§F checkboxes were stale since Batch C/D (writes
+happened but the worklist was never ticked) — backfilled all of Batch C/D's completions plus
+this batch's in the same pass.
+
+Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.
+
+---
+
+## Batch F — final 3 §F "need one quantity" items + Batch E note fixes (2026-07-23) — WRITTEN
+
+Saffron supplied the last three §F quantities/decisions. Written faithfully, rice-excluded per
+her standing instruction where a "rice/base to serve" line was unquantified. This closes §F
+except the deferred Frozen Strawberry Raspberry PB Bites.
+
+Format: `kcal / protein / carbs / fat / fibre / sugar` per serving.
+
+| Recipe | serves | Before | After |
+|---|---|---|---|
+| Peanut Butter Chicken Katsu Noodles | 3 | 495/56 (incl rice) | 430/52/18/16/3.5/6 (rice excl; 150g cooked chicken breast/serving) |
+| Stuffed Breakfast Chicken Sausage Pitas | 1 | 289/29 (null carbs/fat) | 397/29/40/14/7/5 (full recipe; base w/o optional avocado) |
+| Thai Style Chicken Satay | 3 | 498/38 (incl rice) | 496/41.5/14/31/1.5/7.5 (rice excl; light coconut) |
+
+**Decisions applied:**
+- **Katsu** — "Rice of choice" excluded (note added: +200 kcal / +44g carbs per 150g cooked
+  rice); chicken assumed 150g cooked breast per serving per Saffron. The listed title says
+  "Noodles" but the ingredient list is a katsu peanut sauce over rice — computed the sauce +
+  chicken only.
+- **Stuffed Pitas** — full recipe supplied. Wrote the **base** stuffed pita (pita + 120g lean
+  chicken sausage meat + tomato/spinach/spring onion) without the optional ½-avocado dressing,
+  which is labelled "optional to serve". Avocado adds ~125 kcal / +10.5g fat / +9g carbs —
+  noted on the row. Chicken sausage meat assumed ~160 kcal/100g (lean); bump if using a
+  fattier banger.
+- **Thai Satay** — sticky rice excluded (note added); light coconut milk per project default;
+  600g raw thighs across 3 servings; small pickled-veg portion included, sauce fully counted.
+
+**Frozen Strawberry Raspberry PB Bites (serves 8) — 88 → 144/2.6/13.5/9/3.5/9.** Saffron
+supplied the missing quantities: 200g strawberries (¾ box), 150g raspberries (1 box), 8 tsp
+peanut butter, 100g dark chocolate chips (1 bag), plus the 1 tbsp chia and 1 tbsp coconut oil
+already listed. Firmed the `ingredient_sections` with these amounts (the vague "box"/"bag"/bare
+"Peanut butter" lines) and recomputed — the dark-chocolate coating (100g) and PB drive it well
+above the old 88 kcal placeholder. **This closes §F entirely** — all 24 items now written.
+
+---
+
+## §D Café Style resolution + §B sync-bug finding (2026-07-23) — Café done, §B BLOCKED
+
+**§D Café Style Jacket Potatoes → ALREADY DONE.** Saffron asked to rename "Café Style Jacket
+Potatoes with Chicken, Bacon & Sweetcorn" to "Chicken and Bacon Caesar Pasta Salad" and gave the
+corrected recipe + method. On checking the DB there is **no Café Style row** — it was already
+renamed to `Chicken and Bacon Caesar Pasta Salad` (id `d1ab3cbc…`) back in Batch C, and that row
+already holds exactly the recipe/method she re-supplied (100g pasta, 250g seasoned chicken breast,
+4 turkey bacon rashers, lettuce + the Greek-yoghurt/parmesan/anchovy Caesar dressing), macros
+**541/59/47.5/12.5/2/5.5**. A fresh recompute of her list lands ~553/63 — within assumption noise
+of the stored 541/59, so left as is. No DB write needed; ticked the stale §D checkbox. **§D now
+fully closed (4/4).**
+
+**§B is BLOCKED by the app→DB sync bug.** Saffron edited the §B recipes in-app ("adjusted in
+app", "edited – recalculate", "deleted one and reformatted the other"), but per the known bug
+those edits persist only to browser local storage, **not** Supabase. Pulled all 8 §B rows — the
+DB state does **not** reflect her edits:
+
+- **7 of 8 have entirely NULL/empty ingredient lists in the DB** — Asian Chicken Salad w/
+  Cucumber & Crispy Seaweed (461/50), Carrot Cake Loaf (178/14.5), Cinnamon Roll Baked Oats
+  (688/14), Crispy Rice and Chicken Salad (635/51), Fluffy Greek Yogurt Pancakes (495/39), Oat
+  Flour Pancakes (97/8.2, serves 12). **Cannot recompute** — no ingredients in the DB to compute
+  from. Need Saffron to paste the edited ingredient lists + confirmed serves for each.
+- **Butternut Protein Brownie ×2** — both rows still `ready` in the DB (her in-app deletion never
+  synced): `207e379e…` pumpkin-puree variant (189/25, serves 5) and `67a68e1c…` butternut-puree
+  variant (412/52, serves 5). These two *do* carry ingredient lists (structured qty/unit objects),
+  so a faithful recompute is possible: butternut variant ≈ **114/16/12.6/1.7/2.7/1.7** per serving,
+  pumpkin variant ≈ **101/15.4/9.2/1.4/3/2.5** per serving (both ÷5) — the old 412/52 & 189/25
+  were whole-recipe-ish totals, matching the audit's "→~110 / ~98". But since she "reformatted"
+  one in-app (may have changed quantities that didn't sync), holding the write until she confirms
+  which variant survives and whether the reformat changed the recipe.
+
+Note: the §A "Basic Oat Flour Pancakes" (id `9af1cd54…`, has ingredients) is a *different* row
+from the §B "Oat Flour Pancakes" (id `25fe14ad…`, null ingredients, serves 12).
+
+No DB write this pass beyond the doc ticks — §B awaits Saffron's pasted lists / dedupe decision.
+
+---
+
+## Batch G — §B recipes populated + Butternut Brownie dedupe + Cinnamon Roll pair (2026-07-23) — WRITTEN
+
+Saffron pasted the full ingredient lists + methods + serves for the 8 §B items (her in-app
+edits had never synced to Supabase — the known bug). Populated `ingredient_sections` +
+`method_steps` + serves + all 6 macros for each, computed the same staple-grounded way as
+Batches B–F. Format: `kcal / protein / carbs / fat / fibre / sugar` per serving.
+
+| Recipe | serves | Before | After |
+|---|---|---|---|
+| Asian Chicken Salad w/ Cucumber & Crispy Seaweed | 2→1 | 461/50 (nulls) | 455/52/13/22/6.5/2.5 |
+| Carrot Cake Loaf | 5 | 178/14.5 (empty) | 104/7.5/13.5/2.5/2.5/4 |
+| Cinnamon Roll Baked Oats @entirelyemmy | 5→10 | 688/14 (empty) | 284/8.5/36.5/13/4.8/19 |
+| Crispy Rice and Chicken Salad | 2 | 635/51 (empty) | 638/40/54/29/5.5/15 |
+| Fluffy Greek Yogurt Pancakes | 3 | 495/39 (empty) | 225/13/25/8/2.5/8.5 |
+| Oat Flour Pancakes | 12 | 97/8.2 (empty) | 56/2.6/7.5/1.7/0.75/2.4 |
+| Butternut Protein Brownie (butternut/egg-white) | 5 | 412/52 | 112/16/12/1.4/3.5/2 |
+
+**Serving-count corrections (the core §B problem — old figures were whole-recipe totals):**
+Asian Chicken Salad was serves 2 but is a single portion → serves 1 (455 ≈ old 461 total).
+Carrot Cake Loaf ÷5 gives 104/7.5 (old 14.5g protein/slice was impossible — 30g protein powder
+across the whole loaf). Cinnamon Roll @entirelyemmy → serves 10 (284/serving). Oat Flour
+Pancakes stay serves 12 per Saffron's "yields ~12 pancakes" (56/pancake; old 8.2g protein/pancake
+was impossible). Fluffy Greek Yogurt Pancakes ÷3 = 225.
+
+**Butternut Protein Brownie dedupe:** two near-identical rows (pumpkin-puree vs butternut-puree
+variants). Per Saffron, **kept the butternut/egg-white row** (`67a68e1c…`) — recomputed from its
+DB ingredient list to **112/16/12/1.4/3.5/2** (÷5; old 412/52 was a whole-recipe total) — and
+**soft-deleted the pumpkin/egg-white row** (`207e379e…`, `import_status='deleted'`). Only one
+"Butternut Protein Brownie" now shows, so no handle needed.
+
+**Cinnamon Roll Baked Oats — differentiated pair.** Saffron supplied two recipes both titled
+"Cinnamon Roll Baked Oats" and asked to add the IG handle to differentiate. They already existed
+as two separate rows: the §B row (`60244d3e…`, @entirelyemmy) → renamed **"Cinnamon Roll Baked
+Oats @entirelyemmy"** + full recipe (serves 10, oven-baked, 350F→175C converted). The @tracesoats
+recipe was already in the DB as **"Air Fryer Cinnamon Roll Oats"** (`064f61de…`, already at 641,
+a §A item) — renamed **"Cinnamon Roll Baked Oats @tracesoats"** (content unchanged; it's the same
+air-fried recipe). ⚠ Minor note: that row's DB oat base lists "2 tbsp cinnamon roll cookie butter"
+where Saffron's paste says "2 tbsp almond butter + cinnamon" — left the DB content (and 641
+macros) as-is; flag if she wants it switched to almond butter (would nudge macros down slightly).
+
+**Thigh/skin note (Crispy Rice and Chicken Salad):** 300g skin-on chicken thighs computed at
+~211 kcal/100g meat+skin; chicken fat is reused to crisp the rice so counted as consumed. Protein
+landed at 40/serving (audit's rough "→~31" discounted more; the line-item compute is 40).
+
+Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.
+
+---
+
+## Batch H — §B tranche 2: 4 written, 2 held for source/serves (2026-07-23) — WRITTEN
+
+Format: `kcal / protein / carbs / fat / fibre / sugar` per serving.
+
+| Recipe | serves | Before | After |
+|---|---|---|---|
+| Protein Brownie Bake | 2 | 318/22 | 246/16/26/10.5/5.5/12 (recompute from existing list) |
+| Salmon Poke Bowl Meal Prep | 2→1 | 573/47 (nulls) | 765/36/94/24/8/28 (full recipe, serves 1) |
+| Sticky Miso Chicken Prep Boxes | 3 | 520/50 (nulls) | 488/41.5/40.5/19/7/10.5 (all macros filled) |
+| Gluten Free Cinnamon Buns | 6→9 | 488/8 | 779/10/122/27.5/6/50 per bun |
+
+- **Protein Brownie Bake** already had its full ingredient list in the DB (soya yoghurt + oat
+  flour + vegan protein + cocoa + coconut sugar + 20g dark choc); just recomputed ÷2 → 246/16.
+  Old 318/22 was over-stated (only 20g protein powder in the batch).
+- **Salmon Poke Bowl** → serves 1 per Saffron (the whole tin + rice + ½ avocado is one bowl). 765
+  is a hearty single serving; carbs 94 driven by the sticky rice + sweet mirin/maple (used twice —
+  in the salmon mix and the cucumber pickle). Kimchi optional/excluded; Greek yoghurt assumed over
+  mayo. Old 573/47 at serves 2 was neither right.
+- **Sticky Miso Chicken Prep Boxes** — faithful compute of all three components (miso chicken +
+  brown-rice salad + edamame hummus + pumpkin-seed garnish) ÷3 = 488/41.5. Ran a touch above the
+  audit's ~428 (tahini + sesame oil + pumpkin seeds + edamame are calorie-dense).
+- **Gluten Free Cinnamon Buns** → serves 9 per Saffron ("let's go with 9"). ⚠ **Big jump (488 →
+  779/bun).** This is a faithful compute of the full stated quantities — 800g GF bread flour
+  (~2800 kcal) + 210g honey + 150g filling sugar + 90g powdered sugar + cream-cheese frosting +
+  coconut oil/milk ≈ ~7000 kcal whole batch ÷9. The old 488 significantly under-counted. Recipe
+  text says "cut into 6" but 800g flour ÷6 is an implausible bun (the audit flagged this). If the
+  batch actually yields 12, per bun ≈ 585. Flagged in the row's notes.
+
+**Update (2026-07-23, Batch I):** GF Cinnamon Buns yield changed again per Saffron — **serves
+12** (final): 585/8/92/20.5/4.5/37.5 per bun (whole batch ≈ 7000 kcal ÷12).
+
+**Recipe-identity check — Sticky Soy Chicken vs Phò Inspired (both @food_bylucy):** Saffron
+asked whether "Sticky Soy Chicken with Garlic Rice in Spicy Broth" is actually the "Pho Inspired
+Chicken Broth & Rice" recipe she pasted. **They are two different recipes, both by @food_bylucy.**
+The pasted recipe matches the *existing* DB row **"Phò Inspired Chicken Broth and Rice"**
+(`0195b252…`, serves 2, **581/36/85/10/4.5/31**, full ingredients already present and matching —
+so that §A item is DONE). It has a whole-spice broth (star anise/cardamom/cloves), fish sauce, a
+hoisin+miso+honey glazed chicken, ½ cup herb rice and bok choy. The **Sticky Soy Chicken**
+(`4f1e46fe…`) is genuinely different: a gochujang chicken-stock broth, oyster-sauce chicken, 1 cup
+garlic-fried jasmine rice and gai lan — no whole spices, no fish sauce. So the Phò paste does NOT
+resolve the Sticky Soy row; that row still needs its own serves/recompute decision (or, if it was
+a stray entry, deletion). Reported back to Saffron.
+
+**HELD — need Saffron's input (reported, not written):**
+- **Protein Pancakes** (`e1afaed0…`) — she asked "Source?". It has **no IG handle**; creator_name
+  is "Personal Recipe Book" (her own book). DB serves = 15 (recipe makes ~15 small ~1-tbsp
+  pancakes, egg-white-powder based). Whole-recipe compute ≈ 853 kcal / 49g protein → **~57/pancake
+  if serves 15 is right**. Old 312/24 was a larger-portion figure. Not written pending her serves
+  preference (per-pancake vs per-stack). NB: distinct from "Protein Pancakes (Simple)" @mattsfitchef
+  (§G) and "Chocolate Chip Protein Pancakes" @kylecarillet.
+  → **RESOLVED (Batch I):** Saffron chose **per pancake, serves 12** (not 15). 853 kcal ÷12 =
+  **71/4/7.5/2.7/1.2/3.8** per pancake. **§B now fully closed (14/14).**
+
+---
+
+## Batch J — §G macro-completeness fills, all 34 (2026-07-23) — WRITTEN
+
+Filled the missing macro fields on every §G recipe, keeping the existing (audit-confirmed)
+calories + protein and computing the null carbs/fat/fibre/sugar staple-grounded from each DB
+ingredient list. Two groups:
+
+- **17 with all four null** (carbs+fat+fibre+sugar): Cauliflower Cheese Gnocchi Bake, Chocolate
+  Chia Mousse, Creamy Mango & Coconut Cod Curry, Double Choc Fudge Cookie, Frozen Berry Breakfast
+  Crumble, Healthy Orange & Cashew Chicken, High Protein Chocolate Lava Pudding, Meal Prep Spicy
+  Tuna Quesadilla, Protein Berry Parfait, Protein Power BLT, Smoky Caramelised Red Pepper Orzo,
+  Spring Greens Carbonara, Sticky Mango Chicken Prep Bowls, Sticky Miso Chicken Bowl w/ Tahini
+  Broccoli, Sushi Salad, Thai Prawn Meatball Bowl, Tuna Chilli Crunch Salad.
+- **17 needing only fibre+sugar** (cal/protein/carbs/fat already present): Banh Cuon, Char Siu
+  Chicken, Chipotle Chicken Chop Bowl, Chocolate Banana Rice Paper Pie, High Protein Brownie Bowl,
+  High Protein Tiramisu Overnight Oats, High Protein Tuna Salad, Homemade Carrot Cake, Lemon &
+  Coconut Cake, Nandos Chicken Pasta Salad, Protein Pancakes (Simple), Rice Paper Kimchi Jeon with
+  Tuna, Rice Paper Pad See Ew with Shrimp, Spicy Chilli Rice Paper Wontons, Spicy Peanut Chicken
+  Noodles, Sweet Potato Beef Taco Bowl, Zesty + Spicy Chicken Fusion Bowl.
+
+Also filled **Blueberry Protein Yoghurt Bowl** (sugar-only gap, not on the §G list) → sugar 15.
+Cleared the resolved `*_not_stated` review_flags on all of them. Where a full line-item compute
+ran above the stored calories (several composed bowls), carbs/fat were kept roughly consistent
+with the trusted stored cal rather than inflating it — fibre/sugar (the actually-missing fields)
+computed directly from the ingredients.
+
+**Left untouched (not §G):** the two `High Protein Salmon Potato Salad` rows (§C dedupe — needs
+Saffron's call), `Marinated Fish Tacos` (serves + protein null — can't compute per-serving until
+serves is set), and 3 §A recompute items still carrying nulls (Raspberry Cheesecake Protein Bowl,
+Roasted Cod on Sweet Potato, Single Serve Sticky Date Pudding).
+
+**§G now fully closed (34/34).** Remaining open work: §A recomputes, §C dedupes (3).
+
+Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.
+- **Sticky Soy Chicken with Garlic Rice in Spicy Broth** (`4f1e46fe…`) — she asked "Source?" and
+  leaned "likely 2". Source = **@food_bylucy**. The existing 618 (serves 1) is a **large
+  under-count**: 1 cup *dry* jasmine rice (~185g ≈ 666 kcal) + 2 tbsp neutral oil + 1 tbsp sesame
+  oil alone ≈ 1150 kcal, whole recipe ≈ **1700 kcal**. So this needs a genuine recompute, not just
+  a ÷2 of 618. At serves 2 → ~850/serving. Not written pending her confirming serves = 2 and that
+  the rice is 1 cup dry (vs cooked) — both materially swing it.
+  → **RESOLVED (Batch I):** Saffron confirmed the **rice is cooked** (1 cup cooked ≈ 158g, not
+  185g dry — knocks ~460 kcal off) and asked to **bump the chicken to 2 breasts** and set
+  **serves 2**. Edited the ingredient list (1→2 chicken breasts) and recomputed: whole recipe
+  ≈ 1398 kcal ÷2 = **699/53.5/60/27/6/19**. Frying oil counted at ~1.5 tbsp absorbed (rest drains).
+  §B now 13/14 — only Protein Pancakes still held (serves basis).
+
+Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.
+
+**Batch E note corrections (caught while matching the rice-exclusion note convention):**
+- **Mediterranean Chicken & Rice Skillet** — Batch E wrote the macros rice-excluded but left
+  `notes` null and the stale `carbs_not_stated/fat_not_stated` flags. Added the rice-exclusion
+  note and cleared the resolved flags.
+- **Honey Sesame Salmon Bowl** — its `notes` still read "per serving from 2 **with rice**"
+  though Batch E computed it rice-**excluded** (463, carbs 10.5). Corrected the note to say rice
+  excluded (+200 kcal / +44g carbs per 150g) and dropped the resolved `nutrition_not_stated`
+  flag (kept `serves_estimated`).
+
+Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.
+
+
+---
+
+## Batch K — §C salmon-salad dedupe + Fish Tacos serves (2026-07-23) — WRITTEN
+
+- **High Protein Salmon Potato Salad** — two byte-identical `ready` rows (created 11:46 and
+  11:53 on 2026-07-01), both fully null. Soft-deleted the later dup (`033408e6…`,
+  `import_status='deleted'`), filled the survivor (`fff8f78d…`) → **895/44/80/45/19.5/13**
+  (serves 2). Calorie-dense: 400g crushed roast potatoes + generous olive oil, 200g hot-smoked
+  chilli salmon, whole avocado, 200g chickpeas, Greek-yoghurt/light-mayo dressing (audit est.
+  was ~869; the full-quantity compute lands a touch higher).
+- **Marinated Fish Tacos** (@recipe_tin) — had **null serves** and null protein/carbs/fat/
+  fibre/sugar (only cal 410 stored). Saffron set **serves 3**. Recomputed the full macros:
+  **540/45/45/20/5/9** per serving (600g white fish across 3; ~2 small tortillas each; most of
+  the 3 tbsp marinade oil drains off). Supersedes the old rough 410.
+
+**Confirmed duplicates, awaiting Saffron's pick (pulled for comparison, NOT yet deduped):**
+- **Roast Chicken Rice Salad** (`199a8e55…`, 398/32/42/12/6/6) ≈ **Roast Chicken and Charred
+  Corn Rice Salad** (`326278cf…`, 488/38/62/18/6/8) — both @natsnourishments, identical
+  ingredients (200g rice, 250g sweetcorn, 200g chicken, romaine, 3 tomatoes, same avocado
+  dressing) and method. The "Charred Corn" row is the fuller/more-accurate entry.
+- **Easy Chicken Traybake** (`60029cd9…`, 448/38/22/22/4/3) ≈ **Chicken and Potato Traybake**
+  (`93442c4f…`, 448/38/26/22/4/3) — both @natsnourishments, identical ingredients (2 legs +
+  3-4 thighs, 3 tbsp Flora, 500g baby potatoes, onion, 2 lemons, bay, stock, parsley, broccoli)
+  and method. Near-identical macros (carbs 22 vs 26).
+
+Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.
+
+---
+
+## Batch L — §C traybake + rice-salad dedupes (2026-07-23) — WRITTEN
+
+Saffron approved keeping the recommended survivors. Soft-deleted the two duplicate rows
+(`import_status='deleted'`); survivors already carry correct macros, no recompute needed.
+
+- **Roast Chicken Rice Salad** (`199a8e55…`, 398/32) → DELETED. Survivor: **Roast Chicken and
+  Charred Corn Rice Salad** (`326278cf…`, 488/38/62/18/6/8) — the fuller, more accurate row.
+- **Easy Chicken Traybake** (`60029cd9…`, 448/38) → DELETED. Survivor: **Chicken and Potato
+  Traybake** (`93442c4f…`, 448/38/26/22/4/3).
+
+**§C now fully closed (3/3).** Also tidied the §A worklist lines that referenced the deleted
+rows so a future §A pass doesn't recompute them. The surviving "Chicken and Potato Traybake"
+(448) may still merit the §A fat recompute (skin-on legs+thighs+Flora ~589) — left flagged in §A.
+
+Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.
+
+---
+
+## Batch M — final 3 null-macro §A fills; ready library reaches 0 nulls (2026-07-24) — WRITTEN
+
+Picked up the tail of PR #48's outstanding work. A fresh DB completeness sweep showed the
+`recipes` library had moved a long way since the worklist was written: of **307
+`import_status='ready'` rows, only 3 still carried any null macro** — the three §A recipes
+Batch B had explicitly skipped as "+null macros". Batches E–L (merged via PR #48) had since
+closed §B/§C/§D/§E/§G, so these three §A stragglers were the only remaining rows in the whole
+`ready` set still carrying a null macro. (§A itself still has ~90 under-count recalcs open.)
+
+Recomputed all 6 macros per serving from `ingredient_sections`, grounded in `staple_products`.
+Format: `kcal / protein / carbs / fat / fibre / sugar` per serving. Per-ingredient math in
+`scratchpad/null-macro-fills-review.md`.
+
+| Recipe | serves | Before | After |
+|---|---|---|---|
+| Raspberry Cheesecake Protein Bowl | 1 | 225/21/–/–/–/– | **285/31/16/10/4.5/10** |
+| Roasted Cod on Sweet Potato | 2 | 347/49.1/–/–/–/– | **590/41/73/14.5/10.5/23** |
+| Single Serve Sticky Date Pudding | 1 | 235/12/35/5/–/– | **316/12/57/5.5/2.5/32** |
+
+**Eyeball notes:**
+- **Roasted Cod** — recomputed calories land on the audit target (571); at that calorie level
+  the ingredient list computes to ~41 g protein per serve, so the stored 49.1 looked high and
+  was lowered to match the list (2 cod fillets ≈ 290 g).
+- **Sticky Date Pudding** — stored protein (12) and fat (5) were already right; carbs (35) and
+  calories (235) were undercounted (date + flour + maple), corrected to 57 / 316; fibre + sugar
+  filled. Caramel sauce (Biscoff + maple) counted; "sweetener" treated as non-nutritive.
+- **Raspberry Cheesecake Bowl** — 0% Greek + ½ scoop whey give ~31 g protein; the stored 21 was
+  undercounted. Raspberry quantity and whipped-cream-cheese type are estimates (flagged here,
+  not in the row, consistent with every other estimated macro row in the library).
+
+**VERIFY:** read-back confirmed all 3 rows; post-write completeness sweep = **0/307 ready rows
+with any null macro** (library macro-completeness now 100%).
+
+Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.
+
+---
+
+## Batch N — §A reconciliation + final 3 under-count recomputes (2026-07-24) — WRITTEN
+
+Worked §A ("under-counted recalcs"), the last open bucket. Rather than recompute the ~90 lines
+the worklist still showed as `[ ]`, first **reconciled the worklist against the live DB**
+(compared each item's stored calories to its worklist "before" value). Result: **84 of them had
+already been written by Batch B (2026-07-22) and were simply never ticked** — verified off the
+old value and ticked in `remaining-work.md`. Only a handful still held their old figure.
+
+**Recomputed + written (3)** — full 6 macros/serving from `ingredient_sections`, staple-grounded,
+stored `serves` kept, optional toppings excluded. Format `kcal/protein/carbs/fat/fibre/sugar`:
+
+| Recipe | serves | Before | After |
+|---|---|---|---|
+| Single Serve Double Chocolate Butter Cake | 2 | 278/2.5/34/15/2/22 | **358/3/42.5/21/2/27** (butter+oil+chips undercounted; cleared `nutrition_incomplete`) |
+| Skillet Chicken Thighs with Mushroom Gravy | 4 | 318/32/8/18/1.5/2 | **425/36/11.5/27/2/4** (4 tbsp avocado oil counted faithfully; kept `serves_estimated`) |
+| Basic Oat Flour Pancakes | 2 | 68/3.5/8/2/0.8/1.5 | **160/9/18/6/2.5/3** (old 68 was simply wrong for serves 2; base only, toppings excl.) |
+
+**Already-done, ticked not rewritten (Batch B values confirmed live):** the other 84 §A items,
+incl. Sticky Chicken Gochujang (655, rice-excluded + light coconut — lands near its old 646 by
+coincidence, not un-done).
+
+**Left decision-gated (4)** — need Saffron's judgement, not a recompute, so NOT written:
+Chicken and Potato Traybake (bone-in/skin-on weights + fat-retention judgement; faithful compute
+~614), Middle Eastern Chicken & Rice Bowl (no rice qty), Pho Gà (broth meat-yield/fat rendering),
+Thai Red Curry Pot Roast Chicken (whole-bird rendering).
+
+**VERIFY:** read-back confirmed the 3 rows. §A now 4/111 open (all decision-gated); the ready
+library remains at 0 null macros.
+
+Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.
+
+---
+
+## Batch O — decision-gated §A items resolved with Saffron's calls (2026-07-24) — WRITTEN
+
+The 4 §A items Batch N left open needed Saffron's judgement (unstated chicken weights, "rice of
+choice" quantity, whole-bird/broth rendering). She gave calls on 3; written per serving,
+staple-grounded. Format `kcal/protein/carbs/fat/fibre/sugar`:
+
+| Recipe | serves | Before | After | Saffron's call |
+|---|---|---|---|---|
+| Middle Eastern Chicken & Rice Bowl | 4 | 428/38/8/26/1.5/3 | **658/48/41/33/3.5/4.5** | ½ cup cooked rice/serve; full recompute (2 lb thighs, mayo white sauce, sumac salad; cucumber/feta optional excl.) |
+| Pho Gà - Vietnamese Chicken Pho | 4 | 501/20/87/8/3.5/5 | **750/55/90/18/3.5/11** | "logical split of the remaining meat + carbs" — full edible thigh meat (~730 g cooked, bones+skin discarded) split evenly ÷4; broth fat skimmed; 360 g dried noodles ÷4 |
+| Thai Red Curry Pot Roast Chicken | 4 | 548/42/28/30/4/6 | **920/61/42/56/5.5/9** | count just the meat (~780 g cooked from the 1.8 kg bird); oil reduced 3 tbsp→~1 tbsp; full 400 ml coconut cream sauce + potatoes + beans; **jasmine rice excluded + noted** |
+
+`review_flags` cleared on all 3; a per-serving assumptions note appended to `notes` on Pho Gà +
+Thai Red Curry (rice-exclusion recorded on the latter per Saffron).
+
+**Still open (1):** Chicken and Potato Traybake — bone-in/skin-on legs+thighs with no stated
+weights; awaiting a cooked-meat-weight call. Everything else in §A–§G is done.
+
+**VERIFY:** read-back confirmed all 3 rows; ready library remains at 0 null macros.
+
+Data-only change (Supabase `recipes`) — no `index.html`/`sw.js` touch, no cache bump.
+
+**Addendum (Batch O close-out):** Chicken and Potato Traybake — the last open §A item — written
+at **590/37/26/37/3/3** (serves 4) on Saffron's "eyeball ~590" call (bone-in/skin-on 2 legs +
+3–4 thighs + Flora; faithful compute ~614, trimmed to 590). `review_flags` cleared. **§A–§G is
+now fully closed; the ready library carries a complete 6-macro set on every row (0 nulls).**
