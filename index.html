@@ -7,56 +7,73 @@
 
 <!-- PWA -->
 <link rel="manifest" href="./manifest.json">
-<meta name="theme-color" content="#F5F2EC">
+<meta name="theme-color" content="#3D0F13">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Daily Shuffle">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,300..600&display=swap" rel="stylesheet">
 <link rel="apple-touch-icon" href="./icon-192.png">
 <style>
   :root {
-    --bg: #F5F2EC;
-    --surface: #D9D2C6;
-    --surface2: #E8E3DA;
-    --border: #B7A996;
-    --accent: #8C7864;
-    --accent2: #4E4034;
-    --accent-tint: rgba(140,120,100,.12);
-    --text: #4E4034;
-    --text2: #8C7864;
-    --text3: #B7A996;
+    /* Legacy tokens — remapped to the 2026 editorial palette so the
+       not-yet-bespoke screens (Shuffle, Grocery, Add, Tracker, modals) inherit
+       the cream/oxblood register. Bespoke redesign screens use --fn-*/--ed-*. */
+    --bg: #E0D6B8;
+    --surface: #EDE6D2;
+    --surface2: #E7DDC2;
+    --border: #D2C6A8;
+    --accent: #8A7A66;
+    --accent2: #3D0F13;                    /* oxblood — primary buttons/emphasis */
+    --accent-tint: rgba(89,23,27,.10);     /* oxblood wash for active states */
+    --text: #3B2E28;
+    --text2: #6B5D53;
+    --text3: #9E8F79;
     --green: #4a8a5a;
     --yellow: #9a7040;
     --blue: #5060a8;
     --purple: #7048a0;
-    --radius: 10px;
+    --radius: 12px;
     --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+    /* ── 2026 mobile editorial redesign tokens (additive — do not remove the
+          legacy vars above; un-redesigned screens still depend on them) ──── */
+    --fn-bg: #E0D6B8;          /* app cream — shared root swatch */
+    --fn-surface: #EDE6D2;     /* raised surface, one step lighter */
+    --fn-accent: #8A7A66;      /* taupe-brown — default accent (theme-swapped) */
+    --fn-text: #3B2E28;        /* deep espresso — primary text */
+    --fn-text-muted: #6B5D53;  /* secondary / label text */
+    --fn-border: #D2C6A8;      /* hairline dividers */
+    --cta: #3D0F13;            /* oxblood-darker — primary pill + tab bar */
+    --cta-text: #F3ECD8;       /* cream text on oxblood */
+    --ed-cream: #E0D6B8;       /* bridge swatch (== --fn-bg) */
+    --ed-oxblood-deep: #59171B;/* large editorial surfaces */
+    --ed-oxblood-bright: #800000; /* RESERVED: favourited-heart fill ONLY */
+    --ed-gold: #B8842C;        /* kickers, small marks */
+    --font-display: 'Fraunces', Georgia, serif;
+    --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --border-hairline: 1px solid var(--fn-border);
+    --radius-card: 20px;
+    --radius-sm: 12px;
+    --radius-pill: 999px;
+    --shadow-oxblood-sm: 0 10px 26px rgba(89,23,27,.20);
+    --shadow-oxblood-lg: 0 12px 30px rgba(89,23,27,.28);
+    --glass-tint-fn: rgba(224,214,184,.6);
+    --glass-blur: 16px;
+    --canvas-backdrop: #2A2320; /* dark surround behind the mobile column on wide screens */
   }
+  /* Alt themes — accent-only swap; the cream/oxblood base never changes
+     (per design system: "accent-only swap, neutral base never changes"). */
   [data-theme="cafe"] {
-    --bg: #F1EEEB;
-    --surface: #CDC6C3;
-    --surface2: #E4D8CB;
-    --border: #CDC6C3;
-    --accent: #CFB3A9;
-    --accent2: #A09086;
-    --accent-tint: rgba(207,179,169,.12);
-    --text: #5C4E48;
-    --text2: #A09086;
-    --text3: #CFB3A9;
+    --accent: #9C7E86;                   /* dusty mauve */
+    --fn-accent: #9C7E86;
+    --accent-tint: rgba(156,126,134,.12);
   }
   [data-theme="coastal"] {
-    --bg: #FFFFFF;
-    --surface: #C8D9E6;
-    --surface2: #F5EFEB;
-    --border: #C8D9E6;
-    --accent: #567C8D;
-    --accent2: #2F4156;
-    --accent-tint: rgba(86,124,141,.12);
-    --text: #2F4156;
-    --text2: #567C8D;
-    --text3: #8EAAB8;
+    --accent: #5A6B7E;                   /* coastal slate */
+    --fn-accent: #5A6B7E;
+    --accent-tint: rgba(90,107,126,.12);
   }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 14px; line-height: 1.5; min-height: 100vh; }
@@ -134,6 +151,7 @@
   .type-snack { color: var(--green); }
   .type-lunch { color: #7ab8a0; }
   .type-sides { color: #c4956a; }
+  .type-sauce { color: var(--accent); }
   .card-name { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 10px; line-height: 1.3; }
   .card-tags { display: flex; flex-wrap: wrap; gap: 5px; }
   .card-tag { font-size: 11px; color: var(--text3); background: var(--bg); padding: 2px 7px; border-radius: 4px; }
@@ -513,7 +531,7 @@
   .computed-cost-note { font-size: 11px; color: var(--text3); }
 
   /* ── TRACKER TAB ─────────────────────────────────────────────────────── */
-  .trk-wrap { max-width: 760px; margin: 0 auto; padding: 4px 0 60px; }
+  .trk-wrap { max-width: 760px; margin: 0 auto; padding: 4px 22px 60px; }
   .trk-datebar { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:14px; }
   .trk-datebar .trk-date { font-size:16px; font-weight:700; color:var(--text); }
   .trk-datebar .trk-date small { display:block; font-size:11px; font-weight:500; color:var(--text3); text-transform:uppercase; letter-spacing:.5px; }
@@ -579,21 +597,319 @@
   .trk-confirm-item .ci-title small { display:block; color:var(--text3); font-size:10px; }
   .trk-confirm-item input { width:54px; background:var(--surface); border:1px solid var(--border); color:var(--text); border-radius:6px; padding:4px 6px; font-size:12px; }
   .trk-confirm-item .ci-mac { font-size:10px; color:var(--text3); white-space:nowrap; }
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     2026 MOBILE EDITORIAL REDESIGN — foundation shell + Recipe Library
+     Additive; only the shell, bottom tab bar and Recipe Library consume these.
+     ═══════════════════════════════════════════════════════════════════════ */
+
+  /* Inline-icon helper (references the <symbol> sprite at top of <body>) */
+  .ic { width: 20px; height: 20px; display: inline-block; vertical-align: middle; flex-shrink: 0; }
+
+  /* Mobile column, centered on a dark backdrop on wide screens */
+  .app { background: var(--fn-bg); position: relative; }
+  @media (min-width: 500px) {
+    body { background: var(--canvas-backdrop); }
+    .app { max-width: 430px; margin: 0 auto; min-height: 100vh; box-shadow: 0 30px 60px rgba(0,0,0,0.4); }
+  }
+
+  /* Top chrome demoted to a slim transparent bar — nav now lives at the bottom.
+     Settings gear (existing #settingsBtn) is preserved at the top-right. */
+  header { background: transparent; border-bottom: none; gap: 0; justify-content: flex-end;
+           height: calc(46px + env(safe-area-inset-top)); z-index: 120; }
+  header .logo, header nav { display: none; }
+
+  /* Floating oxblood bottom tab bar */
+  .tabbar { position: fixed; left: 50%; transform: translateX(-50%);
+            bottom: calc(16px + env(safe-area-inset-bottom)); width: calc(100% - 32px);
+            max-width: 398px; background: var(--cta); border-radius: var(--radius-pill);
+            padding: 10px 6px; display: flex; align-items: center; justify-content: space-around;
+            box-shadow: var(--shadow-oxblood-sm); z-index: 150; }
+  .tabbar button { background: none; border: none; cursor: pointer; display: flex;
+                   flex-direction: column; align-items: center; gap: 4px; padding: 4px 10px;
+                   color: var(--cta-text); opacity: 0.5; transition: opacity .15s; }
+  .tabbar button.active { opacity: 1; }
+  .tabbar button .ic { width: 20px; height: 20px; }
+  .tab-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--cta-text); opacity: 0; }
+  .tabbar button.active .tab-dot { opacity: 1; }
+  /* Let content clear the floating bar */
+  .tab-content { padding-bottom: 100px; }
+
+  /* ── Recipe Library ────────────────────────────────────────────────────── */
+  .rl { padding: 6px 22px 8px; }
+  .rl-kicker { font-family: var(--font-ui); font-size: 12px; font-weight: 600; letter-spacing: .14em;
+               text-transform: uppercase; color: var(--fn-text-muted); margin: 0 0 6px; }
+  .rl-title { font-family: var(--font-display); font-weight: 400; font-size: 24px;
+              color: var(--ed-oxblood-deep); margin: 0 0 16px; }
+  .rl-toolbar { display: flex; gap: 8px; margin-bottom: 14px; }
+  .rl-search { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; padding: 12px 18px;
+               border-radius: var(--radius-pill); background: var(--fn-surface); border: var(--border-hairline); }
+  .rl-search .ic { width: 16px; height: 16px; opacity: .5; color: var(--fn-text-muted); }
+  .rl-search input { flex: 1; min-width: 0; border: none; background: none; outline: none;
+                     font-family: var(--font-ui); font-size: 15px; color: var(--fn-text); }
+  .rl-search input::placeholder { color: var(--fn-text-muted); }
+  .rl-filter-btn { width: 46px; height: 46px; border-radius: 50%; border: var(--border-hairline);
+                   background: var(--fn-surface); display: flex; align-items: center; justify-content: center;
+                   flex-shrink: 0; color: var(--fn-text); cursor: pointer; }
+  .rl-filter-btn .ic { width: 18px; height: 18px; }
+
+  /* Chip row — restyle of the existing #recipesFilterbar output (pill register) */
+  .rl-chips { gap: 8px; margin-bottom: 18px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .rl-chips::-webkit-scrollbar { display: none; }
+  .rl-chips .filterbar-chip { padding: 9px 18px; border-radius: var(--radius-pill); font-family: var(--font-ui);
+                              font-size: 13px; font-weight: 500; background: transparent; color: var(--fn-text);
+                              border: var(--border-hairline); }
+  .rl-chips .filterbar-chip.has-active { background: var(--fn-accent); color: var(--cta-text); border-color: transparent; }
+  .rl-chips .filterbar-chip-count { background: rgba(255,255,255,.35); color: var(--cta-text); }
+  .rl-chips .filterbar-clear { padding: 9px 14px; border-radius: var(--radius-pill);
+                               border: 1px dashed var(--fn-border); color: var(--fn-text-muted); }
+  .rl-count-row { margin-bottom: 12px; }
+  .rl-count-row .results-count { font-family: var(--font-ui); font-size: 12px; color: var(--fn-text-muted); }
+
+  /* Image cards — asymmetric grid (first = full-width hero) */
+  .rl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .rl-card { position: relative; height: 160px; border-radius: var(--radius-card); overflow: hidden;
+             box-shadow: var(--shadow-oxblood-sm); cursor: pointer; }
+  .rl-card--hero { grid-column: 1 / span 2; height: 200px; }
+  .rl-card-grad { position: absolute; inset: 0; }
+  .rl-card-overlay { position: absolute; inset: 0; display: flex; flex-direction: column;
+                     justify-content: space-between; padding: 12px; }
+  .rl-card-top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .rl-num { font-family: var(--font-display); font-weight: 500; font-size: 13px; color: #fff;
+            background: rgba(0,0,0,.28); padding: 3px 9px; border-radius: var(--radius-pill); }
+  .rl-fav { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; background: var(--glass-tint-fn); border: none; cursor: pointer; padding: 0;
+            backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur)); }
+  .rl-fav .ic { width: 15px; height: 15px; fill: none; stroke: var(--fn-text); stroke-width: 1.75; }
+  .rl-fav.active .ic { fill: var(--ed-oxblood-bright); stroke: var(--ed-oxblood-bright); }
+  .rl-card-name { font-family: var(--font-ui); font-weight: 600; font-size: 15px; color: #fff; margin: 0;
+                  line-height: 1.25; text-shadow: 0 1px 4px rgba(0,0,0,.45); }
+  .rl-card-time { font-family: var(--font-ui); font-size: 12px; color: rgba(255,255,255,.85); margin: 2px 0 0;
+                  text-shadow: 0 1px 4px rgba(0,0,0,.45); }
+
+  /* ── Shared editorial header (kicker + Fraunces title), reused across tabs ── */
+  .scr-kicker { font-family: var(--font-ui); font-size: 12px; font-weight: 600; letter-spacing: .14em;
+                text-transform: uppercase; color: var(--fn-text-muted); margin: 0 0 6px; }
+  .scr-title { font-family: var(--font-display); font-weight: 400; font-size: 26px; line-height: 1.1;
+               color: var(--ed-oxblood-deep); margin: 0 0 18px; }
+
+  /* Reused layouts sized for the mobile column */
+  .plan-layout, .add-layout { max-width: 100%; padding: 8px 22px; }
+  .plan-controls { background: var(--fn-surface); border-radius: var(--radius-card); }
+  .add-layout .add-subtitle { margin-top: -8px; }
+
+  /* Primary actions → oxblood CTA pill register */
+  .btn-generate { background: var(--cta); color: var(--cta-text); border-radius: var(--radius-pill); }
+  .btn-generate:hover { background: var(--ed-oxblood-deep); }
+  .btn-generate-ai, .btn-secondary, .btn-parse, .trk-addbtn { border-radius: var(--radius-pill); }
+  .slot-toggle span, .control-select, .control-input { border-radius: var(--radius-pill); }
+
+  /* ── Grocery catalogue rows (round check + swatch) ── */
+  .grocery-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .btn-clear-checks { background: transparent; border: 1px solid var(--fn-border); color: var(--fn-text-muted);
+                      border-radius: var(--radius-pill); padding: 7px 14px; font-family: var(--font-ui); font-size: 12px; cursor: pointer; }
+  .grocery-cat h4 { font-family: var(--font-ui); font-size: 11px; font-weight: 600; letter-spacing: .14em;
+                    text-transform: uppercase; color: var(--fn-text-muted); margin: 18px 0 2px; }
+  .grocery-cat ul { list-style: none; }
+  .gc-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid rgba(59,46,40,.10); cursor: pointer; }
+  .gc-check { width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0; border: 1.5px solid rgba(59,46,40,.3);
+              display: flex; align-items: center; justify-content: center; transition: all .15s; }
+  .gc-row.checked .gc-check { background: var(--ed-oxblood-deep); border-color: var(--ed-oxblood-deep); }
+  .gc-row.checked .gc-check::after { content: '✓'; color: #fff; font-size: 12px; line-height: 1; }
+  .gc-swatch { width: 40px; height: 40px; border-radius: 12px; flex-shrink: 0; box-shadow: var(--shadow-oxblood-sm); }
+  .gc-main { flex: 1; min-width: 0; }
+  .gc-name { font-family: var(--font-ui); font-size: 14px; font-weight: 500; color: var(--fn-text); }
+  .gc-qty { font-family: var(--font-ui); font-size: 12px; color: var(--fn-text-muted); margin-top: 2px; }
+  .gc-price { font-family: var(--font-ui); font-size: 13px; font-weight: 600; color: var(--fn-text); white-space: nowrap; }
+  .gc-price.gc-price-est { font-weight: 400; color: var(--fn-text-muted); font-size: 11px; }
+  .gc-row.checked .gc-name, .gc-row.checked .gc-qty, .gc-row.checked .gc-price { text-decoration: line-through; opacity: .5; }
+
+  /* ── Nutrition dashboard (Tracker) ── */
+  .nd-strip { background: var(--ed-oxblood-deep); border-radius: var(--radius-card); padding: 18px 20px;
+              box-shadow: var(--shadow-oxblood-lg); margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; }
+  .nd-strip-cell { text-align: center; flex: 1; }
+  .nd-strip-lbl { font-family: var(--font-ui); font-size: 11px; font-weight: 600; color: var(--ed-gold);
+                  text-transform: uppercase; letter-spacing: .14em; }
+  .nd-strip-val { font-family: var(--font-display); font-weight: 500; font-size: 20px; color: var(--ed-cream); margin-top: 5px; }
+  .nd-strip-val.over { color: #E8C9A0; }
+  .nd-strip-div { width: 1px; height: 32px; background: rgba(224,214,184,.2); }
+  .nd-cal-card { background: var(--fn-surface); border-radius: var(--radius-card); padding: 20px; display: flex;
+                 align-items: center; justify-content: space-between; box-shadow: var(--shadow-oxblood-sm); margin-bottom: 14px; }
+  .nd-cal-label { font-family: var(--font-ui); font-weight: 600; font-size: 15px; color: var(--fn-text); }
+  .nd-cal-big { font-family: var(--font-ui); font-size: 32px; font-weight: 500; color: var(--fn-text); line-height: 1.1; margin-top: 4px; }
+  .nd-cal-sub { font-family: var(--font-ui); font-size: 13px; color: var(--fn-text-muted); margin-top: 2px; }
+  .nd-ring { position: relative; width: 92px; height: 92px; flex-shrink: 0; }
+  .nd-ring-pct { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+                 font-family: var(--font-ui); font-weight: 600; font-size: 20px; color: var(--fn-text); }
+  .nd-macros { display: flex; gap: 8px; margin-bottom: 14px; }
+  .nd-macro { flex: 1; background: var(--fn-surface); border-radius: var(--radius-card); padding: 16px 6px;
+              text-align: center; box-shadow: var(--shadow-oxblood-sm); }
+  .nd-macro-name { font-family: var(--font-ui); font-size: 14px; font-weight: 600; color: var(--fn-text);
+                   text-transform: uppercase; letter-spacing: .03em; }
+  .nd-macro-sub { font-family: var(--font-ui); font-size: 11px; color: var(--fn-text-muted); margin-top: 5px; }
+  .nd-macro-sub b { color: var(--fn-text); font-weight: 500; }
+  .nd-loglabel { font-family: var(--font-ui); font-size: 12px; font-weight: 600; letter-spacing: .14em;
+                 text-transform: uppercase; color: var(--fn-text-muted); margin: 4px 0 12px; }
+  .nd-meal { background: var(--fn-surface); border-radius: var(--radius-card); padding: 16px 18px;
+             box-shadow: var(--shadow-oxblood-lg); margin-bottom: 12px; }
+  .nd-meal-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 8px; }
+  .nd-meal-name { font-family: var(--font-ui); font-size: 15px; font-weight: 600; color: var(--fn-text); text-transform: capitalize; }
+  .nd-meal-sum { font-family: var(--font-ui); font-size: 12px; color: var(--fn-text-muted); }
+  .nd-logrow { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 8px 0; border-top: 1px solid var(--fn-border); }
+  .nd-logrow .nd-lt { flex: 1; min-width: 0; font-family: var(--font-ui); font-size: 14px; color: var(--fn-text); }
+  .nd-logrow .nd-lt small { display: block; color: var(--fn-text-muted); font-size: 11px; }
+  .nd-logrow .nd-lm { font-family: var(--font-ui); font-size: 12px; color: var(--fn-text-muted); white-space: nowrap; }
+  .nd-logrow .nd-lbtn { background: none; border: none; color: var(--fn-text-muted); cursor: pointer; font-size: 14px; line-height: 1; padding: 2px 3px; }
+  .nd-logrow .nd-lbtn:hover { color: var(--ed-oxblood-deep); }
+  .nd-empty { font-family: var(--font-ui); font-size: 13px; color: var(--fn-text-muted); padding: 8px 0; border-top: 1px solid var(--fn-border); }
+  .nd-add { margin-top: 10px; font-family: var(--font-ui); font-size: 13px; font-weight: 500; color: var(--fn-text-muted);
+            background: transparent; border: 1px solid var(--fn-border); border-radius: var(--radius-pill); padding: 7px 14px;
+            cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+  .nd-add:hover { border-color: var(--fn-accent); color: var(--fn-text); }
+  .nd-flag { font-family: var(--font-ui); font-size: 11px; color: var(--ed-oxblood-deep); margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--fn-border); }
+
+  /* ── Recipe detail modal — editorial register ── */
+  .modal { background: var(--fn-surface); border-radius: 24px; }
+  .modal-header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; gap: 12px; padding-right: 128px; }
+  .modal-type { color: var(--fn-text-muted); letter-spacing: .14em; font-weight: 600; font-size: 12px; margin-bottom: 0; }
+  .modal-archive { font-family: var(--font-display); font-weight: 500; font-size: 14px; color: var(--fn-text-muted); white-space: nowrap; }
+  .modal-title { font-family: var(--font-display); font-weight: 350; font-size: 26px; line-height: 1.15; color: var(--fn-text); letter-spacing: -.2px; margin-bottom: 8px; }
+  .modal-desc { color: var(--fn-text-muted); font-size: 15px; line-height: 1.6; font-style: normal; }
+  .modal-meta-item { color: var(--fn-text-muted); font-size: 13px; }
+  .modal-meta-item strong { color: var(--fn-text); }
+  .modal-meta-item .ic { width: 15px; height: 15px; color: var(--fn-accent); }
+  .modal-section h4 { color: var(--fn-text-muted); letter-spacing: .14em; }
+  .modal-divider { background: var(--fn-border); margin: 22px 0; }
+  .mult-btn { border-radius: var(--radius-pill); background: transparent; border-color: var(--fn-border);
+              color: var(--fn-text); font-family: var(--font-ui); padding: 7px 15px; }
+  .mult-btn.active { background: var(--fn-accent); color: var(--cta-text); border-color: transparent; }
+  .recipe-method-step { background: transparent; padding: 2px 0 2px 40px; color: var(--fn-text); font-size: 15px; line-height: 1.55; }
+  .recipe-method-step::before { background: var(--fn-bg); border: 1px solid var(--fn-border); color: var(--fn-text);
+                                font-family: var(--font-display); font-weight: 500; width: 26px; height: 26px; top: 0; left: 0; }
+  .recipe-ingredient-item { background: transparent; border-left: none; border-bottom: 1px solid var(--fn-border);
+                            border-radius: 0; padding: 9px 0; font-size: 15px; color: var(--fn-text); }
+  .recipe-ingredient-group { color: var(--fn-accent); }
+  .nutrition-grid { gap: 6px; }
+  .nutrition-cell { background: var(--fn-bg); border: none; border-radius: var(--radius-sm); padding: 12px 4px;
+                    display: flex; align-items: baseline; justify-content: center; gap: 4px; white-space: nowrap; }
+  .nc-val { font-size: 12px; font-weight: 400; color: var(--fn-text); }
+  .nc-lbl { font-size: 11px; color: var(--fn-text); text-transform: none; letter-spacing: .01em; margin-top: 0; }
+  .modal-fav-btn { border-radius: var(--radius-pill); border-color: var(--fn-border); color: var(--fn-text-muted); }
+  .modal-fav-btn.active { background: transparent; border-color: var(--ed-oxblood-bright); color: var(--ed-oxblood-bright); }
+  .modal-close { background: var(--fn-bg); border-color: var(--fn-border); color: var(--fn-text-muted); }
+
+  /* ── Shuffle day cards — editorial register ── */
+  .cal-day, .plan-day-row { border-radius: var(--radius-card); box-shadow: var(--shadow-oxblood-sm); border-color: transparent; }
+  .cal-day-header, .plan-day-header { border-bottom: none; }
+  .cal-date, .plan-day-title { font-family: var(--font-display); font-weight: 500; color: var(--ed-oxblood-deep); font-size: 17px; letter-spacing: -.2px; }
+  .cal-meal-slot, .plan-meal-slot { color: var(--ed-gold); letter-spacing: .08em; }
+  .cal-badge, .plan-day-pill { border-radius: var(--radius-pill); font-family: var(--font-ui); }
+  .cal-day.is-batch .cal-day-header { background: rgba(89,23,27,.06); }
+  /* Let plan controls shrink to their grid cells — a native date input's
+     intrinsic min-width otherwise stretches its track and overflows the card. */
+  #tab-plan .control-group { min-width: 0; }
+  #tab-plan .control-select, #tab-plan .control-input { min-width: 0; max-width: 100%; }
+
+  /* ── Add Recipe tab — editorial register ──
+     The app is a fixed ~430px column, so viewport media queries never fire on
+     desktop. Force single-column grids here so nothing overflows the column. */
+  #tab-add .form-grid { grid-template-columns: 1fr; gap: 16px; }
+  #tab-add .add-subtitle { color: var(--fn-text-muted); font-size: 14px; line-height: 1.5; margin-bottom: 22px; }
+
+  /* AI quick-add panel */
+  .ai-quick-add { background: var(--fn-surface); border: none; border-radius: var(--radius-card);
+                  box-shadow: var(--shadow-oxblood-sm); padding: 18px; }
+  .ai-quick-add-header h3 { font-family: var(--font-display); font-weight: 400; font-size: 18px; color: var(--ed-oxblood-deep); }
+  .ai-badge { background: transparent; border: 1px solid var(--fn-border); color: var(--fn-text-muted);
+              border-radius: var(--radius-pill); font-weight: 600; letter-spacing: .12em; }
+  .ai-tab-btn { background: transparent; border: 1px solid var(--fn-border); color: var(--fn-text);
+                border-radius: var(--radius-pill); font-family: var(--font-ui); padding: 8px 16px; }
+  .ai-tab-btn.active { background: var(--fn-accent); border-color: transparent; color: var(--cta-text); font-weight: 500; }
+  .ai-drop-zone { border: 1px dashed rgba(140,106,74,.45); border-radius: var(--radius-sm); background: rgba(245,239,224,.5); }
+  .ai-drop-zone:hover, .ai-drop-zone.drag-over { border-color: var(--fn-accent); background: rgba(245,239,224,.8); }
+  .ai-text-input { background: var(--fn-bg); border: 1px solid var(--fn-border); border-radius: var(--radius-sm);
+                   color: var(--fn-text); font-family: var(--font-ui); }
+  .ai-text-input:focus { border-color: var(--fn-accent); }
+  .btn-parse { background: var(--cta); color: var(--cta-text); border-radius: var(--radius-pill); font-weight: 600; }
+  .btn-parse:hover:not(:disabled) { background: var(--ed-oxblood-deep); }
+  .ai-no-key-notice { color: var(--fn-text-muted); }
+  .ai-no-key-notice a { color: var(--ed-oxblood-deep); font-weight: 500; }
+
+  /* Manual form card + fields */
+  #tab-add .form-card { background: var(--fn-surface); border: none; border-radius: var(--radius-card);
+                        box-shadow: var(--shadow-oxblood-sm); padding: 20px; }
+  #tab-add .form-group label { font-family: var(--font-ui); font-size: 11px; font-weight: 600; letter-spacing: .14em;
+                               text-transform: uppercase; color: var(--fn-text-muted); }
+  #tab-add .form-group input, #tab-add .form-group select, #tab-add .form-group textarea {
+      background: var(--fn-bg); border: 1px solid var(--fn-border); border-radius: var(--radius-sm);
+      color: var(--fn-text); font-family: var(--font-ui); padding: 11px 14px; }
+  #tab-add .form-group input:focus, #tab-add .form-group select:focus, #tab-add .form-group textarea:focus { border-color: var(--fn-accent); }
+  #tab-add .craving-edit-tag { background: transparent; border: 1px solid var(--fn-border); color: var(--fn-text);
+                               border-radius: var(--radius-pill); }
+  #tab-add .craving-edit-tag.active { background: var(--fn-accent); border-color: transparent; color: var(--cta-text); font-weight: 500; }
+  #tab-add .form-actions { border-top: 1px solid var(--fn-border); }
+  #tab-add .btn-add { background: var(--cta); color: var(--cta-text); border-radius: var(--radius-pill); font-weight: 600; }
+  #tab-add .btn-add:hover { background: var(--ed-oxblood-deep); }
+  #tab-add .btn-clear-form { background: transparent; border: 1px solid var(--fn-border); color: var(--fn-text-muted);
+                             border-radius: var(--radius-pill); }
+  #tab-add .btn-clear-form:hover { border-color: var(--fn-accent); color: var(--fn-text); }
 </style>
 </head>
 <body>
+<!-- ── Inline Lucide icon sprite (offline-safe; no extra network requests) ──── -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="ic-utensils" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/>
+  </symbol>
+  <symbol id="ic-calendar-days" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/>
+  </symbol>
+  <symbol id="ic-shopping-basket" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m15 11-1 9"/><path d="m19 11-4-7"/><path d="M2 11h20"/><path d="m3.5 11 1.6 7.4a2 2 0 0 0 2 1.6h9.8a2 2 0 0 0 2-1.6l1.7-7.4"/><path d="M4.5 15.5h15"/><path d="m5 11 4-7"/><path d="m9 11 1 9"/>
+  </symbol>
+  <symbol id="ic-trending-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M16 7h6v6"/><path d="m22 7-8.5 8.5-5-5L2 17"/>
+  </symbol>
+  <symbol id="ic-book-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/>
+  </symbol>
+  <symbol id="ic-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/>
+  </symbol>
+  <symbol id="ic-sliders-horizontal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M10 5H3"/><path d="M12 19H3"/><path d="M14 3v4"/><path d="M16 17v4"/><path d="M21 12h-9"/><path d="M21 19h-5"/><path d="M21 5h-7"/><path d="M8 10v4"/><path d="M8 12H3"/>
+  </symbol>
+  <symbol id="ic-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M5 12h14"/><path d="M12 5v14"/>
+  </symbol>
+  <symbol id="ic-image" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+  </symbol>
+  <symbol id="ic-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>
+  </symbol>
+  <symbol id="ic-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+  </symbol>
+  <symbol id="ic-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M18 21a8 8 0 0 0-16 0"/><circle cx="10" cy="8" r="5"/><path d="M22 20c0-3.37-2-6.5-4-8a5 5 0 0 0-.45-8.3"/>
+  </symbol>
+  <symbol id="ic-heart" viewBox="0 0 24 24" stroke-width="1.75">
+    <path d="M12 21s-7.5-4.6-10-9.3C.4 8.3 2 4.8 5.4 4.1c2-.4 4 .5 5.1 2.2C11.6 4.6 13.6 3.7 15.6 4.1c3.4.7 5 4.2 3.4 7.6C19.5 16.4 12 21 12 21z"/>
+  </symbol>
+</svg>
 <div class="app">
   <header>
     <div class="logo">Daily <span>Shuffle</span></div>
     <nav>
       <button class="active" onclick="switchTab('plan',this)">🔀 Shuffle</button>
-      <button onclick="switchTab('recipes',this)">🍳 Recipes</button>
-      <button onclick="switchTab('grocery',this)" id="nav-grocery">🛒 Grocery List</button>
+      <button onclick="switchTab('recipes',this)">Recipes</button>
+      <button onclick="switchTab('grocery',this)" id="nav-grocery">Grocery List</button>
       <button onclick="switchTab('tracker',this)" id="nav-tracker">📊 Tracker</button>
       <button onclick="switchTab('add',this)">＋ Add Recipe</button>
     </nav>
     <div class="header-right">
-      <button class="settings-btn" id="settingsBtn" onclick="openSettings()" title="API Key Settings">🔑</button>
+      <button class="settings-btn" id="settingsBtn" onclick="openSettings()" title="Settings" aria-label="Settings"><svg class="ic" style="width:20px;height:20px"><use href="#ic-settings"/></svg></button>
     </div>
   </header>
 
@@ -639,11 +955,11 @@
       <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
         <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:6px">Deleted Recipes</div>
         <p style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5">Built-in recipes that you delete are hidden, not permanently removed. Restore them here.</p>
-        <button class="btn-library" onclick="restoreHiddenRecipes()">↩ Restore hidden recipes</button>
+        <button class="btn-library" onclick="restoreHiddenRecipes()">Restore hidden recipes</button>
         <span id="restoreNotice" style="font-size:12px;color:var(--green);margin-left:10px;display:none">✓ Restored</span>
       </div>
       <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
-        <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:6px">💷 Price Book</div>
+        <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:6px">Price Book</div>
         <p style="font-size:12px;color:var(--text2);margin-bottom:8px;line-height:1.5">Enter pack contents and price. E.g. Eggs → 6 each · £1.80/pk. Chicken → 500 g · £3.50/pk. Loose p/kg items → 1000 g · £X/pk.</p>
         <div id="pbTableWrap"></div>
         <div class="pb-row">
@@ -703,18 +1019,21 @@
   <main>
     <!-- ── RECIPES TAB ──────────────────────────────────────────────────── -->
     <div id="tab-recipes" class="tab-content">
-      <div class="recipes-layout">
-        <div class="recipes-main">
-          <div class="recipes-toolbar">
-            <input type="text" class="search-box" id="searchInput" placeholder="Search recipes…" oninput="applyFilters()">
+      <div class="rl">
+        <p class="rl-kicker">Recipe Library</p>
+        <p class="rl-title">Cook with intention.</p>
+        <div class="rl-toolbar">
+          <div class="rl-search">
+            <svg class="ic"><use href="#ic-search"/></svg>
+            <input type="text" id="searchInput" placeholder="Search recipes" oninput="applyFilters()">
           </div>
-          <div class="recipes-filterbar" id="recipesFilterbar"></div>
-          <div class="recipes-header">
-            <h2>Recipe Library</h2>
-            <span class="results-count" id="resultsCount"></span>
-          </div>
-          <div class="recipe-grid" id="recipeGrid"></div>
+          <button class="rl-filter-btn" aria-label="Filter recipes" onclick="onFilterChipClick(event,'mealType')">
+            <svg class="ic"><use href="#ic-sliders-horizontal"/></svg>
+          </button>
         </div>
+        <div class="recipes-filterbar rl-chips" id="recipesFilterbar"></div>
+        <div class="rl-count-row"><span class="results-count" id="resultsCount"></span></div>
+        <div class="recipe-grid rl-grid" id="recipeGrid"></div>
       </div>
     </div>
 
@@ -727,7 +1046,8 @@
       <div class="plan-layout">
 
         <div class="plan-controls">
-          <h2>Plan Your Week</h2>
+          <p class="scr-kicker">Weekly plan</p>
+          <p class="scr-title">Shuffle your week.</p>
 
           <!-- Craving tags (grouped by taxonomy) -->
           <div class="cravings-section">
@@ -747,23 +1067,23 @@
             <div class="slot-toggles">
               <label class="slot-toggle">
                 <input type="checkbox" id="slot-breakfast" onchange="savePlanSlots()" checked>
-                <span>🌅 Breakfast</span>
+                <span>Breakfast</span>
               </label>
               <label class="slot-toggle">
                 <input type="checkbox" id="slot-lunch" onchange="savePlanSlots()" checked>
-                <span>🥗 Lunch</span>
+                <span>Lunch</span>
               </label>
               <label class="slot-toggle">
                 <input type="checkbox" id="slot-dinner" onchange="savePlanSlots()" checked>
-                <span>🍽 Dinner</span>
+                <span>Dinner</span>
               </label>
               <label class="slot-toggle">
                 <input type="checkbox" id="slot-snack" onchange="savePlanSlots()" checked>
-                <span>🍫 Snack</span>
+                <span>Snack</span>
               </label>
               <label class="slot-toggle" id="slot-snack2-wrap">
                 <input type="checkbox" id="slot-snack2" onchange="savePlanSlots()">
-                <span>🍪 Snack 2</span>
+                <span>Snack 2</span>
               </label>
             </div>
           </div>
@@ -794,9 +1114,9 @@
           </div>
 
           <div class="plan-actions">
-            <button class="btn-generate" onclick="generatePlan()">🔀 Shuffle Plan</button>
-            <button class="btn-generate-ai" id="btnAiGenerate" onclick="generatePlanWithAI()">✨ AI Plan</button>
-            <button class="btn-secondary" id="btnReshuffle" style="display:none" onclick="generatePlan()">↺ Reshuffle All</button>
+            <button class="btn-generate" onclick="generatePlan()">Shuffle plan</button>
+            <button class="btn-generate-ai" id="btnAiGenerate" onclick="generatePlanWithAI()">AI plan</button>
+            <button class="btn-secondary" id="btnReshuffle" style="display:none" onclick="generatePlan()">Reshuffle all</button>
             <span class="ai-plan-status" id="aiPlanStatus"></span>
           </div>
         </div>
@@ -815,6 +1135,8 @@
     <!-- ── GROCERY TAB ───────────────────────────────────────────────────── -->
     <div id="tab-grocery" class="tab-content">
       <div class="plan-layout">
+        <p class="scr-kicker">Shopping</p>
+        <p class="scr-title">Grocery list.</p>
         <div id="groceryTabContent">
           <div class="empty-plan">
             <p style="font-size:15px;margin-bottom:6px">No grocery list yet.</p>
@@ -827,28 +1149,29 @@
     <!-- ── ADD RECIPE TAB ────────────────────────────────────────────────── -->
     <div id="tab-add" class="tab-content">
       <div class="add-layout">
-        <h2>Add a Recipe</h2>
+        <p class="scr-kicker">New entry</p>
+        <p class="scr-title">Add a recipe.</p>
         <p class="add-subtitle">Log an Instagram save or any new recipe. All recipes are assumed GF / DF / banana-free — flag in notes if you need to adapt.</p>
 
         <!-- ── AI QUICK ADD ─────────────────────────────────────────────── -->
         <div class="ai-quick-add">
           <div class="ai-quick-add-header">
-            <h3>✨ Quick Add with AI</h3>
+            <h3>Quick add with AI</h3>
             <span class="ai-badge">Claude Haiku</span>
           </div>
           <div id="aiNoKeyNotice" class="ai-no-key-notice" style="display:none">
             No API key saved. <a onclick="openSettings()">Add your Anthropic key →</a>
           </div>
           <div class="ai-tabs">
-            <button class="ai-tab-btn active" onclick="switchAiTab('image',this)">📷 Screenshot</button>
-            <button class="ai-tab-btn" onclick="switchAiTab('text',this)">📋 Paste text</button>
+            <button class="ai-tab-btn active" onclick="switchAiTab('image',this)">Screenshot</button>
+            <button class="ai-tab-btn" onclick="switchAiTab('text',this)">Paste text</button>
           </div>
 
           <!-- Image upload panel -->
           <div class="ai-input-panel active" id="ai-panel-image">
             <div class="ai-drop-zone" id="aiDropZone">
               <input type="file" id="aiImageInput" accept="image/*" multiple onchange="handleImageSelect(event)" />
-              <div class="ai-drop-zone-icon">📸</div>
+              <div class="ai-drop-zone-icon"><svg class="ic" style="width:24px;height:24px;color:var(--fn-text-muted)"><use href="#ic-image"/></svg></div>
               <div class="ai-drop-zone-text">Drop screenshots here, or click to choose</div>
               <div class="ai-drop-zone-sub">Select multiple images if the recipe spans more than one screenshot</div>
             </div>
@@ -862,8 +1185,8 @@
 
           <div class="ai-actions">
             <button class="btn-parse" id="btnParse" onclick="parseWithAI()">
-              <span id="parseSpinner" style="display:none">⏳</span>
-              ✨ Parse recipe
+              <span id="parseSpinner" style="display:none">…</span>
+              Parse recipe
             </button>
             <span class="ai-parse-status" id="aiParseStatus"></span>
           </div>
@@ -896,7 +1219,11 @@
               <label>Cuisine</label>
               <select id="f-cuisine">
                 <option value="comfort">Comfort</option>
-                <option value="asian">Asian</option>
+                <option value="asian">Asian (other/mixed)</option>
+                <option value="vietnamese">Vietnamese</option>
+                <option value="thai">Thai</option>
+                <option value="chinese">Chinese</option>
+                <option value="korean">Korean</option>
                 <option value="japanese">Japanese</option>
                 <option value="indian">Indian</option>
                 <option value="italian">Italian</option>
@@ -977,15 +1304,17 @@
     <!-- ── TRACKER TAB ───────────────────────────────────────────────────── -->
     <div id="tab-tracker" class="tab-content">
       <div class="trk-wrap" id="trkWrap">
+        <p class="scr-kicker" style="padding-top:6px">Daily macros</p>
+        <p class="scr-title">Tracker.</p>
         <div class="trk-datebar">
           <button class="trk-navbtn" onclick="trkShiftDay(-1)" title="Previous day">‹</button>
           <div class="trk-date" id="trkDateLabel" onclick="trkGoToday()" title="Jump to today" style="cursor:pointer;text-align:center">—<small>today</small></div>
           <button class="trk-navbtn" onclick="trkShiftDay(1)" title="Next day">›</button>
         </div>
         <div class="trk-toolbtns" style="justify-content:center;margin-bottom:14px">
-          <button class="trk-addbtn" onclick="trkOpenAddChooser()">＋ Add food</button>
-          <button class="trk-addbtn" onclick="trkOpenStaples()">🥫 Staples</button>
-          <button class="trk-addbtn" onclick="trkOpenTargets()">🎯 Targets</button>
+          <button class="trk-addbtn" onclick="trkOpenAddChooser()">+ Add food</button>
+          <button class="trk-addbtn" onclick="trkOpenStaples()">Staples</button>
+          <button class="trk-addbtn" onclick="trkOpenTargets()">Targets</button>
         </div>
         <div id="trkBody">
           <div class="trk-empty" style="text-align:center;padding:40px">Loading tracker…</div>
@@ -994,6 +1323,15 @@
     </div>
 
   </main>
+
+  <!-- Floating bottom tab bar (2026 redesign). Wired to the existing switchTab(). -->
+  <nav class="tabbar" aria-label="Primary">
+    <button data-tab="recipes" onclick="switchTab('recipes')" aria-label="Recipes"><svg class="ic"><use href="#ic-utensils"/></svg><span class="tab-dot"></span></button>
+    <button data-tab="plan" class="active" onclick="switchTab('plan')" aria-label="Shuffle"><svg class="ic"><use href="#ic-calendar-days"/></svg><span class="tab-dot"></span></button>
+    <button data-tab="grocery" onclick="switchTab('grocery')" aria-label="Grocery"><svg class="ic"><use href="#ic-shopping-basket"/></svg><span class="tab-dot"></span></button>
+    <button data-tab="tracker" onclick="switchTab('tracker')" aria-label="Tracker"><svg class="ic"><use href="#ic-trending-up"/></svg><span class="tab-dot"></span></button>
+    <button data-tab="add" onclick="switchTab('add')" aria-label="Add recipe"><svg class="ic"><use href="#ic-book-open"/></svg><span class="tab-dot"></span></button>
+  </nav>
 
   <!-- Tracker modal -->
   <div class="trk-overlay" id="trkOverlay" onclick="if(event.target===this)trkCloseModal()">
@@ -1044,9 +1382,9 @@ function setTheme(name) {
     btn.style.borderColor = btn.dataset.themeBtn === name ? 'var(--accent)' : 'var(--border)';
     btn.style.boxShadow = btn.dataset.themeBtn === name ? '0 0 0 2px var(--accent-tint)' : 'none';
   });
-  // Update meta theme-color
-  const colors = { natural: '#F5F2EC', cafe: '#F1EEEB', coastal: '#FFFFFF' };
-  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', colors[name] || '#F5F2EC');
+  // Update meta theme-color. Alt themes are accent-only swaps on one
+  // cream/oxblood base, so the browser chrome stays oxblood across all of them.
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#3D0F13');
 }
 
 // ─── CRAVINGS TAXONOMY ───────────────────────────────────────────────────────
@@ -1054,13 +1392,14 @@ function setTheme(name) {
 // Recipes still store .cravings as a flat string[]; the taxonomy is purely a
 // presentation layer that groups chip rendering by category.
 const CRAVING_TAXONOMY = {
-  cuisine: ['asian','mexican','japanese','indian','italian','mediterranean','middleeastern','american','comfort'],
+  cuisine: ['asian','vietnamese','thai','chinese','korean','mexican','japanese','indian','italian','mediterranean','middleeastern','american','comfort'],
   texture: ['noodles','brothy','crunchy','creamy'],
   mood:    ['spicy','light','fresh','sweet','simple','healthy'],
   dietary: ['highprotein','lowcarb','glutenfree','dairyfree'],
+  dish:    ['salad','pancakes','bakery','soup','stirfry','curry','traybake','sandwich','bowl'],
 };
 const CRAVING_GROUP_LABELS = {
-  cuisine: 'Cuisine', texture: 'Texture', mood: 'Mood', dietary: 'Dietary',
+  cuisine: 'Cuisine', texture: 'Texture', mood: 'Mood', dietary: 'Dietary', dish: 'Dish Type',
 };
 // Flat list of every valid craving value (incl. legacy ones still on recipes
 // like chicken/beef/tofu which moved to the Protein chip group).
@@ -1071,15 +1410,19 @@ const ALL_CRAVINGS = [
   ]),
 ];
 const CRAVING_LABELS = {
-  asian:'🥢 Asian', mexican:'🌮 Mexican', japanese:'🍱 Japanese', indian:'🍛 Indian',
+  asian:'🥢 Asian', vietnamese:'🍜 Vietnamese', thai:'🌶 Thai', chinese:'🥡 Chinese', korean:'🌶 Korean',
+  mexican:'🌮 Mexican', japanese:'🍱 Japanese', indian:'🍛 Indian',
   italian:'🍝 Italian', mediterranean:'🫒 Mediterranean', middleeastern:'🫙 Middle Eastern',
   american:'🍔 American', comfort:'🏠 Comfort',
   noodles:'🍜 Noodles', brothy:'🫕 Brothy', crunchy:'🥨 Crunchy', creamy:'🥛 Creamy',
-  spicy:'🌶 Spicy', light:'🥗 Light', fresh:'🥬 Fresh', sweet:'🍫 Sweet',
-  simple:'🍳 Simple', healthy:'💚 Healthy',
+  spicy:'🌶 Spicy', light:'Light', fresh:'🥬 Fresh', sweet:'Sweet',
+  simple:'Simple', healthy:'Healthy',
   highprotein:'💪 High-protein', lowcarb:'🥑 Low-carb',
   glutenfree:'🌾 GF', dairyfree:'🥛 DF',
   chicken:'🐓 Chicken', beef:'🥩 Beef', tofu:'🌱 Tofu',
+  salad:'🥗 Salad', pancakes:'🥞 Pancakes', bakery:'🍞 Bakery', soup:'🍲 Soup',
+  stirfry:'🥘 Stir-fry', curry:'🍛 Curry', traybake:'🍳 Traybake / One-pot',
+  sandwich:'🥪 Sandwich / Wrap', bowl:'🍚 Bowl',
 };
 
 // ─── PROTEIN CHIPS (Shuffle tab) ─────────────────────────────────────────────
@@ -1089,16 +1432,16 @@ const PROTEIN_LABELS = {
   fish:'🐟 Fish', proteinpowder:'🥤 Protein Powder', mixed:'🍱 Mixed', other:'🔀 Other',
 };
 
-const MEAL_TYPES = ['breakfast','lunch','dinner','sides','dessert','snack'];
+const MEAL_TYPES = ['breakfast','lunch','dinner','sides','dessert','snack','sauce'];
 const MEAL_TYPE_LABELS = {
-  breakfast:'🌅 Breakfast', lunch:'🥗 Lunch', dinner:'🍽 Dinner',
-  sides:'🍟 Sides', dessert:'🍫 Dessert', snack:'☕ Snack',
+  breakfast:'Breakfast', lunch:'Lunch', dinner:'Dinner',
+  sides:'🍟 Sides', dessert:'Dessert', snack:'☕ Snack', sauce:'🥣 Sauce',
 };
 
-const CARB_TYPES = ['none','rice','pasta','bread','potato','grain'];
+const CARB_TYPES = ['none','rice','pasta','bread','potato','grain','noodles','oats'];
 const CARB_TYPE_LABELS = {
   none:'— None', rice:'🍚 Rice', pasta:'🍝 Pasta', bread:'🥖 Bread',
-  potato:'🥔 Potato', grain:'🌾 Grain',
+  potato:'🥔 Potato', grain:'🌾 Grain', noodles:'🍜 Noodles', oats:'🥣 Oats',
 };
 
 // ─── RECIPE DATA ──────────────────────────────────────────────────────────────
@@ -1147,6 +1490,11 @@ function mapSupabaseToApp(row) {
 
 function flattenIngredientSections(sections) {
   if (!sections) return [];
+  // Some imported recipes have null/blank ingredient items (the item text was
+  // lost on import); skip them so they don't render as a literal "null" line.
+  const isBlank = item => item == null
+    || (typeof item === 'string' && item.trim() === '')
+    || (typeof item === 'object' && !(item.name && String(item.name).trim()));
   const toStructured = item => {
     if (item && typeof item === 'object') return item;
     const p = parseQty(String(item));
@@ -1154,11 +1502,11 @@ function flattenIngredientSections(sections) {
   };
   if (!Array.isArray(sections)) {
     return Object.entries(sections).flatMap(([title, items]) =>
-      (Array.isArray(items) ? items : []).map(item => ({ group: title || undefined, ...toStructured(item) }))
+      (Array.isArray(items) ? items : []).filter(item => !isBlank(item)).map(item => ({ group: title || undefined, ...toStructured(item) }))
     );
   }
   return sections.flatMap(sec =>
-    (sec.ingredients || []).map(item => ({ group: sec.section_title || undefined, ...toStructured(item) }))
+    (sec.ingredients || []).filter(item => !isBlank(item)).map(item => ({ group: sec.section_title || undefined, ...toStructured(item) }))
   );
 }
 
@@ -1599,6 +1947,8 @@ function switchTab(tab, btn) {
   document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
   document.getElementById('tab-'+tab).classList.add('active');
   if(btn) btn.classList.add('active');
+  // Sync the floating bottom tab bar's active state + dot
+  document.querySelectorAll('.tabbar button').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
   if(tab==='recipes') renderRecipes();
   if(tab==='tracker') trkOnOpen();
 }
@@ -1695,7 +2045,7 @@ const FILTER_CHIPS = [
   { type: 'protein',    label: 'Protein' },
   { type: 'cuisine',    label: 'Cuisine' },
   { type: 'cravings',   label: 'Cravings' },
-  { type: 'cost',       label: '💷 Cost' },
+  { type: 'cost',       label: 'Cost' },
   { type: 'time',       label: '⏱ Time' },
   { type: 'macros',     label: '📊 Macros' },
   { type: 'carbType',   label: '🌾 Carb' },
@@ -1852,7 +2202,7 @@ function renderFilterBody(type) {
     case 'protein':
       return `<div style="display:flex;flex-wrap:wrap;gap:6px;width:100%">${_multiChipsHtml(filters.proteins, PLAN_PROTEINS, PROTEIN_LABELS, 'protein')}</div>`;
     case 'cuisine': {
-      const cuisines = ['comfort','asian','japanese','indian','italian','mexican','american','mediterranean','middleeastern','simple','other'];
+      const cuisines = ['comfort','asian','vietnamese','thai','chinese','korean','japanese','indian','italian','mexican','american','mediterranean','middleeastern','simple','other'];
       const labels = Object.fromEntries(cuisines.map(c => [c, `${CUISINE_EMOJI[c]||''} ${c.charAt(0).toUpperCase()+c.slice(1)}`]));
       return `<div style="display:flex;flex-wrap:wrap;gap:6px;width:100%">${_multiChipsHtml(filters.cuisines, cuisines, labels, 'cuisine')}</div>`;
     }
@@ -1914,10 +2264,21 @@ function setFilterRange(key, val) {
 }
 
 // ─── RENDER RECIPES ─────────────────────────────────────────────────────────
-const TYPE_LABELS = { breakfast:'Breakfast', lunch:'Lunch', dinner:'Dinner', sides:'Sides', dessert:'Dessert / Snack', snack:'Snack' };
-const TYPE_CLASSES = { breakfast:'type-breakfast', lunch:'type-lunch', dinner:'type-dinner', sides:'type-sides', dessert:'type-dessert', snack:'type-snack' };
-const CUISINE_EMOJI = { asian:'🥢', japanese:'🍱', indian:'🍛', italian:'🍝', mexican:'🌮', american:'🍔', mediterranean:'🫒', middleeastern:'🫙', comfort:'🏠', simple:'🍳', other:'🍴' };
+const TYPE_LABELS = { breakfast:'Breakfast', lunch:'Lunch', dinner:'Dinner', sides:'Sides', dessert:'Dessert / Snack', snack:'Snack', sauce:'Sauce' };
+const TYPE_CLASSES = { breakfast:'type-breakfast', lunch:'type-lunch', dinner:'type-dinner', sides:'type-sides', dessert:'type-dessert', snack:'type-snack', sauce:'type-sauce' };
+const CUISINE_EMOJI = { asian:'🥢', vietnamese:'🍜', thai:'🌶', chinese:'🥡', korean:'🌶', japanese:'🍱', indian:'🍛', italian:'🍝', mexican:'🌮', american:'🍔', mediterranean:'🫒', middleeastern:'🫙', comfort:'🏠', simple:'🍳', other:'🍴' };
 const PROTEIN_EMOJI = { chicken:'🐓', beef:'🥩', eggs:'🥚', tofu:'🌱', fish:'🐟', proteinpowder:'🥤', mixed:'🍱' };
+
+// ── 2026 redesign: strip emoji from chips/labels (editorial "no emoji" rule).
+// Mutates the label maps in place so every chip/filter/label renders text-only.
+function deEmoji(s){
+  if(typeof s!=='string') return s;
+  return s.replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2190}-\u{21FF}\u{2B00}-\u{2BFF}\u{FE0F}\u{200D}\u{20E3}\u{1F1E6}-\u{1F1FF}]/gu,'').replace(/\s{2,}/g,' ').trim();
+}
+[CRAVING_LABELS, PROTEIN_LABELS, MEAL_TYPE_LABELS, CARB_TYPE_LABELS, CUISINE_EMOJI, PROTEIN_EMOJI].forEach(map => {
+  for(const k in map) map[k] = deEmoji(map[k]);
+});
+FILTER_CHIPS.forEach(c => { c.label = c.label === '♥' ? 'Favourites' : deEmoji(c.label); });
 
 function renderRecipes() {
   const filtered = getFilteredRecipes();
@@ -1938,23 +2299,31 @@ function renderRecipes() {
     }
     return;
   }
-  grid.innerHTML = filtered.map(r => {
-    const types = r.mealTypes || [];
-    const primary = types[0] || '';
-    const typeLabel = types.length > 1
-      ? types.map(t => TYPE_LABELS[t] || t).join(' · ')
-      : (TYPE_LABELS[primary] || primary);
+  // Warm gradient placeholders stand in for photography (app has no recipe
+  // images yet) — mirrors the prototype's card fills, cycled by position.
+  const RL_GRADS = [
+    'linear-gradient(135deg,#8a6a4a,#c99a5f)',
+    'linear-gradient(135deg,#6b4a3a,#a67a52)',
+    'linear-gradient(135deg,#5a4638,#9c8060)',
+    'linear-gradient(135deg,#7a5240,#c08a5a)'
+  ];
+  grid.innerHTML = filtered.map((r, i) => {
+    const fav = favourites.has(r.id);
+    const num = 'No. ' + String(i + 1).padStart(3, '0');   // archival numbering motif
+    const grad = RL_GRADS[i % RL_GRADS.length];
+    const heroCls = i === 0 ? ' rl-card--hero' : '';        // first card = full-width hero
     return `
-    <div class="recipe-card" onclick="openModal('${r.id}')">
-      <button class="fav-btn${favourites.has(r.id)?' active':''}" onclick="toggleFav(event,'${r.id}')" title="${favourites.has(r.id)?'Remove from favourites':'Add to favourites'}">♥</button>
-      <div class="card-meal-type ${TYPE_CLASSES[primary]||''}">${typeLabel}</div>
-      <div class="card-name">${r.name}</div>
-      <div class="card-tags">
-        <span class="card-tag">${CUISINE_EMOJI[r.cuisine]||''} ${r.cuisine.charAt(0).toUpperCase()+r.cuisine.slice(1)}</span>
-        <span class="card-tag">${PROTEIN_EMOJI[r.proteinSource]||''} ${r.proteinSource.charAt(0).toUpperCase()+r.proteinSource.slice(1)}</span>
-        ${costTagHtml(r.id, r.costTier)}
-        ${r.prepTime?`<span class="card-tag">⏱ ${r.prepTime}</span>`:''}
-        ${r.source==='instagram'?'<span class="card-tag accent">📱 Insta</span>':''}
+    <div class="rl-card${heroCls}" onclick="openModal('${r.id}')">
+      <div class="rl-card-grad" style="background:${grad}"></div>
+      <div class="rl-card-overlay">
+        <div class="rl-card-top">
+          <span class="rl-num">${num}</span>
+          <button class="rl-fav${fav?' active':''}" onclick="toggleFav(event,'${r.id}')" aria-label="${fav?'Remove from favourites':'Add to favourites'}"><svg class="ic"><use href="#ic-heart"/></svg></button>
+        </div>
+        <div>
+          <p class="rl-card-name">${r.name}</p>
+          ${r.prepTime?`<p class="rl-card-time">${r.prepTime}</p>`:''}
+        </div>
       </div>
     </div>`;
   }).join('');
@@ -1965,7 +2334,7 @@ function renderCostHtml(cost, scale=1) {
   if (!cost) return '';
   if (typeof cost === 'string') {
     const v = (parseFloat(cost) * scale).toFixed(2);
-    return `<div class="cost-badge">💷 Approx. <strong>£${v}</strong> per serving</div>`;
+    return `<div class="cost-badge">Approx. <strong>£${v}</strong> per serving</div>`;
   }
   const prices = [
     { name: 'Aldi', price: cost.aldi * scale },
@@ -2061,7 +2430,7 @@ function openModal(id) {
           <div class="nutrition-cell"><div class="nc-val">${scl(nut.fat)!=null?scl(nut.fat)+'g':'—'}</div><div class="nc-lbl">fat</div></div>
         </div>
         ${renderComputedCostHtml(r.id, srvScale)}
-        ${hasApiKey?`<div style="margin-top:10px"><button class="btn-estimate" id="btnEstimateNutrition" onclick="estimateNutritionWithAI('${r.id}')">✨ Re-estimate</button><span id="estimateStatus" style="font-size:12px;color:var(--text3);margin-left:10px"></span></div>`:''}
+        ${hasApiKey?`<div style="margin-top:10px"><button class="btn-estimate" id="btnEstimateNutrition" onclick="estimateNutritionWithAI('${r.id}')">Re-estimate</button><span id="estimateStatus" style="font-size:12px;color:var(--text3);margin-left:10px"></span></div>`:''}
       </div>`;
   } else {
     const computedCostHtml = renderComputedCostHtml(r.id, srvScale);
@@ -2071,7 +2440,7 @@ function openModal(id) {
           <h4>Nutrition &amp; Cost</h4>
           ${computedCostHtml}
           ${hasApiKey?`<p style="color:var(--text3);font-size:13px;margin-bottom:10px;margin-top:${computedCostHtml?'10':'0'}px">No nutrition data yet — estimate with AI from the ingredient list.</p>
-          <button class="btn-estimate" id="btnEstimateNutrition" onclick="estimateNutritionWithAI('${r.id}')">✨ Estimate with AI</button>
+          <button class="btn-estimate" id="btnEstimateNutrition" onclick="estimateNutritionWithAI('${r.id}')">Estimate with AI</button>
           <span id="estimateStatus" style="font-size:12px;color:var(--text3);margin-left:10px"></span>`:''}
         </div>`;
     }
@@ -2082,23 +2451,30 @@ function openModal(id) {
   const types = r.mealTypes || [];
   const primaryType = types[0] || '';
   const typeLabel = types.map(t => TYPE_LABELS[t] || t).join(' · ');
+  const cuisineName = r.cuisine ? r.cuisine.charAt(0).toUpperCase()+r.cuisine.slice(1) : '';
+  const kicker = [typeLabel, cuisineName].filter(Boolean).join(' · ');
+  const rIdx = recipes.findIndex(x => String(x.id) === String(r.id));
+  const archiveNum = rIdx >= 0 ? 'No. ' + String(rIdx + 1).padStart(3, '0') : '';
 
   document.getElementById('modalContent').innerHTML = `
     <button class="modal-close" onclick="closeModal()">×</button>
     <button class="modal-fav-btn${isFav?' active':''}" style="position:absolute;top:16px;right:56px" onclick="toggleFav(null,'${r.id}')" title="${isFav?'Remove from favourites':'Add to favourites'}">${isFav?'♥ Saved':'♡ Save'}</button>
-    <div class="modal-type ${TYPE_CLASSES[primaryType]||''}">${typeLabel} · ${CUISINE_EMOJI[r.cuisine]||''} ${r.cuisine.charAt(0).toUpperCase()+r.cuisine.slice(1)}</div>
+    <div class="modal-header-row">
+      <div class="modal-type ${TYPE_CLASSES[primaryType]||''}">${kicker}</div>
+      ${archiveNum?`<span class="modal-archive">${archiveNum}</span>`:''}
+    </div>
     <div class="modal-title">${r.name}</div>
     ${r.description?`<div class="modal-desc">${r.description}</div>`:''}
     <div class="modal-meta">
-      ${r.servings?`<div class="modal-meta-item">👥 <span class="servings-override">Serves <input class="servings-input" type="number" min="1" value="${displayServings}" onchange="updateServingOverride('${r.id}',this.value)" title="Change serving count to rescale nutrition"></span></div>`:''}
-      ${r.prepTime?`<div class="modal-meta-item">⏱ <strong>${r.prepTime}</strong></div>`:''}
-      ${'£'.repeat(r.costTier)?`<div class="modal-meta-item">💷 <strong>${'£'.repeat(r.costTier)}</strong></div>`:''}
+      ${r.servings?`<div class="modal-meta-item"><svg class="ic"><use href="#ic-users"/></svg> <span class="servings-override">Serves <input class="servings-input" type="number" min="1" value="${displayServings}" onchange="updateServingOverride('${r.id}',this.value)" title="Change serving count to rescale nutrition"></span></div>`:''}
+      ${r.prepTime?`<div class="modal-meta-item"><svg class="ic"><use href="#ic-clock"/></svg> <strong>${r.prepTime}</strong></div>`:''}
+      ${'£'.repeat(r.costTier)?`<div class="modal-meta-item"><strong>${'£'.repeat(r.costTier)}</strong> per portion</div>`:''}
       ${unitToggleHtml}
     </div>
     ${multiplierHtml}
     <div style="display:flex;gap:8px;align-items:center;margin:4px 0 8px">
-      <button class="btn-edit-open" onclick="openTagEditor('${r.id}')">✏️ Edit recipe</button>
-      <button class="btn-edit-open" style="color:var(--accent);opacity:.7" onclick="deleteRecipe('${r.id}')">🗑 Delete</button>
+      <button class="btn-edit-open" onclick="openTagEditor('${r.id}')">Edit recipe</button>
+      <button class="btn-edit-open" style="color:var(--accent);opacity:.7" onclick="deleteRecipe('${r.id}')">Delete</button>
     </div>
     <div id="modal-tag-editor" style="display:none"></div>
     ${r.notes?`<div class="modal-section"><h4>Batch cook notes</h4><p>${r.notes}</p></div>`:''}
@@ -2107,7 +2483,7 @@ function openModal(id) {
     ${methodHtml}
     ${tipsHtml}
     ${nutritionHtml}
-    ${r.instagramUrl?`<div class="modal-divider"></div><div class="modal-section"><h4>Source</h4><a href="${r.instagramUrl}" target="_blank" class="modal-instagram-link">📱 View on Instagram</a></div>`:''}
+    ${r.instagramUrl?`<div class="modal-divider"></div><div class="modal-section"><h4>Source</h4><a href="${r.instagramUrl}" target="_blank" class="modal-instagram-link">View on Instagram</a></div>`:''}
   `;
   document.getElementById('modalOverlay').classList.add('open');
 }
@@ -2119,12 +2495,12 @@ function toggleFav(event, id) {
   if(favourites.has(id)) favourites.delete(id); else favourites.add(id);
   saveFavourites();
   // Update card if visible
-  const cards = document.querySelectorAll(`#recipeGrid .recipe-card`);
+  const cards = document.querySelectorAll(`#recipeGrid .rl-card`);
   cards.forEach(card => {
-    const btn = card.querySelector('.fav-btn');
+    const btn = card.querySelector('.rl-fav');
     if(btn && card.getAttribute('onclick') === `openModal('${id}')`) {
       btn.classList.toggle('active', favourites.has(id));
-      btn.title = favourites.has(id) ? 'Remove from favourites' : 'Add to favourites';
+      btn.setAttribute('aria-label', favourites.has(id) ? 'Remove from favourites' : 'Add to favourites');
     }
   });
   // Update modal button if open
@@ -2250,7 +2626,11 @@ function openTagEditor(id) {
           <span class="tag-editor-sublabel">Cuisine</span>
           <select class="edit-meta-select" id="edit-cuisine">
             <option value="comfort" ${r.cuisine==='comfort'?'selected':''}>🏠 Comfort</option>
-            <option value="asian" ${r.cuisine==='asian'?'selected':''}>🥢 Asian</option>
+            <option value="asian" ${r.cuisine==='asian'?'selected':''}>🥢 Asian (other/mixed)</option>
+            <option value="vietnamese" ${r.cuisine==='vietnamese'?'selected':''}>🍜 Vietnamese</option>
+            <option value="thai" ${r.cuisine==='thai'?'selected':''}>🌶 Thai</option>
+            <option value="chinese" ${r.cuisine==='chinese'?'selected':''}>🥡 Chinese</option>
+            <option value="korean" ${r.cuisine==='korean'?'selected':''}>🌶 Korean</option>
             <option value="japanese" ${r.cuisine==='japanese'?'selected':''}>🍱 Japanese</option>
             <option value="indian" ${r.cuisine==='indian'?'selected':''}>🍛 Indian</option>
             <option value="italian" ${r.cuisine==='italian'?'selected':''}>🍝 Italian</option>
@@ -2258,7 +2638,7 @@ function openTagEditor(id) {
             <option value="american" ${r.cuisine==='american'?'selected':''}>🍔 American / BBQ</option>
             <option value="mediterranean" ${r.cuisine==='mediterranean'?'selected':''}>🫒 Mediterranean</option>
             <option value="middleeastern" ${r.cuisine==='middleeastern'?'selected':''}>🫙 Middle Eastern</option>
-            <option value="simple" ${r.cuisine==='simple'?'selected':''}>🍳 Simple</option>
+            <option value="simple" ${r.cuisine==='simple'?'selected':''}>Simple</option>
             <option value="other" ${r.cuisine==='other'?'selected':''}>🍴 Other</option>
           </select>
         </div>
@@ -2885,13 +3265,13 @@ const AISLES = {
   dairy:      '🧀 Dairy & Eggs',
   bakery:     '🥖 Bakery',
   pantry:     '🌾 Pantry / Dry Goods',
-  canned:     '🥫 Canned & Jarred',
+  canned:     'Canned & Jarred',
   frozen:     '🧊 Frozen',
   condiments: '🫙 Condiments & Sauces',
-  snacks:     '🍫 Snacks & Confectionery',
+  snacks:     'Snacks & Confectionery',
   beverages:  '🥤 Beverages',
   spices:     '🌶 Spices & Herbs',
-  other:      '🛒 Household / Other',
+  other:      'Household / Other',
 };
 const AISLE_ORDER = ['produce','meat','dairy','bakery','pantry','canned','frozen','condiments','snacks','beverages','spices','other'];
 
@@ -3047,10 +3427,10 @@ function renderComputedCostHtml(recipeId, srvScale) {
     const tot = (cost.total * sc).toFixed(2);
     const note = cost.unpriced > 0
       ? `<span class="computed-cost-note">+${cost.unpriced} ingredient${cost.unpriced>1?'s':''} unpriced</span>` : '';
-    return `<div class="computed-cost">💷 <strong>£${pp}</strong>/portion · <strong>£${tot}</strong> total ${note}</div>`;
+    return `<div class="computed-cost"><strong>£${pp}</strong>/portion · <strong>£${tot}</strong> total ${note}</div>`;
   }
   if (cost && cost.unpriced > 0 && cost.total === 0) {
-    return `<div class="cost-note" style="margin-top:6px">💷 Cost unknown — <a style="color:var(--accent);cursor:pointer;text-decoration:underline" onclick="closeModal();openSettings()">add prices to price book →</a></div>`;
+    return `<div class="cost-note" style="margin-top:6px">Cost unknown — <a style="color:var(--accent);cursor:pointer;text-decoration:underline" onclick="closeModal();openSettings()">add prices to price book →</a></div>`;
   }
   return fallback ? renderCostHtml(fallback, srvScale || 1) : '';
 }
@@ -3200,6 +3580,19 @@ function renderReceiptHistory() {
       }).join('');
 }
 
+// Pull the assistant's text out of a Messages API response.
+//
+// Do NOT index content[0] directly. A response's content array can lead with a
+// non-text block — most importantly a `thinking` block, which is emitted by
+// default on models with adaptive thinking (Sonnet 5, Opus 5). content[0].text
+// is then undefined and every caller silently parses an empty string, which
+// surfaces as "No products recognised" / "Unexpected format from AI" rather
+// than anything pointing at the response shape. Find the text block instead.
+function claudeText(data) {
+  const blocks = Array.isArray(data && data.content) ? data.content : [];
+  return blocks.find(b => b && b.type === 'text')?.text || '';
+}
+
 // Estimate per-serving macros from an ingredient list via Claude. Returns
 // {kcal,protein,carbs,fat} or null on any failure (no key, network, bad JSON).
 // Shared by the in-modal "Re-estimate" button and the Add-Recipe submit flow.
@@ -3255,7 +3648,7 @@ Rules:
     });
     if(!res.ok) return null;
     const data = await res.json();
-    const raw = data.content?.[0]?.text || '';
+    const raw = claudeText(data);
     const cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
     const parsed = JSON.parse(cleaned);
     const perServing = v => (v == null || isNaN(Number(v))) ? null : Math.round(Number(v) / n);
@@ -3275,12 +3668,12 @@ async function estimateNutritionWithAI(id) {
   // Grab button refs early so we can show spinner before guard checks
   const btn = document.getElementById('btnEstimateNutrition');
   const statusEl = document.getElementById('estimateStatus');
-  if(btn) { btn.disabled = true; btn.textContent = '⏳ Estimating…'; btn.style.outline = ''; }
+  if(btn) { btn.disabled = true; btn.textContent = 'Estimating…'; btn.style.outline = ''; }
   if(statusEl) { statusEl.textContent = ''; }
 
   const fd = RECIPE_FULL_DATA[id];
   if(!fd || !fd.ingredients || !fd.ingredients.length) {
-    if(btn) { btn.disabled = false; btn.textContent = '✨ Re-estimate'; }
+    if(btn) { btn.disabled = false; btn.textContent = 'Re-estimate'; }
     showToast('No ingredient list found — add ingredients via Edit first');
     return;
   }
@@ -3323,14 +3716,14 @@ async function estimateNutritionWithAI(id) {
         </div>
         ${renderCostHtml(cost)}
         <div style="margin-top:10px">
-          <button class="btn-estimate" id="btnEstimateNutrition" onclick="estimateNutritionWithAI('${id}')">✨ Re-estimate</button>
+          <button class="btn-estimate" id="btnEstimateNutrition" onclick="estimateNutritionWithAI('${id}')">Re-estimate</button>
           <span id="estimateStatus" style="font-size:12px;color:var(--green);margin-left:10px">✓ Saved!</span>
         </div>`;
     }
   } catch(err) {
     const b = document.getElementById('btnEstimateNutrition');
     const s = document.getElementById('estimateStatus');
-    if(b) { b.disabled = false; b.textContent = '✨ Re-estimate'; b.style.outline = ''; }
+    if(b) { b.disabled = false; b.textContent = 'Re-estimate'; b.style.outline = ''; }
     if(s) { s.textContent = '✗ ' + err.message; s.style.color = 'var(--accent)'; }
     showToast('Estimation failed: ' + err.message);
   }
@@ -3620,7 +4013,7 @@ Exactly ${days} objects. Use null for slots not being planned.`;
 
   const btn = document.getElementById('btnAiGenerate');
   const statusEl = document.getElementById('aiPlanStatus');
-  if (btn) { btn.disabled = true; btn.textContent = '⏳ Planning…'; }
+  if (btn) { btn.disabled = true; btn.textContent = 'Planning…'; }
   if (statusEl) statusEl.textContent = '';
 
   try {
@@ -3646,7 +4039,7 @@ Exactly ${days} objects. Use null for slots not being planned.`;
     }
 
     const data = await res.json();
-    const raw = (data.content?.[0]?.text || '').trim()
+    const raw = claudeText(data).trim()
       .replace(/^```json\s*/,'').replace(/^```\s*/,'').replace(/\s*```$/,'');
 
     const parsed = JSON.parse(raw);
@@ -3706,7 +4099,7 @@ function buildPlanFromAIDays(aiDays, startDate, activeSlots) {
 
 function respinDay(dayIndex, slot) {
   if(!currentPlan) return;
-  if(planLocked){ showToast('Plan is locked 🔒 — unlock to change it'); return; }
+  if(planLocked){ showToast('Plan is locked — unlock to change it'); return; }
   const day = currentPlan[dayIndex];
   const hasType = (r, t) => (r.mealTypes || []).includes(t);
   if(slot==='breakfast') {
@@ -3802,20 +4195,20 @@ function renderPlanOutput(plan) {
 
   // ── Lock bar ("set in stone") ────────────────────────────────────────────
   html += `<div class="plan-lock-bar${planLocked ? ' locked' : ''}">
-      <span>${planLocked ? '🔒 Plan locked — set in stone' : '🔓 Plan unlocked — shuffle freely'}</span>
-      <button class="btn-lock-toggle" onclick="togglePlanLock()">${planLocked ? '🔓 Unlock' : '🔒 Lock plan'}</button>
+      <span>${planLocked ? 'Plan locked — set in stone' : 'Plan unlocked — shuffle freely'}</span>
+      <button class="btn-lock-toggle" onclick="togglePlanLock()">${planLocked ? 'Unlock' : 'Lock plan'}</button>
     </div>`;
 
   // ── Calendar ────────────────────────────────────────────────────────────
   html += `<div class="calendar-section">
-    <h3>📅 Calendar</h3>
+    <h3>Calendar</h3>
     <div class="calendar-grid" style="grid-template-columns:repeat(${plan.length},minmax(155px,1fr))">
   `;
   plan.forEach((day, i) => {
-    const batchLabel = day.isNewCook ? `<span class="cal-badge cal-badge-batch">⚡ Cook</span>` : '';
-    const shopLabel  = day.isNewCook ? `<span class="cal-badge cal-badge-shop">🛒 Shop</span>` : '';
+    const batchLabel = day.isNewCook ? `<span class="cal-badge cal-badge-batch">Cook</span>` : '';
+    const shopLabel  = day.isNewCook ? `<span class="cal-badge cal-badge-shop">Shop</span>` : '';
     const dinLeftover = day.activeSlots.dinner && day.dinner && !day.isNewCook && day.dinnerBatchTotal > 1
-      ? `<span style="font-size:10px;color:var(--text3);margin-left:4px">↩ day ${day.dinnerBatchDay}/${day.dinnerBatchTotal}</span>` : '';
+      ? `<span style="font-size:10px;color:var(--text3);margin-left:4px">day ${day.dinnerBatchDay}/${day.dinnerBatchTotal}</span>` : '';
     html += `
       <div class="cal-day${day.isNewCook?' is-batch':''}">
         <div class="cal-day-header">
@@ -3824,23 +4217,23 @@ function renderPlanOutput(plan) {
         </div>
         <div class="cal-meals">
           ${day.activeSlots.breakfast ? `<div class="cal-meal">
-            <div class="cal-meal-slot">🌅 Breakfast</div>
+            <div class="cal-meal-slot">Breakfast</div>
             <div class="cal-meal-name"><button class="cal-meal-pick-btn" onclick="openPicker(${i},'breakfast')">${day.breakfast?.name||'—'}</button> <button class="cal-meal-respin" onclick="respinDay(${i},'breakfast')">↺</button></div>
           </div>` : ''}
           ${day.activeSlots.lunch ? `<div class="cal-meal">
-            <div class="cal-meal-slot">🥗 Lunch</div>
+            <div class="cal-meal-slot">Lunch</div>
             <div class="cal-meal-name"><button class="cal-meal-pick-btn" onclick="openPicker(${i},'lunch')">${day.lunch?.name||'—'}</button> <button class="cal-meal-respin" onclick="respinDay(${i},'lunch')">↺</button></div>
           </div>` : ''}
           ${day.activeSlots.dinner ? `<div class="cal-meal">
-            <div class="cal-meal-slot">🍽 Dinner${dinLeftover}</div>
+            <div class="cal-meal-slot">Dinner${dinLeftover}</div>
             <div class="cal-meal-name"><button class="cal-meal-pick-btn" onclick="openPicker(${i},'dinner')">${day.dinner?.name||'—'}</button> <button class="cal-meal-respin" onclick="respinDay(${i},'dinner')">↺</button></div>
           </div>` : ''}
           ${day.activeSlots.snack ? `<div class="cal-meal">
-            <div class="cal-meal-slot">🍫 Snack</div>
+            <div class="cal-meal-slot">Snack</div>
             <div class="cal-meal-name"><button class="cal-meal-pick-btn" onclick="openPicker(${i},'snack')">${day.snack?.name||'—'}</button> <button class="cal-meal-respin" onclick="respinDay(${i},'snack')">↺</button></div>
           </div>` : ''}
           ${day.activeSlots.snack2 ? `<div class="cal-meal">
-            <div class="cal-meal-slot">🍪 Snack 2</div>
+            <div class="cal-meal-slot">Snack 2</div>
             <div class="cal-meal-name"><button class="cal-meal-pick-btn" onclick="openPicker(${i},'snack2')">${day.snack2?.name||'—'}</button> <button class="cal-meal-respin" onclick="respinDay(${i},'snack2')">↺</button></div>
           </div>` : ''}
         </div>
@@ -3853,10 +4246,10 @@ function renderPlanOutput(plan) {
   html += `<div class="plan-list">`;
   plan.forEach((day, i) => {
     const pills = [
-      day.isNewCook ? `<span class="plan-day-pill pill-shop">🛒 Shop</span>` : '',
-      day.isNewCook ? `<span class="plan-day-pill pill-batch">⚡ Cook</span>` : '',
+      day.isNewCook ? `<span class="plan-day-pill pill-shop">Shop</span>` : '',
+      day.isNewCook ? `<span class="plan-day-pill pill-batch">Cook</span>` : '',
       (!day.isNewCook && day.dinnerBatchTotal > 1 && day.activeSlots.dinner) ?
-        `<span class="plan-day-pill" style="background:var(--surface2);color:var(--text3)">↩ Leftover day ${day.dinnerBatchDay}/${day.dinnerBatchTotal}</span>` : ''
+        `<span class="plan-day-pill" style="background:var(--surface2);color:var(--text3)">Leftover day ${day.dinnerBatchDay}/${day.dinnerBatchTotal}</span>` : ''
     ].filter(Boolean).join('');
     html += `
       <div class="plan-day-row${day.isNewCook?' is-batch':''}">
@@ -3866,27 +4259,27 @@ function renderPlanOutput(plan) {
         </div>
         <div class="plan-meals">
           ${day.activeSlots.breakfast ? `<div class="plan-meal">
-            <div class="plan-meal-slot">🌅 Breakfast</div>
+            <div class="plan-meal-slot">Breakfast</div>
             <button class="meal-pick-btn" onclick="openPicker(${i},'breakfast')">${day.breakfast?.name||'—'}</button>
             <button class="plan-meal-respin" onclick="respinDay(${i},'breakfast')">↺</button>
           </div>` : ''}
           ${day.activeSlots.lunch ? `<div class="plan-meal">
-            <div class="plan-meal-slot">🥗 Lunch</div>
+            <div class="plan-meal-slot">Lunch</div>
             <button class="meal-pick-btn" onclick="openPicker(${i},'lunch')">${day.lunch?.name||'—'}</button>
             <button class="plan-meal-respin" onclick="respinDay(${i},'lunch')">↺</button>
           </div>` : ''}
           ${day.activeSlots.dinner ? `<div class="plan-meal">
-            <div class="plan-meal-slot">🍽 Dinner</div>
+            <div class="plan-meal-slot">Dinner</div>
             <button class="meal-pick-btn" onclick="openPicker(${i},'dinner')">${day.dinner?.name||'—'}</button>
             <button class="plan-meal-respin" onclick="respinDay(${i},'dinner')">↺</button>
           </div>` : ''}
           ${day.activeSlots.snack ? `<div class="plan-meal">
-            <div class="plan-meal-slot">🍫 Snack</div>
+            <div class="plan-meal-slot">Snack</div>
             <button class="meal-pick-btn" onclick="openPicker(${i},'snack')">${day.snack?.name||'—'}</button>
             <button class="plan-meal-respin" onclick="respinDay(${i},'snack')">↺</button>
           </div>` : ''}
           ${day.activeSlots.snack2 ? `<div class="plan-meal">
-            <div class="plan-meal-slot">🍪 Snack 2</div>
+            <div class="plan-meal-slot">Snack 2</div>
             <button class="meal-pick-btn" onclick="openPicker(${i},'snack2')">${day.snack2?.name||'—'}</button>
             <button class="plan-meal-respin" onclick="respinDay(${i},'snack2')">↺</button>
           </div>` : ''}
@@ -3910,7 +4303,7 @@ function renderPlanOutput(plan) {
     }
     if (planHasCost || planUnpriced > 0) {
       html += `<div style="text-align:center;padding:8px 0 4px;font-size:13px;color:var(--text2)">
-        ${planHasCost ? `💷 Estimated grocery cost: <strong style="color:var(--green)">£${planTotal.toFixed(2)}</strong>` : ''}
+        ${planHasCost ? `Estimated grocery cost: <strong style="color:var(--green)">£${planTotal.toFixed(2)}</strong>` : ''}
         ${planUnpriced > 0 ? `<span style="color:var(--text3)"> · ${planUnpriced} recipe${planUnpriced>1?'s':''} unpriced</span>` : ''}
       </div>`;
     }
@@ -3919,7 +4312,7 @@ function renderPlanOutput(plan) {
   // ── Grocery nudge at bottom of plan ──────────────────────────────────────
   html += `
     <div style="text-align:center;padding:16px 0 8px">
-      <button class="btn-secondary" onclick="switchTab('grocery', document.getElementById('nav-grocery'))" style="font-size:13px">🛒 View Grocery List →</button>
+      <button class="btn-secondary" onclick="switchTab('grocery', document.getElementById('nav-grocery'))" style="font-size:13px">View Grocery List →</button>
     </div>
   `;
 
@@ -4054,16 +4447,19 @@ function renderGroceryList(plan) {
   let html = `
     <div class="grocery-section">
       <div class="grocery-header">
-        <h3>🛒 Grocery List</h3>
-        <button class="btn-clear-checks" onclick="clearGroceryChecks()">↺ Uncheck all</button>
+        <p class="grocery-subtitle" style="margin:0">Based on your ${plan.length}-day plan${planCostLabel ? ' · ' + planCostLabel : ''}</p>
+        <button class="btn-clear-checks" onclick="clearGroceryChecks()">Uncheck all</button>
       </div>
-      <p class="grocery-subtitle">Based on your ${plan.length}-day plan${planCostLabel ? ' · ' + planCostLabel : ''}</p>
       <div class="grocery-grid">
   `;
 
+  // Warm swatch gradients cycled per aisle (stand in for product thumbnails).
+  const GC_SWATCHES = ['linear-gradient(135deg,#8a6a4a,#c99a5f)','linear-gradient(135deg,#6b4a3a,#a67a52)','linear-gradient(135deg,#5a4638,#9c8060)','linear-gradient(135deg,#7a5240,#c08a5a)','linear-gradient(135deg,#6e5a44,#b09068)'];
+  let _aisleIdx = 0;
   for (const ais of AISLE_ORDER) {
     const items = byAisle[ais];
     if (!items.length) continue;
+    const swatch = GC_SWATCHES[_aisleIdx++ % GC_SWATCHES.length];
     let catTotal = 0, catHasCost = false;
     const itemRows = items.map(row => {
       const checked = groceryChecked.has(row.key);
@@ -4072,29 +4468,27 @@ function renderGroceryList(plan) {
       let priceHint = '';
       if (row.priceKnown && row.priceCost > 0) {
         catTotal += row.priceCost; catHasCost = true;
-        priceHint = `<span style="font-size:10px;color:var(--green);margin-left:5px">£${row.priceCost.toFixed(2)}</span>`;
+        priceHint = `<span class="gc-price">£${row.priceCost.toFixed(2)}</span>`;
       } else {
         const pb = lookupPriceBook(row.canonKey);
         if (pb && pb.unitPrice) {
-          priceHint = `<span style="font-size:10px;color:var(--text3);margin-left:5px">£${pb.unitPrice < 0.01 ? pb.unitPrice.toFixed(4) : pb.unitPrice.toFixed(3)}/${pb.unit}</span>`;
+          priceHint = `<span class="gc-price gc-price-est">£${pb.unitPrice < 0.01 ? pb.unitPrice.toFixed(4) : pb.unitPrice.toFixed(3)}/${pb.unit}</span>`;
         }
       }
       const sourcesTitle = ` title="From: ${row.sources.map(s => s.recipe).join(', ').replace(/"/g,'&quot;')}"`;
       const safeKey = row.key.replace(/'/g,"\\'");
-      const qtyHtml = qtyLabel
-        ? `<span style="font-size:12px;font-weight:600;color:var(--text);min-width:48px;text-align:right">${qtyLabel}</span>`
-        : '<span style="font-size:11px;color:var(--text3);min-width:48px;text-align:right">—</span>';
-      return `<li><div class="grocery-item${checked?' checked':''}"${sourcesTitle} onclick="toggleGrocery(this,'${safeKey}')">
-        <input type="checkbox" ${checked?'checked':''} onclick="event.stopPropagation();toggleGrocery(this.parentElement,'${safeKey}')">
-        <label style="display:flex;align-items:baseline;gap:8px;flex:1;min-width:0">
-          ${qtyHtml}
-          <span style="flex:1;min-width:0">${row.displayName}</span>
-          ${priceHint}
-        </label>
+      return `<li><div class="gc-row${checked?' checked':''}"${sourcesTitle} onclick="toggleGrocery(this,'${safeKey}')">
+        <span class="gc-check" aria-hidden="true"></span>
+        <span class="gc-swatch" style="background:${swatch}"></span>
+        <div class="gc-main">
+          <div class="gc-name">${row.displayName}</div>
+          ${qtyLabel?`<div class="gc-qty">${qtyLabel}</div>`:''}
+        </div>
+        ${priceHint}
       </div></li>`;
     });
     const subtotal = catHasCost ? ` <span style="font-size:11px;font-weight:400;color:var(--green)">≥£${catTotal.toFixed(2)}</span>` : '';
-    html += `<div class="grocery-cat"><h4>${AISLES[ais]}${subtotal}</h4><ul>${itemRows.join('')}</ul></div>`;
+    html += `<div class="grocery-cat"><h4>${deEmoji(AISLES[ais])}${subtotal}</h4><ul>${itemRows.join('')}</ul></div>`;
   }
 
   // If nothing aggregated at all (e.g. recipes lack structured ingredients), show note
@@ -4766,7 +5160,7 @@ function getPickerPool(slot) {
 
 function openPicker(dayIndex, slot) {
   if(!currentPlan) return;
-  if(planLocked){ showToast('Plan is locked 🔒 — unlock to change it'); return; }
+  if(planLocked){ showToast('Plan is locked — unlock to change it'); return; }
   pickerContext = { dayIndex, slot };
   document.getElementById('pickerTitle').textContent = `Pick: ${SLOT_LABELS[slot]||slot}`;
   document.getElementById('pickerHint').textContent =
@@ -5033,10 +5427,10 @@ async function parseWithAI() {
 The JSON must have these fields (use null for anything not found):
 {
   "name": string,
-  "mealTypes": ["breakfast" | "lunch" | "dinner" | "sides" | "dessert" | "snack"],
-  "cuisine": "comfort" | "asian" | "japanese" | "indian" | "italian" | "mexican" | "american" | "mediterranean" | "middleeastern" | "simple" | "other",
+  "mealTypes": ["breakfast" | "lunch" | "dinner" | "sides" | "dessert" | "snack" | "sauce"],
+  "cuisine": "comfort" | "asian" | "vietnamese" | "thai" | "chinese" | "korean" | "japanese" | "indian" | "italian" | "mexican" | "american" | "mediterranean" | "middleeastern" | "simple" | "other",
   "proteinSource": "chicken" | "beef" | "eggs" | "tofu" | "fish" | "proteinpowder" | "mixed" | "other" | null,
-  "carbType": "rice" | "pasta" | "bread" | "potato" | "grain" | "none",
+  "carbType": "rice" | "pasta" | "bread" | "potato" | "grain" | "noodles" | "oats" | "none",
   "servings": number | null,
   "prepTime": string | null,
   "costTier": 1 | 2 | 3,
@@ -5045,7 +5439,7 @@ The JSON must have these fields (use null for anything not found):
   "method": [string],
   "tips": string | null,
   "storage": string | null,
-  "cravings": ["asian"|"mexican"|"comfort"|"spicy"|"brothy"|"noodles"|"light"|"healthy"|"simple"|"chicken"|"beef"|"tofu"|"sweet"|"fresh"],
+  "cravings": ["asian"|"vietnamese"|"thai"|"chinese"|"korean"|"mexican"|"comfort"|"spicy"|"brothy"|"noodles"|"light"|"healthy"|"simple"|"chicken"|"beef"|"tofu"|"sweet"|"fresh"|"salad"|"pancakes"|"bakery"|"soup"|"stirfry"|"curry"|"traybake"|"sandwich"|"bowl"],
   "notes": string | null,
   "instagramUrl": string | null,
   "nutrition": {"kcal": number, "protein": number, "carbs": number, "fat": number} | null
@@ -5054,7 +5448,8 @@ The JSON must have these fields (use null for anything not found):
 Rules:
 - All recipes are gluten-free, dairy-free, and banana-free by default. Flag any adaptations needed in notes.
 - mealTypes is an array — a recipe can fit multiple slots (e.g. ["lunch","dinner"]). Always include at least one.
-- carbType: identify the dominant carb if any (rice/pasta/bread/potato/grain), else "none".
+- carbType: identify the dominant carb if any (rice/pasta/bread/potato/grain/noodles/oats), else "none".
+- cuisine: use a specific country tag (vietnamese/thai/chinese/korean/japanese/indian) when the recipe is clearly from that cuisine; use "asian" only when it's ambiguous or a fusion/mixed Asian dish.
 - cravings: pick ONLY from the listed values. Descriptive mood/cuisine tags.
 - costTier: 1=cheap (under £5/serving), 2=moderate (£5-8), 3=pricier (over £8).
 - INGREDIENTS — split every ingredient into its parts, never combine them into one string:
@@ -5099,7 +5494,7 @@ Rules:
     }
 
     const data = await res.json();
-    const raw = data.content?.[0]?.text || '';
+    const raw = claudeText(data);
 
     // Strip any accidental markdown fences
     const cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
@@ -5444,7 +5839,7 @@ async function trkSaveMealFromQa(meal){
 }
 function trkOpenSavedMealPick(){
   const meal = trkChooserMeal();
-  if(!trkSavedMeals.length){ trkModal(`<h3>No saved meals yet</h3><div class="trk-sub">Build a meal, then tap <b>💾 save as meal</b> on the meal card (or “Save as meal” after an AI quick-add) to reuse it on other days.</div>`); return; }
+  if(!trkSavedMeals.length){ trkModal(`<h3>No saved meals yet</h3><div class="trk-sub">Build a meal, then tap <b>save as meal</b> on the meal card (or “Save as meal” after an AI quick-add) to reuse it on other days.</div>`); return; }
   const rows = trkSavedMeals.map(m=>{
     const tot = trkSavedMealTotals(m);
     return `<div class="trk-staple-row"><span class="nm">${trkEsc(m.name)}<br><span style="color:var(--text3);font-size:10px">${(m.items||[]).length} item(s) · ${Math.round(tot.cal)}kcal ${trkRound1(tot.prot)}P</span></span><button onclick="trkApplySavedMeal('${m.id}')" title="Add">＋</button></div>`;
@@ -5554,96 +5949,118 @@ function renderTracker(){
   if(dl) dl.innerHTML = `${trkEsc(fd.main)}<small>${trkEsc(fd.sub)}</small>`;
 
   const tot = trkSum(trkEntries);
-  const macroDefs = [
-    { k:'cal', lbl:'kcal', val:tot.cal, tgt:trkTargets.cal, cls:'cal' },
-    { k:'prot', lbl:'protein', val:tot.prot, tgt:trkTargets.prot },
-    { k:'carb', lbl:'carbs', val:tot.carb, tgt:trkTargets.carb },
-    { k:'fat', lbl:'fat', val:tot.fat, tgt:trkTargets.fat },
-    { k:'fib', lbl:'fibre', val:tot.fib, tgt:trkTargets.fib },
-  ];
-  const macroHtml = macroDefs.map(m => {
-    const pct = m.tgt > 0 ? Math.min(100, Math.round(m.val/m.tgt*100)) : 0;
-    const v = m.k==='cal' ? Math.round(m.val) : trkRound1(m.val);
-    return `<div class="trk-macro">
-      <div class="trk-mval">${v}</div>
-      <div class="trk-mlbl">${m.lbl}</div>
-      <div class="trk-bar ${m.cls||''}"><span style="width:${pct}%"></span></div>
-      <div class="trk-mtgt">/ ${m.k==='cal'?m.tgt:m.tgt+'g'}</div>
-    </div>`;
-  }).join('');
-
-  // diary line
   const food = Math.round(tot.cal), ex = Math.round(trkExerciseCals());
   const tdee = (trkMeta.tdee!=null && trkMeta.tdee!=='') ? Math.round(trkNum(trkMeta.tdee)) : null;
-  let diaryHtml;
-  if(tdee!=null){
-    // TDEE logged (e.g. Apple Watch EOD) — true deficit = burn − food. Exercise is already inside TDEE, so it is NOT added.
-    const deficit = tdee - food;
-    const isDef = deficit >= 0;
-    diaryHtml = `<div class="trk-diary">
-      <div>Burned <b>${tdee}</b></div>
-      <div>Food <b>${food}</b></div>
-      <div>${isDef?'Deficit':'Surplus'} <span class="trk-net ${isDef?'':'over'}">${Math.abs(deficit)}</span></div>
-      <div style="opacity:.55">Goal ${trkTargets.cal} · Exercise ${ex} (in TDEE)</div>
-    </div>`;
-  } else {
-    // No TDEE yet — show food vs goal, but no phantom deficit number until the day's burn is entered.
-    diaryHtml = `<div class="trk-diary">
-      <div>Goal <b>${trkTargets.cal}</b></div>
-      <div>Food <b>${food}</b></div>
-      <div>Exercise <b>${ex}</b></div>
-      <div>Deficit <span class="trk-net" style="opacity:.55">— log TDEE</span></div>
-    </div>`;
-  }
 
-  // meals
+  // ── Stat strip — Eaten / Burned / Deficit (editorial oxblood register) ──
+  const burned = tdee!=null ? tdee : ex;
+  let defLbl = 'Deficit', defVal = '—', defOver = false;
+  if(tdee!=null){
+    const deficit = tdee - food;
+    defLbl = deficit >= 0 ? 'Deficit' : 'Surplus';
+    defVal = String(Math.abs(deficit));
+    defOver = deficit < 0;
+  }
+  const stripHtml = `<div class="nd-strip">
+    <div class="nd-strip-cell"><div class="nd-strip-lbl">Eaten</div><div class="nd-strip-val">${food.toLocaleString()}</div></div>
+    <div class="nd-strip-div"></div>
+    <div class="nd-strip-cell"><div class="nd-strip-lbl">Burned</div><div class="nd-strip-val">${burned!=null?burned.toLocaleString():'—'}</div></div>
+    <div class="nd-strip-div"></div>
+    <div class="nd-strip-cell"><div class="nd-strip-lbl">${defLbl}</div><div class="nd-strip-val${defOver?' over':''}">${defVal}</div></div>
+  </div>`;
+
+  // ── Calorie hero card + progress ring ──
+  const calTgt = trkTargets.cal || 0;
+  const calPct = calTgt > 0 ? Math.round(food/calTgt*100) : 0;
+  const ringPct = Math.max(0, Math.min(100, calPct));
+  const C = 260.75; // 2π·41.5
+  const dashOffset = (C * (1 - ringPct/100)).toFixed(2);
+  const left = calTgt - food;
+  const calSub = calTgt > 0
+    ? `of ${calTgt.toLocaleString()} · ${left>=0 ? left.toLocaleString()+' left' : Math.abs(left).toLocaleString()+' over'}`
+    : 'no calorie target set';
+  const calCardHtml = `<div class="nd-cal-card">
+    <div>
+      <p class="nd-cal-label">Calories</p>
+      <p class="nd-cal-big">${food.toLocaleString()}</p>
+      <p class="nd-cal-sub">${calSub}</p>
+    </div>
+    <div class="nd-ring">
+      <svg width="92" height="92" style="transform:rotate(-90deg)">
+        <circle cx="46" cy="46" r="41.5" fill="none" stroke="var(--fn-border)" stroke-width="9"/>
+        <circle cx="46" cy="46" r="41.5" fill="none" stroke="var(--fn-accent)" stroke-width="9" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${dashOffset}"/>
+      </svg>
+      <div class="nd-ring-pct">${calPct}%</div>
+    </div>
+  </div>`;
+
+  // ── Macro cards — Protein / Carbs / Fat / Fibre ──
+  const macroDefs = [
+    { name:'Protein', val:tot.prot, tgt:trkTargets.prot },
+    { name:'Carbs',   val:tot.carb, tgt:trkTargets.carb },
+    { name:'Fat',     val:tot.fat,  tgt:trkTargets.fat },
+    { name:'Fibre',   val:tot.fib,  tgt:trkTargets.fib },
+  ];
+  const macrosHtml = `<div class="nd-macros">${macroDefs.map(m => {
+    const pct = m.tgt > 0 ? Math.round(m.val/m.tgt*100) : 0;
+    return `<div class="nd-macro">
+      <div class="nd-macro-name">${m.name}</div>
+      <div class="nd-macro-sub">${trkRound1(m.val)}g · <b>${pct}%</b></div>
+    </div>`;
+  }).join('')}</div>`;
+
+  // ── Today's log — one card per meal ──
   const mealsHtml = TRK_MEALS.map(mealId => {
     const entries = trkMealEntries(mealId);
     const mt = trkSum(entries);
-    const rows = entries.length ? entries.map(e => trkEntryRow(e)).join('') : `<div class="trk-empty">— nothing logged —</div>`;
+    const rows = entries.length ? entries.map(e => trkEntryRow(e)).join('') : `<div class="nd-empty">Nothing logged</div>`;
     const flag = trkMealFlag(entries);
-    return `<div class="trk-meal">
-      <div class="trk-meal-head">
-        <span class="trk-meal-title">${mealId}</span>
-        <span class="trk-meal-kcal">${Math.round(mt.cal)} kcal · ${trkRound1(mt.prot)}g P</span>
+    return `<div class="nd-meal">
+      <div class="nd-meal-head">
+        <span class="nd-meal-name">${mealId}</span>
+        <span class="nd-meal-sum">${Math.round(mt.cal)} kcal · ${trkRound1(mt.prot)}g P</span>
       </div>
       ${rows}
-      ${flag ? `<div class="trk-flag">⚠ ${trkEsc(flag)}</div>` : ''}
-      <button class="trk-addbtn" style="margin-top:4px" onclick="trkOpenAddChooser('${mealId}')">＋ add to ${mealId}</button>
-      ${entries.length ? `<button class="trk-addbtn" style="margin-top:4px" onclick="trkSaveMealFromSlot('${mealId}')">💾 save as meal</button>` : ''}
+      ${flag ? `<div class="nd-flag">${trkEsc(flag)}</div>` : ''}
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="nd-add" onclick="trkOpenAddChooser('${mealId}')"><svg class="ic" style="width:14px;height:14px"><use href="#ic-plus"/></svg>Add to ${mealId}</button>
+        ${entries.length ? `<button class="nd-add" onclick="trkSaveMealFromSlot('${mealId}')">Save as meal</button>` : ''}
+      </div>
     </div>`;
   }).join('');
 
-  // exercise
-  const exList = (trkMeta.exercise||[]).map((x,i)=>`<div class="trk-entry"><span class="trk-etitle">${trkEsc(x.name)}<small>${x.durationMin?x.durationMin+' min':''}</small></span><span class="trk-emac">${Math.round(trkNum(x.caloriesBurned))} kcal</span><button class="trk-del" onclick="trkDeleteExercise(${i})">×</button></div>`).join('') || `<div class="trk-empty">— none —</div>`;
-  const exerciseHtml = `<div class="trk-card">
-    <div class="trk-meal-head"><span class="trk-meal-title">🏃 Exercise</span><span class="trk-meal-kcal">${ex} kcal burned</span></div>
+  // ── Exercise + TDEE card ──
+  const exList = (trkMeta.exercise||[]).map((x,i)=>`<div class="nd-logrow"><span class="nd-lt">${trkEsc(x.name)}<small>${x.durationMin?x.durationMin+' min':''}</small></span><span class="nd-lm">${Math.round(trkNum(x.caloriesBurned))} kcal</span><button class="nd-lbtn" onclick="trkDeleteExercise(${i})" title="Remove">×</button></div>`).join('') || `<div class="nd-empty">None</div>`;
+  const exerciseHtml = `<div class="nd-meal">
+    <div class="nd-meal-head"><span class="nd-meal-name">Exercise</span><span class="nd-meal-sum">${ex} kcal burned</span></div>
     ${exList}
-    <button class="trk-addbtn" style="margin-top:6px" onclick="trkOpenExercise()">＋ add exercise</button>
-    <div class="trk-field" style="margin-top:10px">
+    <div style="margin-top:10px"><button class="nd-add" onclick="trkOpenExercise()"><svg class="ic" style="width:14px;height:14px"><use href="#ic-plus"/></svg>Add exercise</button></div>
+    <div class="trk-field" style="margin-top:12px">
       <label>TDEE — total burned today (Apple Watch EOD)</label>
       <input id="trkTdeeInput" type="number" step="any" value="${tdee!=null?tdee:''}" placeholder="e.g. 2100" onchange="trkSetTdee(this.value)">
     </div>
-    ${tdee!=null ? `<div class="trk-sub" style="margin-top:4px;opacity:.7">Deficit is measured against TDEE. Exercise above is already included in this figure, so it isn't added separately.</div>` : `<div class="trk-sub" style="margin-top:4px;opacity:.7">Enter your end-of-day total burn to see today's true deficit (TDEE − food).</div>`}
+    ${tdee!=null ? `<div class="trk-sub" style="margin-top:6px;opacity:.7">Deficit is measured against TDEE. Exercise above is already included, so it isn't added separately.</div>` : `<div class="trk-sub" style="margin-top:6px;opacity:.7">Enter your end-of-day total burn to see today's true deficit (TDEE − food).</div>`}
   </div>`;
 
   body.innerHTML = `
-    <div class="trk-card"><div class="trk-macros">${macroHtml}</div></div>
-    <div class="trk-card">${diaryHtml}</div>
-    <div class="trk-card">${mealsHtml}</div>
+    ${stripHtml}
+    ${calCardHtml}
+    ${macrosHtml}
+    <p class="nd-loglabel">Today's log</p>
+    ${mealsHtml}
     ${exerciseHtml}
-    ${!trkHasCloud() ? `<div class="trk-empty" style="text-align:center">⚠ No Supabase credentials — logging to this browser only. Add them in Settings 🔑 to sync.</div>` : ''}
+    ${!trkHasCloud() ? `<div class="nd-empty" style="text-align:center;border:none">No Supabase credentials — logging to this browser only. Add them in Settings to sync.</div>` : ''}
   `;
 }
 
 function trkEntryRow(e){
   const src = e.nutrition_source && e.nutrition_source!=='manual' ? `<span class="trk-chip">${trkEsc(e.nutrition_source)}</span>` : '';
   const qty = (e.serving_qty && e.serving_unit) ? `<small>${trkRound1(e.serving_qty)} ${trkEsc(e.serving_unit)}</small>` : '';
-  return `<div class="trk-entry">
-    <span class="trk-etitle">${trkEsc(e.title)}${src}${qty}</span>
-    <span class="trk-emac">${Math.round(trkNum(e.calories))} kcal · ${trkRound1(e.protein_g)}P ${trkRound1(e.carbs_g)}C ${trkRound1(e.fat_g)}F</span>
-    <button class="trk-del" onclick="trkOpenEditEntry('${e.id}')" title="Edit quantity">✎</button>
-    <button class="trk-del" onclick="trkRemoveEntry('${e.id}')" title="Remove">×</button>
+  return `<div class="nd-logrow">
+    <span class="nd-lt">${trkEsc(e.title)}${src}${qty}</span>
+    <span class="nd-lm">${Math.round(trkNum(e.calories))} kcal · ${trkRound1(e.protein_g)}P ${trkRound1(e.carbs_g)}C ${trkRound1(e.fat_g)}F</span>
+    <button class="nd-lbtn" onclick="trkOpenEditEntry('${e.id}')" title="Edit quantity">✎</button>
+    <button class="nd-lbtn" onclick="trkRemoveEntry('${e.id}')" title="Remove">×</button>
   </div>`;
 }
 
@@ -5678,8 +6095,8 @@ function trkOpenAddChooser(meal){
     <div class="trk-tiles">
       <button class="trk-tile" onclick="trkOpenQuickAdd()"><b>✨ Quick add (AI)</b><span>Type a meal in plain English</span></button>
       <button class="trk-tile" onclick="trkOpenSavedMealPick()"><b>🍱 Saved meals</b><span>Reuse a meal you saved</span></button>
-      <button class="trk-tile" onclick="trkOpenStaplePick()"><b>🥫 From staple</b><span>Your saved products</span></button>
-      <button class="trk-tile" onclick="trkOpenRecipePick()"><b>🍳 From recipe</b><span>Search your Supabase recipes</span></button>
+      <button class="trk-tile" onclick="trkOpenStaplePick()"><b>From staple</b><span>Your saved products</span></button>
+      <button class="trk-tile" onclick="trkOpenRecipePick()"><b>From recipe</b><span>Search your Supabase recipes</span></button>
       <button class="trk-tile" onclick="trkOpenManual()"><b>✏️ Manual macros</b><span>Enter full nutrition</span></button>
       <button class="trk-tile" onclick="trkOpenQuickCal()"><b>🔢 Quick calories</b><span>Title + calories only</span></button>
       <button class="trk-tile" onclick="trkOpenDrinks()"><b>🥤 Drinks &amp; coffee</b><span>One-tap coffee, tea, water…</span></button>
@@ -5786,32 +6203,44 @@ async function trkSubmitQuickCal(){
 // ── staple picker ───────────────────────────────────────────────────────────
 function trkOpenStaplePick(){
   const meal = trkChooserMeal();
-  if(!trkStaples.length){ trkModal(`<h3>No staples yet</h3><div class="trk-sub">Add products via the 🥫 Staples button${trkHasCloud()?'':' (after adding Supabase credentials)'}.</div>`); return; }
-  const opts = trkStaples.map(s=>`<option value="${s.id}">${trkEsc(s.name)}</option>`).join('');
+  if(!trkStaples.length){ trkModal(`<h3>No staples yet</h3><div class="trk-sub">Add products via the Staples button${trkHasCloud()?'':' (after adding Supabase credentials)'}.</div>`); return; }
   trkModal(`
     <h3>Add from staple</h3>
     <div class="trk-field"><label>Meal</label><select id="trkMeal">${trkMealOptions(meal)}</select></div>
-    <div class="trk-field"><label>Product</label><select id="trkStapleSel" onchange="trkStaplePreview()">${opts}</select></div>
+    <div class="trk-field"><label>Search</label><input id="trkStaplePickFilter" placeholder="name or alias…" oninput="trkRenderStaplePickOptions()"></div>
+    <div class="trk-field"><label>Product</label><select id="trkStapleSel" onchange="trkStaplePreview()"></select></div>
     <div class="trk-field"><label>Quantity (in the product's own unit)</label><input id="trkStapleQty" type="number" step="any" value="" oninput="trkStaplePreview()" placeholder="how much?"></div>
     <div class="trk-sub" id="trkStaplePrev"></div>
     <button class="trk-btn" onclick="trkSubmitStaple()">Add</button>
   `);
+  trkRenderStaplePickOptions();
+}
+function trkRenderStaplePickOptions(){
+  const sel = document.getElementById('trkStapleSel'); if(!sel) return;
+  const filter = document.getElementById('trkStaplePickFilter');
+  const prev = sel.value;
+  const list = trkMatchStaples(filter ? filter.value : '');
+  sel.innerHTML = list.map(s=>`<option value="${s.id}">${trkEsc(s.name)}</option>`).join('');
+  // Keep the current pick selected if it survived the filter.
+  if(list.some(s=>String(s.id)===String(prev))) sel.value = prev;
   trkStaplePreview();
 }
 function trkStapleById(id){ return trkStaples.find(s=>String(s.id)===String(id)); }
 function trkStaplePreview(){
-  const s = trkStapleById(document.getElementById('trkStapleSel').value); if(!s) return;
+  const prevEl = document.getElementById('trkStaplePrev');
+  const s = trkStapleById(document.getElementById('trkStapleSel').value);
+  if(!s){ if(prevEl) prevEl.innerHTML = '<span style="color:var(--text3)">No matching products.</span>'; return; }
   const base = trkNum(s.serving_qty)||1;
   const qty = trkNum(document.getElementById('trkStapleQty').value);
   const f = qty>0 ? qty/base : 0;
-  const prev = document.getElementById('trkStaplePrev');
   const unitNote = `Base: ${trkRound1(s.serving_qty)} ${trkEsc(s.serving_unit)} = ${Math.round(trkNum(s.calories))}kcal · ${trkRound1(s.protein_g)}P ${trkRound1(s.carbs_g)}C ${trkRound1(s.fat_g)}F`;
-  prev.innerHTML = (qty>0)
+  prevEl.innerHTML = (qty>0)
     ? `→ <b>${Math.round(trkNum(s.calories)*f)} kcal</b> · ${trkRound1(trkNum(s.protein_g)*f)}P ${trkRound1(trkNum(s.carbs_g)*f)}C ${trkRound1(trkNum(s.fat_g)*f)}F ${trkRound1(trkNum(s.fibre_g)*f)}Fb<br><span style="color:var(--text3)">${unitNote}${s.notes?' · '+trkEsc(s.notes):''}</span>`
     : `<span style="color:var(--text3)">${unitNote}${s.notes?' · '+trkEsc(s.notes):''}</span>`;
 }
 async function trkSubmitStaple(){
-  const s = trkStapleById(document.getElementById('trkStapleSel').value); if(!s) return;
+  const s = trkStapleById(document.getElementById('trkStapleSel').value);
+  if(!s){ showToast('Pick a product'); return; }
   const base = trkNum(s.serving_qty)||1;
   const qty = trkNum(document.getElementById('trkStapleQty').value);
   if(qty<=0){ showToast('Enter a quantity'); return; }
@@ -5908,15 +6337,30 @@ async function trkOpenStaples(){
   await trkLoadStaples(true);
   trkRenderStaplesManager();
 }
-function trkRenderStaplesManager(){
-  const rows = trkStaples.length ? trkStaples.map(s=>`<div class="trk-staple-row">
+// Match staples on name or any alias — shared by the manager and the picker.
+function trkMatchStaples(q){
+  const s = (q||'').toLowerCase().trim();
+  if(!s) return trkStaples;
+  return trkStaples.filter(p =>
+    (p.name||'').toLowerCase().includes(s) ||
+    (p.aliases||[]).some(a => (a||'').toLowerCase().includes(s))
+  );
+}
+function trkRenderStapleList(){
+  const el = document.getElementById('trkStapleList'); if(!el) return;
+  const filter = document.getElementById('trkStapleFilter');
+  const list = trkMatchStaples(filter ? filter.value : '');
+  el.innerHTML = list.length ? list.map(s=>`<div class="trk-staple-row">
     <span class="nm">${trkEsc(s.name)}<br><span style="color:var(--text3);font-size:10px">${trkRound1(s.serving_qty)}${trkEsc(s.serving_unit)} · ${Math.round(trkNum(s.calories))}kcal ${trkRound1(s.protein_g)}P ${trkRound1(s.carbs_g)}C ${trkRound1(s.fat_g)}F</span></span>
-    <button onclick="trkDeleteStaple('${s.id}').then(trkRenderStaplesManager)" title="Delete">🗑</button>
-  </div>`).join('') : '<div class="trk-empty">No staples yet.</div>';
+    <button onclick="trkDeleteStaple('${s.id}').then(trkRenderStapleList)" title="Delete">🗑</button>
+  </div>`).join('') : `<div class="trk-empty">${trkStaples.length ? 'No matching products.' : 'No staples yet.'}</div>`;
+}
+function trkRenderStaplesManager(){
   trkModal(`<h3>Staple products</h3>
     <div class="trk-sub">Your most-used products with fixed nutrition. These power the AI quick-add.</div>
-    <div style="max-height:240px;overflow-y:auto;margin-bottom:14px">${rows}</div>
-    <div style="display:flex;gap:8px;margin-bottom:14px"><button class="trk-btn sec" onclick="trkOpenBulkStaples()">📋 Bulk paste a list</button></div>
+    <div class="trk-field"><label>Search</label><input id="trkStapleFilter" placeholder="name or alias…" oninput="trkRenderStapleList()"></div>
+    <div id="trkStapleList" style="max-height:240px;overflow-y:auto;margin-bottom:14px"></div>
+    <div style="display:flex;gap:8px;margin-bottom:14px"><button class="trk-btn sec" onclick="trkOpenBulkStaples()">Bulk paste a list</button></div>
     <h3 style="font-size:14px">Add a product</h3>
     <div class="trk-field"><label>Name</label><input id="trkSpName" placeholder="e.g. Lidl soya yoghurt"></div>
     <div class="trk-row"><div class="trk-field"><label>Per qty</label><input id="trkSpQty" type="number" step="any" value="100"></div><div class="trk-field"><label>Unit</label><input id="trkSpUnit" value="g"></div></div>
@@ -5925,6 +6369,7 @@ function trkRenderStaplesManager(){
     <div class="trk-field"><label>Aliases (comma-separated, optional)</label><input id="trkSpAlias" placeholder="pb, peanut butter"></div>
     <div class="trk-field"><label>Notes (optional)</label><input id="trkSpNotes" placeholder="e.g. 1 tbsp ≈ 8g"></div>
     <button class="trk-btn" onclick="trkSubmitStapleProduct()">Save product</button>`);
+  trkRenderStapleList();
 }
 async function trkSubmitStapleProduct(){
   const name = document.getElementById('trkSpName').value.trim(); if(!name){ showToast('Enter a name'); return; }
@@ -5953,7 +6398,7 @@ async function trkUpsertStaplesBatch(arr){
 // ── bulk paste staples (AI-parsed) ──────────────────────────────────────────
 function trkOpenBulkStaples(){
   const noKey = !localStorage.getItem('ds_api_key');
-  trkModal(`<h3>📋 Bulk add staples</h3>
+  trkModal(`<h3>Bulk add staples</h3>
     <div class="trk-sub">Paste a list of products with their nutrition (any format — per 100g, per serving, with notes). Claude extracts each one; you review before saving.</div>
     ${noKey ? `<div class="trk-flag">No Anthropic API key saved — <a onclick="trkCloseModal();openSettings()" style="cursor:pointer;text-decoration:underline">add one in Settings</a> to use bulk paste.</div>` : ''}
     <div class="trk-field"><label>Paste your list</label><textarea id="trkBulkText" style="min-height:140px" placeholder="e.g.\nSoya yoghurt — Lidl: 46 kcal, 4.2g P, 2.1g C, 2.2g F, 0.7g fibre per 100g\nPBfit powder: 443 kcal, 49g P, 33g C, 13g F, 17g fibre per 100g (1 tbsp ≈ 8g)\n..."></textarea></div>
@@ -5965,7 +6410,7 @@ async function trkRunBulkStaples(){
   if(!key){ showToast('Add your Anthropic API key in Settings'); return; }
   const text = document.getElementById('trkBulkText').value.trim();
   if(!text){ showToast('Paste a list first'); return; }
-  const btn = document.getElementById('trkBulkBtn'); btn.disabled = true; btn.textContent = '⏳ Parsing…';
+  const btn = document.getElementById('trkBulkBtn'); btn.disabled = true; btn.textContent = 'Parsing…';
   const resultEl = document.getElementById('trkBulkResult'); resultEl.innerHTML = '';
   const systemPrompt = `You extract staple food products and their nutrition from a pasted list into structured data for a coeliac (gluten-free) and dairy-free user.
 
@@ -5996,7 +6441,7 @@ Rules:
     });
     if(!res.ok){ const e = await res.json().catch(()=>({})); throw new Error(e.error?.message || ('API error '+res.status)); }
     const data = await res.json();
-    let raw = (data.content?.[0]?.text || '').replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/i,'').trim();
+    let raw = claudeText(data).replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/i,'').trim();
     const start = raw.indexOf('['), end = raw.lastIndexOf(']');
     if(start>=0 && end>start) raw = raw.slice(start, end+1);
     const items = trkParseJsonLoose(raw);
@@ -6085,7 +6530,7 @@ async function trkRunQuickAdd(){
   const meal = document.getElementById('trkMeal').value;
   const text = document.getElementById('trkQaText').value.trim();
   if(!text){ showToast('Type what you ate'); return; }
-  const btn = document.getElementById('trkQaBtn'); btn.disabled = true; btn.textContent = '⏳ Analysing…';
+  const btn = document.getElementById('trkQaBtn'); btn.disabled = true; btn.textContent = 'Analysing…';
   const resultEl = document.getElementById('trkQaResult'); resultEl.innerHTML = '';
 
   const stapleCtx = trkBuildStapleContext();
@@ -6131,7 +6576,7 @@ Rules:
     });
     if(!res.ok){ const e = await res.json().catch(()=>({})); throw new Error(e.error?.message || ('API error '+res.status)); }
     const data = await res.json();
-    let raw = (data.content?.[0]?.text || '').replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/i,'').trim();
+    let raw = claudeText(data).replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/i,'').trim();
     const start = raw.indexOf('['), end = raw.lastIndexOf(']');
     if(start>=0 && end>start) raw = raw.slice(start, end+1);
     const items = trkParseJsonLoose(raw);
@@ -6161,7 +6606,7 @@ function trkRenderQuickConfirm(meal, items){
     <div class="trk-sub">Review &amp; adjust quantities, then save to <b>${meal}</b>:</div>
     ${rowsHtml}
     <button class="trk-btn" style="margin-top:8px" onclick="trkCommitQuickAdd('${meal}')">Save ${items.length} item${items.length>1?'s':''}</button>
-    <button class="trk-btn sec" style="margin-top:6px" onclick="trkSaveMealFromQa('${meal}')">💾 Save as reusable meal</button>`;
+    <button class="trk-btn sec" style="margin-top:6px" onclick="trkSaveMealFromQa('${meal}')">Save as reusable meal</button>`;
   const btn = document.getElementById('trkQaBtn'); if(btn){ btn.disabled=false; btn.textContent='Re-analyse'; }
 }
 function trkQaMacStr(r){ const f=r.qty; return `${Math.round(r.perUnit.calories*f)}kcal ${trkRound1(r.perUnit.protein_g*f)}P ${trkRound1(r.perUnit.carbs_g*f)}C ${trkRound1(r.perUnit.fat_g*f)}F`; }

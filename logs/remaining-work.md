@@ -1,0 +1,300 @@
+# Remaining recipe edits — master worklist
+
+Compiled from the library audit (`macro-audit.md`). Format for recalcs:
+`stored kcal → recompute estimate`. Defaults when firming: **light coconut** (unless recipe
+says otherwise), **cooked quinoa**, **85 g instant-noodle pack**. Estimates are audit-pass
+figures; each gets firmed to precise 6-macro per-serving values when written.
+
+★ = was on the Tier 2 priority list — **all ★ now DONE** (written 2026-07-16, Batch A4, with
+optional toppings included; precise after-values in `macro-audit.md`).
+
+---
+
+## ▶ RESUME HERE (updated 2026-07-24, end of Batch O)
+
+**COMPLETE.** Every section (§A–§G) is closed. The whole `ready` library carries a full
+6-macro set (0 null macros).
+
+| Section | Status |
+|---|---|
+| A. Under-counted recalcs | ✅ done (all recalcs written) |
+| B. Over-stated / serving-count | ✅ done (14/14) |
+| C. Duplicate rows | ✅ done (3/3) |
+| D. Ingredient-list integrity | ✅ done (4/4) |
+| E. Empty ingredient lists | ✅ done (8/8) |
+| F. Partial — need one quantity | ✅ done (24/24) |
+| G. Macro-completeness fills | ✅ done (34/34) |
+
+### History (newest first)
+- **Batch O (2026-07-24)** — resolved the final 4 decision-gated §A items with Saffron's calls:
+  Middle Eastern Chicken & Rice Bowl → **658** (½ cup cooked rice/serve), Pho Gà → **750**
+  (full edible meat split ÷4, broth fat skimmed), Thai Red Curry Pot Roast → **920** (meat only,
+  oil reduced, rice excluded + noted), Chicken and Potato Traybake → **590** (eyeball). This
+  **closes §A and the entire §A–§G macro-correction stream.** Details in `macro-audit.md`.
+- **Batch N (2026-07-24)** — reconciled §A against the live DB: 84 items the worklist still showed
+  as `[ ]` had in fact been written by Batch B (just never ticked) → verified + ticked; 3 that
+  genuinely still held their old value were recomputed (Single Serve Double Chocolate Butter Cake
+  →358, Skillet Chicken Thighs w/ Mushroom Gravy →425, Basic Oat Flour Pancakes →160).
+- **Batch M (2026-07-24)** — closed the last 3 null-macro §A rows (Raspberry Cheesecake Bowl →285,
+  Roasted Cod on Sweet Potato →590, Single Serve Sticky Date Pudding →316); library reached
+  **0 rows with any null macro**.
+
+Use the `recipe-db` skill for schema + non-destructive-write conventions. All work is data-only
+in Supabase `recipes` — no `index.html`/`sw.js` change, no cache bump.
+
+---
+
+## A. Recalculate — under-counted (stored too low). Biggest bucket; straight recompute+write.
+
+- [x] 4 Ingredient Rice Cake Chocolate Bars — 165→266  — done (Batch B; verified in DB 2026-07-24)
+- [x] Air Fryer Cinnamon Roll Oats — 398→616 → already recomputed to 641; renamed to "Cinnamon Roll Baked Oats @tracesoats" in Batch G (pairs with the @entirelyemmy §B recipe)
+- [x] Baked Middle Eastern Chicken Tray — 318→377  — done (Batch B; verified in DB 2026-07-24)
+- [x] Basic Oat Flour Pancakes — recomputed to **160** (Batch N, 2026-07-24; full 6 macros, staple-grounded)
+- [x] ★ Blended Overnight Oats — 398→475
+- [x] ★ Blueberry, Lemon & Coconut Overnight Oats — 332→437
+- [x] Butternut Squash Mac and Cheese — 348→542  — done (Batch B; verified in DB 2026-07-24)
+- [x] Caramelised Onion Rice with Tikka Cod — 488→578  — done (Batch B; verified in DB 2026-07-24)
+- [x] Carrot Cake Meal Prep Baked Oats — 318→386  — done (Batch B; verified in DB 2026-07-24)
+- [x] Chicken & Egg Breakfast Casserole — 228→315  — done (Batch B; verified in DB 2026-07-24)
+- [x] Chicken and Potato Traybake — recomputed **590/37/26/37/3/3** (Batch O, 2026-07-24; eyeball ~590 per Saffron — bone-in/skin-on legs+thighs+Flora)
+- [x] Chicken Shawarma Crispy Rice Salad — 488→657  — done (Batch B; verified in DB 2026-07-24)
+- [x] Chile Lime Chipotle Chicken — 338→392  — done (Batch B; verified in DB 2026-07-24)
+- [x] Chili Crunch Ground Chicken Bowls — 398→498  — done (Batch B; verified in DB 2026-07-24)
+- [x] Choc, PB and Raspberry Overnight Oats — 388→496  — done (Batch B; verified in DB 2026-07-24)
+- [x] ★ Chocolate Chia Overnight Oats — 502→689
+- [x] Chocolate Date Peanut Butter Squares — 128→165  — done (Batch B; verified in DB 2026-07-24)
+- [x] Chocolate Hazelnut Cookie Dough Balls — 128→177  — done (Batch B; verified in DB 2026-07-24)
+- [x] Chocolate Peanut Butter Protein Cookie Dough — 228→257  — done (Batch B; verified in DB 2026-07-24)
+- [x] Chocolate Raspberry Baked Protein Oats — 168→210  — done (Batch B; verified in DB 2026-07-24)
+- [x] Chocolate Strawberry Baked Oats — 405→487  — done (Batch B; verified in DB 2026-07-24)
+- [x] ★ Chocolate Tahini Brownies — 178→273
+- [x] Chopped Jalapeño Cheddar Chicken Salad — 185→253  — done (Batch B; verified in DB 2026-07-24)
+- [x] Cinnamon Buckwheat Smoothie — 398→498  — done (Batch B; verified in DB 2026-07-24)
+- [x] Coffee Protein Ice Cream Affogato — 175→321 (+null macros)  — done (Batch B; verified in DB 2026-07-24)
+- [x] Cookie Dough Caramel Bars — 188→224  — done (Batch B; verified in DB 2026-07-24)
+- [x] Copycat Nando's Peri Peri Chicken Burgers — 518→772  — done (Batch B; verified in DB 2026-07-24)
+- [x] Cottage Cheese Pancakes — 218→328  — done (Batch B; verified in DB 2026-07-24)
+- [x] Creamy Peanut Miso Ramen — 528→998  — done (Batch B; verified in DB 2026-07-24)
+- [x] Crispy Bang Bang Chicken — 427→539  — done (Batch B; verified in DB 2026-07-24)
+- [x] Crispy Chicken Rice Paper Dumplings — 358→450  — done (Batch B; verified in DB 2026-07-24)
+- [x] Crispy Rice Paper Spring Rolls Without Frying — 198→412  — done (Batch B; verified in DB 2026-07-24)
+- [x] Crispy Rice Tuna Salad — 418→494  — done (Batch B; verified in DB 2026-07-24)
+- [x] Crispy Rosemary Chicken w/ Apple Beetroot Slaw — 412→742 (+null macros)  — done (Batch B; verified in DB 2026-07-24)
+- [x] Easy Chicken Traybake — DELETED as §C duplicate (survivor = Chicken and Potato Traybake)
+- [x] Easy Chipotle Chicken & Corn Salsa — 338→425  — done (Batch B; verified in DB 2026-07-24)
+- [x] Easy Tuna Salad Mix — 148→224  — done (Batch B; verified in DB 2026-07-24)
+- [x] Fluffy Breakfast Carrot Cake Loaf — 250→330 (+null macros)  — done (Batch B; verified in DB 2026-07-24)
+- [x] Fluffy Vegan Protein Pancakes — 288→339  — done (Batch B; verified in DB 2026-07-24)
+- [x] Garlic Cucumber Salad — 38→64 (minor, tiny absolute)  — done (Batch B; verified in DB 2026-07-24)
+- [x] Giant Rice Cake Snickers Wagon Wheel — 488→630  — done (Batch B; verified in DB 2026-07-24)
+- [x] Glowing Skin Soup — 148→242  — done (Batch B; verified in DB 2026-07-24)
+- [x] Gluten Free Cinnamon Buns — 488→1188 (also check serves, §B)  — done (Batch B; verified in DB 2026-07-24)
+- [x] ★ Halloween Chocolate Almond Butter Balls — 118→175
+- [x] Healthy Lemon Bars — 178→260  — done (Batch B; verified in DB 2026-07-24)
+- [x] High Fibre Sticky Toffee Oats — 420→948 (+null macros)  — done (Batch B; verified in DB 2026-07-24)
+- [x] High Protein Carrot Cake Overnight Oats — 448→607  — done (Batch B; verified in DB 2026-07-24)
+- [x] High Protein Chickpea Flour Pancakes — 318→432  — done (Batch B; verified in DB 2026-07-24)
+- [x] High Protein Pumpkin Spice Muffins — 88→114  — done (Batch B; verified in DB 2026-07-24)
+- [x] Honey Glazed Salmon Bowls with Peach Salsa — 298→439  — done (Batch B; verified in DB 2026-07-24)
+- [x] Honey Mustard Chicken Power Bowl — 488→684  — done (Batch B; verified in DB 2026-07-24)
+- [x] Lemon and Blueberry Baked Oats — 248→383  — done (Batch B; verified in DB 2026-07-24)
+- [x] Loaf Pan Lemon & Yoghurt Chicken — 298→293 (protein 32→~44)  — done (Batch B; verified in DB 2026-07-24)
+- [x] ★ Maple Cinnamon Pumpkin Overnight Oats — 368→599
+- [x] Marinated Chicken Thighs w/ Mint Jalapeño Sauce — 448→623  — done (Batch B; verified in DB 2026-07-24)
+- [x] Matcha Date Butter Balls — 98→136  — done (Batch B; verified in DB 2026-07-24)
+- [x] Microwave Chocolate Protein Oats — 248→380  — done (Batch B; verified in DB 2026-07-24)
+- [x] Middle Eastern Chicken & Rice Bowl — recomputed **658/48/41/33/3.5/4.5** (Batch O, 2026-07-24; ½ cup cooked rice/serve per Saffron)
+- [x] Miso Peanut Ramen Bowl — 498→628  — done (Batch B; verified in DB 2026-07-24)
+- [x] ★ No Bake Coconut Cookies — 168→242
+- [x] One Pan Vegan Sushi Bake — 464→633  — done (Batch B; verified in DB 2026-07-24)
+- [x] Pad Thai with Chicken and Prawns — 528→650  — done (Batch B; verified in DB 2026-07-24)
+- [x] Pad Thai with Prawns — 418→511  — done (Batch B; verified in DB 2026-07-24)
+- [x] Peach and Nectarine Overnight Oats — 318→400  — done (Batch B; verified in DB 2026-07-24)
+- [x] Peaches and Cream Chia Pudding — 195→244  — done (Batch B; verified in DB 2026-07-24)
+- [x] Peanut Butter and Jam Breakfast Oat Bars — 248→374  — done (Batch B; verified in DB 2026-07-24)
+- [x] Peanut Tofu Salad Jars — 278→351  — done (Batch B; verified in DB 2026-07-24)
+- [x] Pho Gà - Vietnamese Chicken Pho — recomputed **750/55/90/18/3.5/11** (Batch O, 2026-07-24; full edible meat split ÷4, broth fat skimmed)
+- [x] Phò Inspired Chicken Broth and Rice — DONE (already populated: @food_bylucy, serves 2, 581/36/85/10/4.5/31, full ingredients match Saffron's paste). NB: distinct from "Sticky Soy Chicken w/ Garlic Rice" (also @food_bylucy) — confirmed 2026-07-23, they are two different recipes.
+- [x] Prawn Fried Rice — 428→551  — done (Batch B; verified in DB 2026-07-24)
+- [x] Protein Packed Roasted Squash Pasta — 348→597  — done (Batch B; verified in DB 2026-07-24)
+- [x] Pumpkin Bread — 238→257  — done (Batch B; verified in DB 2026-07-24)
+- [x] Pumpkin Brookies — 348→532  — done (Batch B; verified in DB 2026-07-24)
+- [x] Pumpkin Candy Apple Salad — 498→913 (portion-heavy single serving)  — done (Batch B; verified in DB 2026-07-24)
+- [x] Pumpkin Cream Cheese Muffins — 298→496  — done (Batch B; verified in DB 2026-07-24)
+- [x] Raspberry Cheesecake Protein Bowl — 225→**285** (Batch M, 2026-07-24; all 6 macros)
+- [x] ★ Raspberry Chocolate Chip Baked Oatmeal — 468→750
+- [x] Raspberry Coconut Chocolate Bars — 128→190  — done (Batch B; verified in DB 2026-07-24)
+- [x] Roast Chicken Rice Salad — DELETED as §C duplicate (survivor = Roast Chicken and Charred Corn Rice Salad, 488)
+- [x] Roasted Butternut Squash and Carrot Soup — 188→307  — done (Batch B; verified in DB 2026-07-24)
+- [x] Roasted Cod on Sweet Potato — 347→**590** (Batch M, 2026-07-24; all 6 macros)
+- [x] Salmon Crispy Rice Paper Bites — 198→275  — done (Batch B; verified in DB 2026-07-24)
+- [x] Seared Miso Tuna Crispy Rice Bowl — 528→611  — done (Batch B; verified in DB 2026-07-24)
+- [x] Simple Salmon Bowl — 488→561  — done (Batch B; verified in DB 2026-07-24)
+- [x] Single Serve Double Chocolate Butter Cake — recomputed to **358** (Batch N, 2026-07-24; full 6 macros, staple-grounded)
+- [x] Single Serve Sticky Date Pudding — 235→**316** (Batch M, 2026-07-24; carbs+cal recomputed, fibre/sugar filled)
+- [x] Skillet Chicken Thighs with Mushroom Gravy — recomputed to **425** (Batch N, 2026-07-24; full 6 macros, staple-grounded)
+- [x] ★ Snickers Overnight Oats — 412→534
+- [x] Speedy Pad Thai Noodle Salad — 420→560 (+null macros)  — done (Batch B; verified in DB 2026-07-24)
+- [x] Spicy Asian Noodles with Spinach & Chilli Crisp — 348→522  — done (Batch B; verified in DB 2026-07-24)
+- [x] Spicy Tofu Bowl — 550→694 (+null macros)  — done (Batch B; verified in DB 2026-07-24)
+- [x] Spicy Tuna Bowl — 448→573  — done (Batch B; verified in DB 2026-07-24)
+- [x] Sticky Chicken, Gochujang & Coconut Broth on Sticky Rice — done (Batch B: 655, rice-excluded + light coconut)
+- [x] Sticky Soy Chicken w/ Garlic Rice in Spicy Broth — 618→1533 (check serves, §B — likely 2)  — done (Batch B; verified in DB 2026-07-24)
+- [x] ★ Sticky Toffee Chia Pudding — 378→462
+- [x] ★ Sticky Toffee Date Oats — 445→741
+- [x] Summer Peach Chia Pudding — 388→589  — done (Batch B; verified in DB 2026-07-24)
+- [x] Summer Salmon and Blackberry Salad — 398→564 (fix ingredients first, §D)  — done (Batch B; verified in DB 2026-07-24)
+- [x] Sunflower Sesame Date Chocolate Bites — 108→156  — done (Batch B; verified in DB 2026-07-24)
+- [x] ★ Sweet Potato Chocolate Cake — 148→237
+- [x] ★ Sweet Potato Chocolate Chip Cookies — 138→211
+- [x] ★ Tahini Oat Chocolate Chip Bars — 198→315
+- [x] Thai Chicken Noodle Soup — 189→300 (+null macros)  — done (Batch B; verified in DB 2026-07-24)
+- [x] Thai Drunken Noodles (Pad Kee Mao) — 454→666 (+null macros)  — done (Batch B; verified in DB 2026-07-24)
+- [x] Thai Red Curry Pot Roast Chicken — recomputed **920/61/42/56/5.5/9** (Batch O, 2026-07-24; meat only, oil reduced, rice excluded per Saffron)
+- [x] The Easiest Soy Chicken — 448→583  — done (Batch B; verified in DB 2026-07-24)
+- [x] Tuna Avocado Wrap — 448→644  — done (Batch B; verified in DB 2026-07-24)
+- [x] Tuna Melt Sandwich — 548→733  — done (Batch B; verified in DB 2026-07-24)
+- [x] Tuna Salad Meal Prep — 168→255  — done (Batch B; verified in DB 2026-07-24)
+- [x] Vegan Chocolate Brownie Pancakes — 118→373  — done (Batch B; verified in DB 2026-07-24)
+- [x] Vegan Chocolate Fudge Cake Oats — 298→417  — done (Batch B; verified in DB 2026-07-24)
+
+## B. Recompute — over-stated (stored too high) &/or serving-count suspect
+
+Stored values look like per-recipe totals or wrong serving counts. Recompute AND decide serves.
+
+- [x] Asian Chicken Salad w/ Cucumber & Seaweed — Batch G, serves 2→1, 455/52/13/22/6.5/2.5 (full recipe supplied)
+- [x] Butternut Protein Brownie (butternut/egg-white) — Batch G, KEPT, recomputed 112/16/12/1.4/3.5/2 (serves 5)
+- [x] Butternut Protein Brownie (pumpkin/egg-white) — Batch G, DEDUPED (import_status='deleted')
+- [x] Carrot Cake Loaf — Batch G, serves 5, 104/7.5/13.5/2.5/2.5/4 (full recipe supplied; walnuts optional/excl)
+- [x] Cinnamon Roll Baked Oats — Batch G, split into @entirelyemmy (serves 10, 284) + @tracesoats (renamed from "Air Fryer Cinnamon Roll Oats", 641). See §A note.
+- [x] Crispy Rice and Chicken Salad — Batch G, serves 2, 638/40/54/29/5.5/15 (full recipe supplied)
+- [x] Fluffy Greek Yogurt Pancakes — Batch G, serves 3, 225/13/25/8/2.5/8.5 (full recipe supplied)
+- [x] Oat Flour Pancakes — Batch G, serves 12, 56/2.6/7.5/1.7/0.75/2.4 (full recipe supplied)
+- [x] Protein Brownie Bake — Batch H, recompute 246/16/26/10.5/5.5/12 (serves 2, from existing list)
+- [x] Protein Pancakes — Batch I, per pancake, serves 15→12 per Saffron → 71/4/7.5/2.7/1.2/3.8
+- [x] Salmon Poke Bowl Meal Prep — Batch H, serves 2→1, 765/36/94/24/8/28 (full recipe supplied; kimchi excl, Greek yoghurt assumed)
+- [x] Sticky Miso Chicken Prep Boxes — Batch H, serves 3, 488/41.5/40.5/19/7/10.5 (full macros filled)
+- [x] Gluten Free Cinnamon Buns — Batch H→I, serves set to 12 (Saffron's final call), recompute 585/8/92/20.5/4.5/37.5 per bun (old 488 under-counted the 800g flour + honey + frosting)
+- [x] Sticky Soy Chicken w/ Garlic Rice — Batch I, RESOLVED: rice is COOKED (Saffron), chicken bumped to 2 breasts, serves 2 → 699/53.5/60/27/6/19. Ingredient list edited (1→2 breasts) per her instruction.
+
+## C. Duplicate rows — dedupe (then correct the survivor)
+
+- [x] High Protein Salmon Potato Salad — Batch K: soft-deleted the identical dup (033408e6), filled the survivor (fff8f78d) → 895/44/80/45/19.5/13 (serves 2)
+- [x] Roast Chicken Rice Salad ≈ Roast Chicken and Charred Corn Rice Salad — Batch L: kept "Roast Chicken and Charred Corn Rice Salad" (488/38, fuller row), deleted "Roast Chicken Rice Salad" (199a8e55).
+- [x] Easy Chicken Traybake ≈ Chicken and Potato Traybake — Batch L: kept "Chicken and Potato Traybake" (448/38, carbs 26), deleted "Easy Chicken Traybake" (60029cd9).
+
+**Also (not §C):** Marinated Fish Tacos (@recipe_tin) had null serves + null macros → Batch K set serves 3, filled 540/45/45/20/5/9.
+
+## D. Ingredient-list integrity — fix ingredients BEFORE macros
+
+- [x] Café Style Jacket Potatoes with Chicken, Bacon & Sweetcorn — no potato/corn in ingredient list — RESOLVED: was already renamed to "Chicken and Bacon Caesar Pasta Salad" in Batch C with the correct Caesar recipe + method + macros (541/59). No separate Café Style row remains in the DB. Saffron re-confirmed the same recipe/method 2026-07-23.
+- [x] Chilli Lime Shrimp and Veggie Bowl — no vegetables listed (title says "Veggie") — Batch D, 280 (veg = serving suggestion, excl)
+- [x] Summer Salmon and Blackberry Salad — no blackberries listed — Batch D, 638 (written as "Summer Salad with Blackened Salmon")
+- [x] Quick Chinese Vegetable Noodle Soup — no noodles listed (also serves null, §B) — Batch C, 196
+
+## E. Empty ingredient lists — populate ingredients, then compute
+
+- [x] Apple Almond Yogurt Bowl — Batch C, 397
+- [x] Blended Raspberry Protein Chia Pudding — Batch C, 283
+- [x] Bounty Bar Overnight Oats — Batch C, 556
+- [x] Brownie Batter Overnight Oats — Batch C, deleted (`import_status='deleted'`)
+- [x] California Rolls in a Bowl — Batch C, deleted (`import_status='deleted'`)
+- [x] Carrot Cake Baked Oats (serves 1) — Batch C, 718 (un-deleted → ready)
+- [x] Strawberry Ice Cream — Batch C, 282
+- [x] Vietnamese Noodles with Lemongrass Chicken — Batch C, 641
+
+## F. Partial — need ONE missing quantity from you, then computable
+
+Mostly "rice/base to serve" with no amount, or an unweighted key item.
+
+- [x] 30 Minute Bang Bang Chicken Bowls — rice/cauli-rice base qty — Batch D, 571 (rice excl)
+- [x] Bone Broth Smothered Chicken — white rice qty — Batch D, 650 (rice excl)
+- [x] Brothy Miso Ginger Chicken and Rice — white rice qty — Batch D, 555 (rice excl)
+- [x] Buffalo Chicken Wrap — how much of the slaw/dressing is actually used — Batch D, 600
+- [x] Burger Bowl — 13 of 16 ingredients unquantified — Batch D, 472
+- [x] Caramel Rice Cake Strawberry Treat — PB / chocolate / yoghurt qty — Batch D, 409
+- [x] Chili Honey Chicken Bowl — rice qty — Batch D, 667 (rice excl)
+- [x] Chipotle Chicken & Rice Skillet — rice qty — Batch D, 424 (rice excl; protein 24.5 open decision, see macro-audit.md)
+- [x] Creamy Thai Coconut Chicken Meatballs — rice qty (+null macros) — Batch D, 305 (rice excl)
+- [x] Crispy Chilli Beef Protein Bowls — rice qty — Batch D, 437 (rice excl)
+- [x] Crispy Gluten Free Shrimp Dumplings — glutinous-rice-flour wrapper qty — Batch E, 68 (coating ~15g adhered assumed, confirmed)
+- [x] Double Roast Chicken with Chicken Fat Rice — 2 whole-chicken weights (stored null) — Batch E, 534 (1.15kg raw/chicken, ~52% roasted yield assumed, confirmed)
+- [x] Frozen Strawberry Raspberry PB Bites — PB & "1 bag" chocolate qty — Batch F, 144 (200g strawb / 150g rasp / 8 tsp PB / 100g dark choc; qtys supplied by Saffron)
+- [x] GF Easy Pan Dumplings (No Wrappers) — coating flour qty (stored null) — Batch E, 170 (coating ~15g adhered assumed, confirmed)
+- [x] GF Easy Pan Dumplings (Pan-Fried) — shaping starch qty (stored null) — Batch E, 328 (coating ~15g adhered assumed, confirmed)
+- [x] Green Goddess Chicken Prep Mix — protein 24→~35; fill null macros — Batch E, 267/28 (full recipe supplied)
+- [x] Harissa Chicken with Roasted Veg and Feta — feta qty (+null macros) — Batch E, 943 (feta excl per Saffron; thigh weight assumed, confirmed)
+- [x] Honey Sesame Salmon Bowl — rice & mayo qty — Batch E, 463 (rice excl; mayo 1 tbsp)
+- [x] Instant Noodle Jars — tofu qty — Batch E, 956 (tofu block assumed 300g, confirmed)
+- [x] Mediterranean Chicken & Rice Skillet — rice qty (stored protein looks high) — Batch E, 377 (rice excl; thigh weight assumed)
+- [x] Peanut Butter Banana French Toast — PB & banana qty — Batch E, 627 (small banana ~100g, 1 tbsp PB)
+- [x] Peanut Butter Chicken Katsu Noodles — rice & chicken qty — Batch F, 430 (rice excl; 150g cooked chicken breast/serving)
+- [x] Stuffed Breakfast Chicken Sausage Pitas — sausage type; avocado optional (+null macros) — Batch F, 397 (full recipe supplied; base w/o optional avocado)
+- [x] Thai Style Chicken Satay — rice qty — Batch F, 496 (rice excl; light coconut)
+
+## G. Macro-completeness fills — calories/protein look right, but carbs/fat/fibre/sugar are null
+
+**✅ DONE (verified 2026-07-24)** — all 34 rows below now carry complete 6-macro values in the
+DB (filled in parallel; row-by-row confirmed). Left un-ticked individually as the historical list.
+
+Quick wins: recompute just fills the missing macro fields (cal/protein already close).
+
+**✅ ALL 34 DONE — Batch J (2026-07-23).** Filled the missing carbs/fat/fibre/sugar (kept
+existing cal/protein) for every recipe below, staple-grounded from the DB ingredient lists.
+17 had all four null; 17 needed only fibre/sugar. Plus the Blueberry Protein Yoghurt Bowl
+(sugar-only gap, not on this list) filled in passing. See macro-audit.md Batch J.
+
+- [x] Banh Cuon - Vietnamese Rice Paper Rolls (fibre/sugar)
+- [x] Cauliflower Cheese Gnocchi Bake (carbs/fat/fibre/sugar)
+- [x] Char Siu Chicken (fibre/sugar)
+- [x] Chipotle Chicken Chop Bowl (fibre/sugar)
+- [x] Chocolate Banana Rice Paper Pie (fibre/sugar)
+- [x] Chocolate Chia Mousse (all macros)
+- [x] Creamy Mango and Coconut Cod Curry (all macros)
+- [x] Double Choc Fudge Cookie (all macros)
+- [x] Frozen Berry Breakfast Crumble (all macros)
+- [x] Healthy Orange & Cashew Chicken (all macros)
+- [x] High Protein Brownie Bowl (fibre/sugar)
+- [x] High Protein Chocolate Lava Pudding (all macros)
+- [x] High Protein Tiramisu Overnight Oats (fibre/sugar)
+- [x] High Protein Tuna Salad (fibre/sugar)
+- [x] Homemade Carrot Cake (fibre/sugar)
+- [x] Lemon and Coconut Cake (fibre/sugar)
+- [x] Meal Prep Spicy Tuna Quesadilla (all macros)
+- [x] Nandos Chicken Pasta Salad (fibre/sugar)
+- [x] Protein Berry Parfait (all macros)
+- [x] Protein Pancakes (Simple) (fibre/sugar)
+- [x] Protein Power BLT (all macros)
+- [x] Rice Paper Kimchi Jeon with Tuna (fibre/sugar)
+- [x] Rice Paper Pad See Ew with Shrimp (fibre/sugar)
+- [x] Smoky Caramelised Red Pepper Orzo (all macros)
+- [x] Spicy Chilli Rice Paper Wontons with Shrimp (fibre/sugar)
+- [x] Spicy Peanut Chicken Noodles (fibre/sugar)
+- [x] Spring Greens Carbonara (all macros)
+- [x] Sticky Mango Chicken Prep Bowls (all macros)
+- [x] Sticky Miso Chicken Bowl w/ Tahini Broccoli (all macros)
+- [x] Sushi Salad (all macros)
+- [x] Sweet Potato Beef Taco Bowl (fibre/sugar)
+- [x] Thai Prawn Meatball Bowl w/ Spicy Peanut Sauce (all macros)
+- [x] Tuna Chilli Crunch Salad (all macros)
+- [x] Zesty + Spicy Chicken Fusion Bowl (fibre/sugar)
+
+---
+
+## Counts
+
+| Section | Count |
+|---|---|
+| A. Recalculate — under-counted | 111 (18 done → **93 left**) |
+| B. Over-stated / serving-count | 14 (all done ✅) |
+| C. Duplicate rows | 3 (all done ✅) |
+| D. Ingredient-list integrity | 4 (all done ✅ — Café Style resolved via the Batch C rename) |
+| E. Empty ingredient lists | 8 (all done) |
+| F. Partial — need one quantity | 24 (all done ✅) |
+| G. Macro-completeness fills | 34 (all done ✅ — Batch J) |
+
+Some recipes appear in two sections (e.g. a dedupe that also needs a recompute); net unique
+≈ 190 of the ~310 ready recipes. The clean, fully-correct remainder needs nothing.
+
+**As of 2026-07-23 (Batches E–L): only §A remains — 93 under-count recomputes.** See the
+▶ RESUME HERE banner at the top for the method and the judgement-call exceptions.

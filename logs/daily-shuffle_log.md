@@ -4,6 +4,1515 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# Nutrition corrections applied, `claudeText()` parse fix shipped, both PRs merged, low-estimate bug diagnosed
+**Date:** 2026-08-02
+**Project:** Daily Shuffle — `staple_products` nutrition data, the embedded-AI response-parse path, and the AI macro-estimate accuracy investigation
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete (one bug parked as possibly-resolved — see Open Questions)
+
+---
+
+## Project Context
+Direct continuation of the entry below (same day, same conversation). That entry covers
+the staples search UI, the 158-row rename, and the collision resolution; it also left
+**8 rows flagged `nutrition_unverified`** and the model change **scoped but not built**.
+This entry covers everything after that point. Read both together.
+
+## Session Goal
+1. Apply the nutrition data Saffron supplied for the 8 flagged staples.
+2. Recommend on the model change, and ship the prerequisite parse fix as its own PR.
+3. Merge both PRs to `main`.
+4. Diagnose the reported "AI nutrition estimates are wrong" problem.
+
+## State Before This Session
+Per the entry below: `staple_products` at 163 rows, renames applied, 8 rows flagged
+`nutrition_unverified`, PR #57 (staples search) open as a draft, model change scoped only.
+It had also been established that **no nutrition data can be sourced from an agent
+session** — USDA and Open Food Facts are both 403 at the egress gateway.
+
+## What Was Done
+
+### 1. Nutrition data applied — but only 5 of the 8 rows
+Saffron supplied figures for all 8 flagged products. **Diffing them against what was
+stored changed the answer: 3 didn't need changing at all.**
+
+**Tamari, Brown sugar and Red pepper flakes were the *legitimate* owners of their USDA
+records** — FDC 174278 is literally *"Soy sauce made from soy (tamari)"* and FDC 168833
+is *"Sugars, brown"*. Their **twins** were the borrowers (`soy sauce`/`dark soy sauce`
+from tamari; `coconut sugar` from brown sugar). The previous entry's flagging was too
+broad. Applying the supplied figures would have made those three *worse* — rounder
+numbers, and fibre zeroed (tamari 0.8 g, red pepper flakes 27.2 g). Values kept, flag
+cleared only.
+
+The 5 that genuinely changed: **Coconut sugar** (was brown sugar's figures),
+**Gochugaru** (was cayenne's), **Vanilla paste** (was vanilla *extract*, 12.7 → 65 g
+carbs), **Dark chocolate chips** (was the chocolate *bar*), and **Chicken stock**
+(36 → 270 kcal/100 g).
+
+`Chicken stock` was **renamed to `Chicken stock cube`** — the figures changed from
+made-up stock to cube, a ~7.5x jump, so without "cube" in the name a 100 g log would be
+silently catastrophic. Tagged `high_sodium` (~13,000 mg/100 g).
+
+`usda_seed` was **stripped from all 5** — their figures are brand-label averages now, so
+that provenance flag had become false. They carry `nutrition_estimated` instead.
+
+### 2. PR #58 — `claudeText()` parse fix
+Shipped separately from any model change because it's a correctness fix on its own.
+All five call sites parsed `data.content?.[0]?.text`, which holds on Haiku (no thinking
+blocks) but breaks on Sonnet 5 / Opus 5, where adaptive thinking is on by default and
+`content[0]` is a `thinking` block. Added `claudeText(data)` — finds the first `text`
+block — at top level of script block 1, so it's global in block 2 the same way
+`showToast()` already is. Unit-tested against 6 response shapes.
+
+### 3. Both PRs merged to `main`
+#57 first (`93bb7e5`), then #58 (`29008c3`). **The `sw.js` conflict predicted in the PR
+body did occur** — both branches changed line 6 from v37 (#57→v38, #58→v39). Resolved to
+**v39**. `index.html` auto-merged cleanly (different regions), and this was verified
+post-merge rather than assumed: 6 `claudeText` sites, 3 `trkMatchStaples` refs, 0
+old-style parses, 3/3 script blocks, 5/5 smoke, no CLAUDE.md drift.
+
+### 4. Low-estimate diagnosis (the substantive investigation)
+Saffron reported estimates skewed **low** in *both* `fetchMacroEstimate` and
+`trkRunQuickAdd`. That direction + both-paths combination was decisive — it ruled out
+two candidates and left two. Full write-up is now in `handoff.md`; summary in Open
+Questions below. By the end she judged it may already be resolved by the nutrition
+corrections in step 1 (which all push estimates *up*), so it was parked rather than fixed.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| index.html | `claudeText()` helper + all 5 call sites routed through it | Modified (merged, `29008c3`) | repo root |
+| sw.js | CACHE v37 → **v39** (v38 claimed by #57, conflict resolved on merge) | Modified (merged) | repo root |
+| handoff.md | New "AI nutrition estimates skewed low" entry — ruled-out causes, live suspects, the one-click test | Modified | repo root |
+| logs/daily-shuffle_log.md | This entry | Modified | repo root |
+| Supabase `staple_products` | 5 rows re-nutritioned + 1 renamed; 3 flag-cleared only; `usda_seed` stripped from the 5 | Modified | project `jsxcctrskkkxgdxfaduo` |
+
+## Decisions & Reasoning
+
+- **Only 5 of 8 nutrition rows updated.** Options were: apply all 8 as supplied, or diff
+  first. Diffing showed 3 would have been *degraded*. Verifying supplied data against
+  what's stored, rather than trusting the request, is what caught it.
+- **Parse fix shipped as its own PR, before any model change.** It changes nothing on
+  Haiku, so it can merge with zero risk, and it removes the tripwire ahead of time. Had
+  the model been swapped first, four of the five sites would have failed with messages
+  ("No products recognised", "Unexpected format from AI") that read as model regression —
+  a near-certain false rollback.
+- **CACHE resolved to v39, not v38.** The constant only has to *change* to bust the
+  cache; contiguity is not required, so skipping 38 on that line is harmless and avoids
+  renumbering a merged commit.
+- **`Chicken stock` renamed rather than just re-numbered.** A silent 7.5x change in what
+  "100 g" means is a data trap; the name now carries the warning.
+- **Model recommendation: Sonnet 5, not Opus 5.** Cost is immaterial at this volume
+  (~2¢ vs ~4¢ vs ~10¢ for the largest call). Opus 5's edge is long-horizon agentic work;
+  these are single-turn bounded extractions, which is Sonnet 5's sweet spot. Paying 5x
+  for an unexercised capability profile is a bad trade.
+- **Bug parked, not fixed.** Saffron's call — she believes the nutrition corrections may
+  have resolved it. Documented thoroughly in `handoff.md` instead, including the two
+  *ruled-out* causes so a future session doesn't re-derive them.
+
+## Current State (end of session)
+- `main` carries both merges. CACHE **v39**. JS parse 3/3, smoke 5/5, no CLAUDE.md drift.
+- `staple_products`: **164 rows** — 163 after this session's work, plus **Konjac noodles**,
+  which Saffron added herself via the app on 2026-08-03 and which already fits the new
+  naming convention unaided (a small signal the convention is self-sustaining).
+- 0 rows `nutrition_unverified`; 5 `nutrition_estimated`; 113 `usda_seed`.
+- Model change: **recommended and scoped, not implemented.** Parse-fix prerequisite done.
+
+## Next Steps
+1. **Confirm whether the low-estimate problem is actually gone.** Add a recipe and run a
+   Quick Add; compare against a hand-calculated figure. If gone, delete the `handoff.md`
+   entry. If not, go to step 2.
+2. If it persists on the **recipe** path: open a 4-serving recipe, hit re-estimate, and
+   check whether it lands ~4x low. That one click confirms or kills the double-division
+   hypothesis outright.
+3. Fix the `serves` fallback at `index.html` ~L4705 (`servings: supabaseRow.serves` has no
+   `|| 2`, unlike L1481) regardless of the above — it's a real bug affecting the 8
+   no-`serves` recipes, just not the one reported.
+4. Optional: the model swap itself (5 model strings + `thinking`/`max_tokens`). Must also
+   update `CLAUDE.md:113` and the `index.html` "claude-haiku call pattern" comment, and
+   bump CACHE.
+
+## Open Questions / Blockers
+- **The low-estimate bug is parked as possibly-resolved.** Full detail in `handoff.md`;
+  the short version: *ruled out* — the `serves` bug (skews high, recipe path only) and
+  truncated JSON (`trkParseJsonLoose` ends in a strict `JSON.parse`, so it throws rather
+  than dropping items). *Live suspects* — double division on the recipe path, and no room
+  to compute on both (measured: **~7,200 tokens** of staples injected into Quick Add,
+  **~4,400** into the recipe estimate, against `max_tokens` of 1024 and **256**).
+- **CLAUDE.md's AI-features list is still drifted** (carried over from the entry below,
+  not fixed): it names *"pantry item parsing"* (pantry lives in `legacy/`, not loaded) and
+  omits `fetchMacroEstimate` and `generatePlanWithAI`, both live. `claude_md_drift.mjs`
+  does not catch this class. Fix when this area is next touched.
+
+## Environment & Config Notes
+- Repo `saffronlm-cmyk/daily-shuffle`. Merged: **#57** (`93bb7e5`), **#58** (`29008c3`).
+- This entry's branch: `claude/ai-model-product-naming-1c1nd4`, **restarted from `main`**
+  after #57 merged, per the merged-PR-is-finished rule — so its new PR is a *new* PR.
+- `sw.js` CACHE **v39**. Supabase project `jsxcctrskkkxgdxfaduo`, `staple_products` 164 rows.
+- Both Supabase and GitHub MCP servers disconnected and reconnected mid-session, twice,
+  under changed tool prefixes — re-load via ToolSearch if tool calls start failing.
+
+## Notes & Gotchas
+- **Do not re-flag Tamari, Brown sugar or Red pepper flakes as needing nutrition.** They
+  are the correct owners of their USDA records. The rows that were borrowing from them
+  (`Soy sauce — generic`, `Dark soy sauce`, `Coconut sugar`) are the ones to scrutinise —
+  and note **`Dark soy sauce` still carries tamari's figures** and was never corrected,
+  because Saffron said to disregard the soy sauces in that group.
+- **`Coconut sugar` carries a knowingly inconsistent figure**: carbs **100.0 g/100 g**
+  against 378 kcal (100 g of carbs ≈ 400 kcal, and leaves no room for moisture/ash).
+  ~94 g would be consistent. Applied verbatim as supplied rather than silently overridden;
+  the discrepancy is ~2.4 kcal at typical 10 g usage. Recorded in the row's `notes`.
+- **`Gochugaru` and `Dark chocolate chips` kept fibre carried over from their old USDA
+  records** (27.2 g and 6.5 g) — the supplied data had none. Flagged in each row's `notes`.
+  Don't mistake those for verified figures.
+- **The staples context injected into Quick Add includes every row's full `notes` text**
+  (`trkBuildStapleContext`), which is why it is ~1.6x the size of the recipe-path context.
+  This session's long explanatory notes therefore have a direct token cost on every
+  Quick Add call — worth remembering before writing more prose into `notes`.
+- `sw.js` CACHE is at **v39**, not v38 — v38 was consumed by the #57/#58 conflict
+  resolution and never existed on `main`. Next bump is v40.
+
+---
+
+# Staple products: search UI, full rename to a new naming convention, collision resolution + AI model-change scoping
+**Date:** 2026-08-02
+**Project:** Daily Shuffle — Tracker staples (`staple_products` data + `index.html` UI) and the embedded-AI model choice
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete (both session tasks landed; one optional follow-up left open)
+
+---
+
+## Project Context
+Second session on 2026-08-02 — see the entry below for the same-day Asian-cuisine
+reclassification work, which is unrelated. This session covered two asks: (1) *scope*
+changing the model behind the app's embedded AI, and (2) rename the staple products,
+change the naming convention (especially branded goods), and add a search function.
+
+The `staple_products` table had reached 168 rows after the USDA expansion (see the
+2026-07-01 entry for the `usda_staples.py` pipeline) and had never had a naming pass —
+so it carried two clashing conventions and a set of silent data faults.
+
+## Session Goal
+1. Scope (not implement) moving the 5 in-browser Anthropic call sites off
+   `claude-haiku-4-5-20251001`.
+2. Add search to the staples manager + staple picker.
+3. Agree a naming convention, resolve name/alias collisions, and apply the renames.
+
+## State Before This Session
+- **`staple_products`**: 168 rows. ~120 lowercase USDA seeds ("almond butter"), ~48
+  Title-case curated rows using *three* different branded formats (brand-first
+  "Alpro Original soya milk"; product-first "Soya yoghurt — Lidl plain";
+  product-first-with-retailer "Dark chocolate 74% — Fin Carré (Lidl)").
+- **No search anywhere**: the manager rendered all 168 into a 240px scroll box; the
+  picker put all 168 into a flat `<select>`.
+- **7 exact name/alias collisions** and **13 groups sharing one USDA FDC record**, none
+  previously identified.
+- All 5 AI call sites parsing `data.content?.[0]?.text`.
+
+## What Was Done
+
+### 1. AI model-change scoping (deliverable: `ai-model-change-scope.md`, sent, not committed)
+Mapped all 5 call sites: `fetchMacroEstimate` (L3581, max_tokens 256),
+`generatePlanWithAI` (L3926, 512), `parseWithAI` (L5380, 2048),
+`trkRunBulkStaples` (L6390, 4096), `trkRunQuickAdd` (L6509, 1024).
+
+**Headline finding — the blocker, not the cost:** every site parses
+`data.content?.[0]?.text`. Adaptive thinking is **on by default on both Sonnet 5 and
+Opus 5**, so `content[0]` becomes a thinking block and `.text` is `undefined`. Verified
+each site's failure mode individually rather than assuming uniform silence:
+`fetchMacroEstimate` fails **silently** (catch returns null); the other four surface a
+*misleading* error ("Unexpected format from AI", "No products recognised", "No items
+recognised") that reads as model regression, not a shape change.
+
+Cost was ruled out as a decision driver — worst case (bulk staple paste, ~5k in/3k out)
+is ~2¢ Haiku vs ~4¢ Sonnet 5 vs ~10¢ Opus 5. Recommendation: **all five → Sonnet 5,
+thinking disabled, defensive parse** (~30 min), with thinking-on for `fetchMacroEstimate`
+as a later measurable experiment. Not implemented — the ask was to scope only.
+
+### 2. Staples search (PR #57, draft)
+Added `trkMatchStaples(q)` matching on **name or any alias**, shared by the manager
+(`trkRenderStapleList()`) and the picker (`trkRenderStaplePickOptions()`). Followed the
+existing recipe-picker idiom rather than a new pattern. Also fixed empty-result paths
+that had never existed: picker clears its macro preview instead of showing stale figures;
+`trkSubmitStaple` toasts "Pick a product" instead of a silent `return`; deleting in the
+manager re-renders only the list so the search box and half-filled add-product form
+survive.
+
+### 3. Collision analysis → two review CSVs → applied renames
+Wrote both review CSVs to scratchpad (per the 2026-08-02 Asian-cuisine precedent —
+review CSVs are **not** committed) and sent via `SendUserFile`. Saffron returned the
+collision CSV annotated; a second round settled the convention.
+
+**Applied to Supabase in three ordered steps** — aliases folded *first* (while old names
+still existed), then deletions, then renames.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| index.html | `trkMatchStaples`, `trkRenderStapleList`, `trkRenderStaplePickOptions`; empty-result handling in `trkStaplePreview`/`trkSubmitStaple`; manager + picker markup | Modified | repo root |
+| sw.js | `CACHE` v37→v38 | Modified | repo root |
+| logs/daily-shuffle_log.md | This entry | Modified | repo root |
+| Supabase `staple_products` | 158 renames, 5 deletions, alias re-pointing, 5 nutrition corrections, flag hygiene | Modified | project `jsxcctrskkkxgdxfaduo` |
+| ai-model-change-scope.md | Model-change scoping doc | Created (scratchpad, sent, not committed) | session scratchpad |
+| staple-collision-review.csv | 7 exact collisions + 13 shared-FDC groups, with proposed resolutions | Created (scratchpad, sent, not committed) | session scratchpad |
+| staple-rename-review.csv / -v2.csv | v1 (inverted convention) then v2 (final) rename plans | Created (scratchpad, sent, not committed) | session scratchpad |
+| gen_rename.py / gen_rename_v2.py | Generators for the above | Created (scratchpad) | session scratchpad |
+| staple_search_check.mjs | Ad-hoc Playwright test of the new search paths, 10/10 | Created (scratchpad, not committed) | session scratchpad |
+
+## Decisions & Reasoning
+
+- **Naming convention → `<Food name>[, <qualifier>][ — <Brand \| generic>]`.** Saffron
+  first picked "product-first, brand after em-dash", so I proposed mechanical inversion
+  (`Sugar, brown`, `Oil, sesame`). She pushed back asking *"should it be sugar, Brown?"*
+  — **and her instinct was right, mine was wrong.** Final rule: **do not invert the food
+  name**; the comma is only for a qualifier separating two rows of the *same* food
+  ("Peanut butter, smooth" vs "Peanut butter, crunchy"), and the dash is only for the
+  source. Test: you'd say "brown sugar" aloud, never "sugar, brown". The original
+  argument for inversion (alphabetical grouping) was obsoleted by the search shipped in
+  the same session. **This reversed ~25 proposed names.**
+- **`— generic` only where a branded twin exists**, not on all 120 USDA rows — chosen
+  over "on every USDA row" and over "`— USDA` everywhere". Keeps the tag informative
+  rather than noise ("Avocado — generic" tells you nothing).
+- **Defaults flipped to match how Saffron actually eats.** The bare terms "soy sauce"
+  and "protein powder" resolved to the USDA generics — which are *wheat-containing* soy
+  sauce and *whey* protein, for a coeliac, dairy-free user. Now `soy sauce` → **Emma
+  Basic GF** and `protein powder` → **Free Soul vegan**; the whey row was stripped of
+  *all* aliases (including the chocolate/vanilla flavour ones, which moved to Free Soul
+  since its label is universal across flavours) so it can't catch a generic mention.
+- **`chilli oil` row deleted, not relabelled.** Saffron asked to relabel it "sesame oil",
+  but it was already byte-identical to the existing `sesame oil` row (same FDC 171016),
+  so relabelling would have created a duplicate. Deleting achieves the same intent.
+- **3 of the 8 "needs nutrition" rows were left untouched.** When Saffron supplied
+  replacement figures, the diff showed **Tamari, Brown sugar and Red pepper flakes were
+  the *legitimate* owners of their USDA records** — their twins were the borrowers. My
+  original flagging was too broad. Applying the supplied figures would have *degraded*
+  them (rounder numbers, fibre zeroed). Values kept; flag cleared only.
+- **`Chicken stock` renamed to `Chicken stock cube`** rather than just re-numbered — the
+  figures changed from made-up stock (36 kcal/100 g) to cube (270 kcal/100 g), a ~7.5×
+  jump. Without "cube" in the name a 100 g log would be silently catastrophic.
+- **`usda_seed` stripped from the 5 re-sourced rows** — their figures are now brand-label
+  averages, so the provenance flag had become false.
+- **Review CSVs to scratchpad, not the repo** — follows the same-day Asian-cuisine
+  precedent; they're pre-review proposals, not the reviewed-decisions the root CSVs hold.
+
+## Current State (end of session)
+- **`staple_products`: 163 rows.** 0 lowercase names, 0 stale `(generic)` suffixes,
+  0 duplicate names, 0 `nutrition_unverified`, 5 `nutrition_estimated`, 113 `usda_seed`.
+- **PR #57** (`claude/ai-model-product-naming-1c1nd4`) open, draft, mergeable_state clean.
+  No CI on this repo (the keepalive is `main`-only), no review comments.
+- Model change **scoped only — no code written**.
+
+## Next Steps
+1. **Merge PR #57** (search) — verified, nothing outstanding.
+2. If proceeding with the model change: apply the defensive parse
+   `(data.content||[]).find(b=>b.type==='text')?.text` at index.html L3633, L4024, L5479,
+   L6426, L6561 — **this is worth landing even if the model doesn't change.** Then swap
+   the 5 model strings and add `thinking:{type:'disabled'}`. Must also update
+   `CLAUDE.md:113` and the `index.html:5596` comment, and bump `sw.js` CACHE.
+3. Optional: replace **Coconut sugar** carbs 100.0 g → ~94 g (see Gotchas).
+4. Optional: re-source the 5 `nutrition_estimated` rows from *her actual UK products* —
+   the current figures are US-leaning brand averages.
+
+## Open Questions / Blockers
+- **CLAUDE.md AI-features list is drifted, independent of this session.** It names
+  *"pantry item parsing"* (pantry now lives in `legacy/`, not loaded) and omits
+  `fetchMacroEstimate` and `generatePlanWithAI`, both live. `claude_md_drift.mjs` does
+  **not** catch this — it only checks mechanical cases. Fix when this area is next touched.
+- **No nutrition data can be sourced from an agent session.** Verified this session:
+  `api.nal.usda.gov` *and* `world.openfoodfacts.org` both return **403 connect_rejected**
+  at the egress gateway, and WebFetch hits the same policy. WebSearch works but returns
+  page snippets only — no per-100 g figures, and no FDC ID for provenance. Only
+  `api.anthropic.com` + package registries are allowlisted. Nutrition sourcing must be
+  `scripts/usda_staples.py` on Saffron's Mac, or label data pasted into chat.
+
+## Environment & Config Notes
+- Repo `saffronlm-cmyk/daily-shuffle`, branch `claude/ai-model-product-naming-1c1nd4`,
+  **PR #57** (draft).
+- `sw.js` CACHE **v37 → v38**.
+- Supabase project `jsxcctrskkkxgdxfaduo`, table `staple_products` (163 rows after).
+- Flags in play: `usda_seed`, `nutrition_estimated` (new this session),
+  `nutrition_unverified` (introduced then fully cleared), `high_sodium`.
+- The Supabase MCP server disconnected and reconnected mid-session under a new tool
+  prefix — re-search via ToolSearch if this happens again.
+
+## Notes & Gotchas
+- **Renaming staples could not orphan saved meals — verified, don't re-panic.**
+  `trkFindStapleId()` (L5773) resolves by name/alias but runs **only at save time**;
+  `trkResolveItemMacros` reads by `source_id`. Confirmed 0 dangling references post-write.
+- **Coconut sugar carries an internally inconsistent figure**, applied verbatim as
+  supplied: carbs **100.0 g/100 g** against 378 kcal. 100 g carbs ≈ 400 kcal, and 100 g
+  of carbs leaves no room for moisture/ash. ~94 g would be consistent. Left as-is
+  deliberately rather than silently overriding her data; the discrepancy is ~2.4 kcal at
+  her typical 10 g usage, so it is immaterial in practice. Noted in the row's `notes`.
+- **Gochugaru and Dark chocolate chips kept fibre carried over from their old USDA
+  records** (27.2 g and 6.5 g) — the supplied data had no fibre. Flagged in each row's
+  `notes`. Don't mistake these for verified figures.
+- **`Chicken stock cube` is per 100 g of CUBE.** A 10 g cube ≈ 1,000–1,700 mg sodium.
+  Never log it by volume of made-up stock.
+- **`staple_products` has no sodium column** — all sodium data from this session lives in
+  the `notes` text, not a queryable field.
+- Ad-hoc browser tests must seed `trkStaples` via `trkLoadStaples(true)` reading the
+  `ds_trk_staples` localStorage key. Setting `window.trkStaples` does **not** work —
+  it's a `let` binding at module scope and doesn't attach to `window`.
+
+---
+
+# Asian cuisine tag expansion + recipe reclassification (cuisine, carb type, meal type, Dish Type)
+**Date:** 2026-08-02
+**Project:** Daily Shuffle — tagging taxonomy (`index.html` taxonomy code + Supabase `recipes` data)
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete
+
+---
+
+## Project Context
+Saffron wanted the "Asian" cuisine tag split into country-specific variants (keeping
+"Asian" as the ambiguous/fusion catch-all), plus a handful of new tags across other
+taxonomies, and then wanted the *existing* recipe library retroactively reclassified
+into the new tags — not just the schema/UI support. First entry to touch the
+cuisine/cravings/meal-type/carb-type taxonomy in `index.html` since it was built; no
+prior log entry to cross-reference.
+
+## Session Goal
+1. Expand the cuisine taxonomy (dropdown, filter chip, Shuffle cravings group, AI
+   parser) with Vietnamese/Thai/Chinese/Korean as first-class values, plus carb types
+   `noodles`/`oats`, meal type `sauce`, and a new "Dish Type" cravings group (Salad,
+   Pancakes, Bakery, Soup, Stir-fry, Curry, Traybake/One-pot, Sandwich/Wrap, Bowl).
+2. Retroactively reclassify the ~327-row `recipes` table against all of the above.
+
+## State Before This Session
+`index.html`'s `cuisine` field only had comfort/asian/japanese/indian/italian/mexican/
+american/mediterranean/middleeastern/simple/other. `CARB_TYPES` had no noodles/oats.
+`MEAL_TYPES` had no sauce. `CRAVING_TAXONOMY` had no dish-type/format group at all —
+only cuisine/texture/mood/dietary. No recipes had ever been reclassified against any of
+this (it didn't exist yet).
+
+## What Was Done
+1. **Code (index.html + sw.js), PR #54, merged** — added vietnamese/thai/chinese/korean
+   to the cuisine dropdown (`#f-cuisine`, `#edit-cuisine`), `CUISINE_EMOJI`, the
+   "Cuisine" filter-panel array, and `CRAVING_TAXONOMY.cuisine`; added `noodles`/`oats`
+   to `CARB_TYPES`/`CARB_TYPE_LABELS`; added `sauce` to `MEAL_TYPES`/`MEAL_TYPE_LABELS`/
+   `TYPE_LABELS`/`TYPE_CLASSES` (+ new `.type-sauce` CSS rule); added a new `dish` group
+   to `CRAVING_TAXONOMY` (salad/pancakes/bakery/soup/stirfry/curry/traybake/sandwich/
+   bowl) with `CRAVING_GROUP_LABELS.dish = 'Dish Type'`; updated the AI recipe-parser
+   system prompt schema/rules to match all of the above. Ran the full `ship-check`
+   (JS parse 3/3, smoke test 5/5, `claude_md_drift.mjs` clean) and bumped `sw.js` CACHE
+   v36→v37 (one bump, this PR only).
+2. **Cuisine reclassification (Supabase `recipes.cuisine`), two passes**:
+   - Pass 1: reviewed all 86 recipes tagged `asian`, proposed a confident/unsure split
+     inline in chat, Saffron answered the 10 unsure ones directly → 34 reclassified
+     (6 vietnamese, 10 thai, 7 chinese, 5 korean, 6 japanese), 52 stayed `asian`.
+   - Pass 2: Saffron asked to see the remaining 52 — exported them as a CSV (path
+     `scratchpad/asian-cuisine-review.csv`, columns id/name/tags/craving_tags/
+     new_cuisine) via `SendUserFile`. She edited it in **Apple Numbers** and uploaded
+     the `.numbers` file back (not CSV) — parsed it by `pip install numbers-parser`
+     (not preinstalled; installs cleanly, no network issues) and reading
+     `doc.sheets[0].tables[0].rows(values_only=True)`. Normalised her answers
+     (strip/lowercase), all 52 mapped cleanly to a known cuisine value → 28 more
+     reclassified (14 chinese, 9 japanese, 3 thai, 2 vietnamese), 24 confirmed staying
+     `asian`. **Final: 62/86 originally-"asian" recipes now have a specific cuisine;
+     24 are the genuine catch-all.**
+3. **Carb type / meal type / Dish Type reclassification (Supabase, same session,
+   mechanical name-pattern matching, no CSV round-trip)** — for each new tag, ran a
+   `SELECT` to find candidates by `name ILIKE` patterns (+ existing `tags`/
+   `craving_tags` signals), manually eyeballed the candidate list for false positives,
+   then ran a matching `UPDATE`. Verified every category with a post-write count and a
+   spot-check read-back.
+   - `carb_type='noodles'`: 32 recipes (Pad Thai/Ramen/Pho/Laksa/noodle bowls).
+   - `carb_type='oats'`: 47 recipes (overnight/baked oats, oat-based pancakes/bars).
+   - `meal_types` gets `sauce`: only 2 recipes — **Chilli Oil**, **Nước Chấm (Huy Vu
+     dipping sauce)** — set to `ARRAY['sauce']` outright (both had been sitting on the
+     mismatched legacy value `'side'` singular, not the app's `'sides'` plural, so this
+     incidentally fixed that data-quality wrinkle for these 2 rows only — **did not**
+     do a wider `side`→`sides` sweep, out of scope). Two borderline condiment-tagged
+     recipes (**Garlic Cucumber Salad**, **Pickled Red Onions**) were flagged and
+     asked about explicitly — Saffron said leave both as-is (no `sauce` tag).
+   - `craving_tags` append (additive, a recipe can carry several): bakery 68, salad 34,
+     bowl 34, soup 17, pancakes 13, stirfry 7, curry 5, sandwich 6, traybake 2.
+4. **`handoff.md` note (PR #55, merged? — see Environment note below re: status)** —
+   captured the "convert primary `cuisine` field to multi-select" idea that came up
+   when Saffron asked whether multi-cuisine tagging was possible. Answer given: it
+   already partially exists — the Shuffle tab's Cravings "Cuisine" subgroup is already
+   multi-select and shares the same value set as the primary dropdown — so for now use
+   that for recipes spanning >1 cuisine; converting the *primary* `cuisine` column
+   itself to an array is logged as a future option, not done.
+5. **Branch-reset gotcha hit and handled**: PR #54 merged mid-session, so per the
+   environment's "restart from `main` after a merge" rule, `git fetch origin main` +
+   `git checkout -B <branch> origin/main` + `git stash pop` was used before the
+   `handoff.md` commit, rather than stacking on the now-merged history.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| index.html | Cuisine dropdown ×2, `CUISINE_EMOJI`, cuisine filter array, `CRAVING_TAXONOMY` (+dish group), `CRAVING_LABELS`, `CARB_TYPES`/`CARB_TYPE_LABELS`, `MEAL_TYPES`/`MEAL_TYPE_LABELS`, `TYPE_LABELS`/`TYPE_CLASSES`, AI parser prompt | Modified | repo root |
+| sw.js | `CACHE` v36→v37 | Modified | repo root |
+| handoff.md | New "Multi-select primary cuisine" future-idea entry | Modified | repo root |
+| Supabase `recipes` | `cuisine` (62 rows across 2 passes), `carb_type` (79 rows), `meal_types` (2 rows), `craving_tags` (186 row-tag-additions across 9 dish-type tags, some rows got >1) | Modified | project `jsxcctrskkkxgdxfaduo` |
+| scratchpad/asian-cuisine-review.csv | Pass-2 review export (id/name/tags/craving_tags/new_cuisine) | Created (not committed — scratchpad) | session scratchpad dir |
+
+## Decisions & Reasoning
+- **Kept "Asian" as a real, permanent value, not a migration artifact** — Saffron was
+  explicit it should stay for genuinely ambiguous/fusion dishes (crispy-rice-salad
+  trend bowls, generic peanut-noodle dishes, etc.), so the reclassification passes
+  deliberately left ~24 recipes on it rather than forcing a specific country.
+- **CSV → Numbers round-trip, not a second inline Q&A** — with 52 items left after
+  pass 1, a wall of AskUserQuestion prompts wasn't viable (tool caps at 4 questions);
+  exporting a fill-in-the-blank CSV and having her return whatever she has (in this
+  case Numbers, not CSV) was the right shape. `numbers-parser` handled the format with
+  zero friction once installed — worth remembering as the tool of choice if this
+  happens again.
+- **Only 2 recipes got the `sauce` meal type**, not every recipe whose name contains
+  "sauce"/"dressing" — a broad keyword match pulled in full dinner/lunch dishes that
+  merely *feature* a sauce (e.g. "Vietnamese Lettuce Wraps with Peanut Sauce"); those
+  correctly stayed on their existing meal type. Only recipes that ARE a condiment
+  (nothing else on the plate) got reclassified.
+- **Bakery dish-tag query needed exclusion patterns**, not a simple keyword OR — naive
+  `name ILIKE '%cake%'` also matches "pan-**cake**s", "rice **cake**s", and "fish**cake**s"
+  since the substring is embedded in unrelated words. Fixed with explicit
+  `NOT ILIKE '%pancake%'` / `%rice cake%` / `%fishcake%` plus exclusions for savory
+  "bake" dishes (gnocchi bake, enchilada bake, sushi bake, chicken traybake) that
+  aren't bakery items at all.
+- **Used `SELECT`-then-matching-`UPDATE` instead of manually transcribing UUID lists**
+  for the mechanical carb/meal/dish-type passes — after building each candidate list
+  and eyeballing it for false positives, the `UPDATE` re-runs the *same* WHERE
+  predicate rather than a hand-typed `id IN (...)` list, removing transcription-error
+  risk across ~80 rows.
+
+## Current State (end of session)
+**Done**, pending Saffron's confirmation that PR #54 and #55 review activity is
+settled (both were merged/open as of this entry — see Environment note). All 4 new
+taxonomy dimensions (cuisine variants, carb types, sauce meal type, Dish Type group)
+exist in the app AND have been retroactively applied across the existing recipe
+library. No further action needed unless she flags a miscategorized recipe.
+
+## Next Steps
+1. Nothing blocking. Optional future work (already logged in `handoff.md`, not
+   scheduled): convert the primary `cuisine` field from single-select to multi-select
+   if the two-parallel-systems (dropdown + Cravings chips) proves confusing in
+   practice.
+2. If Saffron wants further cuisine grain (e.g. splitting out Malaysian/Singaporean/
+   Hawaiian/Filipino, which currently have no matching option and default to `asian`
+   — see Quick Chicken Laksa, Singapore Chicken Noodles, the two poke bowls, One Pan
+   Vegan Sushi Bake), that's a clean follow-on using the same taxonomy-expansion +
+   reclassification pattern from this session.
+3. `Summer Salad with Blackened Salmon` is still tagged `asian` with no clear Asian
+   signal in the dish itself (flagged mid-session as a possible stray import tag,
+   never resolved either way) — worth a decision if it comes up again.
+
+## Open Questions / Blockers
+N/A — no blockers. The only loose thread is the optional Summer Salad w/ Blackened
+Salmon miscategorization flagged above, which isn't blocking anything.
+
+## Environment & Config Notes
+- Repo: `saffronlm-cmyk/daily-shuffle`. Branch: `claude/asian-cuisine-tags-expansion-cvdxj9`.
+- **PR #54** (index.html/sw.js taxonomy code) — merged to `main` (squash, commit
+  `1c81f90`) mid-session.
+- **PR #55** (`handoff.md` note) — opened as a draft after PR #54 merged (branch was
+  reset to fresh `main` first, per the "no stacking on merged history" rule); status as
+  of this log entry: check `gh`/GitHub MCP for current state before assuming it's still
+  open — it may have merged since.
+- Supabase project: `jsxcctrskkkxgdxfaduo` (the bundled recipe-library project, per
+  `recipe-db` skill). All writes were plain `execute_sql` UPDATEs against `recipes` —
+  no migration needed anywhere this session (`cuisine`, `carb_type`, `meal_types`,
+  `craving_tags` all have no `CHECK` constraints, confirmed via
+  `pg_constraint` before the first write).
+- `numbers-parser` (Python) was `pip install`-ed into the sandbox this session — not
+  present by default. Installs fine, no egress issues (PyPI, not the blocked
+  Apify/USDA hosts).
+
+## Notes & Gotchas
+- **`cuisine` (single-select dropdown) and the Cravings-tab "Cuisine" chip group are
+  two separate, parallel systems** that happen to share the same value vocabulary —
+  don't assume setting one sets the other. See `handoff.md`'s "Multi-select primary
+  cuisine" entry for the full explanation and the future unification option.
+- **The pre-existing `meal_type` singular value `'side'` (not `'sides'` plural) is a
+  latent data-quality bug** independent of this session's work — it doesn't match
+  `MEAL_TYPES`/`MEAL_TYPE_LABELS` keys in `index.html`, so any recipe still on it
+  renders with a raw, unstyled fallback label in the app. Only the 2 recipes touched
+  for the `sauce` reclassification (Chilli Oil, Nước Chấm) got fixed as a side effect;
+  a wider sweep was explicitly out of scope this session and has NOT been done.
+- **Keyword-substring tagging needs exclusion lists, not just inclusion lists** — see
+  the bakery/pancake/rice-cake collision above. If extending any of these dish-type
+  categories later (e.g. adding more cuisines or dish types), re-check for the same
+  class of substring collision before trusting a raw `ILIKE` count.
+- All data changes this session were to Supabase only — **no local backup exists**
+  beyond what's in this log and the chat transcript. If a reclassification needs
+  reverting, the before/after cuisine values for the 86 originally-`asian` recipes are
+  recoverable from this log's pass-1/pass-2 breakdown and the chat history, not from
+  any DB snapshot.
+
+# Japchae recipe duplication (in-session, unsaved) + variant-toggle idea + soya milk staple
+**Date:** 2026-08-02
+**Project:** Daily Shuffle — recipe library (Supabase `recipes`) exploration, `staple_products`
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete — one PR merged (#53); one small direct DB write; one item left undone by design
+
+---
+
+## Project Context
+Unrelated to the macro-correction stream closed out in the 2026-07-24 entry below, and to the
+Asian cuisine tag expansion entry immediately below this one (also same-day, different session).
+This was a mixed session: (1) an explicitly non-persisted recipe-duplication exercise against the
+bundled Supabase project (`jsxcctrskkkxgdxfaduo`), (2) a resulting feature-idea note, and (3) an
+unrelated one-off staple addition.
+
+## Session Goal
+1. Pull "Glass & Konjac Chicken Japchae" and its sibling "Chicken Mince Konjac Japchae" from
+   `recipes` into the conversation so Saffron could duplicate and alter them (ingredient swap +
+   macro recalculation) without writing anything to the DB until she says so.
+2. Answer her follow-up questions about how such duplicates would surface in Shuffle/Tracker,
+   and how to represent them as "variants."
+3. (Unrelated, same session) add an unsweetened soya milk entry to `staple_products`.
+
+## State Before This Session
+Clean — prior session (2026-07-24) had closed out the macro-correction stream entirely; `main`
+had no open work relevant to this session's topics.
+
+## What Was Done
+1. **Pulled both japchae recipes read-only** via `execute_sql` (`select * from recipes where
+   name ilike '%japchae%' or ...`) — `b8bb9c91-b2d4-4ee7-877b-ea976d7a5a26` (Glass & Konjac
+   Chicken Japchae, serves 4) and `7670cb5c-e6ef-437e-bc3b-fd0780b4e19d` (Chicken Mince Konjac
+   Japchae, serves 5). Presented both in full (ingredients, method, macros) in chat.
+2. **Duplicated + altered both, in-session only** — per Saffron's explicit instruction ("nothing
+   needs to be stored before my say so"), no `INSERT`/`UPDATE` was run for either recipe. Applied:
+   replace the sweet potato glass noodles line with 200g konjac noodles, merged into the existing
+   konjac noodles line (1000g total in both recipes), scrubbed the glass-noodle mention from each
+   subtitle/notes field, and recalculated macros using generic per-100g reference values (sweet
+   potato glass noodles ≈351 kcal/85g carb dry; konjac noodles ≈7–9 kcal/100g, ~3g fibre, ~0 net
+   carb) applied as a delta against the original per-serving macros:
+   - Glass & Konjac Chicken Japchae (serves 4): 470→**~360** kcal, 66→**~40**g carb, fibre
+     14→**~15**g; protein/fat/sugar effectively unchanged.
+   - Chicken Mince Konjac Japchae (serves 5): 515→**~448** kcal, 50→**~34**g carb, fibre
+     9→**~10**g; protein/fat/sugar effectively unchanged.
+   Neither duplicate was ever written to Supabase — **this recalculated data only exists in that
+   conversation's transcript and is not persisted anywhere.** If Saffron wants these variants
+   saved, they need to be re-derived (the exact deltas are in this log entry) and inserted fresh.
+3. **Answered "how would these show up in Shuffle/Tracker"** by reading the actual fetch queries
+   in `index.html`: Shuffle's pool (`fetchCloudRecipes`, ~line 1511) only pulls
+   `import_status=eq.ready`; Tracker's recipe picker (`trkFetchRecipes`, ~line 6220) pulls
+   `import_status=in.(ready,review,custom)`. So `custom` rows are Tracker-only; `ready` rows are
+   both.
+4. **Answered "how would these show up as *variants*"** — checked the `recipes` schema via
+   `list_tables`: no `variant_of`/`parent_id` column exists. A duplicate is just another
+   standalone row with no link back to its source recipe. Confirmed with Saffron she wants to
+   keep these as `custom` for now (Tracker-only, not Shuffle-eligible) given the macros are
+   AI-recalculated estimates, not staple-grounded.
+5. **Logged the variant-toggle idea** as a new "Future — other feature ideas (unscheduled)"
+   section appended to `handoff.md` (previously only had the cost-aware-features future list).
+   Committed + pushed on `claude/japchae-recipe-duplicate-l3z9i5`, opened **draft PR #53**,
+   subscribed to its activity. CI showed `pending`/0 checks the whole time (repo has no CI beyond
+   the unrelated Supabase keep-alive) — nothing to fix. No review comments. Saffron marked it
+   ready for review herself; **merged** by her directly. Session unsubscribed automatically on
+   merge.
+   - Note: while this PR was open, a **second, unrelated** feature note ("multi-select
+     primary-cuisine idea") was appended to `handoff.md` by another PR (**#55**, merged after
+     #53, alongside **#54** "Expand Asian cuisine tags" — see that entry below). Neither was part
+     of this session — flagging so nobody attributes them here.
+6. **Added a new staple** (unrelated ask): `staple_products` had "Alpro Original soya milk"
+   (sweetened, 2.5g sugar/100ml) but nothing unsweetened. Inserted a new row, first as branded
+   ("Alpro Unsweetened soya milk") using generic Alpro-Unsweetened label values, then — per
+   Saffron's correction ("I want it unbranded and generic") — **updated in place** (same row,
+   `id c88bbbfe-f065-46c9-b917-f991f0142c47`) to rename to "Unsweetened soya milk" and swap
+   aliases to generic terms. Macros were left unchanged (they were already generic-label values,
+   not brand-specific): 33 kcal / 3.3g protein / 0.3g carb / 1.8g fat / 0.5g fibre / 0.3g sugar
+   per 100ml.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| `handoff.md` | Future-ideas section | Modified (variant-toggle bullet added) | repo root — merged via PR #53 |
+| Supabase `staple_products` | New staple row | Created then updated | row `c88bbbfe-f065-46c9-b917-f991f0142c47` |
+| Supabase `recipes` | Japchae duplicates | **Not created** — deliberately left unpersisted | N/A |
+| `logs/daily-shuffle_log.md` | This entry | Modified | repo root |
+
+No `index.html`/`sw.js`/`manifest.json` touched — no cache bump needed.
+
+## Decisions & Reasoning
+- **Kept the duplicates unpersisted per Saffron's explicit instruction**, even after later
+  discussing `import_status`/variant mechanics in detail — the discussion was exploratory, not
+  authorization to write. Only wrote to the DB when she gave a direct, unambiguous instruction
+  ("add unsweetened soya milk to my staples").
+- **Chose to merge the 200g konjac addition into the existing konjac-noodle line** (rather than
+  add a second line item) since "replace X with Y" reads as a net ingredient-quantity change, not
+  two separate konjac lines in the same recipe.
+- **Recalculated macros via generic-value deltas against the original per-serving figures**
+  rather than re-deriving the whole recipe from scratch — faster, and keeps everything else
+  (protein/fat/sugar, which the swap doesn't touch) anchored to the original AI estimate instead
+  of introducing new estimation error.
+- **`variant_of` proposed as nullable, not required** — documented as a future-feature note only,
+  not implemented; no schema migration was run this session.
+- **Named the new staple generically per direct correction** — first guess (branded "Alpro
+  Unsweetened") was wrong; fixed via `UPDATE` on the same row rather than delete+reinsert, since
+  the macros were already valid and only naming needed to change.
+
+## Current State (end of session)
+- PR #53: merged to `main`. Branch `claude/japchae-recipe-duplicate-l3z9i5` reset to `origin/main`
+  after the merge (per the merged-PR restart convention) so this log entry lands clean.
+- `staple_products`: "Unsweetened soya milk" row live and correct per Saffron's confirmation.
+- The two altered japchae recipes exist **only in this log entry and the closed conversation** —
+  not in the database, not in any file. Re-derive from §"What Was Done" item 2 above if resuming.
+
+## Next Steps
+1. If Saffron wants either/both altered japchae recipes actually saved: re-apply the swap
+   documented above (merge 200g into the konjac line, scrub subtitle glass-noodle mentions, use
+   the recalculated macros given) and `INSERT` into `recipes` with `import_status='custom'`
+   (Tracker-only) or `'ready'` (also Shuffle-eligible, her call) — nothing currently blocks this,
+   it just wasn't authorized this session.
+2. `variant_of` column is documented in `handoff.md` under "Future — other feature ideas
+   (unscheduled)" — no urgency, revisit whenever recipe-variant handling comes up again (note this
+   session's discovery that #54/#55 landed a *different* feature idea, "multi-select primary
+   cuisine," in the same handoff.md section — read both before adding a third).
+3. No other open threads from this session.
+
+## Open Questions / Blockers
+N/A — nothing blocking. The only "unfinished" item (the japchae variants) is unfinished by
+Saffron's explicit choice, not a blocker.
+
+## Environment & Config Notes
+- Repo: `saffronlm-cmyk/daily-shuffle`. Branch: `claude/japchae-recipe-duplicate-l3z9i5` (reset
+  from `origin/main` post-merge, per convention, before this log commit).
+- PR #53 (merged). Unrelated PRs #54/#55 also merged to `main` during this session's window by a
+  different session — visible in `git log` but not this session's work.
+- Supabase project: `jsxcctrskkkxgdxfaduo` (bundled `recipes`/`staple_products`/etc.).
+- No env vars or credentials touched.
+
+## Notes & Gotchas
+- **`recipes` has no variant/parent linkage** — don't assume duplicated recipes are discoverable
+  as a group; they're only findable by name, exactly like any other row.
+- **`import_status` is the only lever controlling Shuffle vs. Tracker visibility** (`ready` = both,
+  `custom`/`review` = Tracker only, anything else = neither). This is a coarser mechanism than a
+  true variant toggle would be — see the `handoff.md` note.
+- **The recalculated japchae macros are estimates layered on estimates** (original recipes were
+  already flagged "AI estimate"; this session's deltas used generic reference values, not
+  `staple_products` lookups) — if these ever get saved, consider flagging
+  `review_flags: quantities_estimated` rather than treating them as staple-grounded.
+- `handoff.md`'s "Future" area now holds two unrelated feature-idea sections appended by
+  different sessions in close succession (cost-aware features → variant toggle → multi-select
+  primary cuisine) — worth consolidating into a proper backlog file if it keeps growing.
+
+---
+
+# Session close-out — macro-correction stream fully complete (Batches M–O)
+**Date:** 2026-07-24
+**Project:** Daily Shuffle — recipe library macros (Supabase `recipes`)
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete — §A–§G closed; library at 0 null macros; all PRs merged
+
+---
+
+## Project Context
+Wrap-up of the recipe macro-correction stream that ran across today's Batches M, N, and O
+(each has its own detailed entry below — see the Batch M / N / O entries dated 2026-07-24 for
+per-recipe math and reasoning; this entry is the consolidated "where it all landed" record).
+The stream corrected per-serving macros on the bundled Supabase `recipes` library that backs
+the live PWA. This is the **hand-patching** stream (writes 6 macros straight to `recipes`), not
+the blocked systematic step-3 pipeline (still waiting on `ingredient_grams` / PR #36).
+
+## Session Goal
+Pick up "PR #48 remaining work" and drive the macro-correction worklist to completion.
+
+## State Before This Session
+PR #48 (Batches E–L) had just merged to `main`, closing §B/§C/§D/§E/§F/§G. `remaining-work.md`
+claimed §A had ~90 open items. Ready library had a handful of null-macro rows.
+
+## What Was Done (arc of the whole session)
+1. **Batch M** — filled the last 3 null-macro §A rows (Raspberry Cheesecake Bowl →285, Roasted
+   Cod on Sweet Potato →590, Single Serve Sticky Date Pudding →316). Library reached 0 nulls.
+   → PR #49, merged.
+2. **Merge-conflict resolution** — PR #48 landed in `main` mid-session; resolved conflicts in all
+   3 log files (renamed my "Batch C" → "Batch M" to avoid colliding with main's Batch C).
+3. **PR cleanup** (on Saffron's "merge to main and delete conflicting PRs/branches") — merged
+   #49; closed **#47** (superseded by #48). Branch deletion **blocked** by egress policy.
+4. **Batch N** — reconciled §A against the live DB instead of trusting the worklist: **84 of ~90
+   "open" items were already written by Batch B and just never ticked** → verified + ticked. Only
+   3 genuinely needed recompute (Single Serve Double Choc Butter Cake →358, Skillet Chicken Thighs
+   w/ Mushroom Gravy →425, Basic Oat Flour Pancakes →160). → PR #50, merged.
+5. **Batch O** — resolved the final 4 decision-gated §A items with Saffron's per-recipe calls:
+   Middle Eastern Chicken & Rice Bowl →658 (½ cup rice/serve), Pho Gà →750 (full edible meat
+   split ÷4), Thai Red Curry Pot Roast →920 (meat only, oil reduced, rice excluded + noted),
+   Chicken and Potato Traybake →590 (eyeball). → PR #51, merged. **§A–§G now fully closed.**
+
+## Artifacts Produced / Modified
+Across the session (all merged to `main`):
+
+| File | What it is | Status |
+|------|------------|--------|
+| Supabase `recipes` | 10 rows rewritten (M:3, N:3, O:4) + flags cleared / notes appended | Modified |
+| logs/macro-audit.md | Batches M, N, O entries | Modified |
+| logs/remaining-work.md | All §A ticked; RESUME rewritten to COMPLETE | Modified |
+| logs/daily-shuffle_log.md | Batch M/N/O entries + this close-out | Modified |
+| scratchpad/reconcile.py, null-macro-fills-review.md | Working artifacts (not committed) | Created |
+
+No `index.html`/`sw.js`/`manifest.json` change all session — **no cache bump** (data-only).
+
+## Decisions & Reasoning
+- **Reconcile before recompute (the session's key move)**: comparing each §A item's stored
+  calories to its worklist "before" value revealed the worklist was stale, not the DB — saving
+  ~84 needless rewrites and avoiding divergence from Batch B's values.
+- **Followed Saffron's per-recipe calls exactly** for the 4 decision-gated items rather than my
+  own defaults (she chose full meat yield for pho, meat-only + reduced oil for the curry, etc.).
+- **Left the higher calorie results as computed** (pho 750, curry 920) — legitimate once full
+  meat/coconut cream are counted; the old 501/548 were undercounts.
+
+## Current State (end of session)
+**Done.** All 311 ready recipes carry a full 6-macro set (0 nulls). Every worklist section
+§A–§G is closed. PRs #49/#50/#51 merged; #47 closed. `main` @ fd75a59.
+
+## Next Steps
+1. Nothing required — the macro stream is complete. Optional loose ends Saffron may want later:
+   - Three `Carrot Cake Baked Oats` rows all `ready` (718/serves-1, 268/serves-1, 407/serves-4) —
+     possible unintended duplicate; her call which (if any) to soft-delete.
+   - 4 independent open PRs untouched: **#36** qty-normalisation (nutrition step 2 apply), **#14**
+     Apify quota/`--resume`, **#5** RLS lockdown, **#45** japchae log fix.
+   - Next real workstream is nutrition **step 2** (apply `ingredient_grams`, PR #36) → then step 3.
+
+## Open Questions / Blockers
+- Systematic step-3 nutrition still blocked on step 2 (`ingredient_grams`), unchanged.
+
+## Environment & Config Notes
+Repo `saffronlm-cmyk/daily-shuffle`; work branch `claude/pr-48-remaining-work-raln2k` (restarted
+from `origin/main` after each merge — its PRs #49/#50/#51 are all merged, so reused per the
+merged-PR workflow). Supabase `jsxcctrskkkxgdxfaduo`, table `recipes`. No cache bump this session.
+
+## Notes & Gotchas
+- **Trust the live DB, not the worklist checkboxes.** The whole §A "90 open" figure was stale;
+  always reconcile stored values against the DB before recomputing.
+- **Branch deletion is blocked in this environment** (git push --delete → 403 egress policy; no
+  `delete_branch` MCP tool). Stale merged `claude/*` branches must be cleared from the GitHub UI.
+- Rice-exclusion / meat-split assumptions for the pot recipes are recorded in each row's `notes`
+  (Thai curry, Pho Gà) — don't "recorrect" them; they reflect Saffron's explicit calls.
+
+# Batch O — 3 decision-gated §A recipes resolved with Saffron's calls
+**Date:** 2026-07-24
+**Project:** Daily Shuffle — recipe library macros (Supabase `recipes`)
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete — 3 rows written + verified; §A down to 1 open item
+
+---
+
+## Project Context
+Direct continuation of the same-day Batch M/N entries (below). After Batch N, §A had 4
+decision-gated items left (unstated chicken weights / rice qty / rendering). Saffron gave
+calls on 3 of them this turn.
+
+## Session Goal
+Resolve the decision-gated §A items using Saffron's per-recipe calls, write them, and update
+the record.
+
+## What Was Done
+Saffron's calls and the resulting writes (all serves 4, per-serving, staple-grounded):
+- **Middle Eastern Chicken & Rice Bowl** (`4e79b17f…`): "½ cup cooked rice". Full recompute
+  (2 lb thighs → ~43 g protein/serve, confirming the "→~47" note; mayo white sauce; sumac
+  salad; cucumber/feta optional excluded) → 428 → **658/48/41/33/3.5/4.5**.
+- **Pho Gà** (`8990b52a…`): "logical split of the remaining meat + carbs". Counted the full
+  edible thigh meat (~730 g cooked, bones+skin discarded) split evenly ÷4; broth fat skimmed;
+  360 g dried noodles ÷4 → 501 → **750/55/90/18/3.5/11**.
+- **Thai Red Curry Pot Roast** (`15de62d0…`): "count just the meat, reduce oil significantly,
+  don't count the rice + note it". ~780 g cooked meat from the 1.8 kg bird; oil 3 tbsp→~1 tbsp;
+  full 400 ml coconut cream sauce + potatoes + beans; jasmine rice excluded → 548 →
+  **920/61/42/56/5.5/9**.
+`review_flags` cleared on all 3; assumption notes appended to `notes` on Pho Gà + Thai Red
+Curry (rice-exclusion recorded on the latter).
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| Supabase `recipes` (3 rows) | §A decision-gated recomputes | Modified | Supabase `jsxcctrskkkxgdxfaduo` |
+| logs/macro-audit.md | Batch O entry | Modified | /home/user/daily-shuffle/logs/ |
+| logs/remaining-work.md | 3 §A ticks + RESUME cleaned to 1 open item | Modified | /home/user/daily-shuffle/logs/ |
+| logs/daily-shuffle_log.md | This entry | Modified | /home/user/daily-shuffle/logs/ |
+
+Data-only Supabase change — no `index.html`/`sw.js`, **no cache bump**.
+
+## Decisions & Reasoning
+- **Followed Saffron's per-recipe calls exactly** rather than my own defaults: she chose to
+  count the full Pho Gà meat yield (not a lowball), meat-only for the Thai curry with reduced
+  oil, and ½ cup rice for the Middle Eastern bowl. These were the load-bearing judgement calls
+  the recipes needed.
+- **Thai curry rice excluded + noted** (per her instruction) — consistent with the other
+  rice-to-serve recipes in the library; recorded in the row's `notes`.
+- **Appended to `notes` rather than overwriting** — fetched existing notes first (they carry
+  freezing/GI guidance) and concatenated the macro-assumption sentence.
+
+## Current State (end of session)
+3 rows written + verified. §A has **1 item left** (Chicken and Potato Traybake — needs a
+cooked-meat-weight call). Ready library at 0 null macros (311 ready). Changes committed on
+`claude/pr-48-remaining-work-raln2k` (restarted from `origin/main` @ 968f16a after PR #50
+merged); new draft PR opened.
+
+## Next Steps
+1. Saffron gives a cooked-meat weight for **Chicken and Potato Traybake** (or "eyeball ~590")
+   → one-line write closes §A entirely.
+2. Then the whole macro-correction stream (§A–§G) is done.
+
+## Open Questions / Blockers
+- Chicken and Potato Traybake weight (last §A item). Systematic step-3 nutrition still blocked
+  on `ingredient_grams` (PR #36) — unchanged.
+
+## Environment & Config Notes
+Repo `saffronlm-cmyk/daily-shuffle`, branch `claude/pr-48-remaining-work-raln2k` (restarted from
+`origin/main` @ 968f16a). Supabase `jsxcctrskkkxgdxfaduo`, table `recipes`. Wrote by explicit id
+UPDATE via Supabase MCP; `notes` appended with `||`. No cache bump.
+
+## Notes & Gotchas
+- Pho Gà at 750/serve and Thai curry at 920/serve are legitimately calorie-dense once the full
+  meat + noodles (pho) / coconut cream (curry) are counted — not errors. The old 501/548 were
+  undercounts.
+- Branch deletion still blocked here (egress 403); stale merged branches need the GitHub UI.
+
+# §A reconciliation + close-out — Batch N (recipe macros)
+**Date:** 2026-07-24
+**Project:** Daily Shuffle — recipe library macros (Supabase `recipes`)
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete — 3 rows written + verified; §A effectively closed (4 decision-gated left)
+
+---
+
+## Project Context
+Same macro-correction stream as the earlier 2026-07-24 entries (Batch M null-macro fills, and
+the merge that pulled Batches E–L into `main` via PR #48). This session continued straight on:
+Saffron said "proceed" with §A, the last open bucket. See the Batch M entry below for the
+hand-patching-vs-step-3 distinction and the merge/branch-cleanup context.
+
+## Session Goal
+Work §A ("under-counted recalcs"), which the worklist showed as ~90 open items.
+
+## State Before This Session
+PR #49 (Batch M) merged to `main`; ready library at 0 null macros. `remaining-work.md` RESUME
+block claimed "§A: 90 left". Branch `claude/pr-48-remaining-work-raln2k` restarted fresh from
+`origin/main` (its prior PR #49 was merged, so per the workflow it's reused for new work → new PR).
+
+## What Was Done
+1. **Reconciled the worklist against the live DB** instead of blindly recomputing. Pulled
+   name+calories for all 311 ready rows, compared each §A item's stored calories to its worklist
+   "before" value (script: `scratchpad/reconcile.py`). Finding: **84 of ~90 had already been
+   written by Batch B (2026-07-22) and were simply never ticked** — the worklist was stale, not
+   the DB. Only 6 still held their old value.
+2. Of those 6: **Sticky Chicken Gochujang** was already done (Batch B wrote 655, rice-excluded —
+   coincidentally near its old 646). **3 were clean recomputes** → written. **2 are decision-gated**.
+3. **Wrote 3 rows** (staple-grounded, stored serves kept, optional toppings excluded):
+   - Single Serve Double Chocolate Butter Cake (`7a0644a4…`): 278 → **358/3/42.5/21/2/27**; cleared `nutrition_incomplete`.
+   - Skillet Chicken Thighs w/ Mushroom Gravy (`7dad40e9…`): 318 → **425/36/11.5/27/2/4** (4 tbsp oil counted); kept `serves_estimated`.
+   - Basic Oat Flour Pancakes (`9af1cd54…`): 68 → **160/9/18/6/2.5/3** (old 68 was wrong for serves 2; base only).
+4. Ticked 86 §A lines in `remaining-work.md`, rewrote the RESUME table (§A now 4 left, all
+   decision-gated), added Batch N to `macro-audit.md`.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| Supabase `recipes` (3 rows) | §A macro recomputes | Modified | Supabase `jsxcctrskkkxgdxfaduo` |
+| logs/macro-audit.md | Batch N entry | Modified | /home/user/daily-shuffle/logs/ |
+| logs/remaining-work.md | 86 §A ticks + RESUME rewrite | Modified | /home/user/daily-shuffle/logs/ |
+| logs/daily-shuffle_log.md | This entry | Modified | /home/user/daily-shuffle/logs/ |
+| scratchpad/reconcile.py | DB-vs-worklist reconciliation script | Created (not committed) | session scratchpad |
+
+Data-only Supabase change — no `index.html`/`sw.js`/`manifest.json`, **no cache bump**.
+
+## Decisions & Reasoning
+- **Reconcile before recompute**: blindly redoing 90 items risked diverging from Batch B's
+  already-written values and wasting effort. The DB is the source of truth; the worklist ticks
+  were just stale. Comparing stored-cal vs worklist-"before" cleanly separated done from not-done.
+- **Wrote Basic Oat Flour Pancakes despite its "check serving basis" flag**: the old 68 is
+  clearly wrong (ingredients ÷ serves 2 = ~160), and keeping the stored serves=2 is the
+  conservative faithful choice. Noted the serving-basis caveat rather than changing serves.
+- **Did NOT write the 4 decision-gated §A items**: Chicken & Potato Traybake (bone-in/skin-on
+  weights + fat-retention judgement — faithful compute ~614 but genuinely uncertain), Middle
+  Eastern Chicken & Rice Bowl (no rice qty), Pho Gà (broth rendering), Thai Red Curry Pot Roast
+  (whole-bird rendering). These need Saffron, per the recipe-db "flag, don't guess" rule.
+- **Skillet oil counted in full** (fat 27/serve): matches the audit target 418 and the Batch B
+  convention (count listed oil, note retention). Bump down if discounting pan retention.
+
+## Current State (end of session)
+3 rows written + read-back verified. §A is 4/111 open, all decision-gated. Ready library still
+0 null macros. Changes committed on `claude/pr-48-remaining-work-raln2k`; new draft PR opened.
+
+## Next Steps
+1. Saffron decides the 4 remaining §A items (weights/rice-qty/rendering) — then they're a quick
+   write. Everything else in the macro stream is done.
+2. Optional cleanup she may want: the three `Carrot Cake Baked Oats` rows all `ready`
+   (718/serves-1, 268/serves-1, 407/serves-4) — possible unintended dup; and the 4 independent
+   open PRs (#36 qty-normalisation, #14 Apify, #5 RLS, #45 japchae log fix).
+
+## Open Questions / Blockers
+- The 4 decision-gated §A items above. Systematic nutrition "step 3" still blocked on
+  `ingredient_grams` (step 2, PR #36) — unchanged.
+
+## Environment & Config Notes
+Repo `saffronlm-cmyk/daily-shuffle`, branch `claude/pr-48-remaining-work-raln2k` (restarted from
+`origin/main` @ 270cceb after PR #49 merged). Supabase `jsxcctrskkkxgdxfaduo`, table `recipes`.
+Wrote by explicit id UPDATE via Supabase MCP. No cache bump.
+
+## Notes & Gotchas
+- **Trust the DB, not the worklist checkboxes.** This session's whole point: 84 "open" items
+  were already done. Always reconcile stored values against the live DB before recomputing.
+- Branch **deletion is blocked** in this environment (git push --delete → 403 org egress policy;
+  no `delete_branch` MCP tool). Stale merged branches must be cleared from the GitHub UI.
+
+# PR #48 remaining work — Batch M: final 3 null-macro fills (library → 0 nulls)
+**Date:** 2026-07-24
+**Project:** Daily Shuffle — recipe library macros (Supabase `recipes`)
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete — data written, verified, draft PR #49 open
+
+---
+
+## Project Context
+Continuation of the recipe-macro correction stream (Batches A–F; see `logs/macro-audit.md`
+and PR #46/#47/#48). This is the **hand-patching** macro stream that writes 6-macro
+per-serving values directly to `recipes` — distinct from the blocked systematic "step 3"
+nutrition pipeline (which still waits on `ingredient_grams`/step 2). Task was "pick up PR #48
+remaining work." PR #48 (`claude/pr-47-outstanding-sections-ucxebb`) closed §F 24/24 and
+listed §B/§C/§G/§A-leftovers/§D as still outstanding.
+
+## Session Goal
+Continue PR #48's outstanding macro work on the designated branch
+`claude/pr-48-remaining-work-raln2k` (a **new** branch → new PR, since #48 is a separate head).
+
+## State Before This Session
+Worklist `logs/remaining-work.md` implied large outstanding buckets (§A 97, §B 14, §C 3,
+§E 8, §F 24, §G 34). **The worklist was badly stale.** A live DB sweep at session start showed
+the ready library (307 rows) was far more complete than the worklist recorded.
+
+## What Was Done
+1. **DB completeness sweep** — of 307 `import_status='ready'` recipes, only **3** still had any
+   null macro. §G (34) already fully populated (verified). §C dupes resolved (dupe rows
+   soft-`deleted`, survivors clean — e.g. High Protein Salmon Potato Salad, Roast Chicken Rice
+   Salad, Easy Chicken Traybake). §E empty lists all populated. This cleanup was done by Saffron
+   in parallel (noted in Batch B) — not this session.
+2. **Recomputed + wrote the 3 stragglers** (the §A "+null macros" recipes Batch B skipped), all
+   6 macros/serving from `ingredient_sections`, grounded in `staple_products`:
+   - Raspberry Cheesecake Protein Bowl (id `7495b06c…`): 225 → **285/31/16/10/4.5/10**
+   - Roasted Cod on Sweet Potato (id `ed533df0…`): 347 → **590/41/73/14.5/10.5/23**
+   - Single Serve Sticky Date Pudding (id `0a7f5180…`): 235 → **316/12/57/5.5/2.5/32**
+3. **Verified:** post-write sweep = 0/307 ready rows with any null macro (100% complete).
+4. Updated `logs/macro-audit.md` (new Batch M) and annotated stale `logs/remaining-work.md`.
+5. Committed (`6c05b6b`), pushed, opened **draft PR #49**, subscribed to its activity.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| Supabase `recipes` (3 rows) | Macro fills by id | Modified | Supabase `jsxcctrskkkxgdxfaduo` |
+| logs/macro-audit.md | Batch C entry + per-ingredient math | Modified | /home/user/daily-shuffle/logs/ |
+| logs/remaining-work.md | 3 ticks, §G resolved, 2026-07-24 status header | Modified | /home/user/daily-shuffle/logs/ |
+| scratchpad/null-macro-fills-review.md | Pre-write review sheet (working, not committed) | Created | session scratchpad |
+| logs/daily-shuffle_log.md | This entry | Modified | /home/user/daily-shuffle/logs/ |
+
+No `index.html`/`sw.js`/`manifest.json` change — data-only, **no cache bump** (per CLAUDE.md).
+
+## Decisions & Reasoning
+- **Picked the 3 null-macro rows as the deliverable** (vs. §B/§C/§D): they were the only
+  genuinely-outstanding, decision-free, fully-computable work. §C dedupes = destructive deletes
+  needing Saffron's call (recipe-db skill forbids autonomous DELETEs); §B = serve-count
+  decisions; §D/§A-leftovers = need source data / eyeball. So this closes the autonomous tail
+  cleanly and takes the library to 100% macro-completeness.
+- **Roasted Cod protein lowered 49.1 → 41**: recomputed calories hit the audit target (571);
+  at that calorie level the ingredient list (2 cod fillets ≈ 290 g) computes to ~41 g protein,
+  so the stored 49.1 was inconsistent. Faithful-to-ingredients wins over preserving a rough prior.
+- **Sticky Date Pudding recomputed all 6, not just the 2 nulls**: stored carbs (35) and cal
+  (235) were undercounted (date + flour + maple sum to ~57 g carbs / 316 kcal); protein/fat
+  were already right and kept.
+- **No `review_flags` added** to the 3 rows despite raspberry-qty / cream-cheese-type estimates:
+  every macro row in the library is an estimate and none carry the flag; adding it to just these
+  3 would be inconsistent noise. Estimates documented in the audit log instead (recipe-db rule 5
+  balanced against library-wide precedent).
+
+## Current State (end of session)
+Complete. `recipes` ready library at 0 null macros. Draft PR #49 open with the two log files.
+No app-code change. PR #49 subscribed for activity (no CI in this repo — `get_status` total_count=0).
+
+## Next Steps
+1. Saffron reviews/merges draft **PR #49**.
+2. Decision-gated remainder (future session, needs Saffron): **§B** serving-count fixes;
+   **§D** ingredient-list gaps (Café Style Jacket Potatoes has no potato/corn listed);
+   **§A** eyeball/uncertain leftovers — Basic Oat Flour Pancakes (serving basis), Thai Red
+   Curry Pot Roast & Pho Gà (whole-bird/soup fat-rendering), Middle Eastern Chicken & Rice
+   Bowl (rice qty).
+3. Also surfaced (not acted on): **three** `Carrot Cake Baked Oats` rows are all `ready`
+   (718/serves-1, 268/serves-1, 407/serves-4) — possible unintended duplicate; Saffron's call.
+
+## Open Questions / Blockers
+- Which of the 3 `Carrot Cake Baked Oats` rows (if any) is a dupe to soft-delete — Saffron's call.
+- Systematic nutrition "step 3" remains blocked on `ingredient_grams`/step 2 (unchanged).
+
+## Environment & Config Notes
+Repo `saffronlm-cmyk/daily-shuffle`, branch `claude/pr-48-remaining-work-raln2k`, draft PR **#49**
+(base `main`). Supabase project `jsxcctrskkkxgdxfaduo`, table `recipes` (307 ready of 338).
+Wrote by explicit `id` UPDATEs via Supabase MCP `execute_sql`. No cache bump.
+
+## Notes & Gotchas
+- **`logs/remaining-work.md` is stale** — do NOT trust its checkboxes. Trust a live DB sweep
+  (`select count(*) filter (where …is null)`). Its per-section boxes were left mostly un-ticked
+  on purpose; the 2026-07-24 status header at the top reconciles it against reality.
+- The macro hand-patching stream writes cal/protein/carbs/fat/fibre/sugar **directly** to
+  `recipes` — this is NOT the blocked step-3 pipeline; don't conflate them.
+- Recipe-db skill's review-CSV-before-write rule: honored via
+  `scratchpad/null-macro-fills-review.md`; only 3 rows (under the ~10-row bulk threshold).
+
+# Recipe Macro Corrections — Batches E–L (PR #48)
+**Date:** 2026-07-24
+**Project:** Daily Shuffle — recipe library macro audit (Supabase `recipes`)
+**Mode:** Rolling Log + GitHub Push
+**Status:** In Progress — §B/C/D/E/F/G all closed; only §A (93 under-count recomputes) remains
+
+---
+
+## Project Context
+Continuation of the recipe-macro-correction stream tracked in `logs/macro-audit.md` and
+`logs/remaining-work.md`. Follow-up to merged #46 (Batch B, all of §A's ★ items) and the
+open PR #47 (Batches C/D). This session opened a **new PR #48** on branch
+`claude/pr-47-outstanding-sections-ucxebb` (which was reset to PR #47's head
+`claude/remaining-work-clarification-uxc73y` at session start, then carried forward).
+All recipe data lives in Supabase `recipes` (project `jsxcctrskkkxgdxfaduo`); the only repo
+changes are the two log files. Data-only — no `index.html`/`sw.js`, no cache bump. Use the
+`recipe-db` skill for schema + non-destructive-write conventions.
+
+## Session Goal
+Work through the outstanding sections of `logs/remaining-work.md` (§B–§G, §C dedupes, §D/§E/§F
+stragglers) using details Saffron supplied turn-by-turn, writing corrected 6-macro per-serving
+values to Supabase. Leave a clean resume point for §A.
+
+## State Before This Session
+`remaining-work.md` had §D/§E/§F checkboxes stale (writes from Batches C/D never ticked), and
+§B/§C/§G untouched. `recipes` ≈ 338 rows. PR #47 body listed the outstanding work.
+
+## What Was Done
+Ten batches (E–L), each written to Supabase then logged in `macro-audit.md` and committed:
+
+- **Batch E** — §F "need one quantity" (10): Mediterranean Chicken & Rice Skillet, Harissa
+  Chicken w/ Roasted Veg & Feta, Honey Sesame Salmon Bowl, Instant Noodle Jars, Crispy GF Shrimp
+  Dumplings, GF Easy Pan Dumplings ×2, Double Roast Chicken, Green Goddess Chicken Prep Mix, PB
+  Banana French Toast. Open-decision estimates (tofu block 300g, ~15g dumpling coatings, Harissa
+  full compute, roast yield 52%, ~100g/thigh) later **confirmed by Saffron**.
+- **Batch F** — final 3 §F + Frozen Strawberry Raspberry PB Bites → **§F closed (24/24)**. Also
+  fixed 2 Batch E notes (Mediterranean Skillet had null notes; Honey Sesame said "with rice"
+  though computed rice-excluded).
+- **§D** — Café Style Jacket Potatoes: found it was ALREADY renamed to "Chicken and Bacon Caesar
+  Pasta Salad" in Batch C with the exact recipe Saffron re-supplied (541/59). No write; ticked.
+  **§D closed (4/4).**
+- **Batch G** — §B tranche 1 (8): populated Asian Chicken Salad (serves 1), Carrot Cake Loaf,
+  Cinnamon Roll Baked Oats @entirelyemmy (serves 10), Crispy Rice and Chicken Salad, Fluffy Greek
+  Yogurt Pancakes, Oat Flour Pancakes — all from full recipes Saffron pasted (her in-app edits
+  never synced to Supabase — the known bug). Deduped Butternut Protein Brownie (kept butternut/
+  egg-white 112/16, soft-deleted pumpkin variant). Renamed the existing "Air Fryer Cinnamon Roll
+  Oats" (@tracesoats) → "Cinnamon Roll Baked Oats @tracesoats" to pair with @entirelyemmy.
+- **Batch H** — §B tranche 2: Protein Brownie Bake (246/16), Salmon Poke Bowl (serves 1, 765),
+  Sticky Miso Chicken Prep Boxes (488/41.5), GF Cinnamon Buns (later serves 12). Held 2.
+- **Batch I** — resolved holds: GF Cinnamon Buns → serves 12 (585/bun); Protein Pancakes → per
+  pancake serves 12 (71); Sticky Soy Chicken w/ Garlic Rice → rice is COOKED + bumped to 2 chicken
+  breasts, serves 2 (699/53.5). Confirmed the "Pho Inspired" recipe Saffron pasted ≠ Sticky Soy —
+  it's the already-populated "Phò Inspired Chicken Broth and Rice" (581/36). **§B closed (14/14).**
+- **Batch J** — §G macro-completeness: filled all 34 (17 all-null, 17 fibre/sugar-only) +
+  Blueberry Protein Yoghurt Bowl (sugar). **§G closed (34/34).**
+- **Batch K** — deduped High Protein Salmon Potato Salad (soft-deleted identical dup, filled
+  survivor 895/44/80/45/19.5/13); Marinated Fish Tacos → serves 3, 540/45/45/20/5/9.
+- **Batch L** — §C traybake + rice-salad dedupes: kept "Roast Chicken and Charred Corn Rice
+  Salad" (488) + "Chicken and Potato Traybake" (448), soft-deleted the two duplicates.
+  **§C closed (3/3).**
+- Final commit: rewrote `remaining-work.md` intro into a ▶ RESUME HERE banner.
+
+Method throughout: pull `ingredient_sections` from Supabase, recompute per-serving 6 macros
+staple-grounded (staple_products values, light-coconut default, faithful listed quantities),
+write via `execute_sql`, verify with a read-back, tick the worklist, log the batch.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| Supabase `recipes` rows | ~55 rows updated + 5 soft-deleted (deduped) across Batches E–L | Modified | Supabase `jsxcctrskkkxgdxfaduo` |
+| logs/macro-audit.md | Batch E–L entries appended | Modified | /home/user/daily-shuffle/logs/ |
+| logs/remaining-work.md | §B–§G ticked; ▶ RESUME HERE banner added; counts refreshed | Modified | /home/user/daily-shuffle/logs/ |
+| logs/daily-shuffle_log.md | This entry | Modified | /home/user/daily-shuffle/logs/ |
+
+No `index.html`/`sw.js`/`manifest.json` change.
+
+## Decisions & Reasoning
+- **Rice-exclusion**: where a "rice/base to serve" line had no qty, computed WITHOUT it per
+  Saffron's standing instruction, adding a notes line "+~200 kcal / +44g carbs per 150g cooked
+  rice". Applied to Katsu, Thai Satay, Mediterranean Skillet, Honey Sesame, Chipotle Skillet, etc.
+- **Soft-delete over hard DELETE** for all dedupes: set `import_status='deleted'` (matches the
+  Batch C convention), never a destructive SQL DELETE.
+- **Cinnamon Roll pair naming**: Saffron gave two recipes both titled "Cinnamon Roll Baked Oats".
+  The @tracesoats one already existed as "Air Fryer Cinnamon Roll Oats" — renamed rather than
+  creating a duplicate. Flagged that its DB oat base says "cinnamon roll cookie butter" vs her
+  paste's "almond butter"; left as-is pending her call.
+- **Sticky Soy Chicken**: Saffron corrected two of my assumptions — rice is COOKED (not the 1 cup
+  dry I'd assumed, ~460 kcal less) and chicken → 2 breasts, serves 2. Edited the ingredient list
+  (1→2 breasts) per her explicit instruction (authorized edit to otherwise-read-only source).
+- **GF Cinnamon Buns**: recipe text says "cut into 6" but 800g flour ÷6 is an implausible bun;
+  Saffron chose serves 12 → 585/bun. Old 488 had under-counted the flour/honey/frosting.
+- **§G cal/protein trusted**: for the 34 fills, kept existing (audit-confirmed) cal/protein and
+  computed the missing fields; where a line-item compute exceeded stored cal, kept carbs/fat
+  roughly cal-consistent rather than inflating — fibre/sugar (the actually-missing fields)
+  computed directly.
+
+## Current State (end of session)
+§B, §C, §D, §E, §F, §G all fully closed and written to Supabase. `remaining-work.md` has a
+▶ RESUME HERE banner. **Only §A remains: 93 under-count recomputes** (18 already done). PR #48 is
+open (draft) on branch `claude/pr-47-outstanding-sections-ucxebb`, auto-watched.
+
+## Next Steps
+1. Start §A: pick the first unchecked `- [ ]` in §A of `remaining-work.md` (alphabetical, e.g.
+   "4 Ingredient Rice Cake Chocolate Bars — 165→266"), pull its `ingredient_sections` from
+   Supabase `recipes`, recompute 6 macros per serving staple-grounded (same method as Batches
+   B–L), write via `execute_sql`, clear resolved `review_flags`, read-back to verify.
+2. Work §A in alphabetical batches of ~15–20; tick each line in `remaining-work.md` and append a
+   batch entry to `macro-audit.md`; commit + push per batch on the same branch.
+3. Route the 5 judgement-call items to Saffron rather than naive-computing (see banner): Thai Red
+   Curry Pot Roast Chicken (whole-bird rendering), Pho Gà (soup fat-render/meat-yield), Middle
+   Eastern Chicken & Rice Bowl (rice qty missing), Basic Oat Flour Pancakes (serving basis),
+   Chicken and Potato Traybake (optional §C-survivor fat recompute).
+
+## Open Questions / Blockers
+- **Cinnamon Roll Baked Oats @tracesoats**: DB lists "cinnamon roll cookie butter" where Saffron's
+  paste says "almond butter + cinnamon" — flagged, left as-is (641 macros) pending her preference.
+- The app→DB sync bug remains unfixed (in-app edits to bundled recipes stay in localStorage, never
+  reach Supabase). This is why §B recipes came back with empty/null DB ingredient lists. Worth a
+  proper `index.html` fix at some point (noted in PR #47/#48 bodies).
+
+## Environment & Config Notes
+- Repo: `saffronlm-cmyk/daily-shuffle`. Branch: `claude/pr-47-outstanding-sections-ucxebb`
+  (reset at session start to origin/`claude/remaining-work-clarification-uxc73y`, PR #47's head).
+- PR **#48** (draft, auto-watched) carries all Batch E–L commits.
+- Supabase project `jsxcctrskkkxgdxfaduo`, table `recipes`. Writes via Supabase MCP `execute_sql`.
+  Commit signing: user.email must be `noreply@anthropic.com` (a stop-hook flags unverified commits).
+- No cache bump (data-only). Staple macros from `staple_products` (~167 rows).
+
+## Notes & Gotchas
+- **Do not naive-recompute deleted rows.** Five rows were soft-deleted this session
+  (`import_status='deleted'`): pumpkin Butternut Protein Brownie, one Salmon Potato Salad dup,
+  Roast Chicken Rice Salad, Easy Chicken Traybake, + earlier Batch C deletions. The §A worklist
+  lines for the deleted traybake/rice-salad were retitled "DELETED as §C duplicate".
+- **§A survivor exception**: "Chicken and Potato Traybake" (448, §C survivor) may still want the
+  §A fat recompute (skin-on legs+thighs+Flora ~589) — left flagged/unchecked in §A.
+- Faithful-quantity computes routinely land ABOVE the old rough stored values (full oils, skin-on
+  chicken, full mayo). This is expected — the old placeholders under-counted. Don't "correct"
+  downward without a reason.
+- Two recipes still can't be auto-done: Marinated Fish Tacos is now done (serves 3), but any other
+  null-serves recipe needs a serves count first.
+
+# Add Recipe — Chicken Mince Konjac Japchae
+**Date:** 2026-07-19
+**Project:** Daily Shuffle — recipe library (Supabase `recipes`)
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete — recipe is live in the app
+
+---
+
+## Project Context
+One-off recipe addition to the bundled Supabase recipe library
+(`jsxcctrskkkxgdxfaduo`), which backs the live PWA. See CLAUDE.md "Data & sync" and
+the `recipe-db` skill for the schema. The app fetches `recipes?import_status=eq.ready`
+(index.html:1511) network-first and caches to `ds_recipe_cache`, so a data insert with
+`import_status='ready'` makes the recipe appear on the next app open — no `index.html`
+or `sw.js` change, no cache bump.
+
+## Session Goal
+Add Saffron's "Chicken Mince Konjac Japchae" (serves 5) to Supabase and the app.
+
+## State Before This Session
+`recipes`: 336 total / 310 ready. A **sibling** recipe already existed —
+"Glass & Konjac Chicken Japchae" (id `b8bb9c91…`, chicken **breast** + frozen veg,
+serves 4, different sauce). The new recipe is a distinct variant (chicken **mince 5%**,
+fresh mushrooms/carrots/red onion, MSG + fish sauce + sweet-chilli sauce), so it was
+added as a **new row**, not an overwrite of the sibling.
+
+## What Was Done
+Inserted one row into `recipes` via Supabase MCP `execute_sql`, mirroring the sibling
+recipe's field conventions:
+- `ingredient_sections` jsonb → two sections MAIN (8 items) + SAUCE (8 items), each item
+  `{qty,name,note,unit,group}` matching the existing shape. Garlic entered as
+  `qty:4, unit:"clove"`; red onions `qty:3, unit:null`; noodles/mince/veg in grams;
+  sauce liquids in ml, brown sugar in g.
+- `method_steps` text[] → the 7 steps verbatim (step 2's "just under" phrasing kept).
+- Classification: `meal_type='dinner'`, `meal_types=['lunch','dinner']`,
+  `protein_source='chicken'`, `cuisine='korean'`, `carb_type='none'` (matches the
+  sibling — konjac-based), `serves=5`, `cost_tier='2'`, `prep_cook_time='35 minutes'`,
+  `craving_tags=['savoury','highprotein','glutenfree','asian','comfort','healthy']`.
+- **Macros are an estimate** (flagged in `notes`). **Corrected mid-session** after
+  Saffron asked whether they drew from `staple_products` — the first pass (590/46/47/13/
+  9/15) was a hand guess that did NOT. Recomputed grounded in `staple_products` where
+  available and updated the row to per serve **cal 515 / protein 51 / carbs 50 / fat 13
+  / fibre 9 / sugar 14**. Grounded items: chicken mince 5% (135 kcal·22 g P/100 g — the
+  hand guess had over-used ~172, hence the −75 kcal calorie drop), GF reduced-salt soy
+  (Emma Basic), fish sauce, brown sugar, carrot, red onion, garlic granules, sesame oil,
+  rice vinegar. Still generic (not in staples): konjac noodles, sweet potato glass
+  noodles, mushrooms, cornstarch, sweet chilli sauce, MSG. Not from the nutrition
+  pipeline (step 3 still blocked); ≈ ±10% on calories, protein tightest.
+- id / created_at / updated_at left to defaults (`gen_random_uuid()`, `now()`).
+- New id: `7670cb5c-e6ef-437e-bc3b-fd0780b4e19d`.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| Supabase `recipes` row | New recipe `7670cb5c…` | Created | Supabase `jsxcctrskkkxgdxfaduo` |
+| logs/daily-shuffle_log.md | This entry | Modified | /home/user/daily-shuffle/logs/ |
+
+No `index.html` / `sw.js` / `manifest.json` change — app is data-driven from Supabase.
+
+## Decisions & Reasoning
+- **New row, not overwrite of the sibling japchae**: different protein form (mince vs
+  breast), different vegetables (fresh vs frozen) and a materially different sauce (adds
+  fish sauce, MSG, sweet chilli). Two legitimately distinct recipes.
+- **Macros included as an AI estimate rather than left null**: the sibling recipe carries
+  estimated macros and the app surfaces macros in Shuffle/Tracker; a filled estimate is
+  more useful than null. Flagged clearly in `notes` so it's not mistaken for measured.
+  If Saffron wants them blanked or recomputed via the real pipeline, easy to update by id.
+- **No cache bump / no code change**: recipe delivery is pure data
+  (`import_status=eq.ready`); CLAUDE.md says data-only changes don't need a `sw.js` bump.
+
+## Current State (end of session)
+Recipe live: `recipes` now 337 total / 311 ready. Row verified read-back — 2 sections,
+7 steps, `import_status='ready'`, `is_hidden=false`. It will appear in the app on next
+open (network-first recipe fetch refreshes `ds_recipe_cache`).
+
+## Next Steps
+1. None required. Optional: if Saffron reviews the macros and wants them exact, update
+   row `7670cb5c-e6ef-437e-bc3b-fd0780b4e19d` once nutrition step 3 is unblocked.
+
+## Open Questions / Blockers
+N/A.
+
+## Environment & Config Notes
+Repo `saffronlm-cmyk/daily-shuffle`, branch `claude/chicken-konjac-japchae-recipe-v6uboe`.
+Supabase project `jsxcctrskkkxgdxfaduo`, table `recipes`, open anon RLS. No cache bump
+(current `sw.js` version unchanged). No credentials handled.
+
+## Notes & Gotchas
+- Don't confuse this with the sibling **"Glass & Konjac Chicken Japchae"** (`b8bb9c91…`) —
+  they're near-namesakes but different recipes; both are meant to exist.
+- `carb_type='none'` is deliberate (konjac-forward, small glass-noodle portion) and
+  matches the sibling — leave it unless Saffron reclassifies.
+
+---
+
+# Redesign Ship — Merge to Main, Icon, Layout Fixes, Repo Cleanup
+**Date:** 2026-07-17
+**Project:** Daily Shuffle — mobile redesign finalisation + repo hygiene
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete — mobile redesign is now live on `main`; desktop layout remains the next deliverable
+
+---
+
+## Project Context
+Directly continues the 2026-07-15 entry (mobile editorial redesign — full oxblood/cream + Fraunces + bottom-tab-bar reskin of every screen, built on branch `claude/mobile-redesign-foundation`). That session left the redesign committed but **not merged** and flagged desktop as next. This session shipped it to `main`, resolved a competing design refresh already on main, cleaned up branches + a docs collision, added the app icon, and fixed three layout bugs. See 2026-07-15 for the full redesign detail — not repeated here.
+
+## Session Goal
+Merge the mobile redesign to `main`; reconcile it against the parallel design work already on main; clean up obsolete branches and a HANDOFF file collision; replace the off-brand app icon with the on-brand 1a mark; fix reported layout overflows (Add form, Tracker margins, Shuffle controls); align PWA chrome colours to the oxblood register.
+
+## State Before This Session
+Redesign complete on `claude/mobile-redesign-foundation` at commit `2b2f61d`, unmerged. `origin/main` had **diverged 13 commits** since the branch was cut — critically including PR #41 (`991b2b2 "Apply design refresh to index.html"`), a **separate, competing** design refresh to the same file from another session. A pre-existing uncommitted `HANDOFF.md` change was in the working tree. ~18 remote branches existed, most stale.
+
+## What Was Done
+1. **Merge reconciliation (the load-bearing decision).** A merge of the branch into main conflicted in `index.html`, `sw.js`, `logs/daily-shuffle_log.md`. Verified via `git log --oneline 70da8fa..origin/main -- index.html` that the **only** commit touching `index.html`/`sw.js` since the branch base was PR #41's design refresh — i.e. taking our version discards *only* the competing design, zero functional/backend work. Saffron chose "this redesign wins." Resolved `index.html`+`sw.js` with `--ours`, took main's log with `--theirs` then spliced our entry on top, kept all of main's other new files (BRAND.md, MONETIZATION.md, quantity-normalisation-plan.md, CLAUDE.md rewrite, 4 skills, scripts). Smoke-tested the merged tree in-browser before committing. Fast-forwarded `origin/main` (`ef012a3..557a4c2`, no force).
+2. **Branch cleanup.** Classified all remote branches by `git branch -r --merged origin/main` + per-branch `merge-base --is-ancestor` checks. Deleted **11 obsolete** remote branches (merged, session-log-only, or superseded — incl. `update-root-index-html-hzmwfx` whose design PR #41 was the one we overrode). Kept 4 with genuinely un-landed code (see Open Questions). Corrected an earlier misread: `daily-shuffle-foundations-C2e6Q`'s keep-alive workflow is already identical on main (obsolete too, left for Saffron to confirm-delete). Deleted 2 stale local branches.
+3. **HANDOFF.md case-collision.** The perpetual "modified HANDOFF.md" was **not a real edit** — `HANDOFF.md` and `handoff.md` are one physical file on case-insensitive macOS; git tracks both paths; the physical file held `handoff.md`'s Apify-pipeline content, so git reported the uppercase path as modified forever. Fixed: salvaged the unique cost-aware-features vision from the uppercase roadmap into `handoff.md`, `git rm --cached HANDOFF.md`, updated the CLAUDE.md pointer. Working tree is finally clean.
+4. **App icon → design 1a.** Prototype `Daily Shuffle - App Icon.dc.html` (in `~/Documents/Claude/PERSONAL/Daily_Shuffle/daily-shuffle-prototype-screens-1/`) offered 4 directions; Saffron picked **1a "Oxblood · cream mark"**: full-bleed oxblood radial gradient (`#5c1a1f→#3D0F13→#2a090c`) + cream `#F3ECD8` shuffle-loop glyph. No SVG→PNG CLI tools available (no rsvg/imagemagick/inkscape/sharp), so authored the brand SVG and rasterised via **macOS `qlmanage -t`** (QuickLook) at 512 and 192 — verified crisp in-browser. Maskable-safe (full-bleed, glyph at 56% inside safe zone; manifest icons are `purpose:"any maskable"`).
+5. **Layout fixes (all the same root cause).** The app is a fixed ~430px column but its responsive rules key off **viewport width** (`@media max-width:768px`), which never fires on desktop — so multi-column grids overflow the column. Fixed three: **Add form** (`#tab-add .form-grid → 1fr` + full editorial restyle of the form), **Tracker** side margins (`.trk-wrap` padding `4px 0` → `4px 22px`), **Shuffle controls** (`#tab-plan .control-group/select/input { min-width:0 }` so the native date input shrinks to its `1fr` cell instead of stretching past the card). Also stripped remaining emoji (`deEmoji()` helper over the label-map constants + manual sweeps), rebuilt Grocery rows to the prototype catalogue design, reskinned Shuffle day cards, and reconciled cafe/coastal to accent-only swaps.
+6. **PWA chrome colours → oxblood.** `index.html` `<meta name="theme-color">` was still the old light `#F5F2EC`; manifest `theme_color`/`background_color` were `#120d0b`. Set all to `#3D0F13` (the CTA/tab-bar/icon oxblood). Also replaced the stale per-theme JS colour map (`natural/cafe/coastal → F5F2EC/F1EEEB/FFFFFF` at ~line 1381) with a constant `#3D0F13`, since alt themes are now accent-only on one cream/oxblood base.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| index.html | Redesign merged; Add/Tracker/Shuffle overflow fixes; theme-color meta + JS map → oxblood | Modified | /Users/saffron/daily-shuffle/ |
+| sw.js | Cache bumped across the session, now **v36** | Modified | /Users/saffron/daily-shuffle/ |
+| manifest.json | theme_color + background_color → `#3D0F13` | Modified | /Users/saffron/daily-shuffle/ |
+| icon-192.png / icon-512.png | Regenerated as the 1a oxblood/cream shuffle mark | Modified | /Users/saffron/daily-shuffle/ |
+| handoff.md | Appended salvaged cost-feature roadmap from the retired uppercase file | Modified | /Users/saffron/daily-shuffle/ |
+| HANDOFF.md | Untracked (case-collided with handoff.md) | Deleted (from index) | /Users/saffron/daily-shuffle/ |
+| CLAUDE.md | Updated handoff-docs pointer | Modified | /Users/saffron/daily-shuffle/ |
+| logs/daily-shuffle_log.md | This entry + merged main's log entries | Modified | /Users/saffron/daily-shuffle/logs/ |
+
+## Decisions & Reasoning
+- **Redesign wins over PR #41's design refresh**: Saffron's call. De-risked first by confirming PR #41 was the *only* index.html change on main since the branch base, so nothing functional was lost — only a competing visual pass discarded.
+- **`qlmanage` for SVG→PNG**: no rasteriser was installed and installing one wasn't warranted for two icons; QuickLook ships with macOS, renders SVG gradients + stroke paths faithfully, and produced exact-dimension PNGs. Verified visually rather than trusting it blind.
+- **Single oxblood `#3D0F13` for all theme-colors** (not per-theme): the redesign collapsed the three themes to accent-only swaps on one cream/oxblood base, so the browser chrome should be constant. The old per-theme map was stale light values.
+- **Left the 4 un-landed-code branches undeleted**: they hold work not on main (see below) — deleting them loses it. Only deleted branches proven fully-merged or session-log-only.
+- **Kept manifest → oxblood rather than cream**: the launch splash + chrome reading as the brand oxblood matches the icon and tab bar; a cream chrome would clash with the dark backdrop the mobile column sits on.
+
+## Current State (end of session)
+Mobile redesign is **live on `main`** (last shipped tip before this log commit: `fc56549`, the Shuffle controls fix). Icon 1a live. Add/Tracker/Shuffle overflow bugs fixed and verified at 390px. This session's final code change — the theme-colour/manifest oxblood alignment + SW **v36** — is committed on `claude/mobile-redesign-foundation` alongside this log entry, **pushed to the branch but NOT yet merged to main** (no merge instruction given this turn; awaiting Saffron's go). Working tree clean. JS parses clean (3 blocks, 0 errors); manifest is valid JSON.
+
+## Next Steps
+1. **Merge the theme-colour + log commit to main** if Saffron approves (same fast-forward pattern: `git branch -f main <branch> && git push origin <branch>:main`). Direct-push-to-main is gated by the safety classifier and needs per-turn authorisation.
+2. **Desktop layout — THE next deliverable.** Branch fresh off current `main` (it keeps moving). The core problem, now proven three times (Add form, Tracker, Shuffle controls): **responsive rules key off viewport width but the app is a fixed-width column**, so any multi-column grid overflows on desktop. Solve structurally — either a max-width breakpoint that expands the column into a real multi-pane desktop shell (side nav replacing the bottom tab bar, multi-column recipe grid, side-by-side plan+grocery), or container-query-based components. Decide the desktop IA with Saffron before building (consider another Claude Design pass — that workflow has worked well three times now).
+3. Optional carry-over polish: recipe cards/detail hero still use gradient placeholders (no photography); the prototype's full-screen recipe-detail hero + "Add to plan" sticky flow was not built.
+
+## Open Questions / Blockers
+- **Desktop IA undecided** — side nav vs. bottom bar, how the column expands, plan+grocery side-by-side. Needs a design decision before implementation.
+- **4 un-landed-code branches to triage** (kept, not yet actioned): `daily-shuffle-qty-normalisation-d8su8h` (quantity-normalisation script + applied ruleset, "DB write pending"), `recipe-ingredient-prices-RYSob` (19-commit ingredient CSV pipeline, possibly partly superseded), `gallant-wright-xo9frd` (Apify `--resume` + quota detection, confirmed absent from main's script), `recipe-null-supabase-GnoDV` (old RLS migration, may be superseded). Plus `daily-shuffle-foundations-C2e6Q` (now confirmed obsolete — safe to delete). Decide which to land vs. delete.
+- No recipe photography exists; a source + storage decision is needed before the photo-hero designs can ship.
+
+## Environment & Config Notes
+- Repo `/Users/saffron/daily-shuffle`, working branch `claude/mobile-redesign-foundation`; `main` fast-forwards to it. Remote `origin` = github.com/saffronlm-cmyk/daily-shuffle. No open PR — merges done by direct fast-forward push.
+- **Service worker at v36.** Bump on every shippable index.html/asset change (the project's #1 "my fix isn't showing" cause).
+- Icon prototype + handoff bundle live under `~/Documents/Claude/PERSONAL/Daily_Shuffle/daily-shuffle-prototype-screens-1/` (also zipped as `Daily Shuffle icone-handoff.zip`). Design tokens under its `_ds/…/tokens/`.
+- Two handoff docs on main, distinct: `handoff.md` (Apify price pipeline + salvaged cost-feature roadmap). The uppercase `HANDOFF.md` is gone.
+
+## Notes & Gotchas
+- **macOS case-insensitive FS**: never keep two files differing only in case (`HANDOFF.md`/`handoff.md`) — git shows a permanent phantom "modified" and only one can physically exist. Resolved this session.
+- **The fixed-column-vs-viewport-media-query trap is systemic**: every `@media (max-width: …)` rule in the file is dead on desktop now that the app is a fixed ~430px column. Any grid using viewport breakpoints will overflow until desktop is built properly. Fix new grids with `min-width:0` + column-scoped single-column rules as a stopgap; solve structurally in the desktop pass.
+- **`qlmanage` quirk**: it writes `<name>.svg.png` in the `-o` dir and resets shell cwd after running — use absolute paths and `mv` the output.
+- **`deEmoji()` runs once at load** over the label-map constants; emoji hardcoded in markup/JS strings are NOT auto-stripped (swept manually this session). New emoji added to the constant maps get stripped automatically.
+- SW is now v36 — if verifying in-browser, a stale SW will serve old CSS/manifest; hard-reload with a `?v=` query or bump again.
+
+---
+
+# Mobile Editorial Redesign — Foundation + All Screens Re-skinned
+**Date:** 2026-07-15
+**Project:** Daily Shuffle — recipe/meal-planning PWA
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete (mobile) — desktop layout is the next session's work
+
+---
+
+## Project Context
+See earlier entries (2026-07-01 nutrition estimation; 2026-06-25/29 ingredient + parser work) for data/architecture background. This session was a **visual redesign stream**, orthogonal to the price/nutrition data work. Saffron used Claude Design (claude.ai/design) to mock up a mobile-first editorial reskin of the app and exported two handoff bundles; this session implemented them on the live repo.
+
+## Session Goal
+Implement the Claude Design high-fidelity prototypes as a mobile-first editorial redesign of the whole app — new oxblood/cream + Fraunces brand register, floating bottom tab bar, and every screen re-skinned — **without breaking any existing functionality**. Desktop layout explicitly deferred to a later session.
+
+## State Before This Session
+App was desktop-oriented: top header + horizontal emoji nav, light cream/taupe theme (`--bg #F5F2EC` etc.), plain cards. Single-file `index.html` (~6,200 lines, grew to ~6,500). No design tokens beyond the three legacy theme blocks. On branch `claude/focused-darwin-enipb5` with an unrelated uncommitted `HANDOFF.md` edit (price-book stream — left untouched all session).
+
+## What Was Done
+Worked in four passes, verifying each in-browser via a localhost server + Chrome automation (file:// is blocked by the extension, so `python3 -m http.server 8747` was used throughout).
+
+1. **Foundation + Recipe Library proof** (plan-approved first). Added the prototype's design tokens to `:root` (namespaced `--fn-*`/`--ed-*`/`--cta`, Fraunces via Google Fonts with Georgia fallback, radii/shadow/glass). Inlined the needed Lucide icons as a hidden `<svg><symbol>` sprite at top of `<body>` (offline-safe, no new network requests — deliberate, the app is cache-first PWA). Wrapped the app as a ~430px mobile column centered on a dark `#2A2320` backdrop on wide screens. Added a floating oxblood bottom tab bar (markup after `</main>`) wired to the **existing** `switchTab()` (added a `.tabbar` active/dot sync line inside it). Relocated settings to a top-corner icon. Re-skinned Recipe Library: kicker + Fraunces title, pill search + filter button, restyled `#recipesFilterbar` chips, and rewrote the `renderRecipes()` card template to the prototype's image cards (gradient placeholders, archival `No. 0NN` badges, glass hearts using `--ed-oxblood-bright`, hero + 2-col grid). Updated `toggleFav()` selectors from `.recipe-card/.fav-btn` → `.rl-card/.rl-fav`.
+
+2. **Rolled the register across the other four tabs.** Rather than replace the app's richer functionality with the simpler mockups, **remapped the legacy `:root` tokens** (`--bg`, `--surface`, `--accent`, `--text`, …) to the editorial palette so modals + every un-bespoke screen inherit cream/oxblood at once; then gave Shuffle / Grocery / Add / Tracker editorial headers (kicker + Fraunces title) and pill-styled primary actions (oxblood CTA).
+
+3. **Two bespoke prototypes** (second bundle: `daily-shuffle-prototype-screens-1`, which added the Recipe Detail + Nutrition designs the first bundle lacked). **Nutrition Dashboard**: full rewrite of `renderTracker()` — oxblood editorial stat strip (Eaten/Burned/Deficit), calorie hero card with a real SVG progress ring, name-leads macro cards, per-meal log cards; `trkEntryRow()` reskinned to `.nd-logrow`. **Recipe Detail modal**: restyled `openModal()`'s output — kicker + `No. 0NN` archive mark, Fraunces title, icon meta row (users/clock/££), oxblood pill multiplier, numbered-circle method, compact single-line nutrition tiles. Kept it as the app's feature-rich centered modal (edit/delete/cost/tips/estimate) rather than the prototype's full-screen photo-hero + "Add to plan" sticky bar, since the app has no recipe photos and no add-to-plan-from-detail action.
+
+4. **Cleanup pass** (Saffron's follow-ups). Stripped emoji app-wide per the no-emoji brand rule via a `deEmoji()` helper that mutates the label-map constants at source (`CRAVING_LABELS`, `PROTEIN_LABELS`, `MEAL_TYPE_LABELS`, `CARB_TYPE_LABELS`, `CUISINE_EMOJI`, `PROTEIN_EMOJI`, `FILTER_CHIPS`) plus targeted edits + `perl -i` sweeps for inline-markup and JS status strings. Removed Grocery header duplication and rebuilt grocery rows to the prototype's catalogue design (round oxblood check + colour swatch + stacked name/qty + price). Gave Shuffle day cards the editorial register. Reconciled cafe/coastal alt themes to accent-only swaps on the shared base.
+
+5. **Two layout bugs** (Saffron's final follow-ups). Tracker had no side margin (`.trk-wrap` padding was `4px 0 60px`) → `4px 22px 60px` + de-doubled the header inline padding. Add Recipe form overflowed and looked off-brand: **root cause = responsive breakpoints key off viewport width (`@media max-width:768px`), which never fires now that the app is a fixed 430px column on desktop**, so `.form-grid` stayed 2-col and spilled the card. Fixed with `#tab-add .form-grid { grid-template-columns: 1fr }` and a full editorial restyle of the Add form (cards, inputs, chips, buttons). Hit the project's classic **stale-service-worker trap** mid-verify — a reload showed no change until the SW cache was bumped; confirmed via a `?v=` cache-busted URL.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| index.html | The entire app — all redesign markup/CSS/JS changes | Modified | /Users/saffron/daily-shuffle/ |
+| sw.js | Service worker — cache bumped v32 → v34 | Modified | /Users/saffron/daily-shuffle/ |
+| HANDOFF.md | Pre-existing price-book edit — **NOT touched/committed** this session | Untouched | /Users/saffron/daily-shuffle/ |
+
+Committed as `342bc14` on branch `claude/mobile-redesign-foundation` (index.html + sw.js only). Not pushed, not merged, not deployed.
+
+## Decisions & Reasoning
+- **Additive tokens, then remap legacy tokens** rather than find/replace every hardcoded colour: kept the diff safe and let un-bespoke screens inherit the register for free.
+- **Inline SVG sprite, not icon files**: preserves the single-file, offline-first, no-new-requests nature of the PWA.
+- **Kept app functionality over prototype simplicity**: the mockups (esp. Shuffle/Grocery/Recipe-Detail) are thinner than the shipped features; adapted the *look* onto the real feature set rather than downgrading.
+- **Recipe Detail stayed a centered modal**, not the prototype's full-screen hero — no recipe photos exist and there's no "add to plan from detail" action to anchor the sticky CTA.
+- **Left HANDOFF.md out of the commit**: it's an unrelated uncommitted change from the price-book stream that predates this work.
+- **Mobile-only for now**: all new layout assumes the ~430px column; desktop is a separate deliberate effort (next session).
+
+## Current State (end of session)
+Full mobile editorial redesign is live on the branch and verified in-browser across all five tabs + Recipe Detail modal: tab bar switches with active dots, favourites toggle + persist, cards open the detail modal, search/filters work, grocery checks toggle, tracker renders real data, Add form saves. JS parses clean (3 inline `<script>` blocks, 0 errors via the `new Function()` check). SW at v34.
+
+## Next Steps
+1. **Desktop layout / webpage adjustment — THIS IS THE NEXT DELIVERABLE.** The mobile redesign is now **merged and live on `main`** (fast-forwarded to the merge commit; the redesign won the reconciliation against the parallel PR #41 design refresh, which was discarded). The whole redesign currently assumes a fixed ~430px mobile column; the key structural issue to solve first is that **responsive rules key off viewport width but the app is a fixed-width column**, so a real desktop layout needs either (a) a max-width breakpoint that expands the column into a multi-pane desktop shell (e.g. persistent side nav instead of the bottom tab bar, multi-column recipe grid, side-by-side plan+grocery), or (b) container-query-based components. **Decide the desktop information architecture with Saffron before building** — and branch fresh off current `main` (it moved 13 commits during the mobile work, so re-diverging is a real risk).
+2. Optional polish carried over: recipe cards still use gradient placeholders (no photography); the prototype's full-screen recipe-detail hero + "Add to plan" flow was not built.
+
+## Open Questions / Blockers
+- **Desktop IA is undecided** — bottom tab bar vs. side nav, how the mobile column expands, whether plan+grocery go side-by-side. Needs a design decision with Saffron before implementation (worth another Claude Design pass or a plan-mode discussion).
+- No recipe photography exists; cards/hero use warm gradient placeholders. Real images would need a source + storage decision.
+
+## Environment & Config Notes
+- Repo: `/Users/saffron/daily-shuffle`, branch `claude/mobile-redesign-foundation` (created off `claude/focused-darwin-enipb5`). Remote `origin` = github.com/saffronlm-cmyk/daily-shuffle. Commit `342bc14` local-only.
+- Verify loop: `python3 -m http.server 8747` in the repo, open `http://localhost:8747/index.html` (file:// blocked by the Chrome extension). Bump `sw.js` CACHE or use a `?v=` query when a reload "doesn't show" — SW is cache-first for assets.
+- JS sanity check (no linter/bundler): extract inline `<script>` blocks and `new Function(src)` each — used all session, kept at 0 errors.
+- Prototype bundles: `~/Downloads/daily-shuffle-high-fidelity-prototypes` (screens 1: library/shuffle/grocery/add + 4 editorial screens) and `~/Downloads/daily-shuffle-prototype-screens-1` (Recipe Detail + Nutrition + a design-system change memo). Design tokens live under each bundle's `_ds/…/tokens/`.
+
+## Notes & Gotchas
+- **Design tokens are namespaced**: bespoke screens use `--fn-*`/`--ed-*`/`--cta`; the legacy `--bg/--surface/--accent/--text` were *remapped* to the same palette so both coexist. Don't delete the legacy vars — lots of un-migrated inline styles still reference them.
+- **`deEmoji()` runs once at load** over the label-map constants — new emoji added to those maps get stripped automatically; emoji hardcoded in markup/JS strings do not (had to sweep those manually).
+- **Two prototype bundles, not one**: the 4 editorial screens (Splash/Onboarding/Empty/Weekly-recap) from bundle 1 were **deferred** and never built — they're new features, not reskins.
+- **Fraunces loads from Google Fonts** — degrades to Georgia offline. Acceptable for now; revisit if full-offline serif fidelity matters.
+- Standard project gotcha reconfirmed: the service worker will serve stale HTML/CSS after an edit — bump `sw.js` CACHE every shippable change (now v34).
+
+---
+
+# Claude Config Audit — CLAUDE.md rewrite, 4 skills, browser smoke test, drift automation
+**Date:** 2026-07-05
+**Project:** Daily Shuffle — agent config / dev tooling
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete
+
+---
+
+## Project Context
+Housekeeping session on the agent-facing config rather than the app itself. Saffron asked for a full audit of CLAUDE.md, `.claude/skills`, and `.claude/agents` (dry-run first, then execute), plus a new browser smoke-test workflow. See the 2026-07-01 entries for the state of the nutrition workstream — unchanged this session.
+
+## Session Goal
+Audit and rewrite every instruction file, create the missing skills a repo this shape needs, and add a runnable headless-browser smoke test — first as a reviewed dry-run, then applied on approval.
+
+## State Before This Session
+CLAUDE.md was stale in ways that actively misled: it described `sw.js` as cache-first at `v23` when it had been rewritten to network-first-for-HTML and was at `v32`, said `canonicalise()` lived in three places (it's five), and didn't mention the USDA pipeline, the normalisation workstream/CSVs, either handoff doc, or the keep-alive workflow. `.claude/skills` held only `save-conversation` — a personal cross-machine skill with `~/Documents` paths, other projects' routing tables, `gh` CLI and `present_files` references, and a push-to-main workflow, none of which apply here. `.claude/agents` didn't exist. The repo had zero runtime verification (parse-check only).
+
+## What Was Done
+- **Inventory + audit** of everything in CLAUDE.md and `.claude/`, presented as a full dry-run with proposed file contents; Saffron approved and added one request: also build the browser smoke-test workflow (previously flagged as "the missing piece").
+- **Rewrote CLAUDE.md**: corrected the sw.js description (network-first, one-bump-per-PR, no bump for doc/data-only changes, never trust doc-recorded version numbers), canonicalise now documented in five places, added the USDA staples pipeline, `tools-apply-master.mjs`, the committed data CSVs ("reviewed human decisions — don't regenerate"), both handoff docs, the keep-alive workflow, the nutrition 3-step status (with the step-3-blocked-on-step-2 rule), branch/PR conventions, a concrete JS parse-check command, and slimmed the session-logging block to a pointer at the skill.
+- **Rewrote `save-conversation` SKILL.md** as repo-local: one mode only (rolling log at `logs/daily-shuffle_log.md`, prepend, commit on the working branch, never main), unified template (kept `Mode:`, dropped the unused "Skills Used" section), named the 2026-07-01 §6 entry as the reference standard, added do-nots.
+- **Created `ship-check` skill**: 6-step pre-commit checklist (parse check → smoke test → cache-bump decision → canonicalise sync → res.ok audit → localStorage audit) with a fixed checklist output format.
+- **Created `recipe-db` skill**: Supabase schema map + propose/review/apply/verify discipline for bulk writes, encoding the locked §6 decisions and the review-CSV convention.
+- **Built `scripts/smoke_test.mjs` + `smoke-test` skill**: Playwright/Chromium headless test that serves the repo over a local HTTP server, seeds `ds_recipe_cache` with 5 fixture recipes (one per meal pool), and asserts clean boot, 5 tab containers, tab switching, and that `generatePlan()` renders the fixtures into `#planOutput`. **Ran it — 5/5 green.** First run failed: fixtures lacked `cuisine`/`proteinSource`, which the recipe-card template calls `.charAt()` on unguarded; real cloud recipes always have them, so the fix was fixture-side (noted in the script and skill as a trap).
+- **Deliberately created no `.claude/agents`**: built-in Explore/Plan agents already cover the only plausible use (navigating the 6,000-line index.html); a custom agent set would be bloat for a solo no-CI repo.
+- **Built CLAUDE.md drift automation** (follow-up request): `scripts/claude_md_drift.mjs` mechanically diffs CLAUDE.md's claims against the repo — tabs (both directions), scripts/ files documented, root .md/.csv/.mjs files documented, every `canonicalise()` implementation named in the sync list, sw.js passthrough hosts. Verified it detects (flagged its own then-undocumented self when staged) and passes clean once documented. Wired in three places: ship-check step 7, a "Keep this file true" bullet in CLAUDE.md's Dev workflow, and a **weekly scheduled routine** (`trig_012FVP34K8kH664FDZayj6Lb`, Mondays 07:00 UTC, fresh session, push-notify): runs the script, skims the week's merged diffs and the log's top entry for judgement-level drift the script can't catch (workstream status, conventions, data model), and opens a draft PR with minimal factual edits only when something is stale — otherwise ends silently.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| CLAUDE.md | Project brief — corrected + expanded rewrite | Modified | /home/user/daily-shuffle/ |
+| .claude/skills/save-conversation/SKILL.md | Session-log skill, now repo-local, single source of truth for the template | Modified | /home/user/daily-shuffle/.claude/skills/save-conversation/ |
+| .claude/skills/ship-check/SKILL.md | Pre-commit checklist skill | Created | /home/user/daily-shuffle/.claude/skills/ship-check/ |
+| .claude/skills/recipe-db/SKILL.md | Supabase bulk-work conventions skill | Created | /home/user/daily-shuffle/.claude/skills/recipe-db/ |
+| .claude/skills/smoke-test/SKILL.md | Smoke-test runner/extender skill | Created | /home/user/daily-shuffle/.claude/skills/smoke-test/ |
+| scripts/smoke_test.mjs | Headless-browser smoke test (5 checks, offline, exit-code gated) | Created | /home/user/daily-shuffle/scripts/ |
+| scripts/claude_md_drift.mjs | Mechanical CLAUDE.md drift check (5 checks, exit-code gated) | Created | /home/user/daily-shuffle/scripts/ |
+| scripts/README.md | Added smoke-test + drift-check sections at top | Modified | /home/user/daily-shuffle/scripts/ |
+| (Routine, not a file) | Weekly CLAUDE.md audit trigger trig_012FVP34K8kH664FDZayj6Lb, Mon 07:00 UTC | Created | Claude Code Remote environment |
+| logs/daily-shuffle_log.md | This entry | Modified | /home/user/daily-shuffle/logs/ |
+
+## Decisions & Reasoning
+- **Template lives in the skill, CLAUDE.md just points at it**: the two copies had already drifted (skill had `Mode:` + "Skills Used"; CLAUDE.md had neither). One source of truth; the always-loaded CLAUDE.md keeps only the trigger rule, saving context every session.
+- **No version numbers in docs**: CLAUDE.md said `v23` while sw.js was at `v32` — that class of staleness is structural, so the rewrite says "read it from sw.js" instead of recording a value.
+- **No custom subagents**: considered an index.html-navigator (duplicate of built-in Explore) and a pipeline-reviewer (pipelines run on Saffron's Mac, nothing for an agent to execute). Rejected both as bloat.
+- **Smoke test is offline-by-design with seeded fixtures**: sandbox egress blocks Supabase (confirmed 403 this session), and the app is offline-first anyway — seeding `ds_recipe_cache` tests the real cold-cache-with-data path without any network flakiness.
+- **Fixture shape mirrors real data rather than hardening the app**: the `.charAt()` crash on missing `cuisine` is only reachable with malformed cache data; fixed the fixtures and documented the field requirement instead of patching index.html in a config-only PR (no cache bump needed this way, and app hardening deserves its own change if wanted).
+- **Smoke test wired into ship-check as step 2** so it runs as part of the standard pre-commit ritual, not as an optional extra.
+- **Drift automation = script + routine, not a GitHub Action or hook**: an Action would need an ANTHROPIC_API_KEY secret and CI setup this repo deliberately doesn't have; a settings.json hook only fires inside sessions, which already carry CLAUDE.md + ship-check. The weekly fresh-session routine also catches drift from Saffron's own local pushes, which no in-session mechanism can. The drift script names implementation FILES rather than counts/versions ("canonicalise in FIVE places" is checked by listing, not by parsing "FIVE") so the check itself can't go stale the way the doc did.
+
+## Current State (end of session)
+All files written and committed on `claude/audit-claude-config-ef50ee`; draft PR open. Smoke test passes 5/5 against current main's app code. No app code, no data, and no Supabase state touched — `index.html` and `sw.js` unchanged (hence no cache bump).
+
+## Next Steps
+1. Merge the PR, then start the **quantity-normalisation apply session** — invoke the `recipe-db` skill; the plan is fully locked in `quantity-normalisation-plan.md` (see 2026-07-01 entry).
+2. On the next `index.html` change, exercise the new `ship-check` skill end-to-end and adjust anything that reads wrong in practice.
+3. Optional, Saffron's call: harden the recipe-card template against missing `cuisine`/`proteinSource` (guard the `.charAt()` calls at index.html:1953–1954 and :2089) — a real app change, needs its own PR + cache bump.
+
+## Open Questions / Blockers
+N/A — everything approved in the dry-run was applied, plus the smoke test Saffron requested.
+
+## Environment & Config Notes
+Branch `claude/audit-claude-config-ef50ee`. Smoke test dependencies: global playwright 1.56.1 at `npm root -g` and Chromium at `/opt/pw-browsers` — both preinstalled in the remote sandbox; the script resolves both itself. Confirmed sandbox egress blocks `supabase.co` (CONNECT 403), same as Apify/USDA.
+
+## Notes & Gotchas
+- **Smoke-test fixtures must carry `cuisine` and `proteinSource`** — the recipe-card template calls `.charAt()` on both unguarded. If a future field becomes load-bearing the same way, add it to `FIXTURE_RECIPES` with a comment.
+- The smoke test covers boot/tabs/shuffle only — a green run does NOT prove a new feature works; drive new features directly and add a check if they're core.
+- `.claude/agents` intentionally does not exist — don't "fix" that by scaffolding empty agents.
+- The old personal-machine version of `save-conversation` (with `~/Documents` paths and the multi-project routing table) is gone from this repo; if it's needed elsewhere it lives in Saffron's global setup, not here.
+
+---
+
 # Quantity Normalisation — Ruleset Applied to 317 Recipes (step 2 apply; review CSV out, DB write pending)
 **Date:** 2026-07-01
 **Project:** Daily Shuffle — recipe/meal-planning PWA
