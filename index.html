@@ -1245,7 +1245,7 @@
             </div>
             <div class="form-group">
               <label>Serves</label>
-              <input type="number" id="f-servings" placeholder="e.g. 4" min="1" value="1" />
+              <input type="number" id="f-servings" placeholder="e.g. 4" min="1" value="2" />
             </div>
             <div class="form-group">
               <label>Prep + Cook Time</label>
@@ -4642,7 +4642,7 @@ async function addRecipe() {
     const addBtn = document.querySelector('#tab-add .btn-add');
     const origLabel = addBtn ? addBtn.textContent : '';
     if (addBtn) { addBtn.disabled = true; addBtn.textContent = '✨ Calculating macros…'; }
-    const serves = parseInt(document.getElementById('f-servings').value) || 1;
+    const serves = parseInt(document.getElementById('f-servings').value) || 2;
     const est = await fetchMacroEstimate(name, serves, macroLines);
     if (addBtn) { addBtn.disabled = false; addBtn.textContent = origLabel; }
     if (est) {
@@ -4682,7 +4682,7 @@ async function addRecipe() {
     cuisine: document.getElementById('f-cuisine').value || 'comfort',
     carb_type: carbType,
     cost_tier: String(parseInt(document.getElementById('f-cost').value) || 1),
-    serves: parseInt(document.getElementById('f-servings').value) || 1,
+    serves: parseInt(document.getElementById('f-servings').value) || 2,
     prep_cook_time: document.getElementById('f-time').value || null,
     subtitle: ai?.description || '',
     craving_tags: cravings,
@@ -4727,7 +4727,7 @@ async function addRecipe() {
     proteinSource: protein,
     carbType,
     costTier: supabaseRow.cost_tier,
-    servings: supabaseRow.serves,
+    servings: supabaseRow.serves || 2,
     prepTime: supabaseRow.prep_cook_time,
     description: supabaseRow.subtitle,
     cravings,
@@ -4769,7 +4769,7 @@ async function addRecipe() {
 
 function clearForm() {
   ['f-name','f-servings','f-time','f-url','f-notes','f-ingredients-full','f-method','f-tips','f-storage','f-kcal','f-protein-g','f-carbs-g','f-fat-g'].forEach(id=>{
-    const el=document.getElementById(id); if(el) el.value=id==='f-servings'?'1':'';
+    const el=document.getElementById(id); if(el) el.value=id==='f-servings'?'2':'';
   });
   const protEl = document.getElementById('f-protein'); if (protEl) protEl.value = '';
   document.getElementById('f-cuisine').value='comfort';
@@ -5065,7 +5065,7 @@ function buildRecipeRow(r) {
     cuisine: r.cuisine || 'comfort',
     carb_type: r.carbType || 'none',
     cost_tier: r.costTier ? String(r.costTier) : '1',
-    serves: parseInt(r.servings) || 1,
+    serves: parseInt(r.servings) || 2,
     prep_cook_time: r.prepTime || null,
     subtitle: r.description || '',
     craving_tags: r.cravings || [],

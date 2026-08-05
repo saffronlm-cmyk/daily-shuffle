@@ -161,6 +161,183 @@ went through Supabase MCP.
   is unchanged for a given input dump, so Saffron's in-progress review of normal rows is not
   invalidated.
 
+# Handoff items 2–4 done; the `serves` bug was misdiagnosed — real defect was the Add-form default
+**Date:** 2026-08-04
+**Project:** Daily Shuffle — nutrition accuracy (recipe path), staple data, doc drift
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete (items 2–4). Item 1 **Blocked** — needs Saffron's API key.
+
+---
+
+## Project Context
+Direct continuation of the 2026-08-03 entry below ("PR backlog cleared"), whose Next
+Steps listed four items. This session took all four. See the 2026-08-02 entries for the
+staple corrections and the original low-estimate diagnosis; see `handoff.md` for the
+ruled-out causes list.
+
+## Session Goal
+Work the four-item handoff list: (1) confirm the low-estimate bug is gone, (2) fix the
+`serves` fallback, (3) correct `Dark soy sauce`, (4) fix CLAUDE.md's AI-features list.
+
+## State Before This Session
+0 open PRs, `main` at `b4535e7`, CACHE v40. All four items untouched since being
+enumerated on 2026-08-03.
+
+## What Was Done
+
+### Item 2 — the `serves` fallback: filed premise was wrong on both counts
+The handoff said *"index.html ~L4705 lacks the `|| 2` that L1481 has. Real bug, 8
+recipes, small fix."* Checked before editing, and neither half survived:
+
+- **`supabaseRow.serves` can never be null.** It's built at L4665 as
+  `parseInt(f-servings) || 1`. Adding `|| 2` at L4710 would have been dead code — it
+  would have "fixed" nothing while looking like a fix in the diff.
+- **It's 4 no-`serves` recipes, not 8.** And all 4 are April-import rows that never pass
+  through that code path at all.
+
+The genuine defect was one function away and worse than the one reported. The
+Add-Recipe form hardcodes `value="1"`, and `parseWithAI` returns `servings: null` when
+it can't determine a count from a screenshot. `prefillForm`'s `set()` helper is
+`if (el && val != null)` — so **null silently leaves the field at 1**. `addRecipe` then
+divides whole-recipe macro totals by 1 and stores them labelled per-serving: a 2–4×
+overstatement, with nothing on screen to signal it.
+
+Asked Saffron rather than guessing, since the fix changes a visible form default. She
+chose "default to 2 everywhere" and asked for the list of unknown-serves recipes.
+Unified on the convention the app already used at L1481 (`unknown serves ⇒ 2`) across
+six sites: form default (1248), the macro-estimate divisor (4625), `supabaseRow.serves`
+(4665), the local-object mirror (4710), `clearForm`'s reset (4752), and
+`buildRecipeRow` (5048).
+
+**Deliberately left alone:** `fetchMacroEstimate`'s `Number(servings) > 0 ? … : 1`
+(3605), `estimateNutritionWithAI`'s `recipe.servings || 1` (3683), the modal display
+fallback (2370) and cost-per-portion (3360). These are *invalid-input* guards on values
+already defaulted upstream, not *unknown-serves* defaults. Changing them would silently
+halve a caller's explicit intent.
+
+**No existing rows rewritten.** Checked whether the bug had already corrupted data:
+86 recipes sit at `serves = 1`, but they're overwhelmingly genuine single-serve items
+from the April bulk import (overnight oats, mug cakes, "Single Serve …"). Only 2 were
+created after May. Concluded this was a forward-looking risk, not existing damage —
+so a backfill would have done harm, not good.
+
+### Item 3 — Dark soy sauce corrected (1 row, applied)
+Still carrying tamari's USDA FDC 174278 figures. Not a rounding error — the wrong
+*shape*: dark soy is molasses-sweetened, so it's low-protein/high-sugar, the opposite of
+tamari. Sourced the Amoy UK label (the standard UK supermarket dark soy) via two
+independent web searches that agreed exactly.
+
+60 → **120 kcal**, 10.51 → **1.3 g** protein, 5.57 → **28.6 g** carbs, 1.7 → **24.8 g**
+sugars, unit `100 g` → `100 ml`, flags `usda_seed` → `high_sodium, high_sugar`.
+7 recipes reference it.
+
+Left `Tamari` and `Soy sauce — generic` alone: FDC 174278 genuinely *is* tamari, and
+regular soy sauce is nutritionally close enough that it isn't the same class of error.
+
+### Item 4 — CLAUDE.md AI-features list
+Diffed the doc against the live call sites. Replaced the one-line prose list with a
+five-row table (`parseWithAI`, `fetchMacroEstimate`, `generatePlanWithAI`,
+`trkRunQuickAdd`, `trkRunBulkStaples`), and recorded the total-vs-per-serving contract
+inside `fetchMacroEstimate` — the thing most likely to be broken by a well-meaning
+prompt edit, and the mechanism behind suspect 1 in `handoff.md`.
+
+### Item 1 — low-estimate bug: NOT confirmed, and cannot be from an agent session
+Both tests need a live `api.anthropic.com` call with `ds_api_key`, which lives in
+Saffron's browser localStorage. No agent session has it, and it shouldn't. Code-level
+review can't settle it either: the prompt at index.html:3617-3629 correctly demands
+whole-recipe TOTALS and the JS divides once, so double-division only occurs if the model
+disobeys — which is exactly what the empirical test is for. Recorded this in
+`handoff.md` rather than leaving the item looking actionable.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| index.html | 6 one-token changes unifying unknown-serves on 2 (L1248, 4625, 4665, 4710, 4752, 5048) | Modified | repo root |
+| sw.js | CACHE v40 → **v41** (app-code change) | Modified | repo root |
+| CLAUDE.md | AI-features prose → table of all 5 live call sites | Modified | repo root |
+| handoff.md | Corrected the ruled-out `serves` bullet; recorded item 1 as blocked | Modified | repo root |
+| logs/daily-shuffle_log.md | This entry | Modified | repo root |
+| `staple_products` row `d5004176-…` | Dark soy sauce → Amoy UK label figures | **Updated in Supabase** | project `jsxcctrskkkxgdxfaduo` |
+
+## Decisions & Reasoning
+
+- **Verified the filed bug before fixing it, and reported that it was wrong.** Options:
+  apply the one-line change as described (fast, looks done, fixes nothing), or check
+  first. Checking cost two SQL queries and one file read, and found both a dead-code
+  "fix" and a real 2–4× macro error hiding beside it. The lesson for future sessions:
+  the handoff's line numbers were right, its diagnosis wasn't.
+- **Asked Saffron before changing the form default.** Adding `|| 2` in JS is invisible;
+  changing a visible form default from 1 to 2 is a product decision with a real
+  trade-off (genuinely single-serve recipes now need her to type 1). Different answers
+  meant materially different diffs, so it was worth one question. She picked 2.
+- **Did not backfill the 86 `serves = 1` rows.** Considered it, then read them: they're
+  real single-serve breakfasts and desserts. A blanket rewrite to 2 would have halved
+  correct macros across ~86 recipes — strictly worse than the bug being fixed.
+- **Used the Amoy label rather than a USDA generic for dark soy.** USDA has no clean
+  dark-soy entry (that's how it ended up on tamari's row in the first place), the
+  sandbox blocks `api.nal.usda.gov` anyway, and Amoy is what's actually in UK
+  supermarkets. Two independent searches returned identical figures.
+- **Recorded the wheat content in `notes`, not as a new flag.** The existing flag
+  vocabulary has no `contains_wheat`, and inventing one for a single row helps nothing —
+  whereas `notes` is injected verbatim into the Quick Add prompt, so the model sees it.
+- **Left `quantity-normalisation-plan.md` untouched** despite its §6 saying "the 8
+  no-`serves` recipes" when it's now 4. Its decisions are signed off and the skill says
+  don't reopen them. Flagged in the PR instead.
+
+## Current State (end of session)
+Draft **PR #62** open, commit `cbdd7b5`, `mergeable_state: clean`, no review comments,
+0 check runs (the only workflow is the schedule-only Supabase keepalive, which runs on
+`main`). CACHE **v41**. Subscribed to PR activity.
+
+`staple_products` still 167 rows — one row updated, none added or deleted.
+
+## Next Steps
+1. **Merge PR #62** (un-draft first — `merge_pull_request` returns 405 on drafts).
+2. **Run the two low-estimate tests** — the only remaining item, and only Saffron can do
+   it: (a) open a 4-serving recipe, hit "Re-estimate", check whether it lands ~4× low
+   (confirms/kills the double-division suspect); (b) one Quick Add against a
+   hand-calculated figure (isolates suspect 2, no-room-to-compute). Re-test *before*
+   investigating — every staple correction since 2026-08-02, including Dark soy sauce
+   today, pushes estimates up.
+3. If confirmed: raise `max_tokens` (currently **256** for the recipe estimate, **1024**
+   for Quick Add), enable thinking, make the total-vs-per-serving contract unambiguous.
+   `claudeText()` is already in place so a model swap won't break parsing.
+4. Nutrition step 2: run `scripts/normalise_quantities.py`, review its CSV, populate
+   `ingredient_grams`. Step 3 stays blocked until that lands.
+
+## Open Questions / Blockers
+- **Item 1 is blocked on Saffron specifically** — not on information or effort. It needs
+  her `ds_api_key` in a real browser. No agent session can close it.
+- `quantity-normalisation-plan.md` §6 says 8 no-`serves` recipes; it's 4. Left as-is
+  (signed-off doc) but the apply-session should use the live count, not the doc's.
+- Still parked, unchanged: the 5 `nutrition_estimated` staples on US-leaning brand
+  averages, and `Coconut sugar`'s knowingly-inconsistent 100.0 g carbs.
+
+## Environment & Config Notes
+- Repo `saffronlm-cmyk/daily-shuffle`, branch `claude/low-estimate-recipe-data-yyuwdr`,
+  branched from `main` at `b4535e7`. PR **#62**, draft.
+- `sw.js` CACHE **v41**. Next bump is v42.
+- Supabase project `jsxcctrskkkxgdxfaduo`. Only `staple_products` was written, 1 row.
+- ship-check: 3/3 script blocks, 5/5 smoke, `claude_md_drift.mjs` clean.
+
+## Notes & Gotchas
+- **The smoke test does not exercise the Add-Recipe form.** It covers boot, tabs and
+  shuffle only — so this session's serves change is verified by diff-reading, not by a
+  runtime check. First real confirmation will be Saffron adding a recipe.
+- **Don't "fix" L4710 again.** `supabaseRow.serves || 2` is now belt-and-braces
+  symmetry with L1481, not a live code path — `supabaseRow.serves` is always ≥ 1. A
+  future reader may flag it as redundant; it is, deliberately.
+- **`prefillForm`'s `set()` skips null.** `const set = (id, val) => { … if (el && val
+  != null) … }`. Any future AI-parsed field that can legitimately come back null will
+  hit the same silent-stale-default trap this bug came from. Worth remembering before
+  adding fields to the parse schema at L5434.
+- **Dark soy sauce is not coeliac-safe.** It contains wheat. The corrected row says so
+  in `notes` and names tamari as the swap, but the 7 recipes using it were never
+  audited for that — separate question, not raised this session.
+
+---
+
 # CLAUDE.md drift audit run manually — 3 judgement-level drifts from PR #36, all invisible to the drift script
 **Date:** 2026-08-04
 **Project:** Daily Shuffle — doc accuracy (CLAUDE.md weekly audit)
