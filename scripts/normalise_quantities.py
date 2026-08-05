@@ -8,8 +8,15 @@ Input : a JSON array of {id, serves, sections} where `sections` is the recipe's
         `ingredient_sections` jsonb (list of {title, ingredients:[...]} objects;
         each ingredient is either a plain string (legacy) or a
         {qty,unit,name,note,group} object (structured), or null).
-Output: - <out_csv>   one row per real ingredient line (for human spot-check)
-        - <out_json>  one object per recipe: {id, ingredient_grams:[...], add_flags:[...]}
+Output: - <out_csv>   one row per real ingredient line (for human spot-check), plus a
+                     `skip_reason` column naming the guard that excluded the recipe
+        - <out_json>  one object per recipe:
+                     {id, ingredient_grams, add_flags, items_seen, skipped}
+                     `ingredient_grams` is **null**, not [], for skipped recipes —
+                     the apply step writes nothing for those. Guards:
+                       empty_ingredients  no usable lines (e.g. every line null —
+                                          see the 2026-07 hollow-recipe damage)
+                       serves_missing     no `serves` (plan §6 decision 5)
 
 Build-only; stdlib only. Run locally in the sandbox (no external network needed —
 data is supplied as a file dumped via the Supabase MCP channel).
@@ -418,9 +425,12 @@ def process(recipes):
         rid, serves, sections = r['id'], r.get('serves'), r.get('sections') or []
         ig = []
         flags = set()
+        my_rows = []
+        items_seen = 0
         for si, sect in enumerate(sections):
             title = (sect or {}).get('section_title') or (sect or {}).get('title')
             for ii, item in enumerate((sect or {}).get('ingredients') or []):
+                items_seen += 1
                 raw, grp = flatten_item(item)
                 if raw is None or not raw.strip():
                     continue
@@ -433,10 +443,33 @@ def process(recipes):
                 ig.append(entry)
                 if res['qty_source'] in ('estimated','unresolved'):
                     flags.add('quantities_estimated')
-                rows.append(dict(recipe_id=rid, section=title, sec=si, item=ii,
-                                 original=raw, name=res['name'], grams=res['grams'],
-                                 qty_source=res['qty_source'], detail=res['detail']))
-        updates.append(dict(id=rid, ingredient_grams=ig, add_flags=sorted(flags)))
+                my_rows.append(dict(recipe_id=rid, section=title, sec=si, item=ii,
+                                    original=raw, name=res['name'], grams=res['grams'],
+                                    qty_source=res['qty_source'], detail=res['detail']))
+
+        # --- skip guards -------------------------------------------------
+        # A recipe that yields no usable lines must NOT be written as an empty
+        # ingredient_grams array: that reads downstream as "normalised, has no
+        # ingredients" and would carry a hollow recipe silently into step 3.
+        # `items_seen` distinguishes the two hollow shapes for the operator:
+        # sections present but every line null (the 2026-07 damage) vs no
+        # ingredient data at all.
+        if not ig:
+            flags.add('empty_ingredients')
+        # Locked plan decision 5 (§6): recipes with no `serves` are skipped, not
+        # normalised, so a manual serves fill happens before any later pass.
+        if serves is None:
+            flags.add('serves_missing')
+
+        skipped = sorted(flags & {'empty_ingredients', 'serves_missing'})
+        for row in my_rows:
+            row['skip_reason'] = '+'.join(skipped)
+        rows.extend(my_rows)
+        # ingredient_grams stays null for skipped recipes — the apply step writes
+        # nothing for them, rather than writing an empty array.
+        updates.append(dict(id=rid, ingredient_grams=(None if skipped else ig),
+                            add_flags=sorted(flags), items_seen=items_seen,
+                            skipped=bool(skipped)))
     return rows, updates
 
 def main():
@@ -446,7 +479,7 @@ def main():
     rows, updates = process(recipes)
     with open(out_csv, 'w', newline='') as f:
         w = csv.DictWriter(f, fieldnames=['recipe_id','section','sec','item','original',
-                                          'name','grams','qty_source','detail'])
+                                          'name','grams','qty_source','detail','skip_reason'])
         w.writeheader()
         for row in rows: w.writerow(row)
     with open(out_json, 'w') as f:
@@ -457,8 +490,24 @@ def main():
     print(f"recipes={len(updates)} lines={len(rows)}")
     for k in ['stated','converted','defaulted','to_taste','garnish','estimated','unresolved']:
         print(f"  {k:12} {c.get(k,0)}")
-    flagged = sum(1 for u in updates if u['add_flags'])
+    flagged = sum(1 for u in updates if 'quantities_estimated' in u['add_flags'])
     print(f"recipes flagged quantities_estimated: {flagged}")
+
+    # Skipped recipes are the ones that must never reach step 3 unnoticed.
+    hollow  = [u for u in updates if 'empty_ingredients' in u['add_flags']]
+    noserve = [u for u in updates if 'serves_missing' in u['add_flags']]
+    print(f"\nSKIPPED (ingredient_grams left null) = {sum(1 for u in updates if u['skipped'])}")
+    print(f"  empty_ingredients {len(hollow):4}  "
+          f"({sum(1 for u in hollow if u['items_seen'])} with all-null lines "
+          f"-> re-enter from source; {sum(1 for u in hollow if not u['items_seen'])} with no lines at all)")
+    print(f"  serves_missing    {len(noserve):4}  -> manual serves fill first (plan §6 decision 5)")
+    for u in hollow:
+        print(f"    empty_ingredients {u['id']}  null_lines={u['items_seen']}")
+    for u in noserve:
+        print(f"    serves_missing    {u['id']}")
+    if hollow:
+        print("\nWARNING: hollow recipes found. Re-enter their ingredients from source "
+              "before applying step 2 to them; nutrition (step 3) must not run on them.")
 
 if __name__ == '__main__':
     main()
