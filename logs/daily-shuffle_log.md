@@ -4,6 +4,163 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# Hollow-recipe data damage found and write path fixed — 52 recipes need ingredient re-entry
+**Date:** 2026-08-05
+**Project:** Daily Shuffle — data integrity (recipes.ingredient_sections) + nutrition step 2
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete (PR #63 open as draft) — but leaves a large open manual task
+
+---
+
+## Project Context
+Sits on the nutrition-estimation workstream (see 2026-07-01 entries for the 3-step plan and
+the §6 sign-off; 2026-08-04 for the CLAUDE.md drift audit that last touched step-2 docs).
+This session started as a question about null `serves` and uncovered unrelated, larger
+damage to `ingredient_sections`. Nothing here re-opens the §6 decisions.
+
+## Session Goal
+Saffron asked whether there was an outstanding task to normalise recipes with null `serves`.
+After the answer surfaced a second problem, she approved three follow-ups in order:
+(1) add a skip guard to `normalise_quantities.py`, (2) regenerate the null-line re-entry
+worklist against live data, (3) trace the July write path so it can't recur.
+
+## State Before This Session
+`main` at `228f921`. Step 2 never applied (`ingredient_grams` column does not exist,
+0 rows flagged `serves_missing`). Saffron was part-way through reviewing a locally
+generated `quantity_review.csv`. She believed the null ingredient lines had been fixed by
+re-uploading recipes.
+
+## What Was Done
+
+### 1. Answered the `serves` question — the plan's numbers are stale
+Live: **332** recipes (not 327), **4** with null `serves` (not 8) — Cat Magic Macro Protein
+Brownie, Grilled Hot Honey Chicken with Fresh Peach Salsa, Pumpkin Pecan Pancakes, Vegan
+Blueberry Protein Pancakes with Sticky Toffee Sauce. Not tracked by any GitHub issue. The
+"manual serves fill" that plan §6 decision 5 defers to has never happened.
+
+### 2. Saffron's memory was right, and also the number had grown
+Of the 36 recipes on `null-lines-reentry.csv`, **32 have been re-entered**. But **52**
+recipes are currently hollow, and **48 of them were never on that list**. Every hollow
+recipe has *zero* real lines — section titles and array lengths survive, every element is
+literal `null`. Grouping by `updated_at`: 07-16 8/10 hollow, 07-19 15/16, 07-20 14/14,
+07-22 14/95, 07-23 0/34, 07-24 0/65. A bad write path ran 16–22 July and stopped.
+`updated_at` only records the *last* write, so the original blast radius was probably wider
+— some recipes were rewritten cleanly on 23–24 July and healed themselves.
+
+### 3. Root cause traced (this is the important bit)
+`patchRecipeToLibrary()` (`index.html`, called fire-and-forget from the recipe-edit save)
+rebuilt `ingredient_sections` with `currentSection.ingredients.push(ing.item)`. But
+`flattenIngredientSections()` (`index.html:1491`) emits `{group, qty, unit, name, note}` —
+**there is no `item` key**. Every line became `undefined`, which `JSON.stringify` serialises
+as `null` inside an array. `ing.group` *is* populated, which is exactly why section titles
+and section boundaries survived intact. The Add-Recipe path at ~line 4650 does
+`push(ing.item || ing)` — the `|| ing` fallback is why that path never caused this.
+
+### 4. The quantity pass would have swallowed it silently
+`flatten_item()` returns `None` for a null item and `process()` did `continue` — so a hollow
+recipe emitted **zero** review-CSV rows and an `ingredient_grams: []`, with no flag and a
+clean-looking summary. It reads downstream as "normalised, has no ingredients". Applied
+as-is, all 52 would have sailed into step 3. Also found: the script read `serves` at line
+418 and **never used it** — plan §6 decision 5 was never implemented either.
+
+### 5. Fixes shipped
+- `index.html`: write the structured line (`{qty,unit,name,note}`, minus `group`); **omit**
+  `ingredient_sections`/`method_steps` from the PATCH when the local copy is empty (PATCH
+  ignores absent columns) so an unloaded or already-hollow recipe can't blank the column;
+  added `res.ok` + ⚠ toast (this write was fire-and-forget with only a console.warn).
+- `normalise_quantities.py`: `empty_ingredients` + `serves_missing` guards, skipped recipes
+  get `ingredient_grams: null` (not `[]`), new `skip_reason` CSV column, explicit summary
+  block listing every skipped id. Tested against a 5-case fixture.
+- `null-lines-reentry.v2.csv`: 52 recipes / 103 sections / 681 lines, reconciles exactly
+  with the DB.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| index.html | `patchRecipeToLibrary()` — line rebuild fix, empty-payload guard, res.ok+toast | Modified | repo root |
+| scripts/normalise_quantities.py | `empty_ingredients` + `serves_missing` skip guards, `skip_reason` column, summary block | Modified | scripts/ |
+| null-lines-reentry.v2.csv | Regenerated re-entry worklist (52 recipes / 681 lines) | Created | repo root |
+| null-lines-reentry.csv | Superseded v1 worklist — left untouched as history | Unchanged | repo root |
+| sw.js | CACHE v40 → v41 | Modified | repo root |
+| CLAUDE.md | Step-2 guard behaviour, CSV list, new "Known data damage" section | Modified | repo root |
+| logs/daily-shuffle_log.md | This entry | Modified | logs/ |
+
+**No database writes were made this session** — all Supabase access was read-only.
+
+## Decisions & Reasoning
+- **New `null-lines-reentry.v2.csv` rather than overwriting v1**: CLAUDE.md forbids
+  regenerating a committed data CSV without being asked. Saffron asked, but v1 is also the
+  only record of which 36 were originally damaged and which 32 got re-entered — worth
+  keeping. v2 is the one to work from.
+- **Write the structured object, not a rendered string**: the column already holds both
+  shapes (plan §1: 4049 legacy strings, 56 structured objects), and
+  `normalise_quantities.py`'s `flatten_item()` handles dicts. Rendering back to text would
+  round-trip through `parseQty()` and risk mangling lines it mis-parses.
+- **Omit rather than send `null` for empty payload fields**: considered keeping
+  `ingredient_sections: null`, but that's precisely the next failure — `flattenIngredientSections()`
+  filters blanks, so re-saving an already-hollow recipe would produce an empty sectionMap and
+  wipe the section titles too. PATCH ignores absent keys, so `delete` is the safe form.
+- **Added `serves_missing` alongside `empty_ingredients`** even though only the latter was
+  asked for: same function, same failure mode (silent skip), and it's a locked plan decision
+  the script claimed to implement but didn't.
+- **Did not fill the 4 null `serves` values**: they need real per-recipe judgement from the
+  source, not a guess. Flagged for Saffron.
+
+## Current State (end of session)
+Branch `claude/recipe-db-null-values-9vn3k0` at `b2dc099` + this log commit, pushed. PR #63
+open as draft, subscribed for activity. Repo has no CI (0 checks — expected), no review
+comments. The **write path is fixed but the 52 recipes are still hollow** — the fix stops
+new damage, it cannot recover lost text.
+
+## Next Steps
+1. **Manually edit-and-save one healthy recipe in the live app** and confirm its
+   `ingredient_sections` still holds real lines afterwards. The sandbox blocks egress to
+   `supabase.co`, so the fixed write path was never exercised against live Supabase — the
+   smoke test covers boot/tabs/shuffle, not a recipe-edit round-trip. Do this before merging.
+2. **Re-enter ingredients for the 52 recipes** in `null-lines-reentry.v2.csv`, filling the
+   `ingredients_recovered` column from source (`source` column carries the creator handle).
+   This is the big manual job; 681 lines.
+3. **Fill `serves` on the 4 null-`serves` recipes** (ids in the DB query in this entry's §1).
+   Doing this before the step-2 apply lets the pass cover the whole library and makes the
+   `serves_missing` flag machinery unnecessary.
+4. **Then** run step 2: dump recipes via Supabase MCP → `normalise_quantities.py` →
+   review CSV → `apply_migration` for `ingredient_grams` jsonb → batched writes.
+5. Step 3 (bulk nutrition) stays blocked, and must additionally skip anything flagged
+   `empty_ingredients` or `serves_missing`.
+
+## Open Questions / Blockers
+- **Is the ingredient text recoverable from anywhere cheaper than the source?** Checked and
+  ruled out: `user_library` holds a single settings/overrides blob dated 2026-04-27, not a
+  recipe backup. Supabase free tier has no PITR. If Saffron has a local browser profile with
+  a stale `ds_recipe_cache` in localStorage predating 16 July, that would be worth dumping
+  before it refreshes — untested, and the cache may already have been overwritten.
+- **Was the damage wider than 52?** Unknown and probably unknowable — `updated_at` only holds
+  the last write, so recipes damaged then rewritten cleanly are invisible.
+
+## Environment & Config Notes
+Repo `saffronlm-cmyk/daily-shuffle`, branch `claude/recipe-db-null-values-9vn3k0`, PR #63
+(draft). Supabase project `jsxcctrskkkxgdxfaduo`, table `recipes` (read-only this session).
+Cache bumped v40 → v41. Self check-in scheduled on PR #63 (trigger `trig_01H3wd4vWpmEVGvGGV7inczt`).
+Sandbox egress to `supabase.co` is blocked (curl 403 CONNECT tunnel failed) — all DB access
+went through Supabase MCP.
+
+## Notes & Gotchas
+- **The `|| ing` fallback is load-bearing.** `index.html` ~4650 has `push(ing.item || ing)`
+  and survived; `patchRecipeToLibrary()` had bare `ing.item` and did the damage. If you write
+  a third path that rebuilds `ingredient_sections`, do not read `.item` — that key does not
+  exist on `flattenIngredientSections()` output.
+- **`ingredient_sections` is raw truth** (recipe-db skill: "read-only in practice"). The
+  July damage happened because an app save path overwrote it. Any future write to that
+  column deserves the same scrutiny.
+- **Don't trust the counts in `quantity-normalisation-plan.md` §1** — its "327 recipes / 8
+  no-serves / 53 null lines" are all wrong now (332 / 4 / 681). The 53 is suspiciously close
+  to the 52 affected *recipes*, so it may have been mis-measured as recipes-not-lines even
+  at the time. Measure live before relying on any of them.
+- Regenerating `quantity_review.csv` after this change adds a `skip_reason` column. Row order
+  is unchanged for a given input dump, so Saffron's in-progress review of normal rows is not
+  invalidated.
+
 # Handoff items 2–4 done; the `serves` bug was misdiagnosed — real defect was the Add-form default
 **Date:** 2026-08-04
 **Project:** Daily Shuffle — nutrition accuracy (recipe path), staple data, doc drift

@@ -48,7 +48,8 @@ Single user (Saffron), no auth, deployed as static files.
 - **Committed data CSVs (root)** — inputs/outputs of the data workstreams:
   `pricebook.csv`, `pricebook.variants.csv`, `ingredient-master.csv`,
   `recipe-ingredient-normalisation.csv` / `.final.csv`, `split-plan.csv`,
-  `unmatched-ingredients.csv`, `null-lines-reentry.csv`. These encode reviewed human
+  `unmatched-ingredients.csv`, `null-lines-reentry.csv` (superseded) /
+  `null-lines-reentry.v2.csv` (current). These encode reviewed human
   decisions — never regenerate, reorder, or "clean up" one without being asked.
 - **Planning / handoff docs** — read before touching the related area:
   - `logs/daily-shuffle_log.md` — rolling session log, newest first. **Read the top entry
@@ -109,9 +110,25 @@ Single user (Saffron), no auth, deployed as static files.
 2. **Quantity normalisation** (approved, script written, **not applied**) — ruleset in
    `quantity-normalisation-plan.md`, implemented by `scripts/normalise_quantities.py`
    (merged 2026-08-04, has never been run against live data). Applying it means: new
-   non-destructive `ingredient_grams` jsonb column on `recipes`, skip the 8 no-`serves`
-   recipes (flag `serves_missing`), emit a pre-write review CSV first.
-3. **Bulk nutrition re-population** (blocked) — **must not run until step 2 is applied.**
+   non-destructive `ingredient_grams` jsonb column on `recipes`, skip the recipes with
+   no `serves` (flag `serves_missing`), emit a pre-write review CSV first.
+   The script applies two **skip guards** — `serves_missing` (plan §6 decision 5) and
+   `empty_ingredients` (hollow recipes, below) — leaving `ingredient_grams` **null**,
+   not `[]`, for those. Live counts move; measure, don't trust a number in a doc
+   (the plan's "8 no-`serves`" was 4 as of 2026-08-05).
+3. **Bulk nutrition re-population** (blocked) — **must not run until step 2 is applied**,
+   and must skip anything still flagged `empty_ingredients` or `serves_missing`.
+
+### Known data damage: hollow recipes (open)
+
+52 recipes hold `ingredient_sections` whose section titles and line counts survive but
+whose every ingredient line is a literal `null` — the text is gone and is only
+recoverable by re-entry from source. Worklist: **`null-lines-reentry.v2.csv`** (52
+recipes / 681 lines). Cause was `patchRecipeToLibrary()` in `index.html` reading a
+non-existent `ing.item` key off `flattenIngredientSections()`'s structured output and
+PATCHing `undefined` → `null`; fixed 2026-08-05, but the lost text is not recoverable
+from the fix. The older `null-lines-reentry.csv` is the superseded 2026-06 worklist
+(36 recipes; 32 since re-entered) — kept as history, don't work from it.
 
 ## AI features
 

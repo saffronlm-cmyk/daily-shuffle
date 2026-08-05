@@ -2890,7 +2890,13 @@ async function patchRecipeToLibrary(id) {
   if (!r || !cloudRecipeIds.has(id)) return; // only patch cloud recipes
   const fd = RECIPE_FULL_DATA[id] || {};
 
-  // Convert flat [{group,item}] back to [{section_title, ingredients[]}]
+  // Convert flat [{group,qty,unit,name,note}] back to [{section_title, ingredients[]}].
+  // NOTE: flattenIngredientSections() emits structured items — there is no `item`
+  // key. Reading `ing.item` here pushed `undefined`, which JSON.stringify writes as
+  // `null`, so a save replaced every ingredient line with null while leaving the
+  // section titles and line counts intact. That hollowed out 52 recipes in July 2026
+  // (see null-lines-reentry.v2.csv). Write the structured shape the column already
+  // holds, dropping the section-level `group`.
   const sectionMap = [];
   let currentSection = null;
   for (const ing of (fd.ingredients || [])) {
@@ -2898,7 +2904,8 @@ async function patchRecipeToLibrary(id) {
       currentSection = { section_title: ing.group || '', ingredients: [] };
       sectionMap.push(currentSection);
     }
-    currentSection.ingredients.push(ing.item);
+    const { group, ...line } = ing;
+    currentSection.ingredients.push(line);
   }
 
   const payload = {
@@ -2920,14 +2927,27 @@ async function patchRecipeToLibrary(id) {
     method_steps: fd.method?.length ? fd.method : null,
   };
 
+  // Never let an empty local copy blank out stored content. `fd` is empty whenever
+  // full data hasn't loaded for this recipe, and flattenIngredientSections() also
+  // drops blank lines — so an already-hollow recipe would otherwise be PATCHed to
+  // ingredient_sections: null, destroying the section titles too. Omit the key
+  // instead: PATCH leaves absent columns untouched.
+  if (!sectionMap.length) delete payload.ingredient_sections;
+  if (!fd.method?.length) delete payload.method_steps;
+
   try {
-    await fetch(`${RECIPE_LIB_URL}/rest/v1/recipes?id=eq.${id}`, {
+    const res = await fetch(`${RECIPE_LIB_URL}/rest/v1/recipes?id=eq.${id}`, {
       method: 'PATCH',
       headers: { ...RECIPE_LIB_HEADERS, 'Prefer': 'return=minimal' },
       body: JSON.stringify(payload),
     });
+    if (!res.ok) {
+      console.warn('[Daily Shuffle] Recipe patch rejected:', res.status);
+      showToast('⚠ Couldn’t sync this recipe to the library');
+    }
   } catch (err) {
     console.warn('[Daily Shuffle] Failed to patch recipe to library:', err.message);
+    showToast('⚠ Couldn’t sync this recipe to the library');
   }
 }
 
