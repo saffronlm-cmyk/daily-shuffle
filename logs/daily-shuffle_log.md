@@ -76,6 +76,24 @@ Demonstrated concretely by running `build_entries()` against the book as it now 
 Yoghurt's £0.99/500g would price Greek Yoghurt (72 uses); Vegan Cheese's price would apply to
 Feta; a whole lime's 48p would apply to Lime Juice (57 uses).
 
+### 3b. Saffron's refinement — separate the type-variants from the real duplication
+On seeing the audit she made the distinction that matters: **variants differing by type
+(milk, cheese, yoghurt) are reasonably separate products**; the genuine same-item
+duplication is **mostly veg and fruit, especially rows still carrying qty text**. The data
+agrees, so the audit now says so explicitly instead of treating "duplicates" as one bucket.
+
+Measured: of 214 Produce/Vegetables rows plus 47 fruit rows filed elsewhere, 37 still carry
+quantity/measure text; clustered to their base item, **49 rows / 302 uses fold into 10 base
+items**. Citrus dominates (`Lime Juice` 57, `Lime Wedge` 8, `Juice Of 1 Lime` 7, `Lime Zest`
+6 — all a lime). In three cases the fragments outweigh the clean row: `Garlic Clove` 110 vs
+`Garlic` 72, `Lime Juice` 57 vs `Lime` 18. `Onion` and `Orange` have no clean base row at all.
+
+**The trap, and the reason this is not a find-and-replace:** folding needs a *conversion
+factor*, not just a rename. A clove is ~⅒ of a bulb, a wedge ~⅙ of a lime, a stalk is not a
+head of celery. Renaming `Garlic Clove` → `Garlic` without a factor prices every clove at
+bulb price — ~10× too high on the most-used ingredient in the library. Same class of problem
+as `quantity-normalisation-plan.md` solves for recipe lines; the factors belong in the same pass.
+
 ### 4. Two secondary findings, both left unfixed on purpose
 - `canonicalise()` maps `potatoes` → `potatoe` (the `([^aeiou])es\b → \1e` rule fires before
   the plural-`s` rule), so `Potato` and `Potatoes` are two separate families. Same mechanism
@@ -132,8 +150,11 @@ prices are still unchanged — `ds_pb_seeded_v2`, 41 rows, 2026-04-06.
 2. If the answer is per-variant: change the grouping key in `price_pricebook.py:select_products()`
    and `csv_to_seed.py:build_entries()` from Product to Ingredient, keeping Product as the
    grouping/alias field only. Re-check the quota estimate with `--price-per-1000` first.
-3. Fix the ~46 duplicate rows and reassign the families split across `Carrot`/`Carrots`,
-   `Banana`/`Bananas`, `Tuna`/`Tinned Tuna` (audit §2) — no code change, improves alias coverage.
+3. Fold the 49 produce/fruit fragment rows into their 10 base items **with a conversion
+   factor each** (audit §2a); create base rows for `Onion` and `Orange`. Scope it to produce —
+   do not let it creep into the milk/cheese/yoghurt families, whose variants are separate
+   products. Then reassign the plural-split families `Carrot`/`Carrots`, `Banana`/`Bananas`,
+   `Tuna`/`Tinned Tuna` (audit §2) — no code change, improves alias coverage.
 4. Confirm pack sizes for the 5 unit-dead rows (audit §5) — Sriracha, Light Mayonnaise, Sweet
    Potato, Butternut Squash, Potato. Five minutes with a receipt.
 5. **Then** run the scrape on her Mac (`handoff.md` NEXT STEPS 1–3), then `csv_to_seed.py --apply`.
