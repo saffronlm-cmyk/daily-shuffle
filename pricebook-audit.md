@@ -55,7 +55,44 @@ artefacts where quantity text was never stripped:
 211 rows have **no Product family at all**, and they are overwhelmingly these
 artefacts (281 uses total, i.e. ~1.3 uses each).
 
-**Why this is mostly a non-issue:** only **3** of the 100 artefact rows have
+### 2a. Where the duplicates actually are: produce and fruit
+
+Saffron's read, 2026-08-06, and the data agrees: **variants that differ by type are
+usually genuinely separate products** — the milk, cheese and yoghurt families are the
+clearest cases, and those must be priced separately, not merged (see §3). **The real
+same-item duplication is concentrated in veg and fruit, and it is largely rows that
+still carry quantity text.**
+
+Of 214 Produce/Vegetables rows plus 47 fruit rows filed under other categories, **37
+still carry quantity or measure text**. Clustering those to their base item:
+
+| base item | fragment rows | uses | clean base row |
+|---|---:|---:|---|
+| Garlic | 2 | 111 | `Garlic` (72) |
+| Lime | 16 | 102 | `Lime` (18) |
+| Lemon | 11 | 67 | `Lemon` (24) |
+| Onion | 5 | 5 | **none** |
+| Ginger | 4 | 4 | `Ginger` (75) |
+| Parsley | 4 | 4 | `Parsley` (19) |
+| Orange | 4 | 4 | **none** |
+| Kale / Celery / Edamame | 3 | 5 | all exist |
+
+**49 rows / 302 uses fold into 10 base items.** Citrus dominates: `Lime Juice` (57),
+`Lime Wedge` (8), `Juice Of 1 Lime` (7), `Juice Of 1 Large Lime` (6), `Lime Zest` (6),
+`Zest Of 1 Lime` (4), `Juice Of 2 Limes` (3) … all of which are *a lime*. In three
+cases the fragments outweigh the clean row — `Garlic Clove` has 110 uses against
+`Garlic`'s 72, `Lime Juice` 57 against `Lime`'s 18.
+
+**Trap: folding these needs a conversion factor, not just a rename.** A clove is not a
+bulb (~⅒), a stalk is not a head of celery, the juice of one lime is one lime but a
+wedge is ~⅙. Renaming `Garlic Clove` → `Garlic` without a factor prices every clove at
+bulb price — roughly **10× too high** on the single most-used ingredient in the
+library. Same class of problem as `quantity-normalisation-plan.md` handles for recipe
+lines; the factors belong with the fold, in the same pass.
+
+`Onion` and `Orange` have no clean base row at all — those need creating, not merging.
+
+**Why the rest is mostly a non-issue:** only **3** of the 100 artefact rows have
 occurrences ≥ 3 (`Clove` 8, `Fresh` 5, `Sheets Rice Paper` 3). `price_pricebook.py`
 already groups by Product, drops junk via its own measurement-fragment and
 not-a-grocery filters, and applies `--min-occ`. Run today it queries **208 products**
@@ -86,7 +123,9 @@ and predates that correction, so it still implements the model backwards.
 **Exposure: 83 of the 204 in-scope families carry variants with real distinguishing
 words — 4,355 uses, 62% of all ingredient usage.** (Upper bound: a few flagged
 families, e.g. `garlic`/`clove` or `vanilla extract`/`pure`, are genuinely one
-product.) The clearly wrong ones:
+product.) The clearly wrong ones — note that Milk, Cheese and Yoghurt are here
+**because their variants are legitimately different products**, which is exactly why a
+shared family price is wrong for them:
 
 | uses | variants | family | one price would cover |
 |---:|---:|---|---|
@@ -158,10 +197,16 @@ weight-based recipe line:
    variant rows. Scraping at the family level and then discovering it's wrong means
    burning the Apify quota twice, and quota exhaustion has already bitten once
    (hence `--resume`, PR #14).
-2. **Fix the ~46 duplicate rows and reassign the split families** (§2) — small,
-   improves alias coverage, no code change.
-3. **Confirm pack sizes for the 5 unit-dead rows** (§5) — 5 minutes with a receipt.
-4. **Then scrape**, then `csv_to_seed.py --apply`.
+2. **Fold the 49 produce/fruit fragment rows into their 10 base items** (§2a),
+   recording a conversion factor for each (clove → bulb, wedge → fruit, stalk → head).
+   Create base rows for Onion and Orange. This is where the genuine same-item
+   duplication lives; do **not** extend it to the milk/cheese/yoghurt families, whose
+   variants are separate products.
+3. **Reassign the families split by the plural bug** — `Carrot`/`Carrots`,
+   `Banana`/`Bananas`, `Tuna`/`Tinned Tuna` (§2) — small, improves alias coverage, no
+   code change.
+4. **Confirm pack sizes for the 5 unit-dead rows** (§5) — 5 minutes with a receipt.
+5. **Then scrape**, then `csv_to_seed.py --apply`.
 
 Deferred: the 100 artefact rows (§2) — harmless at `--min-occ 3`, worth a cleanup
 pass only if the book is ever used below that threshold. The `canonicalise()` plural
