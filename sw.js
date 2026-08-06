@@ -3,7 +3,7 @@
 // open, no double hard-refresh needed), cache-first for static assets so the
 // app still loads instantly and works offline.
 
-const CACHE = 'daily-shuffle-v42';
+const CACHE = 'daily-shuffle-v43';
 const ASSETS = [
   './index.html',
   './manifest.json',
