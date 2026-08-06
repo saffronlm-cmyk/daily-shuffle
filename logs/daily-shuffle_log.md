@@ -4,6 +4,172 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# Price-book merge + audit — the pipeline shares one price across a whole Product family
+**Date:** 2026-08-06
+**Project:** Daily Shuffle — product/recipe pricing (Apify price-book stream)
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete (PR #65 open as draft) — surfaces one decision that blocks the scrape
+
+---
+
+## Project Context
+The price-book stream, dormant since 2026-06. See the 2026-06-25 entry ("Apify price-book
+pipeline — build, fix, and merge") for the pipeline build and the ASDA-only/mismatch-policy
+decisions, and the 2026-06-26 entry ("Ingredient Normalisation, Consolidation & Variant-Level
+Price Book") for the data model this session finds the scripts contradicting. Orthogonal to
+the nutrition workstream — nothing here touches steps 1–3 or the hollow-recipe worklist.
+
+## Session Goal
+Saffron asked where product and recipe pricing stood. After the status answer she asked for
+two things in order: (1) merge the stranded verified prices into `pricebook.csv`, (2) audit
+the book and cross-reference it against realistic supermarket products — her instinct being
+"a lot of variants there are derived from the same item".
+
+## State Before This Session
+`main` at `7093165`, no open PRs. Price book unfilled and split across two sheets:
+`pricebook.csv` (987 rows, 1 price — Tortilla) and `pricebook.variants.csv` (781 rows, 20
+prices from the PR #21 Lidl audit). The app was — and still is — on the original 41-row
+hand-entered Lidl seed from 2026-04-06, flag `ds_pb_seeded_v2`; `csv_to_seed.py` has never
+run (it bumps the flag to `v3`). The pipeline had been build-complete and waiting ~6 weeks on
+one action: Saffron re-running the scrape on her Mac.
+
+## What Was Done
+
+### 1. Status answer
+Traced the whole stream: pipeline merged and complete (v2 category-aware matching `1990aff`,
+quota detection + `--resume` PR #14), cost engine fully built and wired into the UI
+(`computeRecipeCost`, `costTagHtml`, `renderComputedCostHtml`, `_groceryAggregate`, plan cost
+label), and **no price data in any of it**. Flagged the two-sheet split as the thing that had
+stranded the manual work.
+
+### 2. Merged the 20 verified prices into `pricebook.csv`
+All 20 matched exactly one row. Pack sizes reconciled against the app's 2026-04 seed by
+**price-match join** — if a `1 each` row carries a price identical to a seed row with a real
+pack size, it is the same observation transcribed lossily:
+- **8 adopted the seed's size/unit** (Cocoa Powder 500g, Dark Chocolate 100g, Peanut Butter
+  Powder 850g, Basil Pesto 250g, Soya Yoghurt 500g, Ketchup 750ml, Spaghetti 500g, Vegan
+  Cheese 350g).
+- **9 already agreed.**
+- **3 kept verbatim** (Sweet Potato £1.18, Butternut Squash £1.45, Potato £0.48) — their
+  prices differ from the seed, so they are a separate observation, not a lossy copy.
+Verified the csv round-trip was byte-identical before writing, so untouched rows could not be
+silently re-quoted. Diff is exactly 20 changed lines; Tortilla untouched.
+
+### 3. The audit — her instinct was right, but the consequence is the reverse
+Duplication confirmed and measured: 42 clusters / 46 redundant rows (plurals, prep words),
+plus **100 rows (10%) that are not products at all** — parse artefacts like `- 1 Tbsp Maple
+Syrup`, `/ 65ml Vegetable Oil`, `½ Tbsp Fish Sauce`. 211 rows have no Product family and are
+overwhelmingly these. **But it costs nothing**: only 3 of the 100 reach occurrences ≥ 3, and
+`price_pricebook.py` already groups by Product and filters junk — running its own
+`select_products()` against the current book still returns exactly **208**, the number
+`handoff.md` quotes.
+
+**The real defect is that the pipeline collapses too much, not too little.**
+`csv_to_seed.py:build_entries()` keys on `canonicalise(Product)` and `setdefault`s, so the
+first priced row in a family sets the price for every variant in it; `price_pricebook.py` has
+the same shape upstream and searches `"Oil"`, not `"sesame oil"`. This contradicts the data
+model locked on 2026-06-26 — *variant = price unit, Product = grouping only* — established
+from Saffron's own master edits. `csv_to_seed.py` is "unchanged since v1" and predates that
+correction. **83 of 204 in-scope families, 62% of all ingredient usage.**
+
+Demonstrated concretely by running `build_entries()` against the book as it now stands: Soya
+Yoghurt's £0.99/500g would price Greek Yoghurt (72 uses); Vegan Cheese's price would apply to
+Feta; a whole lime's 48p would apply to Lime Juice (57 uses).
+
+### 4. Two secondary findings, both left unfixed on purpose
+- `canonicalise()` maps `potatoes` → `potatoe` (the `([^aeiou])es\b → \1e` rule fires before
+  the plural-`s` rule), so `Potato` and `Potatoes` are two separate families. Same mechanism
+  splits `Carrot`/`Carrots` and `Banana`/`Bananas`.
+- `_toBase()` has no `each`↔`g` bridge (only cups→g via density), so an `each` entry silently
+  counts as unpriced against any weight-based line. Five rows are dead this way: Sriracha and
+  Light Mayonnaise (bottles used in tbsp) plus the 3 produce rows from §2.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| pricebook.csv | 20 verified Lidl prices merged in, 8 with pack sizes reconciled | Modified | repo root |
+| pricebook-audit.md | Full audit: book shape, duplicates/junk, the shared-price defect, recommended work order | Created | repo root |
+| CLAUDE.md | Added `pricebook-audit.md` to the planning/handoff docs list | Modified | repo root |
+| logs/daily-shuffle_log.md | This entry | Modified | logs/ |
+| pricebook.variants.csv | Left untouched as the record of the original audit | Unchanged | repo root |
+
+**No database writes, no `index.html`/`sw.js` change** — hence no cache bump and no ship-check.
+
+## Decisions & Reasoning
+- **Price-match join for the pack-size reconciliation, rather than adopting seed sizes
+  wholesale.** Options: take every seed pack size (fabricates a per-kg price from an
+  each-price observation), leave all 20 verbatim (leaves 8 rows unable to price gram lines),
+  or split on whether the price matches. Chose the split: an identical price is real evidence
+  it is the same observation, a differing price is real evidence it is not.
+- **Merged into `pricebook.csv`, not the reverse.** That is what `price_pricebook.py --in`
+  defaults to and what `csv_to_seed.py` consumes. `tools-apply-master.mjs` was deliberately
+  pointed at the variants sheet so the scraper's book could not be clobbered — correct at the
+  time, but it left the manual prices where nothing downstream reads them.
+- **Did not restructure the book, split families, or delete the 100 artefact rows.** CLAUDE.md
+  forbids regenerating/reordering a committed data CSV without being asked; she asked for a
+  merge and an audit, not a rewrite. The artefacts are also genuinely harmless at `--min-occ 3`.
+- **Did not fix `canonicalise()`.** It is duplicated across five files and re-keys the live
+  `ds_pricebook` in localStorage — that is its own change with its own sync obligations, not a
+  drive-by.
+- **Wrote the audit to a repo doc rather than only reporting it in chat.** The finding gates a
+  decision she has to make away from the keyboard (on her Mac, with the Apify token), and
+  chat context does not survive.
+- **Flagged rather than fixed the shared-price defect.** Fixing it means changing the price
+  unit in both scripts, which takes the scrape from 208 queries to ~365 — a quota decision
+  that is hers, and quota exhaustion has already bitten once.
+
+## Current State (end of session)
+Branch `claude/product-recipe-pricing-lw72m2` at `f45d580` + the audit commit + this log
+commit, pushed. PR #65 open as draft, subscribed for activity; 0 checks (repo has no CI, as
+expected), 0 review comments. `pricebook.csv` now holds 21 prices of 987 rows. The app's
+prices are still unchanged — `ds_pb_seeded_v2`, 41 rows, 2026-04-06.
+
+## Next Steps
+1. **Decide the price-unit question** (`pricebook-audit.md` §3): does the scrape query 208
+   Product families or ~365 variant rows? Everything else waits on this — scraping at the
+   family level and then discovering it is wrong burns the Apify quota twice.
+2. If the answer is per-variant: change the grouping key in `price_pricebook.py:select_products()`
+   and `csv_to_seed.py:build_entries()` from Product to Ingredient, keeping Product as the
+   grouping/alias field only. Re-check the quota estimate with `--price-per-1000` first.
+3. Fix the ~46 duplicate rows and reassign the families split across `Carrot`/`Carrots`,
+   `Banana`/`Bananas`, `Tuna`/`Tinned Tuna` (audit §2) — no code change, improves alias coverage.
+4. Confirm pack sizes for the 5 unit-dead rows (audit §5) — Sriracha, Light Mayonnaise, Sweet
+   Potato, Butternut Squash, Potato. Five minutes with a receipt.
+5. **Then** run the scrape on her Mac (`handoff.md` NEXT STEPS 1–3), then `csv_to_seed.py --apply`.
+6. **Do not run `csv_to_seed.py` against the partially-filled book** — with 21 prices it would
+   apply Soya Yoghurt's price to Greek Yoghurt and Vegan Cheese's to Feta.
+
+## Open Questions / Blockers
+- **The price-unit decision (step 1) is the only blocker**, and it is Saffron's to make — it
+  trades Apify quota against pricing accuracy on 62% of ingredient usage.
+- Whether the 3 kept-verbatim produce rows are per-item or per-kg observations is unresolved;
+  only her receipt or memory settles it.
+- Unknown whether she has ever imported a price CSV in-app (Settings → Import price CSV). That
+  writes to `localStorage` and is invisible from a sandbox session, so the live in-app price
+  book may hold more than the 41-row seed.
+
+## Environment & Config Notes
+Repo `saffronlm-cmyk/daily-shuffle`, branch `claude/product-recipe-pricing-lw72m2`, PR #65
+(draft). No Supabase access this session. No cache bump (no app-code change).
+`node scripts/claude_md_drift.mjs` passes (15 root files documented). Sandbox egress to
+`api.apify.com` remains blocked — the scrape is still Saffron-runs-it-on-her-Mac.
+
+## Notes & Gotchas
+- **`select_products()` returning exactly 208 is a coincidence worth not over-reading.** The
+  book grew from ~811 to 987 rows since `handoff.md` was written, and the number is unchanged
+  because it counts *families* and the growth landed in the low-occurrence tail. If the
+  price-unit decision goes per-variant, that number jumps to ~365 and `handoff.md`'s "~208"
+  becomes stale — update it there.
+- **The audit's "83 families affected" is an upper bound.** The heuristic flags any family
+  whose variants carry a distinguishing word, which catches false positives like
+  `garlic`/`clove` and `vanilla extract`/`pure`. The ~30 in the audit's table are the real ones.
+- **`pricebook.variants.csv` is now historical.** Work from `pricebook.csv`. Do not
+  re-merge the variants sheet — the 20 prices are already in and a second pass would
+  re-introduce the `1 each` pack sizes that were deliberately corrected.
+
+---
+
 # Hollow-recipe data damage found and write path fixed — 52 recipes need ingredient re-entry
 **Date:** 2026-08-05
 **Project:** Daily Shuffle — data integrity (recipes.ingredient_sections) + nutrition step 2
