@@ -70,6 +70,12 @@ Single user (Saffron), no auth, deployed as static files.
     uppercase `HANDOFF.md` was removed — it collided with this file on case-insensitive
     macOS. Its ingredient-normalisation Phase-1 work is done; the cost-feature roadmap
     lives here now.)
+  - `pricebook-audit.md` — audit of `pricebook.csv` (2026-08-06). **Read before running
+    the Apify scrape.** Records that both pricing scripts key on Product family, so one
+    price is shared across every variant in it (62% of ingredient usage affected) —
+    which contradicts the locked "variant = price unit, Product = grouping only" data
+    model. That decision gates the scrape, because it sets whether it queries 208
+    families or ~365 variants, and re-scraping burns the Apify quota twice.
 - **`.github/workflows/supabase-keepalive.yml`** — daily ping so the free-tier Supabase
   project doesn't auto-pause. Schedule triggers only fire from `main`, so it must stay
   on `main`. The inlined anon key is already public in `index.html` — not a leak.
