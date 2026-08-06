@@ -4,6 +4,160 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# Hollow-recipe fix shipped (PR #63 merged); re-entry handoff prompts written; cup-basis conflict found
+**Date:** 2026-08-05
+**Project:** Daily Shuffle — data integrity follow-through + ingredient display
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete. Two things left open and named below (display change; cup basis).
+
+---
+
+## Project Context
+Direct continuation of the entry below it (same date, "Hollow-recipe data damage found and
+write path fixed"). **Read that one first** — it holds the root-cause analysis, the damage
+counts, and the full next-steps list. This entry covers everything after that log commit:
+getting PR #63 merged, writing the prompts Saffron will use to re-enter the lost
+ingredients in a separate chat, and a display-format discussion that surfaced a real
+inconsistency in the codebase.
+
+## Session Goal
+Merge the fix, then give Saffron a self-contained way to restore the 52 hollow recipes by
+pasting recipe text into a different chat session with Supabase MCP access.
+
+## State Before This Session
+PR #63 open as draft at `910fa40`, branch cut from `228f921`.
+
+## What Was Done
+
+### 1. PR #63 merged — but not cleanly, and the cache collision matters
+First merge attempt returned 405 merge conflict: **PR #62 had landed on `main`** after this
+branch was cut (`016458d`, "Unify unknown-serves default on 2; correct Dark soy sauce").
+- Only true conflict was `logs/daily-shuffle_log.md` — both branches prepended an entry.
+  Git interleaved them into three conflict hunks. Resolved by reconstructing from the three
+  versions programmatically (base body identical in both; concatenate header + my entry +
+  their entry + base body) rather than hand-editing markers. Verified: 0 markers left,
+  entry dates descending.
+- **#62 had independently bumped the cache to v41 — the same value this branch used.** The
+  merge auto-resolved silently because both sides said v41, which would have shipped two
+  distinct app-code changes under one cache version. Bumped to **v42**. Worth remembering:
+  "one bump per PR" is not collision-proof when two PRs are open at once — always re-check
+  the merged value against `main`, not against the branch point.
+- Checked #62's `index.html` changes for overlap with `patchRecipeToLibrary()` — none; it
+  only moves the Add-form serves default 1 → 2.
+- Re-ran ship-check on the *merged* tree (parse 3/3, smoke 5/5, drift clean), then squash-merged
+  as `7093165`. Session auto-unsubscribed from PR activity; the scheduled check-in fired once,
+  confirmed merged, and was closed out rather than re-armed.
+
+### 2. Wrote the re-entry handoff prompts (delivered in chat, not committed)
+Saffron will restore the 52 recipes by pasting source text into a separate chat with Supabase
+MCP. Produced an opening message for that chat plus a quantity addendum. **These are not in
+the repo** — if she needs them again, the substance is:
+- **Coordinates**: project `jsxcctrskkkxgdxfaduo`, table `recipes`, column
+  `ingredient_sections` only.
+- **Match on `name` AND `creator_handle`** — never name alone. Two distinct recipes are both
+  called "Carrot Cake Baked Oats" (@dietitianrose, @tracesoats).
+- **Verify the row is actually hollow before writing** (every entry null) and STOP if it holds
+  real text — the whole failure mode being recovered from is good data being overwritten.
+- **Write pattern**: `UPDATE recipes SET ingredient_sections = '<json>'::jsonb WHERE id = '<uuid>'`
+  — one row, one column, no upsert, no other tables.
+- **Quantity addendum**: do NOT compute grams in that chat. The script does conversion with the
+  locked ruleset; hand-computed grams would diverge. Instead, enter text good enough that the
+  script never flags it. Only two of the seven `qty_source` categories come back for review —
+  `unresolved` (no amount at all, generic item) and `estimated` (amount present but unsizable
+  item, or bare item with no amount). `stated`/`converted`/`defaulted`/`to_taste`/`garnish` all
+  resolve silently, so "to taste", "to serve", "a handful" are fine as-is. Keep source-stated
+  bracketed grams ("1 cup (240g) flour") — highest-confidence input, and it beats the ruleset's
+  conversion for US sources. Ambiguous lines get raised with Saffron at input time, batched per
+  recipe, rather than months later in a CSV with no source to hand.
+- Also gave her the 52 as copy-paste blocks (full detail w/ uuids + sections, and a names+authors-only
+  version). Both regenerate from `null-lines-reentry.v2.csv`.
+
+### 3. Saffron asked whether converting to grams at input would be simpler — answered no, with evidence
+Her proposal: convert on input so the normalisation script can ignore these recipes; and she
+described a preferred display format — *weight/volume or count | ingredient name | original
+measure in brackets*. Investigated before answering:
+- **The app already does a partial version of this, in the opposite order.** `_ingToText()`
+  (`index.html:4866`) renders `qty unit name (note)` and, **for cups only**, appends a converted
+  hint via `_toBase()` — e.g. `1/2 cup flour (≈63g)`. Her format is the inverse plus wider unit
+  coverage: a change to one function that lands on all 332 recipes.
+- **Found a live inconsistency**: the app converts on a **US 240 ml cup** (`_DENSITY_G_PER_CUP`
+  comment at `index.html:3154`; `_toBase` falls back to 240 at `:3362`) — plain flour **125 g/cup**.
+  The script's ruleset uses the **UK 250 ml cup** locked in §6 decision 2 — plain flour **133 g/cup**.
+  Two tables, ~6% apart, already shipped and disagreeing.
+- Argued against input-time conversion on three grounds: it covers only 52 of 332 recipes (so the
+  library would render in two formats); it would bake in a *third* density table improvised by
+  whichever chat did the typing; and it is irreversible — grams are derived, raw text is the
+  source of truth, and "133 g flour" cannot be turned back into "1 cup".
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| logs/daily-shuffle_log.md | Merge-conflict resolution (kept both entries) + this entry | Modified | logs/ |
+| sw.js | CACHE v41 → v42 after collision with PR #62 | Modified (merged in #63) | repo root |
+| (chat only) | Upload-chat opening message + quantity addendum + two recipe list blocks | Not committed | — |
+
+No database writes this session — all Supabase access was read-only. No new files added to the repo.
+
+## Decisions & Reasoning
+- **Bumped to v42 rather than leaving the auto-resolved v41**: both PRs independently chose v41,
+  so the merge produced no conflict but would have left two different builds sharing a cache key.
+  The service worker keys off that constant; a shared value risks the fix never being fetched.
+- **Rejected input-time gram conversion** (Saffron's suggestion): see §3 above. Recommended the
+  display-layer change instead, which gets her the format she wants across the whole library
+  without touching raw data.
+- **Recommended unifying the app onto the 250 ml cup basis**, not the reverse: §6 decision 2 is
+  signed off and it is the basis that feeds nutrition, so the number displayed should match the
+  number behind the macros. Flagged as her call because it changes displayed weights library-wide.
+- **Did not commit the handoff prompts as a repo file**: they're single-use scaffolding for an
+  external chat, and CLAUDE.md has no home for that category. Substance captured in this entry
+  instead, which is the documented handoff surface.
+
+## Current State (end of session)
+`main` at `7093165` — hollow-recipe write fix, step-2 skip guards, `null-lines-reentry.v2.csv`
+and cache v42 are all shipped and live. The **52 recipes are still hollow**; the fix prevents
+new damage but recovers nothing. Saffron has everything she needs to start re-entry in a
+separate chat.
+
+## Next Steps
+1. **Saffron re-enters the 52 recipes** in a separate Supabase-MCP chat using the opening message
+   + addendum (substance in §2 above). Worklist: `null-lines-reentry.v2.csv`.
+2. **Decide the cup basis** — unify the app's `_DENSITY_G_PER_CUP` / `_toBase` onto 250 ml to match
+   the locked ruleset (recommended), or keep 240 and amend the plan. Blocks step 3 being coherent.
+3. **`_ingToText()` display change** — flip to `63 g flour (1/2 cup)` and widen the converted hint
+   beyond cups to all convertible units. Counted items ("1 onion") stay as counts. Saffron asked
+   for this; awaiting her go-ahead and the step-2 decision.
+4. **Fill `serves` on the 4 null-`serves` recipes** (ids in the previous entry's §1) before the
+   step-2 apply.
+5. Then the step-2 apply session, then step 3 — both gated as described in the previous entry.
+
+## Open Questions / Blockers
+- **Cup basis: 240 or 250 ml?** Saffron's call. Not blocking re-entry, but it should be settled
+  before the display change ships, because that change puts the converted weight on screen and
+  makes the discrepancy visible to her as a cook.
+- **Does `_ingToText`'s hint change belong with or without the basis unification?** Recommended
+  together; she has not answered yet.
+- Everything from the previous entry's Open Questions still stands (recoverability of the lost
+  text, unknowable true blast radius).
+
+## Environment & Config Notes
+Repo `saffronlm-cmyk/daily-shuffle`. PR #63 **merged** (`7093165`); branch
+`claude/recipe-db-null-values-9vn3k0` restarted from `origin/main` for this log entry, per the
+merged-PR rule. Cache now **v42**. Supabase project `jsxcctrskkkxgdxfaduo`, read-only this session.
+Sandbox egress to `supabase.co` is blocked — all DB access via Supabase MCP.
+
+## Notes & Gotchas
+- **"One cache bump per PR" is not collision-proof.** With two PRs open simultaneously both will
+  read the same starting value from `main` and pick the same next number. After merging `main`
+  into a branch, re-check the CACHE constant against `main`'s current value, not the branch point.
+- **The app and the normalisation script have separate, disagreeing conversion tables.** App:
+  `_DENSITY_G_PER_CUP` + `_toBase` (US 240 ml). Script: the plan's §3.3 values (UK 250 ml). This is
+  additional to the `canonicalise()` five-copy problem already in CLAUDE.md — if you change one
+  density table, check the other.
+- The prompts in §2 deliberately instruct the other chat NOT to compute grams. If a future session
+  sees hand-entered gram values in these 52 recipes, that instruction was not followed and those
+  lines should be treated as suspect against the ruleset.
+
 # Hollow-recipe data damage found and write path fixed — 52 recipes need ingredient re-entry
 **Date:** 2026-08-05
 **Project:** Daily Shuffle — data integrity (recipes.ingredient_sections) + nutrition step 2
