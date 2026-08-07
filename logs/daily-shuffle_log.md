@@ -102,6 +102,37 @@ as `quantity-normalisation-plan.md` solves for recipe lines; the factors belong 
   counts as unpriced against any weight-based line. Five rows are dead this way: Sriracha and
   Light Mayonnaise (bottles used in tbsp) plus the 3 produce rows from §2.
 
+### 5. Hand-pricing worklist + terminology safeguard (later in the same session)
+Saffron asked for a list of products she could price **in the meantime**, i.e. excluding
+anything blocked on an open decision. Generated `pricebook-manual-batch.csv` — reusing
+`select_products(rows, 3)` rather than reimplementing scope, then excluding already-priced
+families, multi-product families (§3, the open price-unit question) and produce fragments
+(§2a, need conversion factors first). **99 rows**, every one resolving to exactly one source
+row. Columns are hers: `Product | Pack qty | Measurement convention | Price per item | Price
+per measurement | Notes`; `Product` is the **verbatim `Ingredient` string and the join key**,
+so corrections go in `Notes`.
+
+Reviewing the output surfaced duplicate pairs my family-level filter could not catch —
+they sit in *separate* families. She ruled on six: `Bananas→Banana`, `Zucchini→Courgette`,
+`Pak Choi→Bok Choy`, `Date→Medjool Date`, `Red Curry Paste→Thai Red Curry Paste`,
+`Ginger Puree→Ginger Paste`. **`Garlic Paste` and `Ginger and Garlic Paste` stay distinct;
+the coconut rows are left alone because context decides them.** Batch went 99 → **93**.
+
+### 6. The safeguard — `CANON_TERMS` + `flagCanonTerms()`
+She asked for a rule so this doesn't recur on every new recipe. Implemented as a two-tier
+split, and **the split is the important design decision**:
+- **`parseWithAI` rewrites.** Its output pre-fills a form she reads before saving, so a
+  rename is a visible suggestion (listed in the parse status line), not a silent edit.
+- **`addRecipe` (manual typing) and `importRecipeIngredientsCsv` only flag**, via
+  `flagCanonTerms()` — the save toast and the import's existing confirm dialog list the
+  suggestions without changing anything. Neither path has a review step, and the CSV import
+  replaces live ingredient lists *and* patches the cloud library.
+
+`CANON_TERMS` is deliberately **app-only and separate from `canonicalise()`** — that one is
+duplicated across five files and would re-key the live localStorage price book. Adding a
+synonym to `CANON_TERMS` costs nothing elsewhere. Matching is whole-name via
+`canonicalise(_stripPrep(name))`, so `banana bread` and `Medjool Dates` are untouched.
+
 ## Artifacts Produced / Modified
 
 | File | What it is | Status | Location |
@@ -110,9 +141,13 @@ as `quantity-normalisation-plan.md` solves for recipe lines; the factors belong 
 | pricebook-audit.md | Full audit: book shape, duplicates/junk, the shared-price defect, recommended work order | Created | repo root |
 | CLAUDE.md | Added `pricebook-audit.md` to the planning/handoff docs list | Modified | repo root |
 | logs/daily-shuffle_log.md | This entry | Modified | logs/ |
+| pricebook-manual-batch.csv | Hand-pricing worklist, 93 rows, 6 columns, blank for filling | Created | repo root |
+| index.html | `CANON_TERMS` map, `canonTerm()`, `flagCanonTerms()`; rewrite in `parseWithAI`, flag-only in `addRecipe` + `importRecipeIngredientsCsv` | Modified | repo root |
+| sw.js | CACHE v42 → v43 | Modified | repo root |
 | pricebook.variants.csv | Left untouched as the record of the original audit | Unchanged | repo root |
 
-**No database writes, no `index.html`/`sw.js` change** — hence no cache bump and no ship-check.
+**No database writes.** `index.html`/`sw.js` were changed late in the session (§6) — cache
+bumped v42 → v43, full ship-check run and clean.
 
 ## Decisions & Reasoning
 - **Price-match join for the pack-size reconciliation, rather than adopting seed sizes
@@ -138,10 +173,11 @@ as `quantity-normalisation-plan.md` solves for recipe lines; the factors belong 
   that is hers, and quota exhaustion has already bitten once.
 
 ## Current State (end of session)
-Branch `claude/product-recipe-pricing-lw72m2` at `f45d580` + the audit commit + this log
-commit, pushed. PR #65 open as draft, subscribed for activity; 0 checks (repo has no CI, as
-expected), 0 review comments. `pricebook.csv` now holds 21 prices of 987 rows. The app's
-prices are still unchanged — `ds_pb_seeded_v2`, 41 rows, 2026-04-06.
+Branch `claude/product-recipe-pricing-lw72m2`, PR #65 **merged to `main`**. Repo has no CI
+(0 checks, expected); no review comments were left. `pricebook.csv` holds 21 prices of 987
+rows. `pricebook-manual-batch.csv` holds 93 unpriced rows awaiting Saffron's shelf-label
+pass. The app's *prices* are still unchanged — `ds_pb_seeded_v2`, 41 rows, 2026-04-06 — but
+the app *code* now carries the terminology safeguard at CACHE v43.
 
 ## Next Steps
 1. **Decide the price-unit question** (`pricebook-audit.md` §3): does the scrape query 208
@@ -157,8 +193,15 @@ prices are still unchanged — `ds_pb_seeded_v2`, 41 rows, 2026-04-06.
    `Tuna`/`Tinned Tuna` (audit §2) — no code change, improves alias coverage.
 4. Confirm pack sizes for the 5 unit-dead rows (audit §5) — Sriracha, Light Mayonnaise, Sweet
    Potato, Butternut Squash, Potato. Five minutes with a receipt.
-5. **Then** run the scrape on her Mac (`handoff.md` NEXT STEPS 1–3), then `csv_to_seed.py --apply`.
-6. **Do not run `csv_to_seed.py` against the partially-filled book** — with 21 prices it would
+5. Fill `pricebook-manual-batch.csv` from shelf labels (93 rows, usage-sorted, top of the
+   file is worth the most). Pack size/unit must be the real purchasable pack — `1 each` on
+   anything measured by weight or spoon is a dead row (`_toBase()` has no each↔g bridge).
+   Applying it means merging on the verbatim `Product` key and working the `Notes` column as
+   a separate rename pass. **Four rows in it are known junk, left in deliberately for her
+   call**: `Milk Choice` (42 uses, a fragment of "milk of choice"), `Salt And Pepper` (24),
+   `Salt Pepper` (14), `Pinche Salt Pepper` (10 — "pinche" is a mangled "pinch of").
+6. **Then** run the scrape on her Mac (`handoff.md` NEXT STEPS 1–3), then `csv_to_seed.py --apply`.
+7. **Do not run `csv_to_seed.py` against the partially-filled book** — with 21 prices it would
    apply Soya Yoghurt's price to Greek Yoghurt and Vegan Cheese's to Feta.
 
 ## Open Questions / Blockers
@@ -172,7 +215,7 @@ prices are still unchanged — `ds_pb_seeded_v2`, 41 rows, 2026-04-06.
 
 ## Environment & Config Notes
 Repo `saffronlm-cmyk/daily-shuffle`, branch `claude/product-recipe-pricing-lw72m2`, PR #65
-(draft). No Supabase access this session. No cache bump (no app-code change).
+(merged). No Supabase access this session. Cache bumped v42 → v43.
 `node scripts/claude_md_drift.mjs` passes (15 root files documented). Sandbox egress to
 `api.apify.com` remains blocked — the scrape is still Saffron-runs-it-on-her-Mac.
 
@@ -185,6 +228,10 @@ Repo `saffronlm-cmyk/daily-shuffle`, branch `claude/product-recipe-pricing-lw72m
 - **The audit's "83 families affected" is an upper bound.** The heuristic flags any family
   whose variants carry a distinguishing word, which catches false positives like
   `garlic`/`clove` and `vanilla extract`/`pure`. The ~30 in the audit's table are the real ones.
+- **Two-tier normalisation is a deliberate split, not an inconsistency.** `parseWithAI`
+  rewrites because its output is reviewed before saving; `addRecipe` and
+  `importRecipeIngredientsCsv` only flag because they are not. Do not "tidy this up" by
+  making all three behave the same — the import path patches the cloud library.
 - **`pricebook.variants.csv` is now historical.** Work from `pricebook.csv`. Do not
   re-merge the variants sheet — the 20 prices are already in and a second pass would
   re-introduce the `1 each` pack sizes that were deliberately corrected.
