@@ -3041,9 +3041,14 @@ async function importRecipeIngredientsCsv(evt) {
   const known = allIds.filter(id => recipes.some(r => r.id === id));
   const unknown = allIds.length - known.length;
   if (!known.length) { alert('No recipes in this file match your library (check the row_key column).'); return; }
+  // Flag non-standard wording before the write, so it can be fixed in the CSV and
+  // re-imported. Deliberately does not rewrite — this path replaces live ingredient
+  // lists and patches the cloud library, so it must not alter what was uploaded.
+  const termFlags = flagCanonTerms(known.flatMap(id => byRecipe[id].map(it => it.name)));
   if (!confirm(
     `Apply normalised ingredients to ${known.length} recipe(s)?` +
     (unknown ? `\n${unknown} unrecognised recipe id(s) will be skipped.` : '') +
+    (termFlags.length ? `\n\nNon-standard wording found (not changed):\n  ${termFlags.join('\n  ')}` : '') +
     `\n\nThis replaces those recipes' ingredient lists locally and patches your cloud library.`
   )) return;
 
@@ -3150,6 +3155,45 @@ const _STOP_ADJ = new Set([
   'thinly','thickly','coarsely','optional','approx','approximately','about','around',
   'a','an','the','of','to','for','your','some',
 ]);
+
+// Canonical ingredient terminology. Keys are canonicalise()'d synonyms, values are
+// the preferred display term. Applied to AI-parsed ingredient names before the Add
+// Recipe form is filled, so new recipes land on one vocabulary instead of drifting
+// into near-duplicate price-book entries (Zucchini vs Courgette priced twice).
+// Whole-name matches only — "banana bread" is NOT rewritten to "Banana bread".
+// Decisions are Saffron's (2026-08-06); see pricebook-audit.md §2a. Add new pairs
+// here — this map is app-only and does not need mirroring into the scripts, unlike
+// canonicalise() itself.
+const CANON_TERMS = {
+  'bananas':          'Banana',
+  'zucchini':         'Courgette',
+  'zucchinis':        'Courgette',
+  'pak choi':         'Bok Choy',
+  'pak choy':         'Bok Choy',
+  'date':             'Medjool Date',
+  'red curry paste':  'Thai Red Curry Paste',
+  'ginger puree':     'Ginger Paste',
+};
+
+// Preferred term for a raw ingredient name, or null if it's already right.
+function canonTerm(rawName) {
+  const pref = CANON_TERMS[canonicalise(_stripPrep(rawName))];
+  if (!pref) return null;
+  return pref.toLowerCase() === String(rawName || '').trim().toLowerCase() ? null : pref;
+}
+
+// Deduped "X → Y" suggestions for a list of raw ingredient names. Used by the
+// paths that have no review step (manual entry, CSV import) to FLAG rather than
+// rewrite — silently changing text she typed or uploaded is the thing to avoid.
+function flagCanonTerms(rawNames, cap = 4) {
+  const seen = new Map();
+  for (const n of (rawNames || [])) {
+    const pref = n ? canonTerm(n) : null;
+    if (pref && !seen.has(pref)) seen.set(pref, `${_stripPrep(n)} → ${pref}`);
+  }
+  const list = [...seen.values()];
+  return list.length <= cap ? list : list.slice(0, cap).concat(`+${list.length - cap} more`);
+}
 
 // g per 1 cup (UK, 250 ml) for common dry / sticky ingredients. Keys are
 // canonicalise()'d, so e.g. "rolled oats" → "rolled oat", "mashed banana" →
@@ -4760,8 +4804,13 @@ async function addRecipe() {
   const fi = document.getElementById('aiImageInput'); if(fi) fi.value='';
   const ti = document.getElementById('aiTextInput'); if(ti) ti.value='';
   document.getElementById('aiParseStatus').textContent = '';
+  // Flag non-standard ingredient wording rather than rewriting it — this path has
+  // no review step, unlike the AI parse which pre-fills an editable form.
+  const termFlags = flagCanonTerms(manualIngredients.map(i => i.name));
   if (cloudError) {
     showToast(`⚠ "${name}" saved to this device only — cloud sync failed (${cloudError})`);
+  } else if (termFlags.length) {
+    showToast(`"${name}" added! Non-standard wording: ${termFlags.join(', ')}`);
   } else {
     showToast(`"${name}" added to your library!`);
   }
@@ -5555,8 +5604,17 @@ Rules:
     const cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
     const parsed = JSON.parse(cleaned);
 
+    // Standardise ingredient wording before the form is filled, so it lands as a
+    // visible suggestion she can still edit rather than a silent rewrite on save.
+    const renamed = [];
+    for (const ing of (parsed.ingredients || [])) {
+      const pref = ing && ing.item ? canonTerm(ing.item) : null;
+      if (pref) { renamed.push(`${ing.item} → ${pref}`); ing.item = pref; }
+    }
+
     prefillForm(parsed);
-    statusEl.textContent = '✓ Form pre-filled — review and save!';
+    statusEl.textContent = '✓ Form pre-filled — review and save!'
+      + (renamed.length ? `  Standardised: ${renamed.join(', ')}.` : '');
     statusEl.className = 'ai-parse-status success';
 
     // Scroll down to the form

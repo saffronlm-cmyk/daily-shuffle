@@ -49,8 +49,16 @@ Single user (Saffron), no auth, deployed as static files.
   `pricebook.csv`, `pricebook.variants.csv`, `ingredient-master.csv`,
   `recipe-ingredient-normalisation.csv` / `.final.csv`, `split-plan.csv`,
   `unmatched-ingredients.csv`, `null-lines-reentry.csv` (superseded) /
-  `null-lines-reentry.v2.csv` (current). These encode reviewed human
-  decisions — never regenerate, reorder, or "clean up" one without being asked.
+  `null-lines-reentry.v2.csv` (current), `pricebook-manual-batch.csv`. These encode
+  reviewed human decisions — never regenerate, reorder, or "clean up" one without
+  being asked.
+  - `pricebook-manual-batch.csv` is the hand-pricing worklist (2026-08-06): the 99
+    `pricebook.csv` products that can be priced *without* waiting on the open
+    price-unit decision or the produce-fold conversion factors. Columns are
+    `Product | Pack qty | Measurement convention | Price per item | Price per
+    measurement | Notes`. **`Product` is the verbatim `Ingredient` string and is the
+    join key back into `pricebook.csv`** — corrections belong in `Notes`, never in
+    that column. See `pricebook-audit.md` for the exclusion rules.
 - **Planning / handoff docs** — read before touching the related area:
   - `logs/daily-shuffle_log.md` — rolling session log, newest first. **Read the top entry
     at the start of every session** — it says exactly where things stand.
@@ -75,6 +83,17 @@ Single user (Saffron), no auth, deployed as static files.
     uppercase `HANDOFF.md` was removed — it collided with this file on case-insensitive
     macOS. Its ingredient-normalisation Phase-1 work is done; the cost-feature roadmap
     lives here now.)
+  - `project-instructions.md` — the pasteable Instructions block for the **Claude chat**
+    Project (claude.ai, not Claude Code), scoped to the non-code work around the app.
+    Deliberately shallower than this file. Two copies exist by design — the repo file and
+    the text pasted into the chat Project — and nothing enforces the sync, so if you edit
+    it, tell Saffron to re-paste or the edit is decorative.
+  - `pricebook-audit.md` — audit of `pricebook.csv` (2026-08-06). **Read before running
+    the Apify scrape.** Records that both pricing scripts key on Product family, so one
+    price is shared across every variant in it (62% of ingredient usage affected) —
+    which contradicts the locked "variant = price unit, Product = grouping only" data
+    model. That decision gates the scrape, because it sets whether it queries 208
+    families or ~365 variants, and re-scraping burns the Apify quota twice.
 - **`.github/workflows/supabase-keepalive.yml`** — daily ping so the free-tier Supabase
   project doesn't auto-pause. Schedule triggers only fire from `main`, so it must stay
   on `main`. The inlined anon key is already public in `index.html` — not a leak.
@@ -149,6 +168,22 @@ sharing the `claudeText()` response-parsing helper:
 | `generatePlanWithAI` | Shuffle | Generates a meal plan |
 | `trkRunQuickAdd` | Tracker | Free-text "what I ate" → structured entries |
 | `trkRunBulkStaples` | Tracker | Bulk staple paste import |
+
+`parseWithAI` runs its parsed ingredient names through **`CANON_TERMS`** (a synonym →
+preferred-term map next to `_STOP_ADJ` in `index.html`) before filling the Add Recipe
+form, so new recipes land on one vocabulary instead of drifting into near-duplicate
+price-book entries (`Zucchini` vs `Courgette` priced twice). Matches are whole-name only
+and the rename is shown in the parse status line — it pre-fills a form Saffron reviews,
+so it's a visible suggestion, not a silent rewrite. The map is **app-only**; unlike
+`canonicalise()` it needs no mirroring into the scripts. Add new pairs there, keyed by
+the `canonicalise()`'d synonym.
+
+The two paths with **no review step — manual entry (`addRecipe`) and
+`importRecipeIngredientsCsv`** — use `flagCanonTerms()` instead: they **report**
+non-standard wording (in the save toast, and in the import's confirm dialog) and
+**never rewrite** it. Keep that split. Rewriting is only safe where the result lands
+in something she reads before it is committed; the CSV import in particular replaces
+live ingredient lists and patches the cloud library.
 
 `fetchMacroEstimate` and `trkRunQuickAdd` inject the user's `staple_products` into the
 prompt so her verified figures win over generic estimates. Pantry item parsing is **not**
