@@ -3151,6 +3151,32 @@ const _STOP_ADJ = new Set([
   'a','an','the','of','to','for','your','some',
 ]);
 
+// Canonical ingredient terminology. Keys are canonicalise()'d synonyms, values are
+// the preferred display term. Applied to AI-parsed ingredient names before the Add
+// Recipe form is filled, so new recipes land on one vocabulary instead of drifting
+// into near-duplicate price-book entries (Zucchini vs Courgette priced twice).
+// Whole-name matches only — "banana bread" is NOT rewritten to "Banana bread".
+// Decisions are Saffron's (2026-08-06); see pricebook-audit.md §2a. Add new pairs
+// here — this map is app-only and does not need mirroring into the scripts, unlike
+// canonicalise() itself.
+const CANON_TERMS = {
+  'bananas':          'Banana',
+  'zucchini':         'Courgette',
+  'zucchinis':        'Courgette',
+  'pak choi':         'Bok Choy',
+  'pak choy':         'Bok Choy',
+  'date':             'Medjool Date',
+  'red curry paste':  'Thai Red Curry Paste',
+  'ginger puree':     'Ginger Paste',
+};
+
+// Preferred term for a raw ingredient name, or null if it's already right.
+function canonTerm(rawName) {
+  const pref = CANON_TERMS[canonicalise(_stripPrep(rawName))];
+  if (!pref) return null;
+  return pref.toLowerCase() === String(rawName || '').trim().toLowerCase() ? null : pref;
+}
+
 // g per 1 cup (US, 240 ml) for common dry / sticky ingredients. Keys are
 // canonicalise()'d, so e.g. "rolled oats" → "rolled oat", "mashed banana" →
 // "banana" (because "mashed" is stripped as a prep adj). Anything missing
@@ -5520,8 +5546,17 @@ Rules:
     const cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
     const parsed = JSON.parse(cleaned);
 
+    // Standardise ingredient wording before the form is filled, so it lands as a
+    // visible suggestion she can still edit rather than a silent rewrite on save.
+    const renamed = [];
+    for (const ing of (parsed.ingredients || [])) {
+      const pref = ing && ing.item ? canonTerm(ing.item) : null;
+      if (pref) { renamed.push(`${ing.item} → ${pref}`); ing.item = pref; }
+    }
+
     prefillForm(parsed);
-    statusEl.textContent = '✓ Form pre-filled — review and save!';
+    statusEl.textContent = '✓ Form pre-filled — review and save!'
+      + (renamed.length ? `  Standardised: ${renamed.join(', ')}.` : '');
     statusEl.className = 'ai-parse-status success';
 
     // Scroll down to the form

@@ -159,6 +159,16 @@ sharing the `claudeText()` response-parsing helper:
 | `trkRunQuickAdd` | Tracker | Free-text "what I ate" → structured entries |
 | `trkRunBulkStaples` | Tracker | Bulk staple paste import |
 
+`parseWithAI` runs its parsed ingredient names through **`CANON_TERMS`** (a synonym →
+preferred-term map next to `_STOP_ADJ` in `index.html`) before filling the Add Recipe
+form, so new recipes land on one vocabulary instead of drifting into near-duplicate
+price-book entries (`Zucchini` vs `Courgette` priced twice). Matches are whole-name only
+and the rename is shown in the parse status line — it pre-fills a form Saffron reviews,
+so it's a visible suggestion, not a silent rewrite. The map is **app-only**; unlike
+`canonicalise()` it needs no mirroring into the scripts. Add new pairs there, keyed by
+the `canonicalise()`'d synonym. The manual-typing and CSV-import paths are **not**
+covered.
+
 `fetchMacroEstimate` and `trkRunQuickAdd` inject the user's `staple_products` into the
 prompt so her verified figures win over generic estimates. Pantry item parsing is **not**
 live — it moved to `legacy/pantry.js` in the foundations restructure.
