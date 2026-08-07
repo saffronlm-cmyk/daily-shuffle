@@ -49,8 +49,16 @@ Single user (Saffron), no auth, deployed as static files.
   `pricebook.csv`, `pricebook.variants.csv`, `ingredient-master.csv`,
   `recipe-ingredient-normalisation.csv` / `.final.csv`, `split-plan.csv`,
   `unmatched-ingredients.csv`, `null-lines-reentry.csv` (superseded) /
-  `null-lines-reentry.v2.csv` (current). These encode reviewed human
-  decisions — never regenerate, reorder, or "clean up" one without being asked.
+  `null-lines-reentry.v2.csv` (current), `pricebook-manual-batch.csv`. These encode
+  reviewed human decisions — never regenerate, reorder, or "clean up" one without
+  being asked.
+  - `pricebook-manual-batch.csv` is the hand-pricing worklist (2026-08-06): the 99
+    `pricebook.csv` products that can be priced *without* waiting on the open
+    price-unit decision or the produce-fold conversion factors. Columns are
+    `Product | Pack qty | Measurement convention | Price per item | Price per
+    measurement | Notes`. **`Product` is the verbatim `Ingredient` string and is the
+    join key back into `pricebook.csv`** — corrections belong in `Notes`, never in
+    that column. See `pricebook-audit.md` for the exclusion rules.
 - **Planning / handoff docs** — read before touching the related area:
   - `logs/daily-shuffle_log.md` — rolling session log, newest first. **Read the top entry
     at the start of every session** — it says exactly where things stand.
