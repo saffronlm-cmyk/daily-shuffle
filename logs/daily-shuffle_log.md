@@ -4,6 +4,125 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# Claude chat Project instructions written (PR #67, draft)
+**Date:** 2026-08-07
+**Project:** Daily Shuffle — documentation / tooling context
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete. Draft PR #67 open, awaiting Saffron's merge.
+
+---
+
+## Project Context
+Not a continuation of any workstream — a standalone documentation session. Saffron is
+setting up a **Project in Claude chat** (claude.ai, not Claude Code) to handle Daily
+Shuffle work that isn't code editing, and needed instructions for its Instructions
+field. The nutrition workstream and the hollow-recipe re-entry are untouched by this
+session; see the 2026-08-05 entries for their state.
+
+## Session Goal
+Produce project instructions for the Claude chat Project — derived from `CLAUDE.md` but
+explicitly "won't need to be as in-depth", and scoped to the adjacent (non-code) work.
+
+## State Before This Session
+Branch `claude/daily-shuffle-project-instructions-lpdgyc` cut from `main` at `829db47`
+("Unify cup basis on UK 250ml; lead ingredient lines with weight/volume", PR #66). No
+such document existed in the repo.
+
+## What Was Done
+Read `CLAUDE.md` in full, skimmed `BRAND.md` §1 (palette/token structure),
+`MONETIZATION.md` §0–§2 (operating rules, ground truth, strategy), and the top of this
+log, then wrote `project-instructions.md` at the repo root.
+
+The file wraps the pasteable block in a short preamble stating what it's for and a note
+to keep the file and the pasted text in sync — so the repo copy stays the source of
+truth rather than drifting silently from whatever is live in the chat Project.
+
+Content decisions are listed below. Nothing was attempted and abandoned; no code, data,
+or Supabase table was touched. No `sw.js` cache bump — doc-only change, per CLAUDE.md.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| `project-instructions.md` | Pasteable Instructions block for the Claude chat Project, plus preamble | Created | `/home/user/daily-shuffle/` |
+| `logs/daily-shuffle_log.md` | This entry | Modified | `/home/user/daily-shuffle/logs/` |
+
+## Decisions & Reasoning
+- **Scoped by *audience*, not by depth.** The obvious reading of "less in-depth" is
+  "same content, abridged". Rejected: an abridged CLAUDE.md is just a worse CLAUDE.md,
+  and it would go stale against the real one. Instead the document is scoped to what a
+  session *without the repo* can actually do — planning, copy, content, data review,
+  decisions — and explicitly hands repo edits back to Claude Code. Depth follows from
+  scope: no dev workflow, no `canonicalise()` sync rule, no ship-check, no gitignore
+  list, no per-function AI call-site table.
+- **Framed the architectural constraints as deliberate choices.** A chat session
+  told "single 350 KB HTML file, no build step, no auth" will reflexively propose
+  React/a backend/a login. Added an explicit "treat these as constraints, not problems
+  to solve unprompted" line, because that suggestion loop wastes a whole exchange every
+  time it fires.
+- **Named the docs and told it not to re-derive them.** `MONETIZATION.md` in particular
+  is built to be executed, not re-argued (its own §0 rule 1). Repeating its strategy in
+  the instructions would invite contradiction between two copies; pointing at it does not.
+- **Included an anti-fabrication rule with a stated reason.** "Never invent macros,
+  prices, row counts, or version numbers" lands harder with the *because* attached —
+  invented figures end up in a database of things she eats. Also matches CLAUDE.md's
+  standing "measure, don't trust a number in a doc" instinct.
+- **Included the medical-framing boundary** lifted from `MONETIZATION.md` §1 ("built by
+  a coeliac, for coeliacs" fine; "manages coeliac disease" not) — relevant the moment
+  the chat Project is used for any marketing or listing copy, which is a named use case.
+- **Dated the "current state" section and told it to ask if stale.** A chat Project's
+  instructions don't auto-refresh; an undated status block silently becomes a lie.
+- **Committed to the repo rather than only pasting in chat.** It's project
+  documentation, the session had a designated branch, and a repo copy is what makes the
+  sync note meaningful.
+
+## Current State (end of session)
+`project-instructions.md` committed as `8383d98` and pushed. Draft PR **#67** open
+against `main`. Saffron has not yet pasted the block into the chat Project — that is a
+manual step outside the repo. Confirmed via the GitHub API that PR #67 has **zero check
+runs** (`total_count: 0`), which is expected: the repo has no CI, only the Supabase
+keep-alive workflow.
+
+## Next Steps
+1. Saffron: review PR #67, then copy everything below the "Instructions (copy from
+   here)" heading in `project-instructions.md` into the Claude chat Project's
+   Instructions field.
+2. Merge #67 (draft — mark ready first).
+3. Optional, once the chat Project has been used a few times: fold back whatever the
+   chat sessions kept having to be told, and re-sync the repo copy.
+4. Unrelated and still the real open work — the 52 hollow recipes
+   (`null-lines-reentry.v2.csv`) and nutrition step 2. See the 2026-08-05 entries.
+
+## Open Questions / Blockers
+- The exact use-mix of the chat Project is assumed, not stated. The "what this project
+  is good for" list (recipe content/re-entry, nutrition thinking, price-book questions,
+  marketing copy, brand direction, monetization planning, feature scoping, outreach
+  drafts, data review) is my inference from the repo's active workstreams. If Saffron
+  had a narrower purpose in mind, that section is the one to trim.
+- Unknown whether the chat Project has Supabase MCP access. The instructions assume it
+  does **not**, and route all bulk data work to Claude Code. If it does, the "hand it to
+  Claude Code" boundary needs loosening for read-only queries.
+
+## Environment & Config Notes
+Repo `saffronlm-cmyk/daily-shuffle`, branch
+`claude/daily-shuffle-project-instructions-lpdgyc`, draft PR #67, commit `8383d98`,
+based on `main` at `829db47`. No cache bump (doc-only). No credentials, env vars, or
+Supabase tables involved. Session subscribed to PR #67 activity.
+
+## Notes & Gotchas
+- **Two copies now exist by design** — the repo file and the text pasted into the chat
+  Project. Nothing enforces the sync (`scripts/claude_md_drift.mjs` checks `CLAUDE.md`
+  against the repo, and knows nothing about this file). If a future session edits
+  `project-instructions.md`, tell Saffron to re-paste, or the edit is decorative.
+- **The "current state" block is dated 2026-08-07 for a reason.** It names the 52 hollow
+  recipes and "step 2 not applied". Both of those numbers move. A future session updating
+  this file should re-measure rather than copy the figures forward.
+- The document deliberately does **not** restate brand hex values, the Supabase project
+  ID, or `localStorage` key names. Anything needing that precision needs the repo, which
+  means it isn't a chat-Project task in the first place.
+
+---
+
 # Hollow-recipe fix shipped (PR #63 merged); re-entry handoff prompts written; cup-basis conflict found
 **Date:** 2026-08-05
 **Project:** Daily Shuffle — data integrity follow-through + ingredient display
