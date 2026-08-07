@@ -4,6 +4,181 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# Quantity review landed — her scaling exposed a script defect; step 2 now has a v3 worklist
+**Date:** 2026-08-07
+**Project:** Daily Shuffle — nutrition estimation step 2 (quantity normalisation)
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete (PR #68 open as draft) — step 2 still not applied to the DB, by design
+
+---
+
+## Project Context
+Nutrition workstream step 2. See the 2026-07-01 entry "Quantity Normalisation — §6
+Decisions Signed Off" for the locked ruleset, and 2026-08-05 for the skip guards and the
+hollow-recipe damage. Orthogonal to the price-book stream (2026-08-06 entry) — nothing
+here touches pricing.
+
+## Session Goal
+Saffron uploaded her filled-in review of the step-2 quantity sheet ("qty review DECISIONS
+v2", 80 flagged lines) and noted that she had **scaled the grams by the recipe's
+servings**. The job was to take that in, make it durable and applyable, and work out what
+it means.
+
+## State Before This Session
+`main` at `02eed7b`. Step 2 written but never applied — no `ingredient_grams` column
+exists. Her review existed only as a spreadsheet export on her machine. The repo had no
+record of it and no way to reproduce it.
+
+## What Was Done
+
+### 1. Validated the sheet against live data
+All **80** reviewed lines join 1:1 to live ingredient lines on
+`(recipe_name, section, ingredient_line)`, and every `serves` on the sheet agrees with
+live. No orphans, no ambiguity. One name needed care: **Carrot Cake Baked Oats has three
+rows in `recipes`** (serves 4, 1, 6 — genuinely different recipes, not duplicates); only
+the serves-1 one (`e220f797`) carries a `To Top / Sultanas` line.
+
+### 2. Her scaling is correct — and it exposed a real defect
+The plan defines `grams` as a **whole-recipe** weight (step 3 sums and divides by
+`serves`). So scaling by servings is the convention, not a deviation.
+
+But that means `normalise_quantities.py`'s `BARE_SERVING` table — which returns *one
+person's portion* (rice 180, yoghurt 150) — was feeding a whole-recipe column. Every bare
+staple in a multi-serve recipe came out short by a factor of `serves`. She caught this by
+hand across 80 lines. Measured scope: 241 bare-staple lines with no leading quantity, 172
+of them in `serves > 1` recipes.
+
+### 3. The sheet could not be reproduced from this repo
+The committed script reproduced only **64 of 80** rows. The generator that made the sheet
+knew whole-vegetable weights the script did not (`1 whole butternut squash` → 800 g vs a
+100 g fallback), and emitted `why_flagged`/`how` columns the script doesn't have. So the
+generator is local-only and the sheet was the sole copy of the work — hence committing it.
+
+### 4. Asked the three blocking questions; all three answered
+Recorded in `quantity-review-decisions.md`. She took the recommended option each time.
+
+### 5. Fixed the script and cut the v3 worklist
+Reproduction went from 64/80 to **79/80**. Changes in `scripts/normalise_quantities.py`:
+- `BARE_SERVING` × `serves`. Nothing else scales — a bare count noun ("1 avocado") is
+  already one whole item, and pinch/handful/garnish amounts don't grow with batch size.
+- Whole vegetables added to `COUNT_G`. **Cabbage at 900 g reproduces her 450 / 225 / 315 /
+  157.5 entries exactly** through the existing small/large modifiers — strong evidence
+  that 900 is the number she used.
+- `CONTAINER_G` for punnet / pint / bag — "1 pint cherry tomatoes" was being read as *one
+  cherry tomato*, 17 g.
+- "N serving(s) of X" resolves via `BARE_SERVING`, without also scaling (count is explicit).
+- Size words read only from **before the first comma**: "1 head cauliflower, cut into
+  small florets" was taking a 0.7× "small" off the *prep clause*.
+- Guard so a processed form doesn't match its whole vegetable — "cauliflower rice" is a
+  bulk staple, not a 600 g cauliflower. (This was a regression I introduced with the
+  whole-veg table and caught in testing.)
+- `--decisions=<csv>` and `--review-only`.
+
+### 6. Corrected my own miscount
+The first version of `quantity-review-decisions.md` said ten blanks carry an exclude note.
+Ten blanks carry *a note*; only **six** are exclusions — the other four give quantity
+information. Fixed in the second commit; it changes the classification, so it mattered.
+
+### What was NOT done, deliberately
+**No database writes.** No `ingredient_grams` column, no migration. 18 lines of the v2
+sheet and all 88 of v3 are still undecided, and the recipe edits are unactioned — applying
+now would bake in guesses. The `recipe-db` skill's propose→review→apply→verify discipline
+says review first.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| quantity-review-decisions.v2.raw.csv | Her upload, byte-for-byte | Created | repo root |
+| quantity-review-decisions.v2.csv | Working copy + recipe_id/sec/item + implied_per_serve | Created | repo root |
+| quantity-review-worklist.v3.csv | Next 88 undecided lines / 58 recipes | Created | repo root |
+| quantity-review-decisions.md | Rulings, what's open, remainder sizing | Created | repo root |
+| scripts/normalise_quantities.py | serves scaling, whole-veg, containers, 2 new flags | Modified | scripts/ |
+| scripts/README.md | New flags, the whole-recipe/per-serving warning | Modified | scripts/ |
+| CLAUDE.md | Live counts, new files, step-2 status | Modified | repo root |
+
+## Decisions & Reasoning
+- **Committed the raw upload alongside the working copy.** CLAUDE.md forbids
+  regenerating/cleaning reviewed CSVs. Dropping the spreadsheet's blank filler rows *is*
+  cleanup, so the untouched original is kept next to it. Cheap insurance.
+- **`exclude_from_nutrition` as a per-line flag, not dropped grams.** Options were: flag,
+  count the macros anyway, or write no grams. The flag keeps the rice visible to cost and
+  the grocery list while step 3 skips it. The other two lose information.
+- **Blank + exclude note = exclude; silent blank = to do.** Rejected treating all 24
+  blanks the same — that either invents intent on fourteen rows or discards six real
+  decisions.
+- **Fix the script, then re-review — not auto-apply ×serves.** The ×serves fix is
+  mechanical, but the underlying defaults are still generic guesses; her 80 rows show she
+  overrides them often (rice 125 g/serve, not 180).
+- **Left `1 large head romaine` at 420 g** (script) against the sheet's 300. 300 × 1.4 for
+  "large" is defensible and she left the cell blank, so there is nothing to honour.
+- **Did not "fix" bare plurals in code.** Bare `strawberries` → 12 g (one strawberry)
+  because `COUNT_G` precedes `BARE_SERVING`. The right answer is a guess about intent, so
+  it goes on the v3 sheet flagged instead — 16 rows.
+
+## Current State (end of session)
+Branch `claude/qty-review-csv-scaling-6nhaa4`, two commits (`6c2ba3f`, `42cfbea`), pushed.
+PR **#68** open as draft. Repo has no CI (`total_count: 0`), so nothing to go green.
+Script parses; new paths exercised end-to-end against a synthetic dump. `claude_md_drift`
+clean. Database untouched.
+
+## Next Steps
+1. Saffron fills `corrected_grams` / `exclude_from_nutrition` / `note` in
+   **`quantity-review-worklist.v3.csv`**. Start with the 16 rows flagged "plural name
+   priced as 1 piece" — those are systematic under-counts on toppings.
+2. Finish the **18 undecided rows** in `quantity-review-decisions.v2.csv` (blank
+   `corrected_grams`, no exclude note).
+3. Fill `serves` on the 4 recipes that lack it — `Cat Magic Macro Protein Brownie`,
+   `Grilled Hot Honey Chicken with Fresh Peach Salsa`, `Pumpkin Pecan Pancakes`,
+   `Vegan Blueberry Protein Pancakes with Sticky Toffee Sauce`. Until then the §6 guard
+   skips them and **four already-made decisions are silently discarded**.
+4. Action the 3 recipe edits in §5 of `quantity-review-decisions.md` (sultana removal,
+   `Vanilla` → `vanilla protein powder`, splitting `Soy sauce & fish sauce` into two
+   lines). These write `ingredient_sections`, which is otherwise read-only — go carefully.
+5. Then apply step 2: dump `recipes`, run with `--decisions=` for both sheets, add the
+   `ingredient_grams` jsonb column by migration, review, write, verify counts.
+6. Only then step 3, skipping `exclude_from_nutrition`, `empty_ingredients`, `serves_missing`.
+
+## Open Questions / Blockers
+- ~~Three v2 outliers may or may not be deliberate~~ **Resolved later the same session.**
+  Saffron confirmed all three were wrong: Mediterranean thick yogurt 40 → **160**, Middle
+  Eastern rice 250 → **500**, Firecracker rice 180 → **500**. All now land on her
+  conventions (125 g rice / 40 g yoghurt per serve). Applied to
+  `quantity-review-decisions.v2.csv` only, each row noted `corrected 2026-08-07 (was N)`;
+  `.raw.csv` untouched. The v3 worklist is byte-identical after the change — those rows
+  were already decided, so they were never on it. Note her original "1/3 cup" comment
+  survives on the Firecracker row and now contradicts the corrected value; it is left as
+  written because reviewed notes are not edited, and the dated correction sits beside it.
+- The v2 generator is still not in the repo. It no longer matters much (79/80 reproduce),
+  but the last row's provenance can't be checked.
+
+## Environment & Config Notes
+Repo `saffronlm-cmyk/daily-shuffle`, branch `claude/qty-review-csv-scaling-6nhaa4`, PR #68.
+Supabase project `jsxcctrskkkxgdxfaduo`, table `recipes` — read-only this session, all
+access via Supabase MCP (sandbox egress to `supabase.co` is blocked). No cache bump: no
+`index.html` / `sw.js` change.
+
+## Notes & Gotchas
+- **Live counts have moved and the docs lag.** 343 recipes (docs said 327/332); 4 with
+  null `serves`; **29** fully hollow recipes / **399** null lines, down from the 52 / 681
+  on `null-lines-reentry.v2.csv` — 23 re-entered since. Hollowing is all-or-nothing; no
+  recipe is partially hollow. Measure, don't trust a number in a doc — including these.
+- **`#>> '{}'` renders a jsonb *object* as JSON text.** A count of "stringified JSON"
+  ingredient lines built on that looked like a 90-line data bug; `jsonb_typeof` showed
+  they are 90 legitimately-structured objects across 7 recipes. Check the type before
+  reporting a data-integrity finding built on `#>>`.
+- **Only `BARE_SERVING` scales by `serves`.** If you add a new default, decide which side
+  it is on. Count nouns, `to_taste`, `garnish` and `VAGUE` are all whole-recipe already;
+  multiplying them would double-count.
+- **Adding a whole-vegetable to `COUNT_G` risks catching its processed forms.**
+  "cauliflower rice", "butternut squash soup". `_NOT_WHOLE` guards this — extend it when
+  you extend `WHOLE_VEG`.
+- Large MCP query results get spilled to a file under `tool-results/` instead of the
+  transcript. That is a *feature* for bulk dumps: parse the file with Python
+  (`json.load` the outer envelope, then regex the inner array) and it never costs context.
+
+---
+
 # Price-book merge + audit — the pipeline shares one price across a whole Product family
 **Date:** 2026-08-06
 **Project:** Daily Shuffle — product/recipe pricing (Apify price-book stream)
