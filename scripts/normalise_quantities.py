@@ -194,10 +194,57 @@ COUNT_G = [
     ('slice of bread',40),('bread',40),('bay leaf',0.2),('stock cube',10),
     ('mushroom',20),('gherkin',15),('egg white',33),('egg',50),
     ('baby gem',90),('gem lettuce',90),
+    # Whole vegetables sold as one item. Without these a line like "1 whole
+    # butternut squash" fell through to the 100 g/piece fallback (§5) and came
+    # out ~8x light. Values reconciled against Saffron's 2026-08-07 review
+    # (quantity-review-decisions.v2.csv) — cabbage at 900 reproduces her 450 /
+    # 225 / 315 / 157.5 entries exactly via the existing small/large modifiers.
+    ('butternut squash',800),('butternut',800),('pumpkin',900),('squash',800),
+    ('cauliflower',600),('cabbage',900),('broccoli',350),('celeriac',800),
+    ('swede',700),('aubergine',250),('eggplant',250),
 ]
+
+# Container / portion words that carry an implied weight. Same failure mode as
+# the whole vegetables above: "1 pint cherry tomatoes" was read as one cherry
+# tomato (17 g). Keyed on the container, then the contents where it matters.
+CONTAINER_G = [
+    ('punnet',  [('tomato',250),('mushroom',200),('berr',150)],            200),
+    ('pint',    [('tomato',300),('berr',300)],                             300),
+    ('bag',     [('coleslaw',300),('slaw',300),('salad',100),('spinach',200)], 300),
+    ('head',    [],                                                        None),
+]
+def container_grams(name, lower):
+    """(keyword, grams) for a container word, or (None, None).
+
+    Returns None grams for 'head' so it falls through to COUNT_G — a head of
+    cauliflower/broccoli/romaine is already a whole-vegetable entry there.
+    """
+    for kw, contents, default in CONTAINER_G:
+        if not _kwhit(kw, lower):
+            continue
+        if default is None:
+            return None, None
+        for ckw, g in contents:
+            if _kwhit(ckw, name.lower()):
+                return f"{kw} of {ckw}", g
+        return kw, default
+    return None, None
+# A whole-vegetable keyword must not fire when the line names a *processed form*
+# of it: "cauliflower rice" is a bulk staple, not a 600 g cauliflower, and
+# "butternut squash soup" is not a whole squash. Checked before COUNT_G.
+WHOLE_VEG = {'butternut squash','butternut','pumpkin','squash','cauliflower',
+             'cabbage','broccoli','celeriac','swede','aubergine','eggplant'}
+_NOT_WHOLE = re.compile(
+    r'\b(?:cauli(?:flower)?|butternut|squash|pumpkin|cabbage|broccoli)\s+'
+    r'(?:rice|soup|puree|purée|powder|mash|steaks?|slaw|noodles?)\b'
+    r'|\briced\s|\b(?:soup|puree|purée|powder)\b', re.I)
+
 def count_grams(name):
     n = name.lower()
+    skip_whole = bool(_NOT_WHOLE.search(n))
     for kw, g in COUNT_G:
+        if skip_whole and kw in WHOLE_VEG:
+            continue
         if _kwhit(kw, n):
             return kw, g
     return None, None
@@ -239,9 +286,12 @@ VAGUE = {
 SEASONING_TO_TASTE = [('salt',1),('pepper',0.5)]  # bare/"to taste" nominal grams
 
 # ---------------------------------------------------------------- main rule
-def normalise(raw):
+def normalise(raw, serves=1):
     """
     raw: a single ingredient line already flattened to a string.
+    serves: the recipe's `serves`, used ONLY to scale the bare-bulk-staple
+        default in §6 — see the note there. Everything else on this path is
+        already a whole-recipe quantity.
     returns dict(grams, qty_source, detail, name)
     grams None => unresolved.
     """
@@ -362,11 +412,27 @@ def normalise(raw):
 
     # ---- 5. clove / explicit count noun with amount
     if amount is not None:
+        # "1 serving microwave sticky rice" — the count is explicit, so this is
+        # N × one person's portion and does NOT scale by `serves`.
+        if re.search(r'\bservings?\b', lower):
+            skw, sg = bare_serving(name)
+            if sg is not None:
+                return dict(grams=round(amount*sg,1), qty_source='estimated',
+                            detail=f"{amount} × {sg} g serving ({skw})", name=name)
+        ckw, cg = container_grams(name, lower)
+        if cg is not None:
+            return dict(grams=round(amount*cg*mult,1), qty_source='converted',
+                        detail=f"{amount} × {cg} g ({ckw})", name=name)
         kw, g = count_grams(name)
         if g is not None:
+            # Size words only count when they qualify the ingredient, i.e. before
+            # the first comma. "1 head cauliflower, cut into small florets" is a
+            # whole cauliflower cut small, not a small cauliflower — reading the
+            # prep clause knocked 30% off it.
+            head = lower.split(',', 1)[0]
             adj = 1.0
-            if re.search(r'\bsmall\b', lower): adj = 0.7
-            elif re.search(r'\blarge\b', lower): adj = 1.4
+            if re.search(r'\bsmall\b', head): adj = 0.7
+            elif re.search(r'\blarge\b', head): adj = 1.4
             return dict(grams=round(amount*g*adj,1), qty_source='converted',
                         detail=f"{amount} × {g} g ({kw})", name=name)
         # amount but unknown count item -> estimated fallback 100 g/piece
@@ -385,10 +451,25 @@ def normalise(raw):
     kw, g = count_grams(name)
     if g is not None:
         return dict(grams=round(g,1), qty_source='estimated', detail=f"bare → 1 × {g} g ({kw})", name=name)
-    # bare bulk staple -> typical serving, estimated
+    # bare bulk staple -> typical serving × serves, estimated
+    #
+    # BARE_SERVING holds ONE PERSON'S portion, but `grams` on this path is a
+    # whole-recipe weight (plan §2; step 3 sums and divides by `serves`). Before
+    # 2026-08-07 the per-serving figure was written straight through, so every
+    # bare staple in a multi-serve recipe came out short by a factor of `serves`
+    # — "rice" in a serves-4 recipe scored 180 g rather than 720 g. Saffron's
+    # review caught this by hand; see quantity-review-decisions.md.
+    #
+    # Only this branch scales. A bare count noun (§6 above) is already one whole
+    # item in the recipe, and to_taste/garnish/VAGUE amounts don't grow with
+    # batch size, so none of those are multiplied.
     kw, g = bare_serving(name)
     if g is not None:
-        return dict(grams=round(g,1), qty_source='estimated', detail=f"bare → {g} g typical ({kw})", name=name)
+        n = max(1, int(serves or 1))
+        total = g * n
+        detail = (f"bare → {g} g typical ({kw}) × {n} serves" if n > 1
+                  else f"bare → {g} g typical ({kw})")
+        return dict(grams=round(total,1), qty_source='estimated', detail=detail, name=name)
     # unresolved
     return dict(grams=None, qty_source='unresolved', detail="no amount, generic item", name=name)
 
@@ -418,7 +499,52 @@ def flatten_item(item):
         return ' '.join(parts).strip(), grp
     return None, None
 
-def process(recipes):
+def load_decisions(path):
+    """Read a reviewed decisions CSV into {(recipe_id, sec, item): {...}}.
+
+    Expects the columns of `quantity-review-decisions.v2.csv`: recipe_id, sec,
+    item, corrected_grams, note. Three shapes of `corrected_grams`:
+      a number   -> that whole-recipe gram weight, qty_source becomes 'reviewed'
+      'N/A' / 0  -> exclude the line from nutrition, keep the computed grams
+      empty      -> undecided; the row is ignored and the computed value stands
+    A note containing 'exclude from nutritional' also sets the exclude flag,
+    which is how the three cooked-rice lines are handled (grams kept for cost
+    and the grocery list, macros skipped).
+    """
+    decisions = {}
+    with open(path, newline='') as f:
+        for r in csv.DictReader(f):
+            rid = (r.get('recipe_id') or '').strip()
+            if not rid:
+                continue
+            key = (rid, int(r['sec']), int(r['item']))
+            raw = (r.get('corrected_grams') or '').strip()
+            note = (r.get('note') or '').strip()
+            d = {'grams': None, 'exclude_from_nutrition': False, 'note': note}
+            if 'exclude from nutritional' in note.lower():
+                d['exclude_from_nutrition'] = True
+            if raw.upper() == 'N/A':
+                d['exclude_from_nutrition'] = True
+            else:
+                try:
+                    val = float(raw)
+                except ValueError:
+                    if not raw:
+                        # undecided — but an exclude note still counts
+                        if d['exclude_from_nutrition']:
+                            decisions[key] = d
+                        continue
+                    raise SystemExit(f"unparseable corrected_grams {raw!r} for {key}")
+                d['grams'] = val
+                if val == 0:
+                    d['exclude_from_nutrition'] = True
+            decisions[key] = d
+    return decisions
+
+def process(recipes, decisions=None):
+    """decisions: optional {(recipe_id, sec, item): {grams, exclude_from_nutrition, note}}
+    from a reviewed reviewCSV — see load_decisions(). Reviewed values override the
+    computed ones and are marked qty_source='reviewed'."""
     rows = []
     updates = []
     for r in recipes:
@@ -434,18 +560,31 @@ def process(recipes):
                 raw, grp = flatten_item(item)
                 if raw is None or not raw.strip():
                     continue
-                res = normalise(raw)
+                res = normalise(raw, serves)
                 if res is None:
                     continue
                 entry = dict(sec=si, item=ii, name=res['name'], grams=res['grams'],
                              qty_source=res['qty_source'], detail=res['detail'])
                 if grp: entry['group'] = grp
+                # Reviewed lines may carry exclude_from_nutrition (see
+                # apply_review_decisions); the script never sets it itself.
+                dec = decisions.get((rid, si, ii)) if decisions else None
+                if dec:
+                    if dec.get('grams') is not None:
+                        entry['grams'] = dec['grams']
+                        entry['qty_source'] = 'reviewed'
+                        entry['detail'] = dec.get('note') or 'reviewed by hand'
+                    if dec.get('exclude_from_nutrition'):
+                        entry['exclude_from_nutrition'] = True
                 ig.append(entry)
-                if res['qty_source'] in ('estimated','unresolved'):
+                if entry['qty_source'] in ('estimated','unresolved'):
                     flags.add('quantities_estimated')
                 my_rows.append(dict(recipe_id=rid, section=title, sec=si, item=ii,
-                                    original=raw, name=res['name'], grams=res['grams'],
-                                    qty_source=res['qty_source'], detail=res['detail']))
+                                    original=raw, name=entry['name'], grams=entry['grams'],
+                                    qty_source=entry['qty_source'], detail=entry['detail'],
+                                    serves=serves,
+                                    exclude_from_nutrition=int(bool(entry.get('exclude_from_nutrition'))),
+                                    reviewed=int(bool(dec))))
 
         # --- skip guards -------------------------------------------------
         # A recipe that yields no usable lines must NOT be written as an empty
@@ -473,13 +612,29 @@ def process(recipes):
     return rows, updates
 
 def main():
-    inp, out_csv, out_json = sys.argv[1], sys.argv[2], sys.argv[3]
+    args = [a for a in sys.argv[1:] if not a.startswith('--')]
+    dec_path = next((a.split('=',1)[1] for a in sys.argv[1:]
+                     if a.startswith('--decisions=')), None)
+    inp, out_csv, out_json = args[0], args[1], args[2]
     with open(inp) as f:
         recipes = json.load(f)
-    rows, updates = process(recipes)
+    decisions = load_decisions(dec_path) if dec_path else None
+    if decisions:
+        print(f"loaded {len(decisions)} reviewed decisions from {dec_path}")
+    rows, updates = process(recipes, decisions)
+    if '--review-only' in sys.argv:
+        # The worklist: lines the script had to guess at that a human has not yet
+        # ruled on. Same shape as quantity-review-decisions.v2.csv so a filled-in
+        # sheet feeds straight back through --decisions.
+        rows = [r for r in rows
+                if r['qty_source'] in ('estimated', 'unresolved')
+                and not r['reviewed'] and not r['skip_reason']]
+        print(f"--review-only: {len(rows)} undecided lines "
+              f"across {len({r['recipe_id'] for r in rows})} recipes")
     with open(out_csv, 'w', newline='') as f:
         w = csv.DictWriter(f, fieldnames=['recipe_id','section','sec','item','original',
-                                          'name','grams','qty_source','detail','skip_reason'])
+                                          'name','grams','qty_source','detail','serves',
+                                          'exclude_from_nutrition','reviewed','skip_reason'])
         w.writeheader()
         for row in rows: w.writerow(row)
     with open(out_json, 'w') as f:

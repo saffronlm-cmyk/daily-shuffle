@@ -10,6 +10,7 @@ Companion to `quantity-review-decisions.v2.csv`. Nutrition workstream **step 2**
 |---|---|
 | `quantity-review-decisions.v2.raw.csv` | Saffron's upload, byte-for-byte. Do not edit. |
 | `quantity-review-decisions.v2.csv` | Working copy: same values, joined to live recipe IDs. |
+| `quantity-review-worklist.v3.csv` | The next 88 lines to rule on. Empty `corrected_grams` — this one is for filling in. |
 
 The working copy differs from the raw upload in three mechanical ways and **no
 value was changed**:
@@ -48,9 +49,9 @@ factor of `serves`. See "The unreviewed remainder" below for how far that reache
 Scaling is consistent across the sheet: rice/noodles/quinoa mostly land on
 **125 g per serve**, yoghurt on 20–60 g, avocado on 45 g (¼ each).
 
-## Open decisions (these block the apply)
+## Decisions taken (2026-08-07)
 
-### 1. "Exclude from nutritional calculations" has nowhere to go
+### 1. "Exclude from nutritional calculations" → a per-line flag
 
 Three rows carry that note *and* a gram value:
 
@@ -60,27 +61,49 @@ Three rows carry that note *and* a gram value:
 | Creamy Thai Coconut Chicken Meatballs | rice | 400 |
 | Double Roast Chicken with Chicken Fat Rice | Toasted rice, ground | 800 |
 
-`ingredient_grams` as specced has no per-line exclude flag, so as things stand the
-grams would be written and step 3 would count them. Needs a decision: add an
-`exclude_from_nutrition` flag per line, or drop the grams, or accept the macros.
+**Resolved:** each line in `ingredient_grams` may carry
+`exclude_from_nutrition: true`. The grams are still written, so cost and the
+grocery list see the rice; step 3 must skip those lines when summing macros.
+`load_decisions()` sets the flag from the note text, from a literal `N/A`, or
+from a `corrected_grams` of 0.
 
-### 2. 24 of 80 rows have no `corrected_grams`
+### 2. Blank `corrected_grams` — 24 of 80 rows
 
-Blank is ambiguous — "computed default is fine" and "not done yet" look identical.
-Ten of the blanks carry a note that reads as *exclude the line* ("irrelevant",
-"N/A", "not enough to actually count", "optional, not included in nutritional
-estimations or grocery list"); the other fourteen are silent. Also
-`Copycat Nando's / lettuce of choice` has the literal string `N/A` in the grams
-column rather than a number.
+**Resolved:** a blank with an exclude note means *leave the line out*; a silent
+blank is still to do.
 
-### 3. Two of the recipes have no `serves`
+Correcting a miscount in the first version of this doc: ten blanks carry *a note*,
+but only **six** of those notes actually say to leave the line out — Fluffy Vegan
+Protein Pancakes (filling of choice), Cat Magic Macro Protein Brownie (×2,
+sweetener drops), Firecracker Beef Bowls (diced cucumber), Miso Peanut Ramen Bowl
+(sliced cucumber) and Turkey Taco Scramble (pickled onions). The other four notes
+give quantity information instead of an exclusion — BBQ Chicken Stuffed Sweet
+Potatoes ("1 avocado split between the 4 serves"), Chili Honey Chicken Bowl, Creamy
+Mango and Coconut Cod Curry, and Double Roast Chicken ("1/2 cup?") — so those stay
+on the to-do pile with the fourteen silent ones.
+
+That makes it **6 excluded, 18 still to decide**, plus `Copycat Nando's / lettuce
+of choice`, which has the literal string `N/A` in the grams column and is read as
+an exclusion.
+
+### 3. The unreviewed remainder → a v3 worklist
+
+**Resolved:** fix the script, then re-review. Both halves are done —
+`BARE_SERVING` now scales by `serves`, the missing whole-vegetable weights are in,
+and `quantity-review-worklist.v3.csv` holds the **88 undecided lines across 58
+recipes** in the same shape as the v2 sheet. Fill in `corrected_grams` /
+`exclude_from_nutrition` / `note` and it feeds back through `--decisions`.
+
+## Still open
+
+### 4. Two of the recipes have no `serves`
 
 `Cat Magic Macro Protein Brownie` (2 rows) and `Grilled Hot Honey Chicken with
 Fresh Peach Salsa` (2 rows) are on the 4-recipe `serves_missing` list. The script's
 plan-§6 guard skips those recipes entirely and leaves `ingredient_grams` **null**,
 so these four decisions will be silently discarded unless `serves` is filled first.
 
-### 4. Three rows are recipe edits, not gram values
+### 5. Three rows are recipe edits, not gram values
 
 These need a write to `ingredient_sections`, which is otherwise read-only:
 
@@ -108,24 +131,40 @@ Four rows are given in **millilitres** (`Oat milk` 45, `Milk to thin` 15,
 `Extra milk` 60, `Avocado oil for coating` 15). Milk and water are ~1:1 so those
 are fine as grams; the avocado oil is 15 ml ≈ 13.8 g.
 
-## The sheet cannot be regenerated from this repo
+## Closing the gap with the script (done)
 
-The committed `scripts/normalise_quantities.py` reproduces **64 of 80** rows
-exactly. The other 16 differ because the generator that made this sheet knows
-whole-vegetable weights that the committed script does not:
+The committed script originally reproduced only **64 of 80** rows; it now
+reproduces **79 of 80**. What changed in `scripts/normalise_quantities.py`:
 
-| Line | Sheet | Committed script |
-|---|---|---|
-| `1 whole butternut squash` | 800 | 100 (`unknown unit, fallback`) |
-| `1 head cauliflower, cut into small florets` | 600 | 100 |
-| `½ cabbage, thinly sliced` | 450 | 50 |
-| `¼ red cabbage` | 225 | 25 |
-| `1 head of broccoli, cut into florets` | 350 | 100 |
+- **Whole vegetables added to `COUNT_G`** — butternut squash 800 g, cauliflower
+  600, cabbage 900, broccoli 350, pumpkin 900 and friends. Previously these fell
+  through to the 100 g/piece fallback and came out ~8× light. Cabbage at 900 g
+  reproduces Saffron's 450 / 225 / 315 / 157.5 entries exactly through the existing
+  small/large modifiers, which is a good sign the number is the one she used.
+- **A `CONTAINER_G` table** for punnet / pint / bag — `1 pint cherry tomatoes` was
+  being read as *one cherry tomato* (17 g) rather than 300 g.
+- **`N serving(s) of X`** now resolves through `BARE_SERVING` instead of the 100 g
+  fallback. The count is explicit, so it does not also scale by `serves`.
+- **Size words are read from before the first comma only.** `1 head cauliflower,
+  cut into small florets` was taking a 0.7× "small" modifier off the prep clause —
+  a whole cauliflower cut small, not a small cauliflower.
+- **`BARE_SERVING` scales by `serves`** — the defect described above.
 
-The sheet's `why_flagged` and `how` columns are likewise not emitted by the
-committed script. So whatever produced this v2 sheet is local-only. Either fold
-those whole-vegetable weights into `normalise_quantities.py`, or treat this CSV as
-the source of truth for these 80 lines and let the script handle only the rest.
+The one row that still differs is `1 large head romaine`: the script says 420 g
+(300 × 1.4 for "large"), the sheet said 300. The script's answer looks more
+correct and Saffron left the cell blank, so it is left alone.
+
+Two flags were added to the script:
+
+```bash
+# merge reviewed decisions back in; reviewed lines get qty_source='reviewed'
+python3 scripts/normalise_quantities.py recipes_dump.json review.csv updates.json \
+    --decisions=quantity-review-decisions.v2.csv
+
+# emit only the lines still needing a human ruling (this is how the v3 sheet is cut)
+python3 scripts/normalise_quantities.py recipes_dump.json worklist.csv updates.json \
+    --decisions=quantity-review-decisions.v2.csv --review-only
+```
 
 ## The unreviewed remainder
 
@@ -136,9 +175,26 @@ Measured against live data on 2026-08-07 (343 recipes, 4,355 ingredient lines):
   take `to_taste`/`garnish`/`VAGUE` defaults, which are per-recipe already and are
   not affected by the scaling problem.
 - **241** are bare bulk staples (the class this sheet is drawn from). **172** of
-  those sit in recipes with `serves > 1`, across **80** recipes — so roughly **90
-  more lines** carry the same per-serving defect and have never been surfaced for
-  review. They need the same treatment as the 80 here.
+  those sit in recipes with `serves > 1`.
+
+Running the fixed script over those and subtracting the 80 already decided leaves
+**88 lines across 58 recipes** — `quantity-review-worklist.v3.csv`. Its
+`why_flagged` column sorts the work:
+
+| Count | Flag |
+|---|---|
+| 37 | estimated default |
+| 16 | plural name priced as 1 piece — likely a portion |
+| 15 | medium (100–299 g) |
+| 12 | large (≥300 g) main/base |
+| 7 | very small (≤15 g) — check it is not a portion |
+| 1 | unresolved (no value) |
+
+The 16 "plural name priced as 1 piece" rows are worth doing first: bare
+`strawberries` resolves to 12 g (one strawberry) because `COUNT_G` is consulted
+before `BARE_SERVING`. Left alone that is a real under-count on toppings. It was
+not changed in code because the fix is a guess about intent, which is what the
+review sheet exists to settle.
 
 Two live counts that have moved since the docs were written:
 

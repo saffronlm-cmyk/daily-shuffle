@@ -201,20 +201,41 @@ in the Claude Code sandbox on a JSON dump of the `recipes` table pulled via the
 Supabase MCP channel (not sandbox-blocked). Stdlib only.
 
 ```
-# 1. dump id/serves/ingredient_sections for the 317 non-deleted recipes with
-#    serves (via Supabase MCP execute_sql -> a JSON file; the 8 no-serves
-#    recipes are skipped per the §6 sign-off and flagged serves_missing)
+# 1. dump id/serves/ingredient_sections for every recipe (via Supabase MCP
+#    execute_sql -> a JSON file; recipes with no serves are skipped per the §6
+#    sign-off and flagged serves_missing). Measure the counts, don't trust a doc.
 # 2. run:
 python3 scripts/normalise_quantities.py recipes_dump.json quantity_review.csv ingredient_grams_updates.json
+
+# merge Saffron's reviewed rulings back in (see quantity-review-decisions.md):
+#   reviewed lines take her grams and get qty_source='reviewed'
+python3 scripts/normalise_quantities.py recipes_dump.json quantity_review.csv ingredient_grams_updates.json \
+    --decisions=quantity-review-decisions.v2.csv
+
+# cut the next review worklist — only the lines still needing a human ruling
+python3 scripts/normalise_quantities.py recipes_dump.json worklist.csv updates.json \
+    --decisions=quantity-review-decisions.v2.csv --review-only
 ```
+
+`--decisions` reads `recipe_id, sec, item, corrected_grams, note`. A numeric
+`corrected_grams` overrides the computed value; `N/A`, a `0`, or a note containing
+"exclude from nutritional" sets `exclude_from_nutrition: true` on that line, which
+keeps the grams (cost, grocery list) but tells step 3 not to count the macros.
+
+**`BARE_SERVING` holds one person's portion and is multiplied by `serves`**, because
+`grams` on this path is a whole-recipe weight. Nothing else scales — a bare count
+noun is already one whole item, and pinches/handfuls/garnishes don't grow with batch
+size. Getting this wrong is what made every bare staple in a multi-serve recipe come
+out short before 2026-08-07.
 
 Outputs (git-ignored):
 - `quantity_review.csv` — one row per ingredient line (`recipe_id, section, sec,
-  item, original, name, grams, qty_source, detail`) for human spot-check
-  **before** the live write.
+  item, original, name, grams, qty_source, detail, serves, exclude_from_nutrition,
+  reviewed, skip_reason`) for human spot-check **before** the live write.
 - `ingredient_grams_updates.json` — one object per recipe
-  (`{id, ingredient_grams:[{sec,item,name,grams,qty_source,detail,group?}], add_flags}`),
-  written into a new `recipes.ingredient_grams` jsonb column after review.
+  (`{id, ingredient_grams:[{sec,item,name,grams,qty_source,detail,group?,
+  exclude_from_nutrition?}], add_flags}`), written into a new
+  `recipes.ingredient_grams` jsonb column after review.
 
 `qty_source` vocabulary (high→low confidence): `stated` · `converted` ·
 `defaulted` · `to_taste` · `garnish` · `estimated` · `unresolved`. Any recipe
