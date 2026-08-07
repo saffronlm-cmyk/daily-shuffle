@@ -166,8 +166,14 @@ price-book entries (`Zucchini` vs `Courgette` priced twice). Matches are whole-n
 and the rename is shown in the parse status line — it pre-fills a form Saffron reviews,
 so it's a visible suggestion, not a silent rewrite. The map is **app-only**; unlike
 `canonicalise()` it needs no mirroring into the scripts. Add new pairs there, keyed by
-the `canonicalise()`'d synonym. The manual-typing and CSV-import paths are **not**
-covered.
+the `canonicalise()`'d synonym.
+
+The two paths with **no review step — manual entry (`addRecipe`) and
+`importRecipeIngredientsCsv`** — use `flagCanonTerms()` instead: they **report**
+non-standard wording (in the save toast, and in the import's confirm dialog) and
+**never rewrite** it. Keep that split. Rewriting is only safe where the result lands
+in something she reads before it is committed; the CSV import in particular replaces
+live ingredient lists and patches the cloud library.
 
 `fetchMacroEstimate` and `trkRunQuickAdd` inject the user's `staple_products` into the
 prompt so her verified figures win over generic estimates. Pantry item parsing is **not**

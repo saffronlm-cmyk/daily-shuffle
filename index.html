@@ -3041,9 +3041,14 @@ async function importRecipeIngredientsCsv(evt) {
   const known = allIds.filter(id => recipes.some(r => r.id === id));
   const unknown = allIds.length - known.length;
   if (!known.length) { alert('No recipes in this file match your library (check the row_key column).'); return; }
+  // Flag non-standard wording before the write, so it can be fixed in the CSV and
+  // re-imported. Deliberately does not rewrite — this path replaces live ingredient
+  // lists and patches the cloud library, so it must not alter what was uploaded.
+  const termFlags = flagCanonTerms(known.flatMap(id => byRecipe[id].map(it => it.name)));
   if (!confirm(
     `Apply normalised ingredients to ${known.length} recipe(s)?` +
     (unknown ? `\n${unknown} unrecognised recipe id(s) will be skipped.` : '') +
+    (termFlags.length ? `\n\nNon-standard wording found (not changed):\n  ${termFlags.join('\n  ')}` : '') +
     `\n\nThis replaces those recipes' ingredient lists locally and patches your cloud library.`
   )) return;
 
@@ -3175,6 +3180,19 @@ function canonTerm(rawName) {
   const pref = CANON_TERMS[canonicalise(_stripPrep(rawName))];
   if (!pref) return null;
   return pref.toLowerCase() === String(rawName || '').trim().toLowerCase() ? null : pref;
+}
+
+// Deduped "X → Y" suggestions for a list of raw ingredient names. Used by the
+// paths that have no review step (manual entry, CSV import) to FLAG rather than
+// rewrite — silently changing text she typed or uploaded is the thing to avoid.
+function flagCanonTerms(rawNames, cap = 4) {
+  const seen = new Map();
+  for (const n of (rawNames || [])) {
+    const pref = n ? canonTerm(n) : null;
+    if (pref && !seen.has(pref)) seen.set(pref, `${_stripPrep(n)} → ${pref}`);
+  }
+  const list = [...seen.values()];
+  return list.length <= cap ? list : list.slice(0, cap).concat(`+${list.length - cap} more`);
 }
 
 // g per 1 cup (US, 240 ml) for common dry / sticky ingredients. Keys are
@@ -4786,8 +4804,13 @@ async function addRecipe() {
   const fi = document.getElementById('aiImageInput'); if(fi) fi.value='';
   const ti = document.getElementById('aiTextInput'); if(ti) ti.value='';
   document.getElementById('aiParseStatus').textContent = '';
+  // Flag non-standard ingredient wording rather than rewriting it — this path has
+  // no review step, unlike the AI parse which pre-fills an editable form.
+  const termFlags = flagCanonTerms(manualIngredients.map(i => i.name));
   if (cloudError) {
     showToast(`⚠ "${name}" saved to this device only — cloud sync failed (${cloudError})`);
+  } else if (termFlags.length) {
+    showToast(`"${name}" added! Non-standard wording: ${termFlags.join(', ')}`);
   } else {
     showToast(`"${name}" added to your library!`);
   }
