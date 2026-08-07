@@ -64,7 +64,12 @@ Single user (Saffron), no auth, deployed as static files.
     at the start of every session** — it says exactly where things stand.
   - `quantity-normalisation-plan.md` — approved ruleset for ingredient-quantity
     normalisation (nutrition step 2). Decisions are locked (UK 250 ml cup, skip the 8
-    no-`serves` recipes, etc.) — apply it, don't re-litigate it.
+    no-`serves` recipes, etc.) — apply it, don't re-litigate it. The app's own
+    `_DENSITY_G_PER_CUP` / `_toBase()` in `index.html` were unified onto the same
+    **250 ml** basis on 2026-08-05 (they previously used a US 240 ml cup, so displayed
+    weights disagreed with the macro figures). These are still two separate tables at
+    different granularity — the app keys on specific ingredient names, the script on
+    ~20 broad classes — so change one and check the other.
   - `MONETIZATION.md` — monetization + rollout roadmap (strategy, phases, tasks with
     acceptance criteria, decision gates, status tracker). Built to be executed one task
     at a time by any session — read its §0 operating rules before doing any
@@ -78,6 +83,11 @@ Single user (Saffron), no auth, deployed as static files.
     uppercase `HANDOFF.md` was removed — it collided with this file on case-insensitive
     macOS. Its ingredient-normalisation Phase-1 work is done; the cost-feature roadmap
     lives here now.)
+  - `project-instructions.md` — the pasteable Instructions block for the **Claude chat**
+    Project (claude.ai, not Claude Code), scoped to the non-code work around the app.
+    Deliberately shallower than this file. Two copies exist by design — the repo file and
+    the text pasted into the chat Project — and nothing enforces the sync, so if you edit
+    it, tell Saffron to re-paste or the edit is decorative.
   - `pricebook-audit.md` — audit of `pricebook.csv` (2026-08-06). **Read before running
     the Apify scrape.** Records that both pricing scripts key on Product family, so one
     price is shared across every variant in it (62% of ingredient usage affected) —

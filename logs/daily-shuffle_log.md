@@ -238,6 +238,279 @@ Repo `saffronlm-cmyk/daily-shuffle`, branch `claude/product-recipe-pricing-lw72m
 
 ---
 
+# Claude chat Project instructions written (PR #67, draft)
+**Date:** 2026-08-07
+**Project:** Daily Shuffle — documentation / tooling context
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete. Draft PR #67 open, awaiting Saffron's merge.
+
+---
+
+## Project Context
+Not a continuation of any workstream — a standalone documentation session. Saffron is
+setting up a **Project in Claude chat** (claude.ai, not Claude Code) to handle Daily
+Shuffle work that isn't code editing, and needed instructions for its Instructions
+field. The nutrition workstream and the hollow-recipe re-entry are untouched by this
+session; see the 2026-08-05 entries for their state.
+
+## Session Goal
+Produce project instructions for the Claude chat Project — derived from `CLAUDE.md` but
+explicitly "won't need to be as in-depth", and scoped to the adjacent (non-code) work.
+
+## State Before This Session
+Branch `claude/daily-shuffle-project-instructions-lpdgyc` cut from `main` at `829db47`
+("Unify cup basis on UK 250ml; lead ingredient lines with weight/volume", PR #66). No
+such document existed in the repo.
+
+## What Was Done
+Read `CLAUDE.md` in full, skimmed `BRAND.md` §1 (palette/token structure),
+`MONETIZATION.md` §0–§2 (operating rules, ground truth, strategy), and the top of this
+log, then wrote `project-instructions.md` at the repo root.
+
+The file wraps the pasteable block in a short preamble stating what it's for and a note
+to keep the file and the pasted text in sync — so the repo copy stays the source of
+truth rather than drifting silently from whatever is live in the chat Project.
+
+Content decisions are listed below. Nothing was attempted and abandoned; no code, data,
+or Supabase table was touched. No `sw.js` cache bump — doc-only change, per CLAUDE.md.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| `project-instructions.md` | Pasteable Instructions block for the Claude chat Project, plus preamble | Created | `/home/user/daily-shuffle/` |
+| `logs/daily-shuffle_log.md` | This entry | Modified | `/home/user/daily-shuffle/logs/` |
+
+## Decisions & Reasoning
+- **Scoped by *audience*, not by depth.** The obvious reading of "less in-depth" is
+  "same content, abridged". Rejected: an abridged CLAUDE.md is just a worse CLAUDE.md,
+  and it would go stale against the real one. Instead the document is scoped to what a
+  session *without the repo* can actually do — planning, copy, content, data review,
+  decisions — and explicitly hands repo edits back to Claude Code. Depth follows from
+  scope: no dev workflow, no `canonicalise()` sync rule, no ship-check, no gitignore
+  list, no per-function AI call-site table.
+- **Framed the architectural constraints as deliberate choices.** A chat session
+  told "single 350 KB HTML file, no build step, no auth" will reflexively propose
+  React/a backend/a login. Added an explicit "treat these as constraints, not problems
+  to solve unprompted" line, because that suggestion loop wastes a whole exchange every
+  time it fires.
+- **Named the docs and told it not to re-derive them.** `MONETIZATION.md` in particular
+  is built to be executed, not re-argued (its own §0 rule 1). Repeating its strategy in
+  the instructions would invite contradiction between two copies; pointing at it does not.
+- **Included an anti-fabrication rule with a stated reason.** "Never invent macros,
+  prices, row counts, or version numbers" lands harder with the *because* attached —
+  invented figures end up in a database of things she eats. Also matches CLAUDE.md's
+  standing "measure, don't trust a number in a doc" instinct.
+- **Included the medical-framing boundary** lifted from `MONETIZATION.md` §1 ("built by
+  a coeliac, for coeliacs" fine; "manages coeliac disease" not) — relevant the moment
+  the chat Project is used for any marketing or listing copy, which is a named use case.
+- **Dated the "current state" section and told it to ask if stale.** A chat Project's
+  instructions don't auto-refresh; an undated status block silently becomes a lie.
+- **Committed to the repo rather than only pasting in chat.** It's project
+  documentation, the session had a designated branch, and a repo copy is what makes the
+  sync note meaningful.
+
+## Current State (end of session)
+`project-instructions.md` committed as `8383d98` and pushed. Draft PR **#67** open
+against `main`. Saffron has not yet pasted the block into the chat Project — that is a
+manual step outside the repo. Confirmed via the GitHub API that PR #67 has **zero check
+runs** (`total_count: 0`), which is expected: the repo has no CI, only the Supabase
+keep-alive workflow.
+
+## Next Steps
+1. Saffron: review PR #67, then copy everything below the "Instructions (copy from
+   here)" heading in `project-instructions.md` into the Claude chat Project's
+   Instructions field.
+2. Merge #67 (draft — mark ready first).
+3. Optional, once the chat Project has been used a few times: fold back whatever the
+   chat sessions kept having to be told, and re-sync the repo copy.
+4. Unrelated and still the real open work — the 52 hollow recipes
+   (`null-lines-reentry.v2.csv`) and nutrition step 2. See the 2026-08-05 entries.
+
+## Open Questions / Blockers
+- The exact use-mix of the chat Project is assumed, not stated. The "what this project
+  is good for" list (recipe content/re-entry, nutrition thinking, price-book questions,
+  marketing copy, brand direction, monetization planning, feature scoping, outreach
+  drafts, data review) is my inference from the repo's active workstreams. If Saffron
+  had a narrower purpose in mind, that section is the one to trim.
+- Unknown whether the chat Project has Supabase MCP access. The instructions assume it
+  does **not**, and route all bulk data work to Claude Code. If it does, the "hand it to
+  Claude Code" boundary needs loosening for read-only queries.
+
+## Environment & Config Notes
+Repo `saffronlm-cmyk/daily-shuffle`, branch
+`claude/daily-shuffle-project-instructions-lpdgyc`, draft PR #67, commit `8383d98`,
+based on `main` at `829db47`. No cache bump (doc-only). No credentials, env vars, or
+Supabase tables involved. Session subscribed to PR #67 activity.
+
+## Notes & Gotchas
+- **Two copies now exist by design** — the repo file and the text pasted into the chat
+  Project. Nothing enforces the sync (`scripts/claude_md_drift.mjs` checks `CLAUDE.md`
+  against the repo, and knows nothing about this file). If a future session edits
+  `project-instructions.md`, tell Saffron to re-paste, or the edit is decorative.
+- **The "current state" block is dated 2026-08-07 for a reason.** It names the 52 hollow
+  recipes and "step 2 not applied". Both of those numbers move. A future session updating
+  this file should re-measure rather than copy the figures forward.
+- The document deliberately does **not** restate brand hex values, the Supabase project
+  ID, or `localStorage` key names. Anything needing that precision needs the repo, which
+  means it isn't a chat-Project task in the first place.
+
+---
+
+# Hollow-recipe fix shipped (PR #63 merged); re-entry handoff prompts written; cup-basis conflict found
+**Date:** 2026-08-05
+**Project:** Daily Shuffle — data integrity follow-through + ingredient display
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete. Two things left open and named below (display change; cup basis).
+
+---
+
+## Project Context
+Direct continuation of the entry below it (same date, "Hollow-recipe data damage found and
+write path fixed"). **Read that one first** — it holds the root-cause analysis, the damage
+counts, and the full next-steps list. This entry covers everything after that log commit:
+getting PR #63 merged, writing the prompts Saffron will use to re-enter the lost
+ingredients in a separate chat, and a display-format discussion that surfaced a real
+inconsistency in the codebase.
+
+## Session Goal
+Merge the fix, then give Saffron a self-contained way to restore the 52 hollow recipes by
+pasting recipe text into a different chat session with Supabase MCP access.
+
+## State Before This Session
+PR #63 open as draft at `910fa40`, branch cut from `228f921`.
+
+## What Was Done
+
+### 1. PR #63 merged — but not cleanly, and the cache collision matters
+First merge attempt returned 405 merge conflict: **PR #62 had landed on `main`** after this
+branch was cut (`016458d`, "Unify unknown-serves default on 2; correct Dark soy sauce").
+- Only true conflict was `logs/daily-shuffle_log.md` — both branches prepended an entry.
+  Git interleaved them into three conflict hunks. Resolved by reconstructing from the three
+  versions programmatically (base body identical in both; concatenate header + my entry +
+  their entry + base body) rather than hand-editing markers. Verified: 0 markers left,
+  entry dates descending.
+- **#62 had independently bumped the cache to v41 — the same value this branch used.** The
+  merge auto-resolved silently because both sides said v41, which would have shipped two
+  distinct app-code changes under one cache version. Bumped to **v42**. Worth remembering:
+  "one bump per PR" is not collision-proof when two PRs are open at once — always re-check
+  the merged value against `main`, not against the branch point.
+- Checked #62's `index.html` changes for overlap with `patchRecipeToLibrary()` — none; it
+  only moves the Add-form serves default 1 → 2.
+- Re-ran ship-check on the *merged* tree (parse 3/3, smoke 5/5, drift clean), then squash-merged
+  as `7093165`. Session auto-unsubscribed from PR activity; the scheduled check-in fired once,
+  confirmed merged, and was closed out rather than re-armed.
+
+### 2. Wrote the re-entry handoff prompts (delivered in chat, not committed)
+Saffron will restore the 52 recipes by pasting source text into a separate chat with Supabase
+MCP. Produced an opening message for that chat plus a quantity addendum. **These are not in
+the repo** — if she needs them again, the substance is:
+- **Coordinates**: project `jsxcctrskkkxgdxfaduo`, table `recipes`, column
+  `ingredient_sections` only.
+- **Match on `name` AND `creator_handle`** — never name alone. Two distinct recipes are both
+  called "Carrot Cake Baked Oats" (@dietitianrose, @tracesoats).
+- **Verify the row is actually hollow before writing** (every entry null) and STOP if it holds
+  real text — the whole failure mode being recovered from is good data being overwritten.
+- **Write pattern**: `UPDATE recipes SET ingredient_sections = '<json>'::jsonb WHERE id = '<uuid>'`
+  — one row, one column, no upsert, no other tables.
+- **Quantity addendum**: do NOT compute grams in that chat. The script does conversion with the
+  locked ruleset; hand-computed grams would diverge. Instead, enter text good enough that the
+  script never flags it. Only two of the seven `qty_source` categories come back for review —
+  `unresolved` (no amount at all, generic item) and `estimated` (amount present but unsizable
+  item, or bare item with no amount). `stated`/`converted`/`defaulted`/`to_taste`/`garnish` all
+  resolve silently, so "to taste", "to serve", "a handful" are fine as-is. Keep source-stated
+  bracketed grams ("1 cup (240g) flour") — highest-confidence input, and it beats the ruleset's
+  conversion for US sources. Ambiguous lines get raised with Saffron at input time, batched per
+  recipe, rather than months later in a CSV with no source to hand.
+- Also gave her the 52 as copy-paste blocks (full detail w/ uuids + sections, and a names+authors-only
+  version). Both regenerate from `null-lines-reentry.v2.csv`.
+
+### 3. Saffron asked whether converting to grams at input would be simpler — answered no, with evidence
+Her proposal: convert on input so the normalisation script can ignore these recipes; and she
+described a preferred display format — *weight/volume or count | ingredient name | original
+measure in brackets*. Investigated before answering:
+- **The app already does a partial version of this, in the opposite order.** `_ingToText()`
+  (`index.html:4866`) renders `qty unit name (note)` and, **for cups only**, appends a converted
+  hint via `_toBase()` — e.g. `1/2 cup flour (≈63g)`. Her format is the inverse plus wider unit
+  coverage: a change to one function that lands on all 332 recipes.
+- **Found a live inconsistency**: the app converts on a **US 240 ml cup** (`_DENSITY_G_PER_CUP`
+  comment at `index.html:3154`; `_toBase` falls back to 240 at `:3362`) — plain flour **125 g/cup**.
+  The script's ruleset uses the **UK 250 ml cup** locked in §6 decision 2 — plain flour **133 g/cup**.
+  Two tables, ~6% apart, already shipped and disagreeing.
+- Argued against input-time conversion on three grounds: it covers only 52 of 332 recipes (so the
+  library would render in two formats); it would bake in a *third* density table improvised by
+  whichever chat did the typing; and it is irreversible — grams are derived, raw text is the
+  source of truth, and "133 g flour" cannot be turned back into "1 cup".
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| logs/daily-shuffle_log.md | Merge-conflict resolution (kept both entries) + this entry | Modified | logs/ |
+| sw.js | CACHE v41 → v42 after collision with PR #62 | Modified (merged in #63) | repo root |
+| (chat only) | Upload-chat opening message + quantity addendum + two recipe list blocks | Not committed | — |
+
+No database writes this session — all Supabase access was read-only. No new files added to the repo.
+
+## Decisions & Reasoning
+- **Bumped to v42 rather than leaving the auto-resolved v41**: both PRs independently chose v41,
+  so the merge produced no conflict but would have left two different builds sharing a cache key.
+  The service worker keys off that constant; a shared value risks the fix never being fetched.
+- **Rejected input-time gram conversion** (Saffron's suggestion): see §3 above. Recommended the
+  display-layer change instead, which gets her the format she wants across the whole library
+  without touching raw data.
+- **Recommended unifying the app onto the 250 ml cup basis**, not the reverse: §6 decision 2 is
+  signed off and it is the basis that feeds nutrition, so the number displayed should match the
+  number behind the macros. Flagged as her call because it changes displayed weights library-wide.
+- **Did not commit the handoff prompts as a repo file**: they're single-use scaffolding for an
+  external chat, and CLAUDE.md has no home for that category. Substance captured in this entry
+  instead, which is the documented handoff surface.
+
+## Current State (end of session)
+`main` at `7093165` — hollow-recipe write fix, step-2 skip guards, `null-lines-reentry.v2.csv`
+and cache v42 are all shipped and live. The **52 recipes are still hollow**; the fix prevents
+new damage but recovers nothing. Saffron has everything she needs to start re-entry in a
+separate chat.
+
+## Next Steps
+1. **Saffron re-enters the 52 recipes** in a separate Supabase-MCP chat using the opening message
+   + addendum (substance in §2 above). Worklist: `null-lines-reentry.v2.csv`.
+2. **Decide the cup basis** — unify the app's `_DENSITY_G_PER_CUP` / `_toBase` onto 250 ml to match
+   the locked ruleset (recommended), or keep 240 and amend the plan. Blocks step 3 being coherent.
+3. **`_ingToText()` display change** — flip to `63 g flour (1/2 cup)` and widen the converted hint
+   beyond cups to all convertible units. Counted items ("1 onion") stay as counts. Saffron asked
+   for this; awaiting her go-ahead and the step-2 decision.
+4. **Fill `serves` on the 4 null-`serves` recipes** (ids in the previous entry's §1) before the
+   step-2 apply.
+5. Then the step-2 apply session, then step 3 — both gated as described in the previous entry.
+
+## Open Questions / Blockers
+- **Cup basis: 240 or 250 ml?** Saffron's call. Not blocking re-entry, but it should be settled
+  before the display change ships, because that change puts the converted weight on screen and
+  makes the discrepancy visible to her as a cook.
+- **Does `_ingToText`'s hint change belong with or without the basis unification?** Recommended
+  together; she has not answered yet.
+- Everything from the previous entry's Open Questions still stands (recoverability of the lost
+  text, unknowable true blast radius).
+
+## Environment & Config Notes
+Repo `saffronlm-cmyk/daily-shuffle`. PR #63 **merged** (`7093165`); branch
+`claude/recipe-db-null-values-9vn3k0` restarted from `origin/main` for this log entry, per the
+merged-PR rule. Cache now **v42**. Supabase project `jsxcctrskkkxgdxfaduo`, read-only this session.
+Sandbox egress to `supabase.co` is blocked — all DB access via Supabase MCP.
+
+## Notes & Gotchas
+- **"One cache bump per PR" is not collision-proof.** With two PRs open simultaneously both will
+  read the same starting value from `main` and pick the same next number. After merging `main`
+  into a branch, re-check the CACHE constant against `main`'s current value, not the branch point.
+- **The app and the normalisation script have separate, disagreeing conversion tables.** App:
+  `_DENSITY_G_PER_CUP` + `_toBase` (US 240 ml). Script: the plan's §3.3 values (UK 250 ml). This is
+  additional to the `canonicalise()` five-copy problem already in CLAUDE.md — if you change one
+  density table, check the other.
+- The prompts in §2 deliberately instruct the other chat NOT to compute grams. If a future session
+  sees hand-entered gram values in these 52 recipes, that instruction was not followed and those
+  lines should be treated as suspect against the ruleset.
+
 # Hollow-recipe data damage found and write path fixed — 52 recipes need ingredient re-entry
 **Date:** 2026-08-05
 **Project:** Daily Shuffle — data integrity (recipes.ingredient_sections) + nutrition step 2

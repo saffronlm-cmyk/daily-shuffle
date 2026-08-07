@@ -3195,18 +3195,18 @@ function flagCanonTerms(rawNames, cap = 4) {
   return list.length <= cap ? list : list.slice(0, cap).concat(`+${list.length - cap} more`);
 }
 
-// g per 1 cup (US, 240 ml) for common dry / sticky ingredients. Keys are
+// g per 1 cup (UK, 250 ml) for common dry / sticky ingredients. Keys are
 // canonicalise()'d, so e.g. "rolled oats" → "rolled oat", "mashed banana" →
 // "banana" (because "mashed" is stripped as a prep adj). Anything missing
 // falls back to the aisle heuristic in _toBase.
 const _DENSITY_G_PER_CUP = {
   // Flours & starches
-  'flour': 125, 'plain flour': 125, 'self-raising flour': 125, 'self raising flour': 125,
-  'gluten-free flour': 130, 'gf flour': 130, 'almond flour': 96, 'coconut flour': 110,
-  'cornflour': 130, 'cornstarch': 130, 'rice flour': 158, 'oat flour': 100,
+  'flour': 133, 'plain flour': 133, 'self-raising flour': 133, 'self raising flour': 133,
+  'gluten-free flour': 135, 'gf flour': 135, 'almond flour': 100, 'coconut flour': 115,
+  'cornflour': 135, 'cornstarch': 135, 'rice flour': 165, 'oat flour': 104,
   // Sugars
-  'sugar': 200, 'caster sugar': 200, 'brown sugar': 220, 'icing sugar': 130,
-  'powdered sugar': 130, 'coconut sugar': 170,
+  'sugar': 213, 'caster sugar': 213, 'brown sugar': 229, 'icing sugar': 135,
+  'powdered sugar': 135, 'coconut sugar': 177,
   // Grains & legumes
   'rice': 200, 'basmati': 200, 'jasmine rice': 200, 'brown rice': 195, 'wild rice': 160,
   'quinoa': 170, 'oat': 80, 'rolled oat': 80, 'porridge oat': 80, 'oatmeal': 80,
@@ -3217,11 +3217,11 @@ const _DENSITY_G_PER_CUP = {
   'chia seed': 170, 'flax seed': 140, 'flaxseed': 140, 'milled flaxseed': 130,
   'sesame seed': 150, 'sunflower seed': 140, 'pumpkin seed': 130,
   // Sweeteners & sticky / pureed (denser than water)
-  'honey': 340, 'maple syrup': 320, 'peanut butter': 256, 'almond butter': 256, 'tahini': 250,
-  'butternut puree': 245, 'pumpkin puree': 245, 'apple sauce': 245, 'apple puree': 245,
-  'banana': 225, 'mashed potato': 210, 'tomato puree': 240, 'tomato passata': 240, 'tomato sauce': 245,
+  'honey': 350, 'maple syrup': 350, 'peanut butter': 263, 'almond butter': 263, 'tahini': 263,
+  'butternut puree': 255, 'pumpkin puree': 255, 'apple sauce': 255, 'apple puree': 255,
+  'banana': 234, 'mashed potato': 219, 'tomato puree': 250, 'tomato passata': 250, 'tomato sauce': 255,
   // Other dry
-  'cocoa powder': 100, 'cacao powder': 100, 'protein powder': 100,
+  'cocoa powder': 103, 'cacao powder': 103, 'protein powder': 104,
   'desiccated coconut': 80, 'shredded coconut': 80,
   'breadcrumb': 110, 'panko': 50,
   'cheese': 100, 'vegan cheese': 100,
@@ -3401,11 +3401,11 @@ function _toBase(qty, unit, name) {
       const gpc = _DENSITY_G_PER_CUP[canon];
       if (gpc != null) return { qty: qty * gpc, base: 'g' };
       // Unknown name — if the aisle suggests liquid, stay in ml; else assume
-      // ~240 g/cup (close to water and to most dry-but-non-fluffy ingredients).
+      // ~250 g/cup (close to water and to most dry-but-non-fluffy ingredients).
       const aisle = classifyAisle(name);
-      if (!_LIQUID_AISLES.has(aisle)) return { qty: qty * 240, base: 'g' };
+      if (!_LIQUID_AISLES.has(aisle)) return { qty: qty * 250, base: 'g' };
     }
-    return { qty: qty * 240, base: 'ml' };
+    return { qty: qty * 250, base: 'ml' };
   }
   const map = { g:'g', kg:'g', ml:'ml', l:'ml', 'fl oz':'ml', floz:'ml',
                 tbsp:'ml', tsp:'ml', oz:'g', lb:'g', each:'each', x:'each', '':'g' };
@@ -4838,8 +4838,12 @@ function showToast(msg) {
 // ─── UNIT CONVERSION ─────────────────────────────────────────────────────────
 function convertIngredientText(text, toImperial) {
   if (!text) return text;
-  // Skip lines that already contain both units in brackets e.g. "300g (10.5oz)"
-  if (/\(.*(?:oz|g|lb|cup|ml)\)/.test(text)) return text;
+  // Skip lines whose source text already spells out an imperial equivalent in
+  // brackets, e.g. "300g (10.5oz)" — converting those would double up.
+  // Deliberately does NOT match a bracketed metric/cup measure: _ingToText()
+  // renders "133g flour (1 cup)", and that leading 133g still needs converting
+  // when the reader has asked for imperial.
+  if (/\(.*(?:oz|lb)\)/.test(text)) return text;
   if (toImperial) {
     // g → oz
     text = text.replace(/(\d+(?:\.\d+)?)\s*g\b(?!\s*(?:arlic|inger|reen|round))/g, (_, n) => {
@@ -4866,7 +4870,7 @@ function convertIngredientText(text, toImperial) {
     // fl oz → ml
     text = text.replace(/(\d+(?:\.\d+)?)\s*fl\s*oz\b/g, (_, n) => Math.round(parseFloat(n) * 29.5737) + 'ml');
     // cups → ml
-    text = text.replace(/(\d+(?:\.\d+)?)\s*cups?\b/g, (_, n) => Math.round(parseFloat(n) * 240) + 'ml');
+    text = text.replace(/(\d+(?:\.\d+)?)\s*cups?\b/g, (_, n) => Math.round(parseFloat(n) * 250) + 'ml');
     // °F → °C
     text = text.replace(/(\d+)\s*°F\b/g, (_, n) => Math.round((parseFloat(n) - 32) * 5/9) + '°C');
   }
@@ -4880,7 +4884,7 @@ function multiplyIngredientText(text, factor) {
   if (!text || factor === 1) return text;
   const FRAC = { '½':0.5, '¼':0.25, '¾':0.75, '⅓':0.333, '⅔':0.667, '⅛':0.125 };
   const FRAC_OUT = { 0.5:'½', 0.25:'¼', 0.75:'¾', 0.333:'⅓', 0.667:'⅔', 0.125:'⅛' };
-  return text.replace(/([\d½¼¾⅓⅔⅛]+(?:\s*[\d½¼¾⅓⅔⅛]+)?)\s*(?=\s*(?:g|kg|ml|oz|lb|cup|tbsp|tsp|l\b|x\b|\w))/g, (match, numStr) => {
+  return text.replace(/([\d½¼¾⅓⅔⅛]+(?:\s*[\d½¼¾⅓⅔⅛]+)?)(\s*)(?=\s*(?:g|kg|ml|oz|lb|cup|tbsp|tsp|l\b|x\b|\w))/g, (match, numStr, gap) => {
     // Parse number including unicode fractions
     let val = 0;
     const parts = numStr.trim().split(/\s+/);
@@ -4894,10 +4898,14 @@ function multiplyIngredientText(text, factor) {
     const rounded = Math.round(result * 4) / 4;
     const whole = Math.floor(rounded);
     const frac = Math.round((rounded - whole) * 4) / 4;
-    const fracStr = Object.entries(FRAC_OUT).find(([,v]) => Math.abs(v - frac) < 0.01)?.[0] || '';
-    if (whole === 0 && fracStr) return fracStr;
-    if (whole > 0 && fracStr) return whole + fracStr;
-    return rounded % 1 === 0 ? String(rounded) : rounded.toFixed(1);
+    // FRAC_OUT is keyed by the numeric value, so match on the KEY and take the
+    // character as the result — reading `v` here compared a glyph to a number,
+    // which is never within tolerance, so fractions always fell through to the
+    // decimal branch ("¾" came out as "0.8").
+    const fracStr = Object.entries(FRAC_OUT).find(([k]) => Math.abs(parseFloat(k) - frac) < 0.01)?.[1] || '';
+    if (whole === 0 && fracStr) return fracStr + gap;
+    if (whole > 0 && fracStr) return whole + fracStr + gap;
+    return (rounded % 1 === 0 ? String(rounded) : rounded.toFixed(1)) + gap;
   });
 }
 
@@ -4914,17 +4922,44 @@ function _formatBaseQty(qty, base) {
 
 function _ingToText(ing) {
   if (ing.item != null) return ing.item;
-  const q = ing.qty != null ? ing.qty + ' ' : '';
-  const u = (ing.unit && ing.unit !== 'each') ? ing.unit + ' ' : '';
-  const n = ing.note ? ` (${ing.note})` : '';
-  // Cup-measurement hint: surface the converted weight/volume so cooks who
-  // prefer to weigh can. e.g. "1/2 cup flour (≈63g)".
-  let hint = '';
-  if (ing.qty != null && (ing.unit === 'cup' || ing.unit === 'cups')) {
-    const base = _toBase(ing.qty, ing.unit, ing.name);
-    if (base && base.base !== 'each') hint = ` (≈${_formatBaseQty(base.qty, base.base)})`;
+  const name = ing.name || '';
+  const note = ing.note ? ` (${ing.note})` : '';
+  const unit = (ing.unit || '').toLowerCase();
+  const qty  = ing.qty;
+  // Render as a unicode fraction where one fits. Not just cosmetic:
+  // multiplyIngredientText() can scale "½" but parses a decimal like "0.5" as
+  // two separate numbers, so "0.5 cup" doubled would come out "0.10cup".
+  const FRAC_CHARS = [[0.5,'½'],[0.25,'¼'],[0.75,'¾'],[1/3,'⅓'],[2/3,'⅔'],[0.125,'⅛']];
+  const fmtQty = q => {
+    const whole = Math.floor(q), frac = q - whole;
+    const hit = FRAC_CHARS.find(([v]) => Math.abs(v - frac) < 0.02);
+    if (hit) return whole > 0 ? `${whole}${hit[1]}` : hit[1];
+    return String(Math.round(q * 100) / 100);
+  };
+
+  if (qty == null) return `${name}${note}`.trim();
+
+  // Counted items ("1 onion", "2 eggs") stay as counts — nothing to convert.
+  if (!unit || unit === 'each' || unit === 'x') {
+    return `${fmtQty(qty)} ${name}${note}`.trim();
   }
-  return `${q}${u}${ing.name || ''}${n}${hint}`.trim();
+
+  // Already a weight/volume — it IS the metric figure, so nothing to bracket.
+  if (unit === 'g' || unit === 'kg' || unit === 'ml' || unit === 'l') {
+    return `${fmtQty(qty)}${ing.unit} ${name}${note}`.trim();
+  }
+
+  // Lead with weight/volume, keep the cook's original measure in brackets:
+  // "133g flour (1 cup)". Cup conversions use the UK 250 ml basis, matching
+  // the quantity-normalisation ruleset that feeds the macro figures — the
+  // number on screen is the number behind the nutrition.
+  const original = `${fmtQty(qty)} ${ing.unit}`;
+  const base = _toBase(qty, ing.unit, ing.name);
+  if (base && base.base !== 'each') {
+    const bracket = ing.note ? `${original}, ${ing.note}` : original;
+    return `${_formatBaseQty(base.qty, base.base)} ${name} (${bracket})`.trim();
+  }
+  return `${original} ${name}${note}`.trim();
 }
 
 function buildIngredientsHtml(fd, multiplier, toImperial) {
