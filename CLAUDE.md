@@ -49,9 +49,16 @@ Single user (Saffron), no auth, deployed as static files.
   `pricebook.csv`, `pricebook.variants.csv`, `ingredient-master.csv`,
   `recipe-ingredient-normalisation.csv` / `.final.csv`, `split-plan.csv`,
   `unmatched-ingredients.csv`, `null-lines-reentry.csv` (superseded) /
-  `null-lines-reentry.v2.csv` (current), `pricebook-manual-batch.csv`. These encode
+  `null-lines-reentry.v2.csv` (current), `pricebook-manual-batch.csv`,
+  `quantity-review-decisions.v2.csv` / `.raw.csv`. These encode
   reviewed human decisions — never regenerate, reorder, or "clean up" one without
   being asked.
+  - `quantity-review-decisions.v2.*` is Saffron's review of the step-2 quantity
+    sheet (2026-08-07, 80 lines / 59 recipes). `.raw.csv` is her upload byte-for-byte;
+    the working copy adds `recipe_id`/`sec`/`item` and drops the spreadsheet's blank
+    filler rows, changing no value. `corrected_grams` is a **whole-recipe** total
+    (she scaled by `serves` — that is the plan's convention, not an error).
+    Read `quantity-review-decisions.md` before applying any of it.
   - `pricebook-manual-batch.csv` is the hand-pricing worklist (2026-08-06): the 99
     `pricebook.csv` products that can be priced *without* waiting on the open
     price-unit decision or the produce-fold conversion factors. Columns are
@@ -70,6 +77,9 @@ Single user (Saffron), no auth, deployed as static files.
     weights disagreed with the macro figures). These are still two separate tables at
     different granularity — the app keys on specific ingredient names, the script on
     ~20 broad classes — so change one and check the other.
+  - `quantity-review-decisions.md` — what Saffron's reviewed step-2 sheet contains,
+    the four decisions still open on it, and the measured size of the unreviewed
+    remainder. Read before applying step 2 or touching the script's `BARE_SERVING`.
   - `MONETIZATION.md` — monetization + rollout roadmap (strategy, phases, tasks with
     acceptance criteria, decision gates, status tracker). Built to be executed one task
     at a time by any session — read its §0 operating rules before doing any
@@ -139,16 +149,26 @@ Single user (Saffron), no auth, deployed as static files.
    The script applies two **skip guards** — `serves_missing` (plan §6 decision 5) and
    `empty_ingredients` (hollow recipes, below) — leaving `ingredient_grams` **null**,
    not `[]`, for those. Live counts move; measure, don't trust a number in a doc
-   (the plan's "8 no-`serves`" was 4 as of 2026-08-05).
+   (the plan's "8 no-`serves`" was 4 as of 2026-08-07, over 343 recipes not 327).
+   Saffron's review of the flagged lines came back 2026-08-07 —
+   `quantity-review-decisions.v2.csv`, 56 of 80 lines decided, four open questions
+   documented in `quantity-review-decisions.md`. Two things that doc settles and
+   this file should not contradict: `corrected_grams` is a **whole-recipe** total
+   (the script's `BARE_SERVING` defaults are per-*serving*, so they are short by a
+   factor of `serves` — ~90 further lines carry that defect unreviewed), and the
+   generator that produced the review sheet is **not in this repo** (the committed
+   script reproduces only 64 of its 80 rows).
 3. **Bulk nutrition re-population** (blocked) — **must not run until step 2 is applied**,
    and must skip anything still flagged `empty_ingredients` or `serves_missing`.
 
 ### Known data damage: hollow recipes (open)
 
-52 recipes hold `ingredient_sections` whose section titles and line counts survive but
-whose every ingredient line is a literal `null` — the text is gone and is only
-recoverable by re-entry from source. Worklist: **`null-lines-reentry.v2.csv`** (52
-recipes / 681 lines). Cause was `patchRecipeToLibrary()` in `index.html` reading a
+Some recipes hold `ingredient_sections` whose section titles and line counts survive
+but whose every ingredient line is a literal `null` — the text is gone and is only
+recoverable by re-entry from source. Worklist: **`null-lines-reentry.v2.csv`**, cut
+at 52 recipes / 681 lines; live was **29 recipes / 399 lines** on 2026-08-07, so 23
+have been re-entered since. Damage is always all-or-nothing — no recipe is partially
+hollow. Cause was `patchRecipeToLibrary()` in `index.html` reading a
 non-existent `ing.item` key off `flattenIngredientSections()`'s structured output and
 PATCHing `undefined` → `null`; fixed 2026-08-05, but the lost text is not recoverable
 from the fix. The older `null-lines-reentry.csv` is the superseded 2026-06 worklist
