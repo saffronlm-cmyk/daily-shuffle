@@ -21,7 +21,12 @@ value was changed**:
    `ingredient_sections[sec].ingredients[item]` position each decision belongs to.
 3. Added `implied_per_serve` = `corrected_grams / serves`, derived for review only.
 
-Columns were reordered for readability; every value cell is verbatim.
+Columns were reordered for readability.
+
+**Three `corrected_grams` values were later changed on Saffron's instruction**
+(2026-08-07, see "Outliers" below) — those rows carry a `corrected 2026-08-07
+(was N)` note. Every other value cell is verbatim, and the raw upload is
+untouched, so the originals are always recoverable from `.raw.csv`.
 
 ## The join is clean
 
@@ -114,18 +119,24 @@ These need a write to `ingredient_sections`, which is otherwise read-only:
 - **Creamy Mango and Coconut Cod Curry** (`5c54547f`) — `Soy sauce & fish sauce`
   is one line holding two ingredients; should be split into two lines, 1 tbsp each.
 
-## Worth a second look before applying
+## Outliers — found and corrected
 
-Three values sit outside Saffron's own per-serve pattern. They may be deliberate:
+Three values sat outside Saffron's own per-serve pattern. She confirmed all three
+were wrong and gave the replacements on 2026-08-07:
 
-| Recipe | Line | Entered | Per serve | Her usual |
+| Recipe | Line | Was | Now | Per serve |
 |---|---|---|---|---|
-| Mediterranean Chicken & Rice Skillet | thick yogurt | 40 g / serves 4 | 10 g | 20–60 g |
-| Middle Eastern Chicken & Rice Bowl | rice of choice | 250 g / serves 4 | 62.5 g | 125 g |
-| Firecracker Beef Bowls | Rice, soba or vermicelli | 180 g / serves 4 | 45 g | 125 g |
+| Mediterranean Chicken & Rice Skillet | thick yogurt | 40 g | **160 g** | 10 g → 40 g |
+| Middle Eastern Chicken & Rice Bowl | rice of choice | 250 g | **500 g** | 62.5 g → 125 g |
+| Firecracker Beef Bowls | Rice, soba or vermicelli | 180 g | **500 g** | 45 g → 125 g |
 
-The Firecracker value is also exactly the script's computed default, which is what
-an un-scaled row looks like.
+All three now land exactly on her conventions elsewhere in the sheet — 125 g of
+rice per serve, 40 g of yoghurt per serve. The Firecracker value was also exactly
+the script's old computed default, which is what an un-scaled row looks like; that
+was the tell.
+
+These are edits to `quantity-review-decisions.v2.csv` only. The worklist is
+unaffected — all three rows were already decided, so they were never on it.
 
 Four rows are given in **millilitres** (`Oat milk` 45, `Milk to thin` 15,
 `Extra milk` 60, `Avocado oil for coating` 15). Milk and water are ~1:1 so those

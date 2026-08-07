@@ -140,10 +140,15 @@ clean. Database untouched.
 6. Only then step 3, skipping `exclude_from_nutrition`, `empty_ingredients`, `serves_missing`.
 
 ## Open Questions / Blockers
-- **Three v2 outliers may or may not be deliberate** (table in the doc): Mediterranean
-  thick yogurt at 10 g/serve against her 20–60 norm; Middle Eastern rice at 62.5 g/serve
-  against her 125; Firecracker rice at 45 g/serve — that last one is exactly the script's
-  old computed value, which is what an un-scaled row looks like. Worth a glance.
+- ~~Three v2 outliers may or may not be deliberate~~ **Resolved later the same session.**
+  Saffron confirmed all three were wrong: Mediterranean thick yogurt 40 → **160**, Middle
+  Eastern rice 250 → **500**, Firecracker rice 180 → **500**. All now land on her
+  conventions (125 g rice / 40 g yoghurt per serve). Applied to
+  `quantity-review-decisions.v2.csv` only, each row noted `corrected 2026-08-07 (was N)`;
+  `.raw.csv` untouched. The v3 worklist is byte-identical after the change — those rows
+  were already decided, so they were never on it. Note her original "1/3 cup" comment
+  survives on the Firecracker row and now contradicts the corrected value; it is left as
+  written because reviewed notes are not edited, and the dated correction sits beside it.
 - The v2 generator is still not in the repo. It no longer matters much (79/80 reproduce),
   but the last row's provenance can't be checked.
 
