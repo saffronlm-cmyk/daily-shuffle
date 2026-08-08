@@ -4,6 +4,138 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# Hand-priced batch landed; naming directives applied; pluralising convention blocked on canonicalise()
+**Date:** 2026-08-07
+**Project:** Daily Shuffle — product/recipe pricing
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete (PR #69 open as draft) — 8 items await Saffron's call
+
+---
+
+## Project Context
+Direct continuation of the entry below (price-book merge + audit, PR #65 merged). That
+entry produced `pricebook-manual-batch.csv` as an empty worklist; this one lands it filled.
+PR #65 is merged, so this branch was restarted from `main` per the merged-PR rule.
+
+## Session Goal
+Process the filled `pricebook-manual-batch.csv` Saffron uploaded, act on the decisions in
+its `Notes` column, and surface anything needing her judgement.
+
+## State Before This Session
+`main` at `02eed7b` (PR #65 + #67 merged). Worklist committed but empty. `CANON_TERMS` live
+with 8 entries, CACHE v44.
+
+## What Was Done
+
+### 1. Landed the filled worklist
+**87 of 93 rows priced**, with store, brand, pack alternatives and explicit assumptions in
+`Notes`. Committed as-is — reviewed human data. Unpriced: `White Pepper`,
+`Grass-fed Collagen`, and the three Salt/Pepper rows (flagged for consolidation) plus
+`Argentine Red Shrimp` (flagged for renaming). `Almond Butter` and `Chinese Five Spice` are
+priced but their pack size was not visible in the screenshot.
+
+**She used shelf-label conventions, not my column spec** — `Pack qty` carries its unit
+(`1kg`, `loose`, `x2`, `4x145g (580g)`, `400g/400ml`) and `Measurement convention` is
+`per kg`/`per litre`/`per item`. This is *more* faithful than the spec asked for and
+preserves detail (`drained weight`, multipacks) the spec would have lost. Converting it to
+the app's `packSize`/`packUnit`/`packPrice` shape is a parsing step for the apply pass —
+**do not treat the divergence as an error and do not ask her to redo it.**
+
+### 2. Five naming directives wired into `CANON_TERMS`
+`Crispy Fried Shallot → Crispy Fried Onions` (no fried-shallot product exists in UK
+supermarkets — she matched it to Fudco Crispy Fried Onions), all shrimp wordings →
+`Prawns`, `Gras-fed → Grass-fed Collagen`, `Pitted Medjool Date → Medjool Date`,
+`Corn → Sweetcorn`. Shrimp needed **one entry per observed wording** (7 of them) because
+`CANON_TERMS` matches whole names; a word-level rule would also rewrite `shrimp paste`,
+which is a different product. Verified it does not.
+
+### 3. The pluralising convention — right call, wrong order (audit §5a)
+Her `NOTE` row: product names should follow supermarket pluralising convention
+(hazelnuts, cashews, almonds), on a final naming pass. **It collides with the
+`canonicalise()` plural bug (audit §4), systematically.**
+
+`canonicalise()` singularises with `([^aeiou])s\b → $1` — it needs a **consonant** before
+the `s`:
+- **Safe** (consonant): hazelnuts, cashews, almonds, carrots, dates, olives, courgettes,
+  raisins, shallots — all collapse to the singular correctly.
+- **Splits** (vowel): `bananas`, `avocados`, `peas`, `tortillas`, `sultanas`, `chickpeas`
+  each become a *second* key.
+- **Splits** (`-oes`): `tomatoes → tomatoe`, `potatoes → potatoe`, `mangoes → mangoe`.
+
+So the recipe says `avocado`, the book says `avocados`, `lookupPriceBook()` misses. Same
+mechanism that already split `Potato`/`Potatoes` and `Banana`/`Bananas`. **Applying the
+convention before fixing §4 converts a handful of splits into a systematic one.**
+
+Also recorded: `CANON_TERMS` currently normalises *toward the singular*
+(`bananas → Banana`), the opposite of the convention. Deliberate — the singular is the form
+`canonicalise()` can key on. Flip those entries once §4 lands.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| pricebook-manual-batch.csv | Filled: 87/93 priced, Notes carrying stores, brands, assumptions | Modified | repo root |
+| index.html | 13 new `CANON_TERMS` entries from her Notes | Modified | repo root |
+| pricebook-audit.md | New §5a — pluralising convention and its dependency on §4 | Modified | repo root |
+| sw.js | CACHE v44 → v45 | Modified | repo root |
+| logs/daily-shuffle_log.md | This entry | Modified | logs/ |
+
+## Decisions & Reasoning
+- **Committed her CSV verbatim rather than reformatting it to the spec.** Her format is
+  shelf-faithful and lossless; mine was lossy. The parse belongs in the apply step.
+- **Implemented only the five explicit directives; flagged the six "ASSUMPTION/confirm"
+  items.** Her Notes distinguish the two clearly ("normalise to X" vs "confirm this is
+  right"). Acting on an assumption she asked to confirm would launder a guess into data.
+- **Did not consolidate the Salt/Pepper rows.** She flagged them but gave no target name,
+  and they are arguably *two* ingredients that should be split in the recipes rather than
+  priced as one. Needs her call.
+- **Did not fix `canonicalise()` to unblock the plural convention.** Five copies to sync
+  and it re-keys the live localStorage price book — its own change, not a drive-by.
+- **One `CANON_TERMS` entry per shrimp wording rather than a word-level rule.** Word-level
+  would catch `shrimp paste`.
+
+## Current State (end of session)
+Branch `claude/product-recipe-pricing-lw72m2` restarted from `main` at `02eed7b`, PR **#69**
+open as draft, subscribed. 0 checks (no CI, expected). CACHE v45. `pricebook.csv` still
+holds 21 prices — **the 87 hand-priced rows are NOT yet merged into it**; that is the next
+apply step.
+
+## Next Steps
+1. **Saffron answers the 8 open items** (listed in PR #69, and in Open Questions below).
+2. **Apply the 87 prices into `pricebook.csv`**, joining on the verbatim `Product` column.
+   Needs a parse of her shelf-label format: `Pack qty` → number + unit (`loose` → 1000 g
+   at the per-kg price; `each`/`x2` → `each`; `4x145g (580g)` → 580 g), `Price per item` →
+   `Pack price (£)`. Write a review CSV before touching `pricebook.csv`.
+3. **Fix `canonicalise()`'s plural handling** (audit §4) across all five copies — this
+   unblocks the pluralising convention *and* fixes the existing Potato/Carrot/Banana splits.
+   Then flip the `CANON_TERMS` entries to plural.
+4. The price-unit decision (audit §3) still gates the Apify scrape. Unchanged.
+
+## Open Questions / Blockers
+Eight items, all Saffron's call, none blocking each other:
+- `Milk Choice` → matched to Coconut Milk. Right product for this row?
+- `Chicken` → matched to Chicken Thigh Fillets. Right cut?
+- `Chipotle Powder` → matched to Chipotle Chilli Flakes. Flakes vs powder acceptable?
+- `Green Cabbage` → matched to Savoy. White and Red also available at 89p.
+- `Vanilla Essence` vs `Vanilla Bean Paste` — two products or one?
+- `Salt And Pepper` / `Salt Pepper` / `Pinche Salt Pepper` — target name, or split into two?
+- `White Pepper`, `Grass-fed Collagen` — still unpriced.
+- `Almond Butter`, `Chinese Five Spice` — pack size not visible.
+
+## Environment & Config Notes
+Repo `saffronlm-cmyk/daily-shuffle`, branch `claude/product-recipe-pricing-lw72m2` (restarted
+from `main`), PR #69 draft. CACHE v44 → v45. No Supabase access. No credentials involved.
+
+## Notes & Gotchas
+- **Her CSV format is a feature, not a mistake.** See §1.
+- **`Prawns`/`Crispy Fried Onions` are plural/renamed display names whose `canonicalise()`
+  keys still collapse correctly** (`prawns → prawn`, `onions → onion`) — both end in a
+  consonant. That is luck, not design; check any future plural addition against §5a.
+- **The three Salt/Pepper rows are still in the worklist on purpose.** Do not silently drop
+  them; she has been asked and has not yet answered.
+
+---
+
 # Price-book merge + audit — the pipeline shares one price across a whole Product family
 **Date:** 2026-08-06
 **Project:** Daily Shuffle — product/recipe pricing (Apify price-book stream)
