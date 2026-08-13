@@ -24,7 +24,7 @@ Project: `jsxcctrskkkxgdxfaduo` (hardcoded in `index.html` as `RECIPE_LIB_URL`).
 | Table | What it holds | Keying / notes |
 |---|---|---|
 | `recipes` | Recipe library (~327 rows; `import_status='ready'` ≈ 305) | `ingredient_sections` jsonb (free text); `review_flags`; `ingredient_grams` jsonb planned by step 2 (not yet created) |
-| `staple_products` | Generic ingredient macros grounding AI estimates (~167 rows) | per-100 g macros, expanded via usda_staples.py |
+| `staple_products` | Generic ingredient macros grounding AI estimates (~179 rows) | per-100 g macros, expanded via usda_staples.py, then hand-added label-verified products |
 | `food_log`, `day_meta`, `saved_meals` | Tracker state | date/id-keyed, upserted with `Prefer: resolution=merge-duplicates` |
 | `user_library` | Cross-device sync blob (price book etc.) | row `id='default'`; belongs to the personal-creds path — rarely touched |
 

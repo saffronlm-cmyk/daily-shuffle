@@ -112,7 +112,8 @@ Single user (Saffron), no auth, deployed as static files.
   tracker). Check existing key names before adding new state.
 - **Bundled Supabase project** (`jsxcctrskkkxgdxfaduo`, hardcoded as
   `RECIPE_LIB_URL`/`RECIPE_LIB_KEY` in `index.html`): backs the recipe library **and** the
-  Tracker (`recipes`, `staple_products` (~167 rows after the USDA expansion), `food_log`,
+  Tracker (`recipes`, `staple_products` (~179 rows — 167 after the USDA expansion, plus
+  hand-added label-verified products), `food_log`,
   `day_meta`, `saved_meals`, all PK-keyed with open `anon ALL` RLS, upserted via
   `Prefer: resolution=merge-duplicates`). The Tracker's `TRK_SB_URL`/`TRK_SB_KEY` prefer
   this bundled project and fall back to personal creds.

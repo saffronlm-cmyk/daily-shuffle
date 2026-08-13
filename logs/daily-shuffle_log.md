@@ -4,6 +4,141 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# Added Alpro Greek Style plain yoghurt alternative to `staple_products` (178 → 179 rows)
+**Date:** 2026-08-13
+**Project:** Daily Shuffle — nutrition data (staple products)
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete.
+
+---
+
+## Project Context
+Nutrition-estimation step 1 (`staple_products`) is long done — see the 2026-07-01 entry
+"USDA Staple Lookup Built…" for how the 122 USDA rows were seeded. This session is
+ordinary upkeep on that table: Saffron pasted a product label and asked for it to be
+added. No connection to steps 2/3, which remain where the 2026-08-12 entry left them.
+
+## Session Goal
+Add Alpro Greek Style Plain Dairy Free Yoghurt Alternative to `staple_products` from a
+pasted label, following the table's existing naming/notes conventions.
+
+## State Before This Session
+`main` at `8257bbd` (#70). `staple_products` at **178 rows** — note CLAUDE.md and the
+`recipe-db` skill both still claimed "~167", the post-USDA figure; 11 rows had been
+hand-added since without either doc being updated.
+
+## What Was Done
+
+### 1. Checked conventions before writing
+Queried the live column list rather than trusting the skill doc, then pulled every
+yoghurt/Alpro/soya row to copy the house style. Findings that shaped the row:
+- **There is no price column** on `staple_products` (id, name, aliases, serving_qty,
+  serving_unit, calories, protein_g, carbs_g, fat_g, fibre_g, sugar_g, gi_estimate,
+  flags, notes, timestamps). Nor is there a sodium/salt column — existing rows put
+  salt and saturated fat in `notes` free text (e.g. the "Soya yoghurt, plain, no
+  sugars — Alpro" row: "Sat 0.4g, salt 0.24g").
+- **Naming pattern for branded rows is `<food>, <qualifiers> — <Brand>`** ("Almond milk,
+  barista — Alpro", "Soya yoghurt, plain, no sugars — Alpro", "Soy sauce, gluten free,
+  reduced sodium — Emma Basic").
+- **Flag vocabulary in use** is exactly: `usda_seed` (112), `high_sodium` (6),
+  `high_sugar` (5), `nutrition_estimated` (5), `high_fat` (4), `zero_macro` (3),
+  `high_sat_fat` (1). There is no `dairy_free`/`vegan` flag and the other Alpro rows
+  carry `flags = {}` — so this row does too. Nothing about it is "high" anything, and
+  it is label-verified, so `nutrition_estimated` would be wrong.
+
+### 2. Inserted the row
+`id e5ccadf0-5302-44c0-983a-422a5321a94e`, per 100 g:
+65 kcal · 5.6 P · 2.2 C · 3.3 F · 1.3 fibre · 2.2 sugar. `gi_estimate` null, `flags` `{}`.
+
+Macro cross-check before writing: 5.6×4 + 2.2×4 + 3.3×9 + 1.3×2 = 63.5 kcal vs the
+label's 65 — consistent, so the figures were taken as pasted.
+
+### 3. Verified no alias collision
+Alias matching in `index.html` is **exact** in `trkFindStapleId()` (line ~5904) and
+substring-`includes` in `trkMatchStaples()` (line ~6454), and every alias is also
+injected into the AI prompt context by `trkBuildStapleContext()`. So a careless alias
+can silently hijack a different product's logging. Ran an explicit collision query
+against every other row's name and aliases — **zero collisions**.
+
+### 4. Fixed the stale row count in two docs
+CLAUDE.md and `.claude/skills/recipe-db/SKILL.md` both said "~167 rows". Updated to
+~179 with a note that it is 167 from USDA plus hand-added label-verified products.
+Historical mentions of 167 in this log and in `quantity-normalisation-plan.md` were
+left alone — they were true when written.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| `staple_products` (Supabase) | +1 row, id `e5ccadf0-5302-44c0-983a-422a5321a94e` | Modified (insert) | project `jsxcctrskkkxgdxfaduo` |
+| CLAUDE.md | Data & sync section: staple row count ~167 → ~179 | Modified | /home/user/daily-shuffle/ |
+| .claude/skills/recipe-db/SKILL.md | Schema map: staple row count ~167 → ~179 | Modified | /home/user/daily-shuffle/.claude/skills/recipe-db/ |
+| logs/daily-shuffle_log.md | This entry | Modified | /home/user/daily-shuffle/logs/ |
+
+**No app code touched** — `index.html` and `sw.js` are untouched, so **no cache bump**
+and no ship-check run (data + docs only, per CLAUDE.md's bump rule).
+
+## Decisions & Reasoning
+- **Name `Greek style yoghurt, plain, dairy free — Alpro`**, not "Alpro Greek Yoghurt":
+  matches the existing `<food>, <qualifiers> — <Brand>` convention, and keeps it sorting
+  next to the other yoghurts rather than under A.
+- **Did NOT reuse the aliases `greek yoghurt` / `greek yogurt`**: those are exact-match
+  aliases on the *dairy* "Greek yoghurt" row (USDA FDC 2259794, 93.7 kcal). Claiming
+  them would make a bare "greek yoghurt" log resolve to whichever row matched first —
+  a silent 29-kcal-per-100g error. Used brand-qualified and dairy-free-qualified
+  aliases only (`alpro greek`, `alpro greek style`, `alpro greek yoghurt`,
+  `dairy free greek yoghurt`, `greek style yoghurt alternative`, `vegan greek yoghurt`).
+- **Price went into `notes`, not the price book**: there is no price column on
+  `staple_products`, and `pricebook.csv` is an *audited* file whose rows are derived
+  from recipe ingredient usage, currently gated on the open price-unit decision
+  (`pricebook-audit.md`). Hand-inserting a branded SKU into it would perturb a file
+  CLAUDE.md says not to touch unasked, and would not match any recipe ingredient
+  string. Recorded "400g pot £2.15 (£5.38/kg) on offer, normally £2.50 (2026-08-13)"
+  in `notes` instead and flagged the gap to Saffron.
+- **Recorded salt verbatim as `<0.5g`**: that is what the pasted label said. It is
+  almost certainly the packaging's "less than" rounding rather than a real 0.5 g
+  (comparable Alpro yoghurts are ~0.09–0.24 g), but inventing a tighter number would
+  breach the flag-don't-guess rule. There is no salt column so nothing computes on it.
+- **Skipped the pre-write review CSV** from the `recipe-db` skill: that rule is scoped
+  to bulk writes (>~10 rows). This is a single insert from a label Saffron supplied and
+  read back to her in full.
+
+## Current State (end of session)
+`staple_products` = **179 rows**, verified by count. The new row reads back correctly
+and collides with nothing. The Tracker and `fetchMacroEstimate` both read this table
+live and alias-aware, so the product is usable immediately with no app deploy.
+
+## Next Steps
+1. Nothing outstanding on this row.
+2. If Saffron wants the £5.38/kg figure to actually drive cost features, decide whether
+   branded SKUs belong in `pricebook.csv` at all — that is really a sub-question of the
+   open "variant = price unit vs Product = grouping" decision in `pricebook-audit.md`,
+   which still gates the Apify scrape.
+3. Unrelated and still the real next milestone: nutrition step 2 (apply
+   `scripts/normalise_quantities.py` against a live `recipes` dump) — see 2026-08-12.
+
+## Open Questions / Blockers
+- Should hand-added branded products get a price home at all? Deferred, see Next Steps 2.
+- The `<0.5g` salt figure is the label's rounded value, not a measured one. Harmless
+  today (no salt column, nothing computes on it); worth correcting if a sodium column
+  is ever added.
+
+## Environment & Config Notes
+Repo `saffronlm-cmyk/daily-shuffle`, branch `claude/alpro-greek-yoghurt-staples-liiqhy`
+off `main` @ `8257bbd`. Supabase project `jsxcctrskkkxgdxfaduo`, table
+`staple_products`, written via Supabase MCP `execute_sql` (no migration — no schema
+change). No cache version bumped. No credentials touched.
+
+## Notes & Gotchas
+- **The dairy "Greek yoghurt" row still exists and still owns the bare `greek yoghurt`
+  aliases.** Both rows are now in the AI prompt context simultaneously. If a bare
+  "greek yoghurt" tracker entry ever resolves to the dairy row when Saffron meant the
+  Alpro, the fix is to re-point those aliases — not to add them to both rows.
+- CLAUDE.md's row counts for this table have gone stale twice now (167 stated while the
+  live table was 178). Treat any row count in a doc as a hint and run
+  `select count(*)` — the same warning the workstream section already makes about the
+  "8 no-`serves`" figure.
+
 # Hollow-recipe damage CLOSED (all 52 resolved); cup basis unified on 250 ml; ingredient lines now weight-first
 **Date:** 2026-08-12
 **Project:** Daily Shuffle — data integrity closeout + ingredient display
