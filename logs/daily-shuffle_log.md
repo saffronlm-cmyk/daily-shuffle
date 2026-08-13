@@ -94,7 +94,8 @@ protein, carbs and fat rather than guessed:
 | Vegan Blueberry Protein Pancakes | **6** | ~845 kcal / 142 ≈ 6.0; carbs ≈ 6.7; fat ≈ 5.0 |
 | Grilled Hot Honey Chicken w/ Peach Salsa | **4** (weak) | No quantities and no macros — conventional default only |
 
-**Nothing was written to the database.** Awaiting Saffron's confirmation.
+**Written and verified** after Saffron confirmed: 4 rows updated (id-scoped, guarded by
+`serves is null`), 0 null `serves` remaining across 330 live recipes, none non-positive.
 
 ## Artifacts Produced / Modified
 
@@ -105,8 +106,9 @@ protein, carbs and fat rather than guessed:
 | CLAUDE.md | Damage section open → RESOLVED; cup-basis note added in #66 | Modified | repo root |
 | null-lines-reentry.v2.csv | `ingredients_recovered` filled — closed out as history | Modified | repo root |
 | logs/daily-shuffle_log.md | This entry | Modified | logs/ |
+| Supabase `recipes` (4 rows) | `serves` filled: 6 / 7 / 6 / 4 | Modified | Supabase `jsxcctrskkkxgdxfaduo` |
 
-No database writes this session — all Supabase access read-only.
+One database write this session: the 4 `serves` values above. Everything else read-only.
 
 ## Decisions & Reasoning
 - **Rejected input-time gram conversion** (Saffron's suggestion) in favour of the display
@@ -122,17 +124,15 @@ No database writes this session — all Supabase access read-only.
 
 ## Current State (end of session)
 `main` has the fix, the guards, the 250 ml basis and the new ingredient rendering. The
-recipe library is clean: 330 live recipes, 0 null ingredient lines. Nutrition step 2 is
-unblocked except for the 4 `serves` values.
+recipe library is clean: 330 live recipes, 0 null ingredient lines, 0 null `serves`.
+**Nutrition step 2 is fully unblocked** — nothing is gating it.
 
 ## Next Steps
-1. **Confirm/adjust the 4 `serves` values** in the table above, then write them (a
-   4-row update; count before and after per the recipe-db skill).
-2. **Run step 2**: dump `recipes` via Supabase MCP → `normalise_quantities.py` → review
+1. **Run step 2**: dump `recipes` via Supabase MCP → `normalise_quantities.py` → review
    CSV → `apply_migration` for the `ingredient_grams` jsonb column → batched writes.
    The `empty_ingredients` / `serves_missing` guards will now catch anything unusable.
-3. **Step 3** (bulk nutrition re-population) once step 2 is applied.
-4. Unrelated and still open: the price-book Product-family decision from the 2026-08-06
+2. **Step 3** (bulk nutrition re-population) once step 2 is applied.
+3. Unrelated and still open: the price-book Product-family decision from the 2026-08-06
    entry below, which gates the Apify scrape.
 
 ## Open Questions / Blockers
