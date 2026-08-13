@@ -4,6 +4,163 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# Hollow-recipe damage CLOSED (all 52 resolved); cup basis unified on 250 ml; ingredient lines now weight-first
+**Date:** 2026-08-12
+**Project:** Daily Shuffle — data integrity closeout + ingredient display
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete. Nutrition step 2 is now unblocked apart from 4 `serves` values.
+
+---
+
+## Project Context
+Closes the thread opened by the two 2026-08-05 entries below (hollow-recipe damage found;
+fix merged). **Read those for the root-cause analysis** — this entry does not repeat it.
+Covers the cup-basis/display work (PR #66) and the verification + closeout after Saffron
+re-entered the lost ingredients.
+
+## Session Goal
+Two things: unify the app's cup conversion onto the ruleset's 250 ml basis and change the
+ingredient line to lead with weight/volume; then verify the re-entry and close the damage
+record out.
+
+## State Before This Session
+`main` at `829db47` (#66) then `02eed7b` (#65, price-book, from a parallel session). 52
+recipes hollow, CLAUDE.md carrying an open "Known data damage" section.
+
+## What Was Done
+
+### 1. Cup basis unified on UK 250 ml + weight-first ingredient lines (PR #66, merged `829db47`)
+The app converted cups on a **US 240 ml** basis while the normalisation ruleset uses the
+**UK 250 ml** cup from §6 decision 2 — plain flour 125 vs 133 g/cup. Two shipped tables,
+disagreeing, one feeding the screen and one feeding the macros.
+
+Because the tables are differently grained (app: ~60 ingredient names; script: ~20 broad
+classes) a blanket ×250/240 rescale would *not* have made them agree. Rule applied:
+- **Generic member of a script class → adopt that class's exact value** (flour 133,
+  sugar 213, syrup 350, paste 263, cocoa 103). Real agreement on the common ingredients.
+- **Finer variant the script doesn't distinguish → rescale ×250/240** (almond flour
+  96→100, icing sugar 130→135). Collapsing almond flour to a generic 133 would be worse.
+- **Empirically measured entries → untouched** (grains, nuts, seeds, cheese, berries).
+  Same distinction the plan drew in July. Cheese already agreed at 100.
+
+`_ingToText()` now renders `133g plain flour (1 cup)` — weight/volume, name, original
+measure in brackets. Counts stay counts; already-metric lines are left alone; a note
+merges into the same bracket (`80g rolled oats (1 cup, jumbo)`).
+
+**Three pre-existing bugs surfaced by that change**, all fixed in the same PR:
+- `convertIngredientText()` skipped any line containing `(...cup)`. The new format would
+  have **silently disabled the imperial toggle on every converted line**. Narrowed to
+  skip only genuine imperial equivalents `(...oz|lb)`.
+- `multiplyIngredientText()` matched `FRAC_OUT` on the entry *value* (a glyph) instead of
+  the key (a number), so the fraction branch never fired and `¾` rendered as `0.8`.
+- The same function swallowed the space before the unit → `2onion` when scaled.
+
+### 2. Verified the re-entry — 50 of 52, and two deliberate deletions
+Saffron re-entered the ingredients via a separate Supabase-MCP chat using the prompts in
+the previous entry. Verified against live data:
+- **0 null ingredient lines library-wide.** Damage cleared.
+- All restored lines are plain strings with source quantities intact and **no
+  hand-computed grams** — the addendum's central instruction was followed.
+- 50 of the 52 restored; **2 were deliberately deleted by Saffron** (hard-deleted, rows
+  gone, not `import_status='deleted'`): Maple Cinnamon Pumpkin Overnight Oats
+  (@manskis_wellness) and XL Gluten Free Rice Paper Dumplings (glutenfree.asian). Live
+  recipe count 332 → 330.
+- Checked for dangling references: **no table in the project has a `recipe_id` column**,
+  so nothing in `saved_meals` / `food_log` / `day_meta` points at deleted rows. Only a
+  client's `ds_recipe_cache` could hold stale copies until it refreshes.
+- Line-count reconciliation vs the worklist: 41 exact, 5 longer (extra detail — e.g.
+  Chicken Tikka Masala gained a "Cooking Chicken" section), 4 one line short (Green
+  Goddess Pasta Salad, No Bake Coconut Cookies, Pad See Ew with Beef, Snickers Overnight
+  Oats). **Saffron reviewed and accepted the short ones** — normal re-entry variance.
+- Two recipes have empty `ingredient_sections` (Apple & Cinnamon Protein Porridge, Whole
+  Roast Chicken) — both `import_status='custom'` from April/May, unrelated to this damage.
+
+### 3. Closed the damage record
+CLAUDE.md's "Known data damage" section rewritten from open to **RESOLVED**, with a note
+that any future null lines are a *new* regression rather than this one.
+`null-lines-reentry.v2.csv`'s `ingredients_recovered` column filled in (99 rows
+"re-entered 2026-08-12", 4 rows "recipe deleted 2026-08-12") so the file is
+self-describing history rather than an open worklist.
+
+### 4. Worked out the 4 missing `serves` values (proposed, NOT written)
+Three of the four already carry per-serve macros, so serves was **back-calculated** from
+stored per-serve figures ÷ estimated whole-recipe totals, cross-checked across kcal,
+protein, carbs and fat rather than guessed:
+
+| Recipe | Proposed | Basis |
+|---|---|---|
+| Cat Magic Macro Protein Brownie | **6** | ~990 kcal / 149 per serve ≈ 6.6; ~95 g protein / 15 ≈ 6.3 |
+| Pumpkin Pecan Pancakes | **7** | ~1030 kcal / 148 ≈ 7.0; carbs ≈ 7.2; fat ≈ 6.0 |
+| Vegan Blueberry Protein Pancakes | **6** | ~845 kcal / 142 ≈ 6.0; carbs ≈ 6.7; fat ≈ 5.0 |
+| Grilled Hot Honey Chicken w/ Peach Salsa | **4** (weak) | No quantities and no macros — conventional default only |
+
+**Written and verified** after Saffron confirmed: 4 rows updated (id-scoped, guarded by
+`serves is null`), 0 null `serves` remaining across 330 live recipes, none non-positive.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| index.html | Cup basis 240→250, `_ingToText()` weight-first, 3 display-path bug fixes | Modified (merged #66) | repo root |
+| sw.js | v42 → v43 (#66). Now v44 on main from #65. | Modified (merged #66) | repo root |
+| CLAUDE.md | Damage section open → RESOLVED; cup-basis note added in #66 | Modified | repo root |
+| null-lines-reentry.v2.csv | `ingredients_recovered` filled — closed out as history | Modified | repo root |
+| logs/daily-shuffle_log.md | This entry | Modified | logs/ |
+| Supabase `recipes` (4 rows) | `serves` filled: 6 / 7 / 6 / 4 | Modified | Supabase `jsxcctrskkkxgdxfaduo` |
+
+One database write this session: the 4 `serves` values above. Everything else read-only.
+
+## Decisions & Reasoning
+- **Rejected input-time gram conversion** (Saffron's suggestion) in favour of the display
+  change: it would have covered only 52 of 332 recipes, baked a *third* density table
+  into the raw text, and destroyed the source measure — grams are derived, text is truth.
+- **Class-value adoption over blanket rescale** for the density table: see §1. A ×250/240
+  rescale would have left flour at 130 vs the script's 133 — basis fixed, disagreement not.
+- **Left the 4 short-by-one recipes alone** — Saffron reviewed and accepted them.
+- **Kept `null-lines-reentry.v2.csv` rather than deleting it**, mirroring how v1 was
+  treated: the record of what was damaged has value even once the work is done.
+- **Did not write the `serves` values** — they're derived estimates, and serves is coupled
+  to the stored per-serve macros (see Gotchas). Saffron's call.
+
+## Current State (end of session)
+`main` has the fix, the guards, the 250 ml basis and the new ingredient rendering. The
+recipe library is clean: 330 live recipes, 0 null ingredient lines, 0 null `serves`.
+**Nutrition step 2 is fully unblocked** — nothing is gating it.
+
+## Next Steps
+1. **Run step 2**: dump `recipes` via Supabase MCP → `normalise_quantities.py` → review
+   CSV → `apply_migration` for the `ingredient_grams` jsonb column → batched writes.
+   The `empty_ingredients` / `serves_missing` guards will now catch anything unusable.
+2. **Step 3** (bulk nutrition re-population) once step 2 is applied.
+3. Unrelated and still open: the price-book Product-family decision from the 2026-08-06
+   entry below, which gates the Apify scrape.
+
+## Open Questions / Blockers
+- **`serves` for Grilled Hot Honey Chicken is a guess.** It has no quantities and no
+  macros, so nothing constrains it. Filling `serves` will *not* make it usable for step 3
+  — its real blocker is the `no_quantities` flag, which needs the source recipe.
+- **Does "serves" mean people or pancakes?** For the two pancake recipes the stored
+  per-serve macros imply serves = number of pancakes (7 and 6), not diners. Kept
+  consistent with the stored macros; changing that convention means recomputing them.
+
+## Environment & Config Notes
+Repo `saffronlm-cmyk/daily-shuffle`. PR #66 merged (`829db47`). Cache on `main` is **v44**
+(#65 bumped past #66's v43). Supabase `jsxcctrskkkxgdxfaduo`, read-only. Sandbox egress to
+`supabase.co` blocked — all DB access via Supabase MCP.
+
+## Notes & Gotchas
+- **`serves` and the stored per-serve macros are coupled.** Changing `serves` without
+  recomputing `calories`/`protein_g`/`carbs_g`/`fat_g` silently makes the per-serving
+  figures wrong. This is how the 4 values above were derived in the first place.
+- **`Snickers Overnight Oats` has a bare `"peanuts"` line** with no quantity — it will
+  come out `unresolved` in the step-2 review CSV. Expected, not a defect.
+- **Hard deletes bypass the `import_status='deleted'` convention.** Two rows were removed
+  outright this time. Nothing referenced them, but a hard delete leaves no tombstone, so
+  a recipe that vanishes from a worklist may simply be gone rather than damaged.
+- The display change is untested against the real recipe modal — the smoke test covers
+  boot/tabs/shuffle only. Open a recipe with cup measures and try the ×2 and imperial
+  toggles.
+
 # Price-book merge + audit — the pipeline shares one price across a whole Product family
 **Date:** 2026-08-06
 **Project:** Daily Shuffle — product/recipe pricing (Apify price-book stream)

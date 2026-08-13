@@ -48,8 +48,9 @@ Single user (Saffron), no auth, deployed as static files.
 - **Committed data CSVs (root)** — inputs/outputs of the data workstreams:
   `pricebook.csv`, `pricebook.variants.csv`, `ingredient-master.csv`,
   `recipe-ingredient-normalisation.csv` / `.final.csv`, `split-plan.csv`,
-  `unmatched-ingredients.csv`, `null-lines-reentry.csv` (superseded) /
-  `null-lines-reentry.v2.csv` (current), `pricebook-manual-batch.csv`. These encode
+  `unmatched-ingredients.csv`, `null-lines-reentry.csv` /
+  `null-lines-reentry.v2.csv` (both **closed** — see the resolved hollow-recipe section
+  below; history only, no open work), `pricebook-manual-batch.csv`. These encode
   reviewed human decisions — never regenerate, reorder, or "clean up" one without
   being asked.
   - `pricebook-manual-batch.csv` is the hand-pricing worklist (2026-08-06): the 99
@@ -143,16 +144,22 @@ Single user (Saffron), no auth, deployed as static files.
 3. **Bulk nutrition re-population** (blocked) — **must not run until step 2 is applied**,
    and must skip anything still flagged `empty_ingredients` or `serves_missing`.
 
-### Known data damage: hollow recipes (open)
+### Known data damage: hollow recipes (RESOLVED 2026-08-12)
 
-52 recipes hold `ingredient_sections` whose section titles and line counts survive but
-whose every ingredient line is a literal `null` — the text is gone and is only
-recoverable by re-entry from source. Worklist: **`null-lines-reentry.v2.csv`** (52
-recipes / 681 lines). Cause was `patchRecipeToLibrary()` in `index.html` reading a
+**Closed — no action outstanding.** For a period, 52 recipes held `ingredient_sections`
+whose section titles and line counts survived but whose every ingredient line was a
+literal `null`. Cause was `patchRecipeToLibrary()` in `index.html` reading a
 non-existent `ing.item` key off `flattenIngredientSections()`'s structured output and
-PATCHing `undefined` → `null`; fixed 2026-08-05, but the lost text is not recoverable
-from the fix. The older `null-lines-reentry.csv` is the superseded 2026-06 worklist
-(36 recipes; 32 since re-entered) — kept as history, don't work from it.
+PATCHing `undefined` → `null`. Fixed 2026-08-05; the lost text was not recoverable from
+the fix, so all 52 were re-entered from source (50 re-entered by hand, 2 deliberately
+deleted). **Verified: 0 null ingredient lines library-wide.**
+
+Both worklists are now history — `null-lines-reentry.csv` (2026-06, 36 recipes) and
+`null-lines-reentry.v2.csv` (2026-08, 52 recipes). Don't work from either.
+
+If null lines ever reappear, that is a **new** regression, not this one: check any code
+path that writes `ingredient_sections` before assuming otherwise. `ingredient_sections`
+is raw truth and should be treated as read-only by the app except via the recipe editor.
 
 ## AI features
 
