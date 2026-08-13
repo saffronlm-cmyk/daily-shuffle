@@ -49,9 +49,19 @@ Single user (Saffron), no auth, deployed as static files.
   `pricebook.csv`, `pricebook.variants.csv`, `ingredient-master.csv`,
   `recipe-ingredient-normalisation.csv` / `.final.csv`, `split-plan.csv`,
   `unmatched-ingredients.csv`, `null-lines-reentry.csv` (superseded) /
-  `null-lines-reentry.v2.csv` (current), `pricebook-manual-batch.csv`. These encode
-  reviewed human decisions — never regenerate, reorder, or "clean up" one without
-  being asked.
+  `null-lines-reentry.v2.csv` (current), `pricebook-manual-batch.csv`,
+  `salt-pepper-split-review.csv`. These encode reviewed human decisions — never
+  regenerate, reorder, or "clean up" one without being asked.
+  - `salt-pepper-split-review.csv` is the **pre-write review sheet** for splitting
+    combined "salt and pepper" ingredient lines into separate Salt + Pepper lines
+    (2026-08-07 decision): 56 lines across 48 recipes, keyed by
+    `row_key = recipeId|sectionIdx|lineIdx`. 48 are clean two-way splits; **8 are
+    flagged** — four compound lines that also carry sugar/olive oil/lemon, a 6-way
+    Nando's seasoning blend, a 4-way `½ tsp each` line, one ambiguous `1 tsp salt &
+    pepper`, and one row that is a **method step**, not an ingredient. Applying it
+    writes to `recipes.ingredient_sections`, which the `recipe-db` skill treats as
+    read-only source of truth — needs Saffron's sign-off in the `approve?` column
+    first, and the same column is what the apply pass reads.
   - `pricebook-manual-batch.csv` is the hand-pricing worklist (2026-08-06): the 99
     `pricebook.csv` products that can be priced *without* waiting on the open
     price-unit decision or the produce-fold conversion factors. Columns are
