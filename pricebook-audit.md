@@ -224,6 +224,38 @@ Two things partly cover the gap in the meantime:
   the plural form so the map and the convention agree. Until then they disagree
   deliberately, because the singular is the form `canonicalise()` can actually key on.
 
+## 5b. Open items resolved from the hand-pricing pass (2026-08-07)
+
+| item | decision |
+|---|---|
+| `Green Cabbage` | **= Savoy Cabbage.** Confirmed. |
+| `Vanilla Essence` / `Vanilla Bean Paste` | **Distinct products.** Price separately. |
+| `Chipotle Powder` | **Leave unpriced.** Sainsbury's stocks no chipotle powder; do *not* substitute Chipotle Chilli Flakes. |
+| `Salt And Pepper` / `Salt Pepper` / `Pinche Salt Pepper` | **Not a product — split into Salt + Pepper in the recipes.** Scope: **56 ingredient lines across 48 recipes**, 6 carrying `pinche`. |
+| `Chicken` | **Cooked whole/rotisserie chicken, not thigh fillets** — see below. |
+| `Milk Choice` | **Still open** — needs a target term. Evidence below. |
+
+**`Chicken` — the earlier match was wrong.** Checked against the live library: the bare
+`Chicken` lines are overwhelmingly *cooked* — `shredded chicken`, `cooked shredded
+chicken`, `rotisserie chicken`, `leftover shredded chicken`, `pre-cooked chicken` (12 of
+~20 lines) — plus one `1.8 kg whole chicken`. It should be priced as a whole or
+rotisserie bird, which is also what the app's 2026-04 seed implies (`chicken`, 1000 g,
+£5.15). Several of its 19 "uses" are not ingredients at all (`Olive oil, to brush over
+the chicken`, `Enough water to cover the chicken`, `1/2 tbsp oil (to cook chicken)`) and
+should drop out on a cleanup pass.
+
+**`Milk Choice` — context for the decision.** 28 recipes, almost all sweet
+breakfast/baking: overnight oats, baked oats, pancakes, chia puddings, smoothies, cakes,
+muffins. Three name almond milk as the default (`1 cup almond milk, or milk of choice`),
+two say dairy-free/non-dairy explicitly. It is **not** coconut milk — that match was
+wrong. Candidates are `Almond Milk` (14 uses already in the book) or `Soya Milk` (8 uses,
+and the cheapest at £0.85/L in the app seed). Whichever is chosen becomes a `CANON_TERMS`
+entry so future recipes normalise to it.
+
+**Splitting salt & pepper touches `ingredient_sections`**, which the `recipe-db` skill
+treats as the raw source of truth and read-only in practice. It needs a review CSV and an
+explicit go-ahead before any write — it is not a find-and-replace.
+
 ## 6. Recommended order of work
 
 1. **Decide the price-unit question in §3** — this gates the scrape, because it

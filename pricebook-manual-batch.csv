@@ -5,17 +5,17 @@ Baking Powder,160g,per kg,£0.65,£4.06/kg,
 Black Pepper,100g,per kg,£2.80,£28.00/kg,Whole Black Peppercorns. Grinder version also available: 50g £2.85 (£57.00/kg)
 Baking Soda,180g,per kg,£0.65,£3.61/kg,Sainsbury's Bicarbonate of Soda
 Chia Seed,150g,per kg,£1.80,£12.00/kg,
-Milk Choice,400g/400ml,per litre,£0.75,£1.88/litre,"ASSUMPTION: matched to Coconut Milk (Light 400g and regular 400ml, both £0.75/£1.88 per litre) - confirm this is the right product for this row"
+Milk Choice,,,,,"STILL UNDECIDED 2026-08-07 — needs a target term. Context: 28 recipes, almost all sweet breakfast/baking (overnight oats, baked oats, pancakes, chia puddings, smoothies, cakes). 3 name almond milk as the default ('almond milk, or milk of choice'); 2 say dairy-free/non-dairy. NOT coconut milk — the earlier match was wrong. Candidates: Almond Milk (14 uses in book) or Soya Milk (8 uses, cheapest at £0.85/L in the app seed)."
 Fish Sauce,725ml,per litre,£5.49,£7.57/litre,Squid Brand (Amazon)
 Chicken Breast,1kg,per kg,£6.69,£6.69/kg,640g pack also available: £4.62 (£7.22/kg)
 Medjool Date,500g,per kg,£5.00,£10.00/kg,Tesco Finest Medjool Dates (non-pitted)
-Salt And Pepper,,,,,"FLAGGED FOR CONSOLIDATION per user note: this row, 'Salt Pepper', and 'Pinche Salt Pepper' likely refer to the same ingredient combo and need to be normalised into one entry across recipes - not filled with product data yet"
+Salt And Pepper,,,,,DECISION 2026-08-07: not a product — SPLIT INTO SALT + PEPPER IN THE RECIPES. Scope: 56 ingredient lines across 48 recipes (6 of them carrying 'pinche'). Do not price this row.
 Tahini,300g,per kg,£3.00,£10.00/kg,
 Oregano,18g,per kg,£0.98,£54.44/kg,"Stamford Street Co. (dried, jar)"
 White Pepper,,,,,
 Almond Butter,,,£12.81,£12.81/kg,Pack size not visible in screenshot; was £13.41
 Turmeric Powder,48g,per kg,£1.15,£23.96/kg,Sainsbury's Ground Turmeric
-Chicken,1kg,per kg,£6.95,£6.95/kg,"ASSUMPTION: matched to Chicken Thigh Fillets (boneless, skinless) since no other generic 'Chicken' product was screenshotted - confirm this is the right cut"
+Chicken,1kg,per kg,£6.95,£6.95/kg,"CONTEXT CHECKED 2026-08-07 against the library: the bare 'Chicken' lines are overwhelmingly COOKED — shredded/leftover/rotisserie (12 of ~20 lines), plus one 1.8kg whole chicken. NOT thigh fillets; the earlier match was wrong. Price as a whole/rotisserie chicken. Several of the 19 uses are not ingredients at all ('oil to brush over the chicken', 'water to cover the chicken') and should drop out on a cleanup pass."
 Cornstarch,500g,per kg,£2.65,£5.30/kg,Sainsbury's Cornflour (UK equivalent of cornstarch)
 Pumpkin Pie Spice,38g,per kg,£1.15,£30.26/kg,Same price/pack size as Ground Cinnamon (per user note)
 Coconut Aminos,250ml,per litre,£6.99,£27.96/litre,Cocofina Organic (Amazon)
@@ -23,10 +23,10 @@ Nutritional Yeast,100g,per kg,£4.00,£40.00/kg,Marigold Engevita B12 flakes
 Onion Powder,58g,per kg,£1.15,£19.83/kg,Sainsbury's Onion Granules
 Rice Paper,340g,per kg,£3.45,£10.15/kg,Bamboo Tree (Amazon)
 Dill,20g,per kg,£0.60,£30.00/kg,Sainsbury's Bunched Dill
-Salt Pepper,,,,,FLAGGED FOR CONSOLIDATION - see 'Salt And Pepper' row note
-Vanilla Bean Paste,60ml,per litre,£5.75,£95.83/litre,Nielsen-Massey. 118ml also available: £10.00 (£84.75/litre)
+Salt Pepper,,,,,DECISION 2026-08-07: split in the recipes — see 'Salt And Pepper' row.
+Vanilla Bean Paste,60ml,per litre,£5.75,£95.83/litre,Nielsen-Massey. 118ml also available: £10.00 (£84.75/litre). CONFIRMED 2026-08-07 distinct from Vanilla Essence.
 Tuna,4x145g (580g),per kg,£2.49,£6.10/kg,Tuna Chunks in Spring Water
-Chipotle Powder,45g,per kg,£1.30,£28.89/kg,ASSUMPTION: matched to Chipotle Chilli Flakes (closest match; Sainsbury's doesn't stock a chipotle powder specifically) - confirm flakes vs powder is fine for your recipes
+Chipotle Powder,,,,,DECISION 2026-08-07: Sainsbury's stocks no chipotle powder — left unpriced rather than substituting Chipotle Chilli Flakes. Do not fill with the flakes price.
 Nutmeg,50g,per kg,£1.15,£23.00/kg,Sainsbury's Ground Nutmeg
 Thai Red Curry Paste,180g,per kg,£2.50,£13.89/kg,
 Tomato,loose,per kg,£1.80,£1.80/kg,Sold loose/per kg. Also: Cherry Tomatoes 500g £1.50 (£3.00/kg); Baby Plum 325g £1.00 (£3.08/kg)
@@ -37,13 +37,13 @@ Bean Sprout,300g,per kg,£0.85,£2.83/kg,Sainsbury's Beansprouts
 Ginger Paste,75g,per kg,£1.75,£23.33/kg,
 Gochujang Paste,500g,per kg,£3.10,£6.20/kg,Chung Jung One (Amazon)
 Miso Paste,300g,per kg,£3.30,£11.00/kg,Yutaka Organic Miso Paste
-Pinche Salt Pepper,,,,,"FLAGGED FOR CONSOLIDATION - 'Pinche' (a pinch) is a quantity, not part of the ingredient name; consolidate with 'Salt And Pepper' / 'Salt Pepper'"
+Pinche Salt Pepper,,,,,"DECISION 2026-08-07: split in the recipes — see 'Salt And Pepper' row. 'Pinche' is a mangled 'pinch of', a quantity, not part of the name."
 Coconut Cream,250ml,per litre,£2.10,£8.40/litre,
 Desiccated Coconut,250g,per kg,£2.70,£10.80/kg,
 Star Anise,15g,per kg,£1.15,£76.67/kg,
 Sumac,45g,per kg,£1.45,£32.22/kg,
 Sweetcorn,x2,per item,£1.29,65p each,Corn on the cob. Cobettes x4 also available: £1.29 (32p each)
-Vanilla Essence,38ml,per litre,£2.85,£75.00/litre,"Matched to Madagascan Vanilla Extract, Taste the Difference - confirm vs. Vanilla Bean Paste row"
+Vanilla Essence,38ml,per litre,£2.85,£75.00/litre,"CONFIRMED 2026-08-07 distinct from Vanilla Bean Paste — price both separately. Madagascan Vanilla Extract, Taste the Difference"
 Walnut,200g,per kg,£2.35,£11.75/kg,Walnut Pieces
 Arrowroot Starch,80g,per kg,£1.10,£13.75/kg,Sainsbury's Ground Arrowroot
 Garam Masala,38g,per kg,£1.15,£30.26/kg,
@@ -91,5 +91,5 @@ Raisin,500g,per kg,£2.30,£4.60/kg,Seedless
 Taco Seasoning,25g,per kg,£1.30,£52.00/kg,Old El Paso Mexican Taco Seasoning Mix
 Tofu,450g,per kg,£3.50,£7.78/kg,The Tofoo Co. Naked Organic Tofu
 Cashew,200g,per kg,£3.20,£16.00/kg,Oven Baked Unsalted
-Green Cabbage,each,per item,£0.77,77p each,"ASSUMPTION: matched to Savoy Cabbage as the closest 'green' option - White Cabbage (89p) and Red Cabbage (89p) also available, confirm this is right"
+Green Cabbage,each,per item,£0.77,77p each,CONFIRMED 2026-08-07 = Savoy Cabbage. (White and Red also stocked at 89p — not this row.)
 Lean Turkey,500g,per kg,£4.95,£9.90/kg,2% Fat Turkey Breast Mince (leaner option). 7% Fat Turkey Mince also available: £4.25 (£8.50/kg)
