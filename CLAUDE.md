@@ -70,7 +70,12 @@ Single user (Saffron), no auth, deployed as static files.
     **250 ml** basis on 2026-08-05 (they previously used a US 240 ml cup, so displayed
     weights disagreed with the macro figures). These are still two separate tables at
     different granularity — the app keys on specific ingredient names, the script on
-    ~20 broad classes — so change one and check the other.
+    ~20 broad classes — so change one and check the other. The app's `parseQty()` was
+    likewise brought onto the script's parsing rules on 2026-08-23: it now reads
+    units glued to the number (`200g flour`, `15ml fish sauce` — the library's
+    dominant form, previously unparsed, so the whole line fell through as the
+    ingredient name) and collapses ranges (`3–4 tbsp`) to their **midpoint**, per the
+    plan's §3. Keep the two in step.
   - `MONETIZATION.md` — monetization + rollout roadmap (strategy, phases, tasks with
     acceptance criteria, decision gates, status tracker). Built to be executed one task
     at a time by any session — read its §0 operating rules before doing any

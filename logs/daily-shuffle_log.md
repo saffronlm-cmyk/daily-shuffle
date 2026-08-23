@@ -4,6 +4,186 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# parseQty Was Dropping Quantities on Glued Units and Ranges (650 lines, 225 recipes)
+**Date:** 2026-08-23
+**Project:** Daily Shuffle — recipe ingredient parsing (`index.html`)
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete. PR #72 merged.
+
+---
+
+## Project Context
+Sits underneath the nutrition-estimation workstream (steps in CLAUDE.md). Step 2
+(quantity normalisation) is approved and scripted but still **not applied** — see the
+2026-07-01 entry for the §6 decisions and the 2026-08-05 entry for the 250 ml cup
+unification. This session did not advance step 2; it fixed a **pre-existing app-side
+parser bug** that would have made step 2's output disagree with what the app displays.
+
+Not related to the hollow-recipe damage (closed 2026-08-12) — this bug never wrote
+anything to the database.
+
+## Session Goal
+Started as two questions from Saffron: (1) does the Tracker let her manually adjust
+macro targets, and (2) why do recipes she uploads to Supabase via **Claude chat** end
+up with the quantity sitting inside the ingredient-name box instead of the qty box.
+Question 2 turned into the session's real work: diagnose and fix.
+
+## State Before This Session
+`main` at `5469d36` (#71). Working branch `claude/manual-macro-targets-y9czdf` did not
+yet exist. `sw.js` at `daily-shuffle-v44`.
+
+## What Was Done
+
+### 1. Tracker macro targets — answered, no change made
+Already implemented, and has been since the tracker was integrated (commit `1ffe151`).
+Tracker tab → **"Targets"** button (`index.html:1317`) → `trkOpenTargets()` modal with
+five editable fields; `trkSaveTargets()` persists to `localStorage` under
+`ds_trk_targets`, merged over `TRK_TARGET_DEFAULTS` (1800/130/170/58/30) on load.
+
+Two caveats surfaced and reported, **neither fixed** (not asked to):
+- `ds_trk_targets` is **not** in the cloud-sync snapshot (`buildSyncPayload`, approx.
+  `index.html:5037-5053`). That list carries a *legacy* `ds_targets` key from the old
+  Track tab — a different thing. So targets do not follow her across devices.
+- `trkSaveTargets` does `|| TRK_TARGET_DEFAULTS.cal`, so a blank/zero **calorie** field
+  silently reverts to 1800. The other four macros accept 0 fine.
+
+### 2. Diagnosed the ingredient-field bug — it was NOT the chat uploads
+Saffron's framing was that Claude chat writes the rows wrong. It doesn't. The library
+stores each ingredient as **one plain string** (`"15ml fish sauce"`) — that is the
+convention across all 334 recipes including hand-entered ones — and the app splits it
+into qty/unit/name at **read time** via `parseQty()`.
+
+Root cause: the quantity regex in `_consumeQtyUnit()` required **whitespace** between
+the number and the unit:
+
+```js
+/^([\d½¼¾⅓⅔⅛][½¼¾⅓⅔⅛\d.\s]*?)\s+(?=[a-zA-Z(])/
+```
+
+So `2 tbsp soy sauce` parsed, `15ml fish sauce` did not. On a miss `parseQty` returns
+the **entire original string** as the name — hence a filled name box and an empty qty
+box. Verified by extracting the real function out of `index.html` into a node harness
+and running it, not by reading the regex.
+
+### 3. Measured the blast radius against live Supabase
+Reimplemented the parser's match conditions as SQL over all `ingredient_sections`:
+- **4,350** ingredient lines total; **650** lose their quantity; **225 of 334 recipes
+  (67%)** affected.
+- Breakdown: 536 glued-unit (`200ml milk of choice`), 97 numeric range
+  (`4–5 garlic cloves`), 17 other.
+
+Damage was **not** confined to the editor boxes: `computeRecipeCost()`
+(`index.html:3440`) passes the null qty to `_toBase()`, gets null back, and counts the
+line as **unpriced** — so recipe costs have been silently understated wherever a
+glued-unit line appears. Price-book lookups also missed, since
+`canonicalise("200g milk of choice")` keys on the digits too.
+
+### 4. Found the Python side was already correct
+`parse_leading_amount()` in `scripts/normalise_quantities.py:61` handles both shapes:
+`\d+(?:\.\d+)?` followed by `\s*` (so `200g` splits), and ranges → **midpoint**. So the
+app was the only component out of step. This meant **no script change was needed**, and
+it set the choice of range semantics (see Decisions).
+
+### 5. Fixed `_consumeQtyUnit()` and verified
+Two additions, both placed **after** the existing fraction and spaced parsers have
+already missed, so existing behaviour is untouched by construction.
+
+### 6. Verification (the part worth trusting)
+- 26 hand-picked shapes through old vs. new harness: 12 previously-broken now parse,
+  7 previously-working unchanged, 7 must-not-grab cases untouched.
+- All 16 distinct "other" residual shapes diffed old vs. new: 13 identical, **2
+  improved** (`1.5–2 lb …`, `1x 425g can tuna`), **0 regressed**.
+- **Regression proof, not a sample:** counted in SQL how many of the 2,887 lines the
+  old parser already handled could trigger either new branch. **Zero overlap on both.**
+  The change is therefore strictly additive on this corpus.
+- Post-fix: **635 of 650** broken lines parse (224 recipes). 15 remain — see Gotchas.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| `index.html` | `_consumeQtyUnit()` — added glued-unit branch + range-midpoint pre-pass | Modified | `/home/user/daily-shuffle/` |
+| `sw.js` | `CACHE` bumped `daily-shuffle-v44` → `v45` | Modified | `/home/user/daily-shuffle/` |
+| `CLAUDE.md` | Added the parseQty/midpoint rule to the quantity-normalisation bullet | Modified | `/home/user/daily-shuffle/` |
+| `logs/daily-shuffle_log.md` | This entry | Modified | `/home/user/daily-shuffle/logs/` |
+
+No database writes. `ingredient_sections` untouched — Supabase MCP used **read-only**.
+
+## Decisions & Reasoning
+- **Fixed the app parser rather than the uploaded data.** Options: (a) tell Claude chat
+  to write `200 g` with a space, (b) migrate the 650 lines, (c) fix `parseQty`. Chose
+  (c): the glued form is correct UK convention and already dominant in the library, so
+  (a) fights the house style forever and (b) is a destructive rewrite of reviewed data
+  that only fixes today's rows. (c) is read-time — **no migration, every existing
+  recipe corrects itself on next load**.
+- **Ranges → midpoint, not lower bound.** Lower bound is the conservative default I'd
+  otherwise pick, but `quantity-normalisation-plan.md` §3 locks **midpoint** and
+  `normalise_quantities.py` already implements it. App now agrees with the script.
+  Do not "simplify" this to the lower bound later — it would resplit the two.
+- **Reused `_UNIT_RE` for the glued branch instead of writing a second unit list.**
+  A duplicated list is a guaranteed future drift bug — CLAUDE.md already tracks five
+  copies of `canonicalise()` for exactly this reason.
+- **Guarded the glued branch with a lookahead + `_UNIT_RE` test** so it only eats digits
+  when a *real* unit follows. Keeps it off `200grams`, `7Up`, `2x400g`.
+- **Left `cm`, `4 × 100g` and vulgar-fraction ranges unfixed.** 15 lines total; `cm`
+  isn't a supported unit anywhere in the app, so "fixing" it means a new unit class —
+  scope creep on a parser fix.
+- **Did not fix the two Tracker-target caveats.** Real, but she asked a question, not
+  for a change; bundling them into a parser PR would muddy it.
+
+## Current State (end of session)
+Working. PR **#72** merged into `main`. ship-check clean: 3/3 script blocks parse,
+smoke test 5/5, cache bumped, drift script clean. Nutrition step 2 remains **not
+applied** — unchanged by this session.
+
+## Next Steps
+1. **Open the app and confirm on a real recipe** — the smoke test covers boot/tabs/
+   shuffle, it does **not** exercise the editor's qty boxes. Open any recipe with a
+   `200g`-style line, hit "✏️ Edit recipe", confirm qty/unit/name land in three boxes.
+   Hard-refresh once if the old `v44` cache is still serving.
+2. **Expect recipe costs to move.** Glued-unit lines were being dropped as unpriced, so
+   per-portion costs were understated. Post-fix figures are the correct ones — don't
+   read the change as a new bug.
+3. Nutrition step 2 (quantity normalisation) is still the open workstream — unchanged.
+   Its next action is still: dump `recipes` via Supabase MCP, run
+   `scripts/normalise_quantities.py`, review `quantity_review.csv` before any write.
+4. Optional, if she wants them: the two Tracker-target caveats in §1 above.
+
+## Open Questions / Blockers
+None blocking. Two deferred items, both logged above and neither started: Tracker
+targets not cloud-synced, and the calorie-field `|| default` quirk.
+
+## Environment & Config Notes
+- Repo `saffronlm-cmyk/daily-shuffle`, branch `claude/manual-macro-targets-y9czdf`,
+  PR **#72** (merged). Branch name is a leftover from the macro-targets question and
+  does not describe its contents — don't be confused by it later.
+- `sw.js` `CACHE` now **`daily-shuffle-v45`**. Read the live value from `sw.js`, never
+  from this entry.
+- Supabase project `jsxcctrskkkxgdxfaduo`, table `recipes`, read-only this session.
+- No credentials involved beyond the already-public inlined anon key.
+
+## Notes & Gotchas
+- **The 650/225 figures are as measured on 2026-08-23 and will drift** as recipes are
+  added. The SQL that produced them is reproducible from the classification in §3:
+  a line is "lost" if it starts with a digit or vulgar fraction but matches neither the
+  ASCII-fraction nor the spaced-qty pattern.
+- **`parseQty` returns the whole input string as `name` on a parse miss.** That silent
+  fallback is what made this bug invisible for so long — nothing errors, the line just
+  quietly carries its quantity in the wrong field. Worth remembering when debugging any
+  future ingredient-field weirdness.
+- **`_UNIT_RE` has no `g` flag**, so `.test()` is stateless — the new glued branch
+  relies on that. If anyone adds `/g` to it, the glued branch breaks intermittently via
+  `lastIndex`.
+- **The range pre-pass rewrites `t` before parsing** (`4–5 garlic` → `4.5 garlic`). It
+  is deliberately gated on a `(?=\s|[a-zA-Z])` lookahead so it can't fire on
+  `70-80% dark chocolate` or `5-spice powder`. Don't loosen that lookahead.
+- `"00 flour"` still yields qty null and name `"flour"` — the `00` is eaten and not
+  recovered. Pre-existing, unchanged by this fix, and not worth chasing.
+- Claude chat was **not** doing anything wrong. If this symptom is ever reported again,
+  check `parseQty` before blaming the writer.
+
+---
+
 # Added Alpro Greek Style plain yoghurt alternative to `staple_products` (178 → 179 rows)
 **Date:** 2026-08-13
 **Project:** Daily Shuffle — nutrition data (staple products)

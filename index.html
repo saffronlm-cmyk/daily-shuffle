@@ -3233,6 +3233,16 @@ const _DENSITY_G_PER_CUP = {
 // the remaining text. Used by parseQty so it can pick up compound forms like
 // "1/2 cup 1 tbsp butternut puree" and sum them into one quantity.
 function _consumeQtyUnit(t) {
+  // Ranges ("4-5 garlic cloves", "100-150g flour") collapse to their midpoint
+  // first, so the parsers below see a single number. Midpoint (not the lower
+  // bound) is the rule locked in quantity-normalisation-plan.md 3, and is what
+  // scripts/normalise_quantities.py already does. The lookahead keeps this off
+  // "70-80% dark chocolate" and "5-spice powder".
+  const range = t.match(/^(\d+(?:\.\d+)?)\s*[-–—]\s*(\d+(?:\.\d+)?)(?=\s|[a-zA-Z])/);
+  if (range) {
+    const mid = (parseFloat(range[1]) + parseFloat(range[2])) / 2;
+    t = mid + ' ' + t.slice(range[0].length).replace(/^\s+/, '');
+  }
   let qty = null, rest = t;
   // ASCII fractions (with optional whole-number prefix)
   const ascii = t.match(/^(\d+\s+)?(\d+)\s*\/\s*(\d+)(?=\s|$)/);
@@ -3248,6 +3258,17 @@ function _consumeQtyUnit(t) {
       for (const p of qm[1].trim().split(/\s+/)) val += (_FRAC_QTY[p] ?? (parseFloat(p) || 0));
       qty = val || null;
       rest = t.slice(qm[0].length);
+    } else {
+      // Unit glued to the number, with no space: "200g flour", "15ml fish
+      // sauce", "1.13kg chicken thighs". This is the dominant UK form and the
+      // one the library actually uses, so without it the whole line fell
+      // through as the ingredient name. Only consume the digits when a real
+      // unit follows, so "200grams", "7Up" and "2x400g" are left untouched.
+      const glued = t.match(/^(\d+(?:\.\d+)?)(?=[a-zA-Z])/);
+      if (glued && _UNIT_RE.test(t.slice(glued[0].length))) {
+        qty = parseFloat(glued[1]) || null;
+        rest = t.slice(glued[0].length);
+      }
     }
   }
   let unit = null;
