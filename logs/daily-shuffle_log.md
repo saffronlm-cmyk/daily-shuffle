@@ -4,6 +4,166 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# Grocery List Was Multiplying Batch Recipes by Days Instead of Batches
+**Date:** 2026-08-23
+**Project:** Daily Shuffle — meal plan → grocery list (`index.html`)
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete. PR #73 merged.
+
+---
+
+## Project Context
+Second piece of work in the same session as the entry immediately below
+("parseQty Was Dropping Quantities…", 2026-08-23). **The two bugs are unrelated in
+cause but landed on the same screen**, which is very likely why the grocery list looked
+wrong in more than one way at once: `parseQty` was *losing* quantities, and
+`_groceryAggregate` was *over-counting* the ones that survived. Read both entries
+together before touching grocery-list maths.
+
+Nutrition workstream untouched again — step 2 still not applied.
+
+## Session Goal
+Saffron asked whether recipe serving sizes are factored into the leftover quantities on
+the calendar, then reported the real symptom: a **4-day plan whose breakfast and dinner
+each serve 4 had multiplied quantities in the grocery list**. Diagnose and fix.
+
+## State Before This Session
+`main` at `4225e50` (#72, the parseQty fix, merged earlier this session).
+`sw.js` at `daily-shuffle-v45`.
+
+## What Was Done
+
+### 1. Answered the servings/leftover question — two paths, only one correct
+There is **no Calendar tab**. The Calendar is a *section inside the Shuffle tab*
+(`tab-plan`), rendered by `renderPlanOutput()` (`index.html:4278`). Worth knowing
+before hunting for a tab that doesn't exist.
+
+- **Shuffle button — servings drives leftovers correctly.** `buildBatchSchedule()`
+  (`index.html:3916`) does `const n = Math.min(pick.servings || 1, rem)` — a recipe
+  occupies exactly `servings` consecutive days. `dinnerBatchDay`/`dinnerBatchTotal` are
+  measured off that span.
+- **AI Plan button — servings is never consulted.** `buildPlanFromAIDays()`
+  (`index.html:4149`) *measures* the span from whatever IDs the model repeated. The
+  model is never told servings: `formatR()` (`index.html:4051`) sends only
+  `id: name [kcal, protein] ★`, and the system prompt hardcodes *"group the SAME dinner
+  ID across 2–4 consecutive days"* (`index.html:4089`).
+  Against the live library that misfires both ways — of 54 dinner recipes, **5 serve 1**
+  (would be labelled "Leftover day 2/3" with no food left) and anything serving 5+ gets
+  truncated to 4. Only the 23 serves-2 and 7 serves-3 dinners fit the hardcoded range.
+
+**Not fixed** — see Next Steps. Flagged in PR #73's "Not included" section too.
+
+### 2. Found the actual reported bug — grocery scaling
+`_groceryAggregate()` (`index.html:4441`) had:
+
+```js
+const portionScale = (idCounts[idStr] || 1); // recipe used N times in plan
+```
+
+`idCounts` is the number of **plan slots** a recipe fills = **portions eaten**. But the
+recipe as written already yields `servings` portions, so what you shop for is
+**batches** = `ceil(portions / servings)`. Scaling by portions multiplied a 4-serve
+dinner over 4 days by 4.
+
+Note the app's own planner contradicts this: `buildBatchSchedule` deliberately spreads
+one cook across `servings` days and the calendar labels them "Leftover day 2/4". The
+grocery list was the only component treating those days as separate cooks.
+
+### 3. Reproduced at runtime before changing anything
+Wrote a throwaway Playwright script (same fixture-seeding trick as
+`scripts/smoke_test.mjs` — `ds_recipe_cache` + `ds_recipe_cache_full` in
+`addInitScript`), built a 4-day plan by hand, called the real `_groceryAggregate`:
+
+| Recipe line | Correct | Showed (before fix) |
+|---|---|---|
+| 400 g oats (serves 4) | 400 g | **1600 g** |
+| 800 g chicken thighs (serves 4) | 800 g | **3200 g** |
+
+### 4. Fixed and verified
+```js
+const serves = Math.max(1, (r && r.servings) || 1);
+const portionScale = Math.ceil((idCounts[idStr] || 1) / serves);
+```
+Re-ran the harness across 8 servings/days combinations (100 g per recipe, so grams
+should equal batches × 100): serves 1/3 days→300, 2/4→200, 3/4→200, 4/2→100, 4/4→100,
+6/4→100, 4/6→200, 4/9→300. **All correct.**
+
+### 5. Noticed a corroborating inconsistency
+`agg[].priceCost` uses the same `portionScale`, so the **per-aisle subtotals** were
+inflated by the same factor. The **plan cost summary** in `renderGroceryList` sums
+`cost.perPortion` across plan slots (4 days × total/4 = one batch) and was **already
+correct**. So the two figures on that screen disagreed before this change and agree
+after it — independent evidence that `portionScale` was the wrong term rather than the
+cost summary. Did not touch the cost summary.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| `index.html` | `_groceryAggregate()` — `portionScale` now batches, not portions | Modified | `/home/user/daily-shuffle/` |
+| `sw.js` | `CACHE` bumped `daily-shuffle-v45` → `v46` | Modified | `/home/user/daily-shuffle/` |
+| `logs/daily-shuffle_log.md` | This entry | Modified | `/home/user/daily-shuffle/logs/` |
+
+No database writes; Supabase MCP used read-only (serves distribution only).
+
+## Decisions & Reasoning
+- **Fixed `portionScale`, not the cost summary.** Both couldn't be right. The planner's
+  own batch model (`buildBatchSchedule` spreading one cook over `servings` days) and the
+  already-correct plan cost summary both point at portionScale as the outlier.
+- **`ceil(portions / servings)`, not `floor` or exact division.** You can't cook 0.5 of a
+  batch — shopping must round **up**. `ceil` also leaves serves-1 recipes at their old
+  value, so that whole class is provably unaffected.
+- **Fallback `servings || 1`, not `|| 2`.** `mapSupabaseToApp` defaults to 2, but here a
+  wrong-high default would *under*-buy. Falling back to 1 reproduces the old behaviour
+  exactly for any recipe whose servings we can't determine — fails safe.
+- **Left the AI-path leftover-span bug out of this PR.** Different mechanism (prompt +
+  catalog, not aggregation), and mixing them makes the diff harder to review.
+- **Kept the throwaway repro scripts in the scratchpad, not the repo.** They're one-off
+  diagnostics; `scripts/smoke_test.mjs` is the committed runtime check. If this needs
+  re-testing, the pattern is 20 lines — see §3.
+
+## Current State (end of session)
+Working. PR **#73** merged into `main`. ship-check clean: 3/3 parse, smoke 5/5, cache
+bumped to `v46`, drift clean.
+
+## Next Steps
+1. **Re-open the Shuffle tab and regenerate/re-check the current 4-day plan.** Quantities
+   should now show one batch per recipe. Hard-refresh once if `v45` is still cached.
+2. **Per-aisle price subtotals will drop** by the same factor the quantities did. Correct,
+   not a new bug.
+3. **Optional — fix the AI Plan leftover span** (§1). Two candidate changes: add `serves`
+   to `formatR`'s catalog line and replace the hardcoded "2–4 consecutive days" with a
+   per-recipe instruction; and/or clamp the returned span to the recipe's servings in
+   `buildPlanFromAIDays`. **The clamp is the more robust of the two** — it doesn't depend
+   on the model obeying the prompt.
+4. Nutrition step 2 remains the open workstream, unchanged.
+
+## Open Questions / Blockers
+None blocking. Deferred: the AI-path leftover span (above), plus the two Tracker-target
+caveats from the entry below.
+
+## Environment & Config Notes
+- Repo `saffronlm-cmyk/daily-shuffle`, branch `claude/manual-macro-targets-y9czdf`
+  (restarted from `origin/main` after #72 merged, per the merged-PR rule), PR **#73**.
+- `sw.js` `CACHE` now **`daily-shuffle-v46`**. Read the live value from `sw.js`.
+- No credentials in play.
+
+## Notes & Gotchas
+- **`idCounts` counts slot-occurrences, not days.** That's the right numerator — a recipe
+  in two slots on one day is two portions. Don't "fix" it to count distinct days.
+- **The grocery list and the plan cost summary compute cost by different routes** (aisle
+  subtotals via `agg[].priceCost` × portionScale; the header via `computeRecipeCost`'s
+  `perPortion` summed over slots). They agree now. If a future change touches one, check
+  the other — a disagreement between them is a reliable smell.
+- **The Calendar is a section of the Shuffle tab, not a tab.** `renderPlanOutput()`.
+- The serves distribution as of today: no NULLs, 342 recipes, dinners spread 5×serves-1,
+  23×serves-2, 7×serves-3, 17×serves-4, 2×serves-5. Will drift — re-measure, don't cite.
+- Runtime repro pattern worth reusing: `page.addInitScript` seeding `ds_recipe_cache` +
+  `ds_recipe_cache_full`, then `page.evaluate` calling app internals directly. Much
+  faster than driving the UI, and it works fully offline.
+
+---
+
 # parseQty Was Dropping Quantities on Glued Units and Ranges (650 lines, 225 recipes)
 **Date:** 2026-08-23
 **Project:** Daily Shuffle — recipe ingredient parsing (`index.html`)

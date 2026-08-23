@@ -4454,7 +4454,14 @@ function _groceryAggregate(plan) {
     const fd = RECIPE_FULL_DATA[id];
     const r = recipes.find(x => x.id === id || x.id === idStr);
     if (!fd || !fd.ingredients || !fd.ingredients.length) continue;
-    const portionScale = (idCounts[idStr] || 1); // recipe used N times in plan
+    // idCounts is how many plan slots the recipe fills — i.e. portions eaten.
+    // The recipe as written already yields `servings` portions, so what you
+    // actually shop for is the number of BATCHES: ceil(portions / servings).
+    // Scaling by portions alone (the old behaviour) multiplied a 4-serve
+    // dinner spread over 4 days by 4, when one batch cook covers the week.
+    // servings unknown -> treat as 1 serving, i.e. one batch per portion.
+    const serves = Math.max(1, (r && r.servings) || 1);
+    const portionScale = Math.ceil((idCounts[idStr] || 1) / serves);
     for (const ing of fd.ingredients) {
       let qty, unit, name;
       if (ing.item != null) {
