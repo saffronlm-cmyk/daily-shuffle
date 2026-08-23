@@ -122,6 +122,15 @@ Single user (Saffron), no auth, deployed as static files.
   `day_meta`, `saved_meals`, all PK-keyed with open `anon ALL` RLS, upserted via
   `Prefer: resolution=merge-duplicates`). The Tracker's `TRK_SB_URL`/`TRK_SB_KEY` prefer
   this bundled project and fall back to personal creds.
+- **Plan → Tracker sync**: the Shuffle tab's "Send to Tracker" button
+  (`syncPlanToTracker()`) writes one `food_log` entry per planned slot, on that slot's
+  own date, as a normal eaten entry (it counts towards the rings immediately — the
+  `planned`/`status` columns exist and are written but nothing reads them). Every entry
+  it creates is tagged **`entry_type:'plan_sync'`**; a re-sync deletes only those for the
+  affected dates and rewrites them, so it never duplicates and never touches
+  hand-logged entries. **Don't reuse that `entry_type` for anything else** — the delete
+  is keyed on it. Macros come from the Supabase recipe row (per serving), falling back
+  to `RECIPE_FULL_DATA[id].nutrition` for local-only recipes.
 - **Personal Supabase creds** (`ds_supabase_url`/`ds_supabase_key`, Settings → Cloud
   Sync): optional, used only by the separate `user_library` cross-device sync path.
   Most sessions can assume they are NOT set.
