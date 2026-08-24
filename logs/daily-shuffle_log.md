@@ -4,6 +4,158 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# Saffron's hand-priced worklist merged in (87 of 93 rows priced) — supersedes the per-pack-unit convention I invented hours earlier
+**Date:** 2026-08-24
+**Project:** Daily Shuffle — price book (hand-pricing worklist)
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete. Rides in the still-open PR #75. Three follow-ups are hers to decide.
+
+---
+
+## Project Context
+Direct continuation of the entry below (same date, same PR branch). That entry added
+one row to `pricebook-manual-batch.csv` and **guessed at the `Price per measurement`
+convention because every row in the file was empty**. Saffron then supplied the
+hand-priced file, which answers that question — differently from my guess.
+
+## Session Goal
+She uploaded a filled-in `pricebook-manual-batch.csv` and asked two things: does it
+correlate with what's in the repo, and add the M&S hoops row to it.
+
+## State Before This Session
+Branch `claude/alpro-greek-yoghurt-staples-liiqhy` at `3b42a68`, PR #75 open as a
+draft (never merged). Repo file: 94 data rows, exactly one priced — mine, in
+per-pack-unit format. `main` at `ad26046`.
+
+## What Was Done
+
+### 1. Correlation check — it matches
+Parsed both files with a real RFC4180 parser rather than eyeballing (script:
+`scratchpad/compare.mjs`). Result: **identical headers, and 92 of the 93 product rows
+match by name AND in the same order.** Full set of differences:
+
+| Difference | Side | What it is |
+|---|---|---|
+| `NOTE` | uploaded only | A **pseudo-row**, not a product — `Product = NOTE`, Notes holds a file-wide instruction to pluralise names to match supermarket labelling on a final pass |
+| `Gras-fed Collagen` → `Grass-fed Collagen` | renamed | Deliberate spelling fix, documented in her Notes |
+| `M&S Only 5 Ingredients Multigrain Hoops` | repo only | My row from the previous entry — her copy predates it |
+
+So: her file is the repo file plus prices, one rename, one note row. No reordering, no
+dropped products, no field-count damage (all 95 rows exactly 6 fields).
+
+### 2. Her conventions overrule mine — mine was wrong
+The previous entry recorded, at length, a decision to use **per pack unit**
+(`0.00833` = £/g) with bare numbers. Her 87 priced rows use:
+- `Pack qty` with the unit inline — `340g`, `725ml`, `x2`, `loose`, `each`
+- `Measurement convention` = **`per kg` / `per litre` / `per item`** (69/12/5 rows)
+- `£` symbols on prices, unit suffixes on the measurement — `£3.06/kg`,
+  `£7.57/litre`, `65p each`
+
+i.e. **shelf-label figures, kept human-readable**, which in hindsight is obviously
+right for a file whose whole purpose is standing at a shelf with a phone. My
+reasoning (match the app's `packPrice / packSize`) optimised for a consumer that
+doesn't exist yet over the human actually filling the file in. Reformatted the hoops
+row to her convention: `300g | per kg | £2.50 | £8.33/kg`. **Same underlying price,
+same shelf label** — only the presentation changed.
+
+### 3. Took her file verbatim
+Copied her 95 lines byte-for-byte and appended only the hoops row; verified with
+`diff` that `head -n -1` of the result is **identical** to her upload. Deliberately
+did *not* normalise her `£`/`p` mixing (`65p each` vs `£1.25 each`), tidy her
+`ASSUMPTION:` prose, or reorder anything — CLAUDE.md forbids cleaning up these
+reviewed CSVs, and her formatting is self-consistent.
+
+### 4. Rewrote the CLAUDE.md bullet
+The previous commit had documented my per-pack-unit convention as fact. Replaced it
+with hers, plus the two things a future reader would otherwise trip on: the `NOTE`
+pseudo-row, and her `Notes` vocabulary (`ASSUMPTION:` = confirm this match,
+`FLAGGED FOR CONSOLIDATION` = merge these rows). Also recorded that anything importing
+this file **must divide per-kg by 1000** to reach the app's per-g `unitPrice` — the
+conversion my format would have avoided, now stated where an importer will read it.
+
+### 5. Checked the join keys of the rows she changed
+`grep`ped `pricebook.csv` for each:
+- `Gras-fed Collagen` **exists at `pricebook.csv:296`** (4 occurrences) with the
+  typo. Her rename to `Grass-fed Collagen` therefore **breaks that join** until
+  `pricebook.csv` is fixed too. Left her spelling — it's correct English and a
+  deliberate decision — and flagged it rather than "fixing" either file unasked.
+- `Argentine Red Shrimp` exists (`:254`, 4 occ) and `Prawn` exists separately
+  (`:114`, 14 occ) — so her "normalise to Prawns" note is a real merge, not a rename.
+- `Crispy Fried Shallot` exists (`:209`, 6 occ); her note says Sainsbury's has no such
+  product and it should become `Crispy Fried Onions`. `Fried Shallot` (`:292`) already
+  maps to Product `Onion`, so the two rows disagree with each other today.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| pricebook-manual-batch.csv | Replaced with her hand-priced version + the hoops row reformatted to her convention. 94 → 95 data rows, 1 priced → 88 priced | Modified | /home/user/daily-shuffle/ |
+| CLAUDE.md | Worklist bullet rewritten: her conventions, the `NOTE` pseudo-row, her Notes vocabulary, the ÷1000 warning, the two broken join keys | Modified | /home/user/daily-shuffle/ |
+| logs/daily-shuffle_log.md | This entry | Modified | /home/user/daily-shuffle/logs/ |
+| compare.mjs, merge.mjs, check_csv.mjs | RFC4180 comparison / merge / validation scripts | Created (scratchpad, NOT committed) | scratchpad/ |
+
+**No app code touched** — no cache bump, JS parse check and smoke test don't apply.
+
+## Decisions & Reasoning
+- **Adopted her conventions wholesale, did not argue for mine.** 87 rows of real data
+  beat one row of my inference, and her format is the one that works at a shelf.
+- **Did not touch `pricebook.csv`** despite two now-broken join keys. It's audited,
+  and the collagen typo fix + the shrimp/shallot merges are ingredient-normalisation
+  decisions with occurrence counts attached — her call, not a side effect of a CSV
+  merge.
+- **Kept her `NOTE` pseudo-row** rather than moving it to a comment or a doc. It is
+  how she left it, it's inside the file where the work happens, and CLAUDE.md's
+  no-cleanup rule covers exactly this. Documented it instead so no script trips on it.
+- **Kept the hoops row's join warning in `Notes`** — still true, still the only place
+  a reader of that row will see it.
+
+## Current State (end of session)
+`pricebook-manual-batch.csv`: 95 data rows — 88 priced, 6 deliberately blank
+(`White Pepper` genuinely unpriced; `Salt And Pepper` / `Salt Pepper` /
+`Pinche Salt Pepper` / `Argentine Red Shrimp` / `Grass-fed Collagen` awaiting her
+consolidation or price), plus the `NOTE` row. Nothing consumes the file automatically
+— `csv_to_seed.py` must still not run against a partially-filled book
+(`pricebook-audit.md` §3). Pushed to PR #75, still a draft.
+
+## Next Steps
+1. Confirm or correct the four `ASSUMPTION:` rows — `Milk Choice` (matched to Coconut
+   Milk), `Chicken` (matched to thigh fillets), `Chipotle Powder` (matched to chilli
+   flakes), `Green Cabbage` (matched to Savoy).
+2. Do the consolidations her notes flag: the three salt-and-pepper rows → one;
+   `Argentine Red Shrimp` → `Prawns`; `Crispy Fried Shallot` → `Crispy Fried Onions`.
+   These touch `pricebook.csv` and recipe ingredient text, so they're a real pass, not
+   a CSV edit.
+3. Fix `pricebook.csv:296` `Gras-fed` → `Grass-fed` so that row joins again.
+4. Price `White Pepper`, and decide whether the hoops SKU gets a `pricebook.csv` row.
+5. Still the gate on the whole workstream: `pricebook-audit.md` §3 (208 families vs
+   ~365 variants), which blocks the Apify scrape.
+
+## Open Questions / Blockers
+- The four `ASSUMPTION:` matches (Next Step 1) — hers to confirm.
+- Whether the pluralising instruction in the `NOTE` row applies to the whole file now
+  or at the "final naming pass" she mentions. Not acted on.
+- The hoops SKU still joins to nothing; unchanged from the previous entry.
+
+## Environment & Config Notes
+Repo `saffronlm-cmyk/daily-shuffle`, branch `claude/alpro-greek-yoghurt-staples-liiqhy`
+(off `main` @ `ad26046`), PR **#75** — open, draft, this commit extends it rather than
+opening a new one. No Supabase writes. No cache bump. No credentials touched.
+
+## Notes & Gotchas
+- **`Product = NOTE` on row 2 is not a product.** Any script reading this file as
+  products must skip it.
+- **Her figures are per-kg/litre shelf labels; the app's `unitPrice` is per g/ml.**
+  An importer that doesn't ÷1000 will price everything 1000× too high.
+- **`£` and `p` are mixed** in her values (`£3.06/kg`, `65p each`, `77p each`). Any
+  parser needs both.
+- **`Pack qty` is not always numeric** — `loose`, `each`, `x2`, `x2 pack`,
+  `4x145g (580g)`, `400g/400ml`, `340g (150g drained)`. Don't assume `parseFloat`.
+- Two rows are priced with an empty `Pack qty` (`Almond Butter`, `Chinese Five Spice`)
+  — her note says the pack size wasn't visible in the screenshot.
+- The previous entry (below, same date) states the per-pack-unit convention as a
+  decision. **It is superseded by this one** — kept as written, since prior entries
+  aren't edited.
+
 # First priced row in `pricebook-manual-batch.csv` — sets the per-pack-unit precedent; M&S Multigrain Hoops has no `pricebook.csv` join
 **Date:** 2026-08-24
 **Project:** Daily Shuffle — price book (hand-pricing worklist)

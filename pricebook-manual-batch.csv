@@ -1,95 +1,96 @@
 Product,Pack qty,Measurement convention,Price per item,Price per measurement,Notes
-Honey,,,,,
-Baking Powder,,,,,
-Black Pepper,,,,,
-Baking Soda,,,,,
-Chia Seed,,,,,
-Milk Choice,,,,,
-Fish Sauce,,,,,
-Chicken Breast,,,,,
-Medjool Date,,,,,
-Salt And Pepper,,,,,
-Tahini,,,,,
-Oregano,,,,,
+NOTE,,,,,"Product naming should follow pluralising convention as used in supermarket labelling (e.g. hazelnuts, cashews, almonds) - apply on final naming pass"
+Honey,340g,per kg,£1.04,£3.06/kg,720g pack also available: £2.30 (£3.19/kg)
+Baking Powder,160g,per kg,£0.65,£4.06/kg,
+Black Pepper,100g,per kg,£2.80,£28.00/kg,Whole Black Peppercorns. Grinder version also available: 50g £2.85 (£57.00/kg)
+Baking Soda,180g,per kg,£0.65,£3.61/kg,Sainsbury's Bicarbonate of Soda
+Chia Seed,150g,per kg,£1.80,£12.00/kg,
+Milk Choice,400g/400ml,per litre,£0.75,£1.88/litre,"ASSUMPTION: matched to Coconut Milk (Light 400g and regular 400ml, both £0.75/£1.88 per litre) - confirm this is the right product for this row"
+Fish Sauce,725ml,per litre,£5.49,£7.57/litre,Squid Brand (Amazon)
+Chicken Breast,1kg,per kg,£6.69,£6.69/kg,640g pack also available: £4.62 (£7.22/kg)
+Medjool Date,500g,per kg,£5.00,£10.00/kg,Tesco Finest Medjool Dates (non-pitted)
+Salt And Pepper,,,,,"FLAGGED FOR CONSOLIDATION per user note: this row, 'Salt Pepper', and 'Pinche Salt Pepper' likely refer to the same ingredient combo and need to be normalised into one entry across recipes - not filled with product data yet"
+Tahini,300g,per kg,£3.00,£10.00/kg,
+Oregano,18g,per kg,£0.98,£54.44/kg,"Stamford Street Co. (dried, jar)"
 White Pepper,,,,,
-Almond Butter,,,,,
-Turmeric Powder,,,,,
-Chicken,,,,,
-Cornstarch,,,,,
-Pumpkin Pie Spice,,,,,
-Coconut Aminos,,,,,
-Nutritional Yeast,,,,,
-Onion Powder,,,,,
-Rice Paper,,,,,
-Dill,,,,,
-Salt Pepper,,,,,
-Vanilla Bean Paste,,,,,
-Tuna,,,,,
-Chipotle Powder,,,,,
-Nutmeg,,,,,
-Thai Red Curry Paste,,,,,
-Tomato,,,,,
-Cayenne Pepper,,,,,
-Thyme,,,,,
-Banana,,,,,
-Bean Sprout,,,,,
-Ginger Paste,,,,,
-Gochujang Paste,,,,,
-Miso Paste,,,,,
-Pinche Salt Pepper,,,,,
-Coconut Cream,,,,,
-Desiccated Coconut,,,,,
-Star Anise,,,,,
-Sumac,,,,,
-Sweetcorn,,,,,
-Vanilla Essence,,,,,
-Walnut,,,,,
-Arrowroot Starch,,,,,
-Garam Masala,,,,,
-Ginger And Garlic Paste,,,,,
-Almond,,,,,
-Bone-in Skin-on Chicken Thigh,,,,,
-Chickpeas,,,,,
-Chile Lime Seasoning,,,,,
-Crispy Fried Shallot,,,,,
-Garlic Paste,,,,,
-Mirin,,,,,
-Olive,,,,,
-Sun-dried Tomatoes,,,,,
-Sweet Chilli Sauce,,,,,
-Bok Choy,,,,,
-Tamarind Paste,,,,,
-Agave Syrup,,,,,
-Aleppo Pepper,,,,,
-Almond Extract,,,,,
-Apple Sauce,,,,,
-Argentine Red Shrimp,,,,,
-Beetroot,,,,,
-Black Bean,,,,,
-Black Sesame Seed,,,,,
-Chicken Leg,,,,,
-Chili Crunch,,,,,
-Chinese Five Spice,,,,,
-Coconut,,,,,
-Cooking Oil Spray,,,,,
-Coriander Seed,,,,,
-Corn,,,,,
-Courgette,,,,,
-Gras-fed Collagen,,,,,
-Green Bean,,,,,
-Harissa,,,,,
-Hazelnut,,,,,
-Hot Sauce,,,,,
-Mango,,,,,
-Mixed Herb,,,,,
-Msg,,,,,
-Nori,,,,,
-Pitted Medjool Date,,,,,
-Potato Starch,,,,,
-Raisin,,,,,
-Taco Seasoning,,,,,
-Tofu,,,,,
-Cashew,,,,,
-Green Cabbage,,,,,
-Lean Turkey,,,,,
-M&S Only 5 Ingredients Multigrain Hoops,300,g,2.50,0.00833,"Shelf label £8.33/kg (300g box, £2.50), M&S, 2026-08-24. Price per measurement is per g, matching pricebook.csv pack-unit convention. No matching Ingredient row in pricebook.csv yet — new SKU, not currently used by any recipe, so this row does not join until one is added."
+Almond Butter,,,£12.81,£12.81/kg,Pack size not visible in screenshot; was £13.41
+Turmeric Powder,48g,per kg,£1.15,£23.96/kg,Sainsbury's Ground Turmeric
+Chicken,1kg,per kg,£6.95,£6.95/kg,"ASSUMPTION: matched to Chicken Thigh Fillets (boneless, skinless) since no other generic 'Chicken' product was screenshotted - confirm this is the right cut"
+Cornstarch,500g,per kg,£2.65,£5.30/kg,Sainsbury's Cornflour (UK equivalent of cornstarch)
+Pumpkin Pie Spice,38g,per kg,£1.15,£30.26/kg,Same price/pack size as Ground Cinnamon (per user note)
+Coconut Aminos,250ml,per litre,£6.99,£27.96/litre,Cocofina Organic (Amazon)
+Nutritional Yeast,100g,per kg,£4.00,£40.00/kg,Marigold Engevita B12 flakes
+Onion Powder,58g,per kg,£1.15,£19.83/kg,Sainsbury's Onion Granules
+Rice Paper,340g,per kg,£3.45,£10.15/kg,Bamboo Tree (Amazon)
+Dill,20g,per kg,£0.60,£30.00/kg,Sainsbury's Bunched Dill
+Salt Pepper,,,,,FLAGGED FOR CONSOLIDATION - see 'Salt And Pepper' row note
+Vanilla Bean Paste,60ml,per litre,£5.75,£95.83/litre,Nielsen-Massey. 118ml also available: £10.00 (£84.75/litre)
+Tuna,4x145g (580g),per kg,£2.49,£6.10/kg,Tuna Chunks in Spring Water
+Chipotle Powder,45g,per kg,£1.30,£28.89/kg,ASSUMPTION: matched to Chipotle Chilli Flakes (closest match; Sainsbury's doesn't stock a chipotle powder specifically) - confirm flakes vs powder is fine for your recipes
+Nutmeg,50g,per kg,£1.15,£23.00/kg,Sainsbury's Ground Nutmeg
+Thai Red Curry Paste,180g,per kg,£2.50,£13.89/kg,
+Tomato,loose,per kg,£1.80,£1.80/kg,Sold loose/per kg. Also: Cherry Tomatoes 500g £1.50 (£3.00/kg); Baby Plum 325g £1.00 (£3.08/kg)
+Cayenne Pepper,42g,per kg,£1.15,£27.38/kg,
+Thyme,20g,per kg,£0.55,£27.50/kg,Bunched/fresh. Dried jar also available: 12g £1.15 (£95.83/kg)
+Banana,loose,per kg,£0.95,£0.95/kg,Sold loose/per kg
+Bean Sprout,300g,per kg,£0.85,£2.83/kg,Sainsbury's Beansprouts
+Ginger Paste,75g,per kg,£1.75,£23.33/kg,
+Gochujang Paste,500g,per kg,£3.10,£6.20/kg,Chung Jung One (Amazon)
+Miso Paste,300g,per kg,£3.30,£11.00/kg,Yutaka Organic Miso Paste
+Pinche Salt Pepper,,,,,"FLAGGED FOR CONSOLIDATION - 'Pinche' (a pinch) is a quantity, not part of the ingredient name; consolidate with 'Salt And Pepper' / 'Salt Pepper'"
+Coconut Cream,250ml,per litre,£2.10,£8.40/litre,
+Desiccated Coconut,250g,per kg,£2.70,£10.80/kg,
+Star Anise,15g,per kg,£1.15,£76.67/kg,
+Sumac,45g,per kg,£1.45,£32.22/kg,
+Sweetcorn,x2,per item,£1.29,65p each,Corn on the cob. Cobettes x4 also available: £1.29 (32p each)
+Vanilla Essence,38ml,per litre,£2.85,£75.00/litre,"Matched to Madagascan Vanilla Extract, Taste the Difference - confirm vs. Vanilla Bean Paste row"
+Walnut,200g,per kg,£2.35,£11.75/kg,Walnut Pieces
+Arrowroot Starch,80g,per kg,£1.10,£13.75/kg,Sainsbury's Ground Arrowroot
+Garam Masala,38g,per kg,£1.15,£30.26/kg,
+Ginger And Garlic Paste,90g,per kg,£1.90,£21.11/kg,
+Almond,300g,per kg,£3.50,£11.67/kg,Whole Almonds
+Bone-in Skin-on Chicken Thigh,540g,per kg,£2.50,£4.63/kg,Skin on Thighs & Drumsticks pack (mixed cut)
+Chickpeas,400g (240g drained),per kg,£0.41,£1.71/kg,"In water, drained weight noted"
+Chile Lime Seasoning,142g,per kg,£3.50,£24.65/kg,Tajin Clasico Chilli & Lime Seasoning
+Crispy Fried Shallot,200g,per kg,£2.40,£12.00/kg,Naming discrepancy: no fried shallot product exists at Sainsbury's - matched to Fudco Crispy Fried Onions. All recipe mentions of this product should be normalised to 'Crispy Fried Onions'
+Garlic Paste,75g,per kg,£1.75,£23.33/kg,
+Mirin,150ml,per litre,£1.90,£12.67/litre,
+Olive,340g (150g drained),per kg,£1.35,£3.97/kg,"Pitted Black Olives. Nectar price: £1.10 (£3.23/kg). Pitted Green Olives also available, same price"
+Sun-dried Tomatoes,280g,per kg,£3.00,£10.71/kg,
+Sweet Chilli Sauce,280g,per kg,£2.35,£8.39/kg,
+Bok Choy,250g,per kg,£1.55,£6.20/kg,Sainsbury's Pak Choi
+Tamarind Paste,200g,per kg,£1.85,£9.25/kg,MAHI Tamarind Pulp Cooking Paste
+Agave Syrup,250ml,per litre,£2.85,£11.40/litre,The Groovy Food Company
+Aleppo Pepper,170g,per kg,£6.49,£38.00/kg,"Cerez Pazari, Pul Biber (Amazon)"
+Almond Extract,38ml,per litre,£2.40,£63.16/litre,"Moroccan Almond Extract, Taste the Difference"
+Apple Sauce,420ml,per litre,£1.10,£2.62/litre,Sainsbury's Bramley Apple Sauce
+Argentine Red Shrimp,,,,,FLAGGED per user note: normalise to 'Prawns' - all shrimp mentions across recipes should use 'Prawns' naming convention
+Beetroot,500g,per kg,£2.30,£4.60/kg,Sainsbury's Bunched Beetroot
+Black Bean,400g (235g drained),per kg,£0.45,£1.91/kg,"In water, drained weight noted"
+Black Sesame Seed,100g,per kg,£2.10,£21.00/kg,Yutaka Roasted Black Sesame Seeds
+Chicken Leg,1kg,per kg,£2.25,£2.25/kg,Skin on Chicken Legs
+Chili Crunch,210g,per kg,£6.36,£30.29/kg,Laoganma Crispy Chilli Oil (Amazon)
+Chinese Five Spice,,per kg,£1.15,£34.85/kg,Pack size not visible in screenshot
+Coconut,each,per item,£1.25,£1.25 each,Whole cooking coconut
+Cooking Oil Spray,200ml,per litre,£2.60,£13.00/litre,Extra Virgin Olive Oil Spray
+Coriander Seed,25g,per kg,£1.15,£46.00/kg,
+Corn,x2,per item,£1.29,65p each,Same as Sweetcorn - corn on the cob x2 (per user note)
+Courgette,loose,per kg,£2.78,£2.78/kg,Sold loose/per kg
+Grass-fed Collagen,,,,,Corrected spelling from 'Gras-fed' to 'Grass-fed' (per user note). Price data still needed.
+Green Bean,300g,per kg,£1.16,£3.87/kg,
+Harissa,90g,per kg,£1.90,£21.11/kg,
+Hazelnut,100g,per kg,£2.50,£25.00/kg,Blanched Hazelnuts
+Hot Sauce,57ml,per litre,£2.50,£43.86/litre,Tabasco Original
+Mango,x2 pack,per item,£2.00,£1.00 each,
+Mixed Herb,14g,per kg,£1.15,£82.14/kg,Sainsbury's Mixed Herbs
+Msg,100g,per kg,£2.99,£30.00/kg,The Worldwide Mint (Amazon)
+Nori,11g (x5 sheets),per kg,£2.00,£181.82/kg,Yutaka Sushi Nori Roasted Seaweed Sheets
+Pitted Medjool Date,500g,per kg,£5.00,£10.00/kg,"Same as Medjool Date - Tesco Finest, non-pitted (per user note)"
+Potato Starch,1kg,per kg,£6.99,£6.99/kg,The Worldwide Mint (Amazon)
+Raisin,500g,per kg,£2.30,£4.60/kg,Seedless
+Taco Seasoning,25g,per kg,£1.30,£52.00/kg,Old El Paso Mexican Taco Seasoning Mix
+Tofu,450g,per kg,£3.50,£7.78/kg,The Tofoo Co. Naked Organic Tofu
+Cashew,200g,per kg,£3.20,£16.00/kg,Oven Baked Unsalted
+Green Cabbage,each,per item,£0.77,77p each,"ASSUMPTION: matched to Savoy Cabbage as the closest 'green' option - White Cabbage (89p) and Red Cabbage (89p) also available, confirm this is right"
+Lean Turkey,500g,per kg,£4.95,£9.90/kg,2% Fat Turkey Breast Mince (leaner option). 7% Fat Turkey Mince also available: £4.25 (£8.50/kg)
+M&S Only 5 Ingredients Multigrain Hoops,300g,per kg,£2.50,£8.33/kg,"M&S Only 5 Ingredients range. No matching Ingredient row in pricebook.csv — new SKU, not used by any recipe, so this row does not join yet"

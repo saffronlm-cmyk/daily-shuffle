@@ -59,13 +59,26 @@ Single user (Saffron), no auth, deployed as static files.
     `Product | Pack qty | Measurement convention | Price per item | Price per
     measurement | Notes`. **`Product` is the verbatim `Ingredient` string and is the
     join key back into `pricebook.csv`** — corrections belong in `Notes`, never in
-    that column. See `pricebook-audit.md` for the exclusion rules. Count the rows
-    rather than trusting a number here (this line said 99 while the file held 93).
-    **Price per measurement is per pack unit** (per g / per ml / per each), matching
-    `pricebook.csv`'s `Pack unit` column and the app's `packPrice / packSize` — not
-    the per-kg figure shelf labels quote; put that in `Notes`. One row
-    (`M&S Only 5 Ingredients Multigrain Hoops`, added 2026-08-24) is a priced SKU
-    with **no `Ingredient` row in `pricebook.csv`**, so it does not join yet.
+    that column — with one deliberate exception, below. See `pricebook-audit.md` for
+    the exclusion rules. Count the rows rather than trusting a number here (this line
+    said 99 while the file held 93).
+    - **Saffron hand-priced 87 of the rows on 2026-08-24**, which set the value
+      conventions — follow them, don't re-derive: `Pack qty` carries its unit
+      inline (`340g`, `725ml`, `x2`, `loose`, `each`); `Measurement convention` is
+      **`per kg` / `per litre` / `per item`** (not per g/ml); prices carry the `£`
+      symbol; `Price per measurement` carries its unit suffix (`£3.06/kg`,
+      `£7.57/litre`, `65p each`). These are **shelf-label figures, not the app's
+      `packPrice / packSize`** — anything importing this file must divide per-kg by
+      1000 to reach the app's per-g `unitPrice`.
+    - Her `Notes` carry live worklist state: `ASSUMPTION:` = a product match she
+      wants confirmed, `FLAGGED FOR CONSOLIDATION` = duplicate rows to merge into
+      one ingredient. Row 2 is a pseudo-row with `Product = NOTE` holding a
+      file-wide naming instruction (pluralise to match supermarket labelling) —
+      **not a product**; skip it when reading this file as data.
+    - Two rows deliberately break the join-key rule and need `pricebook.csv` fixed
+      to match: `Grass-fed Collagen` (still `Gras-fed Collagen` at
+      `pricebook.csv:296`) and `M&S Only 5 Ingredients Multigrain Hoops` (a priced
+      SKU with **no `Ingredient` row at all**, 0 recipe occurrences).
 - **Planning / handoff docs** — read before touching the related area:
   - `logs/daily-shuffle_log.md` — rolling session log, newest first. **Read the top entry
     at the start of every session** — it says exactly where things stand.
