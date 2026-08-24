@@ -438,6 +438,172 @@ version bumped. No Supabase writes this session. No credentials touched.
   is not in the same class as the locked `pricebook-audit.md` decisions — treat it as
   provisional until she confirms.
 
+# "Send to Tracker" — Plan → Tracker Sync Built and Shipped
+**Date:** 2026-08-23
+**Project:** Daily Shuffle — Shuffle ↔ Tracker integration (`index.html`)
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete. PR #74 merged (`ad26046`).
+
+---
+
+## Project Context
+Third and final piece of the 2026-08-23 session. The two entries below cover the earlier
+halves — the `parseQty` glued-unit fix (#72) and the grocery batch-scaling fix (#73).
+This one is a **new feature**, not a bug fix, and is independent of both.
+
+Nutrition workstream still untouched — step 2 (quantity normalisation) remains not
+applied, unchanged all session.
+
+## Session Goal
+Saffron asked for "a button or something" to push the Shuffle plan's meals through to
+the matching Tracker slots, so a planned week wouldn't have to be re-entered by hand.
+Scope it, take the design decisions, build it, ship it.
+
+## State Before This Session
+`main` at `0b2536e` (#73). `sw.js` at `daily-shuffle-v46`. No link of any kind between
+the Shuffle plan and the Tracker — every planned meal had to be re-added manually.
+
+## What Was Done
+
+### 1. Reconnaissance — the groundwork was mostly already there
+Four findings that made this much smaller than expected:
+- **`food_log` already has `planned` (boolean) and `status` columns**, and
+  `trkMakeEntry()` already writes both — but **nothing in the app reads either**. The
+  schema anticipated this feature and was never wired up.
+- **`trkAddRecipe()`** (`index.html:6431`) already builds a valid recipe entry with
+  macros and a `recipe_snapshot`. The sync is essentially that in a loop.
+- **The plan already persists what's needed** — `savePlan()` stores each day's
+  `dateISO` and slots (`_PLAN_DAY_SLOTS`).
+- **Recipe macros are stored PER SERVING.** Confirmed in `fetchMacroEstimate` (which
+  divides by servings before saving), not from the doc. So one planned slot = one entry
+  of one serving, **no scaling maths at all**.
+
+### 2. Two decisions put to Saffron (they changed the work materially)
+Asked rather than guessed; both answered:
+- **Ring maths → "count immediately as eaten."** I recommended the planned/confirm
+  model (it would have used the dormant `planned`/`status` columns and given honest
+  totals on days she deviates), but she chose immediate counting. **Consequence she was
+  told and accepted: syncing a week ahead shows every future day as fully eaten.**
+- **Button placement → Shuffle tab, by the plan** (push model), next to the lock bar.
+
+### 3. Built `syncPlanToTracker()`
+Placed in the tracker section after `trkAddRecipe` (it uses tracker internals; the
+`<script>` blocks share global scope so the Shuffle-tab button can call it).
+
+- Slot map `PLAN_SLOT_TO_MEAL`: breakfast/lunch/dinner straight across, **`snack` and
+  `snack2` both → `snack`** (the tracker has one snack slot).
+- Skips empty slots and **SHAKE (`id: 0`)** — it carries no macros.
+- Macros from the Supabase row via `trkFetchRecipes()`; **falls back to
+  `RECIPE_FULL_DATA[id].nutrition`** for local-only recipes (that fetch only returns
+  cloud rows). Neither available → still logged, with the count surfaced in the toast.
+- **`trkMakeEntry()` changed**: `date_key: o.date_key || trkDay`. That one-line change is
+  what lets the sync write future dates without navigating the tracker to each one.
+- New helper **`_trkPatchDayCache(dateKey, mutate)`** — read-modify-write on
+  `ds_trk_day_<key>` that **preserves each day's `meta`** (exercise, notes, tdee).
+  Necessary because `trkCacheDay()` only ever writes the day currently on screen.
+
+### 4. Idempotency (the part most worth understanding)
+Every entry is tagged **`entry_type:'plan_sync'`**. A sync first DELETEs only those rows
+for the affected `date_key`s, then rewrites. So repeat syncs never duplicate and
+hand-logged entries are never touched.
+
+**If the cloud delete fails the sync aborts** rather than writing entries that would
+duplicate once the device reconnects (`trkLoadDay` replaces `trkEntries` from cloud). If
+there's **no cloud configured at all** it proceeds locally — nothing to duplicate there.
+That asymmetry is deliberate.
+
+### 5. Verified at runtime, not by reading
+Sandbox can't reach Supabase, so **stubbed `window.fetch` and `window.confirm`** in the
+page and drove a real 2-day, 3-slot plan through `_groceryAggregate`'s sibling path:
+
+| Check | Result |
+|---|---|
+| Entries created | 6, correct dates |
+| Macros from cloud row | 400 / 600 kcal ✓ |
+| Local-only fallback | 333 kcal from `RECIPE_FULL_DATA` ✓ |
+| Pre-existing hand-logged entry | survived ✓ |
+| Day meta (exercise/notes/tdee) | preserved ✓ |
+| Second sync | 4 and 3 — unchanged, no duplication ✓ |
+| Delete scope | `?entry_type=eq.plan_sync&date_key=in.("2026-08-25","2026-08-26")` ✓ |
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| `index.html` | `syncPlanToTracker()`, `_trkPatchDayCache()`, `PLAN_SLOT_TO_MEAL`, `date_key` override in `trkMakeEntry()`, button in the lock bar | Modified | `/home/user/daily-shuffle/` |
+| `sw.js` | `CACHE` bumped `v46` → `v47` | Modified | `/home/user/daily-shuffle/` |
+| `CLAUDE.md` | New "Plan → Tracker sync" bullet in Data & sync | Modified | `/home/user/daily-shuffle/` |
+| `logs/daily-shuffle_log.md` | This entry | Modified | `/home/user/daily-shuffle/logs/` |
+
+No database writes this session. Supabase MCP used **read-only** (schema + serves
+distribution only).
+
+## Decisions & Reasoning
+- **Count as eaten immediately** — Saffron's call over my recommendation (see §2).
+  Reversible later: the `planned`/`status` columns are already written on every entry,
+  so a confirm-to-count model is a contained change, and `syncPlanToTracker` is where
+  those fields would be set.
+- **Tag + delete-by-tag for idempotency**, not upsert-by-id. IDs are random per call, so
+  upsert wouldn't dedupe; and delete-by-tag is the only approach that provably cannot
+  touch hand-logged rows.
+- **Abort on failed cloud delete, proceed when there's no cloud at all.** Duplication is
+  only possible when a cloud copy exists — so refusing offline entirely would be too
+  strict, and proceeding after a *failed* delete would be too loose.
+- **Fallback `servings || 1`, `date_key || trkDay`** — every new default reproduces the
+  prior behaviour exactly, so nothing existing changes.
+- **`snack2` → `snack`** rather than `dessert`. Both plan snack slots are snacks;
+  `dessert` is a separate tracker concept she uses deliberately.
+- **Left the AI-plan leftover-span bug alone** (see the #73 entry §1) — different
+  mechanism, would muddy this diff.
+
+## Current State (end of session)
+Working and shipped. `main` at **`ad26046`**. ship-check clean: 3/3 parse, smoke 5/5,
+cache `v47`, drift clean. All three of today's PRs (#72, #73, #74) merged.
+
+## Next Steps
+1. **Use it once for real**: Shuffle → generate/open a plan → "Send to Tracker" →
+   check the Tracker's slots on those dates. Hard-refresh if `v46` is still cached.
+2. **Expect future days to read as fully eaten** if a week is synced ahead. That's the
+   chosen behaviour, not a bug. If it grates, switch to the confirm-to-count model —
+   the columns are already there.
+3. **Optional — fix the AI Plan leftover span** (carried over from the #73 entry). The
+   clamp in `buildPlanFromAIDays` is the more robust of the two options; it doesn't
+   depend on the model obeying the prompt.
+4. Nutrition step 2 remains the open workstream, unchanged all session.
+
+## Open Questions / Blockers
+None blocking. Carried-over deferrals: the AI-plan leftover span; the two
+Tracker-target caveats (not cloud-synced, calorie field `|| default`) from the #72 entry.
+
+## Environment & Config Notes
+- Repo `saffronlm-cmyk/daily-shuffle`, branch `claude/manual-macro-targets-y9czdf`
+  (restarted from `origin/main` before each of today's three PRs), PR **#74** merged.
+- `sw.js` `CACHE` now **`daily-shuffle-v47`**. Read the live value from `sw.js`.
+- Supabase project `jsxcctrskkkxgdxfaduo`; tables `food_log`, `recipes` — read-only here.
+- No credentials beyond the already-public inlined anon key.
+
+## Notes & Gotchas
+- **`entry_type:'plan_sync'` is load-bearing.** The idempotent delete is keyed on it.
+  Never reuse that string for another feature, and never rename it without updating the
+  delete. Documented in CLAUDE.md for the same reason.
+- **`trkCacheDay()` only writes `trkDay`.** Anything touching another day's cache must go
+  through `_trkPatchDayCache` or it will silently wipe that day's `meta`.
+- **Recipe macros are per serving** (`fetchMacroEstimate` divides before saving). If that
+  ever changes, this sync starts logging whole batches per slot.
+- **`trkFetchRecipes()` memoises into `_trkRecipeCache`** and only returns cloud rows —
+  hence the `RECIPE_FULL_DATA` fallback. A recipe added locally this session won't be in
+  it until a reload.
+- **`trkNum()` coerces null → 0**, so an entry with unknown macros contributes nothing to
+  the rings rather than breaking the sum. That's why unmatched recipes are still logged.
+- **Runtime test pattern (reusable, and faster than driving the UI):** `addInitScript`
+  seeds `ds_recipe_cache` + `ds_recipe_cache_full`; then inside `page.evaluate` stub
+  `window.fetch` and `window.confirm` and call app internals directly. Used for both
+  today's grocery fix and this feature. Scratchpad only — not committed.
+- The branch name `claude/manual-macro-targets-y9czdf` describes none of today's three
+  changes; it came from the opening macro-targets question. Don't read meaning into it.
+
+---
+
 # Grocery List Was Multiplying Batch Recipes by Days Instead of Batches
 **Date:** 2026-08-23
 **Project:** Daily Shuffle — meal plan → grocery list (`index.html`)

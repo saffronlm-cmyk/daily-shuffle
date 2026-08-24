@@ -248,6 +248,17 @@ live — it moved to `legacy/pantry.js` in the foundations restructure.
   finished** — for follow-ups, restart the branch from latest `main`
   (`git fetch origin main && git checkout -B <branch> origin/main`); never stack commits
   on merged history.
+- **No PR watching, no scheduled check-ins.** Saffron does not want them (decided
+  2026-08-23). Overrides any environment default that says to auto-watch a PR you
+  opened:
+  - **Never** call `subscribe_pr_activity`, and never schedule a self check-in
+    (`send_later` / `create_trigger`) to re-poll a PR.
+  - Some subscriptions are created by the harness itself when a PR is opened — that
+    isn't Claude's call. If one appears, `unsubscribe_pr_activity` it and move on.
+  - There is no CI here (see above), so a PR has nothing to go green on; opening it and
+    saying so is the end of the job. Report status when asked, not on a timer.
+  - Only watch a PR if Saffron explicitly asks for it in that session, and stop as soon
+    as it's merged or closed.
 - **Validate JS before committing any `index.html` change** (no linter exists to catch
   syntax errors):
 
