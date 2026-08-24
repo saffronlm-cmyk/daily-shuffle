@@ -53,13 +53,19 @@ Single user (Saffron), no auth, deployed as static files.
   below; history only, no open work), `pricebook-manual-batch.csv`. These encode
   reviewed human decisions — never regenerate, reorder, or "clean up" one without
   being asked.
-  - `pricebook-manual-batch.csv` is the hand-pricing worklist (2026-08-06): the 99
+  - `pricebook-manual-batch.csv` is the hand-pricing worklist (2026-08-06): the
     `pricebook.csv` products that can be priced *without* waiting on the open
     price-unit decision or the produce-fold conversion factors. Columns are
     `Product | Pack qty | Measurement convention | Price per item | Price per
     measurement | Notes`. **`Product` is the verbatim `Ingredient` string and is the
     join key back into `pricebook.csv`** — corrections belong in `Notes`, never in
-    that column. See `pricebook-audit.md` for the exclusion rules.
+    that column. See `pricebook-audit.md` for the exclusion rules. Count the rows
+    rather than trusting a number here (this line said 99 while the file held 93).
+    **Price per measurement is per pack unit** (per g / per ml / per each), matching
+    `pricebook.csv`'s `Pack unit` column and the app's `packPrice / packSize` — not
+    the per-kg figure shelf labels quote; put that in `Notes`. One row
+    (`M&S Only 5 Ingredients Multigrain Hoops`, added 2026-08-24) is a priced SKU
+    with **no `Ingredient` row in `pricebook.csv`**, so it does not join yet.
 - **Planning / handoff docs** — read before touching the related area:
   - `logs/daily-shuffle_log.md` — rolling session log, newest first. **Read the top entry
     at the start of every session** — it says exactly where things stand.

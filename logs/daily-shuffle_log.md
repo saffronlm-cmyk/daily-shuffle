@@ -4,6 +4,149 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# First priced row in `pricebook-manual-batch.csv` — sets the per-pack-unit precedent; M&S Multigrain Hoops has no `pricebook.csv` join
+**Date:** 2026-08-24
+**Project:** Daily Shuffle — price book (hand-pricing worklist)
+**Status:** Complete. Two things need Saffron's eye — see Open Questions.
+**Mode:** Rolling Log + GitHub Push
+
+---
+
+## Project Context
+`pricebook-manual-batch.csv` was created 2026-08-06 as the subset of `pricebook.csv`
+products that can be hand-priced *now*, without waiting on the two open blockers in
+`pricebook-audit.md` (§3 price-unit decision, §2a produce-fold conversion factors).
+Until this session **every one of its rows was empty** — Product column filled in,
+all five value columns blank. See `pricebook-audit.md` for why the scrape is still
+gated; nothing in this session unblocks it.
+
+Earlier the same day, a separate task in this session added the Alpro Greek Style
+yoghurt to `staple_products` (PR #71, merged `5469d36`) — unrelated except that it
+raised the same "there is no price column on `staple_products`" point that made
+Saffron reach for this file.
+
+## Session Goal
+Add M&S Only 5 Ingredients Multigrain Hoops to `pricebook-manual-batch.csv` from a
+screenshot of the M&S shelf listing (300 g, £2.50, £8.33/kg).
+
+## State Before This Session
+`main` at `ad26046` (#74 — "Send to Tracker"). Note main moved four PRs (#71→#74)
+during this session from parallel work; the branch was restarted off `ad26046` per
+the merged-PR rule rather than stacked on the #71 branch.
+`pricebook-manual-batch.csv`: 93 data rows, **all value columns empty**.
+
+## What Was Done
+
+### 1. Added the row (the only filled row in the file)
+```
+M&S Only 5 Ingredients Multigrain Hoops,300,g,2.50,0.00833,"…"
+```
+Appended at the end rather than inserted — the file is ordered by descending
+occurrence count and CLAUDE.md forbids reordering these CSVs.
+
+### 2. Had to invent the "Price per measurement" convention
+**No row was filled in, so there was no precedent to copy — this row sets it.**
+The column could reasonably mean per-kg (what the shelf label quotes, £8.33) or per
+pack-unit (£0.00833/g). Chose **per pack unit**, because:
+- `pricebook.csv`'s own columns are `Pack size (qty)` / `Pack unit (g / ml / each)` /
+  `Pack price (£)`, and this file's whole purpose is joining back into it;
+- the app computes `unitPrice = packPrice / packSize` (`index.html`, `seedPriceBook()`
+  and `importPriceBookCsv()`), i.e. per pack unit — a per-kg column would need a
+  ×1000 that nothing downstream applies;
+- `pricebook-audit.md` §5 is already a list of rows broken by unit mismatch. Adding a
+  third unit basis to the same data invites exactly that.
+The shelf figure (£8.33/kg) is preserved verbatim in `Notes`, so nothing is lost if
+Saffron prefers per-kg — it is a one-column rewrite across a file with one filled row.
+
+### 3. Found the row does not join
+`Product` is documented as **the verbatim `Ingredient` string from `pricebook.csv`,
+and the join key**. Grepped `pricebook.csv` for `hoop|multigrain|cereal|m&s|marks`:
+the only hit is `Granola,Cereal,Pantry / Dry Goods,…,2`. **This SKU has no
+`Ingredient` row**, so as written the row joins to nothing. Added it anyway — Saffron
+asked for it by name and the price observation is worth capturing — with the
+mismatch recorded in `Notes` rather than silently left to be discovered later.
+
+### 4. Fixed a false number in CLAUDE.md
+CLAUDE.md said the worklist held "the 99 `pricebook.csv` products"; the file has held
+**93** for as long as git knows. Replaced the hard number with an instruction to count,
+and documented the per-pack-unit convention and the non-joining row.
+
+### 5. Validated
+Wrote a throwaway RFC4180 parser (`scratchpad/check_csv.mjs`) rather than eyeballing,
+because the new `Notes` value is the file's first quoted field containing commas — a
+naive `split(',')` reader would now see 9 fields on that row. Result: 94 data rows,
+**every row exactly 6 fields**, no duplicate Product values, and `2.50/300 = 0.00833`
+reproducing the label's £8.33/kg exactly. `node scripts/claude_md_drift.mjs` clean.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| pricebook-manual-batch.csv | +1 row, the file's first priced row (93 → 94 data rows) | Modified | /home/user/daily-shuffle/ |
+| CLAUDE.md | Worklist bullet: dropped the false "99", documented the per-pack-unit convention + the non-joining row | Modified | /home/user/daily-shuffle/ |
+| logs/daily-shuffle_log.md | This entry | Modified | /home/user/daily-shuffle/logs/ |
+| check_csv.mjs | Throwaway CSV field-count validator | Created (scratchpad, NOT committed) | scratchpad/ |
+
+**No app code touched** — `index.html`/`sw.js` untouched, so **no cache bump**, and the
+JS parse check / smoke test do not apply (data + docs only).
+
+## Decisions & Reasoning
+- **Per pack unit, not per kg** for `Price per measurement` — reasoning in §2 above.
+  Rejected per-kg despite it being what the shelf label shows, because three unit
+  bases in one dataset is how `pricebook-audit.md` §5 got its list of dead rows.
+- **Appended, did not insert** — file is occurrence-ordered and CLAUDE.md forbids
+  reordering these reviewed CSVs.
+- **Added the row despite the broken join, rather than stopping to ask** — she named
+  the product explicitly and supplied a complete price observation. Recording it with
+  the mismatch flagged in `Notes` loses nothing; refusing to write it would have lost
+  the observation. The fix (an `Ingredient` row, or a rename to an existing one) is
+  hers to choose.
+- **Did NOT add a matching row to `pricebook.csv`** — it is an audited file whose rows
+  derive from recipe ingredient usage, this SKU has 0 occurrences, and inserting a
+  0-occurrence branded row would fall below the `--min-occ 3` threshold the audit
+  recommends anyway. Not worth perturbing that file unasked.
+- **Kept the `&` unescaped** in `M&S` — plain CSV, no HTML/XML in the path; the app's
+  `importPriceBookCsv()` reads it as text.
+
+## Current State (end of session)
+`pricebook-manual-batch.csv` has 94 data rows, exactly one of them priced. The other
+93 remain the untouched worklist. Nothing consumes this file automatically yet — it is
+a hand-pricing worklist, so the row is inert until someone runs `csv_to_seed.py`
+(which the audit says must not run against a partially-filled book) or imports via
+Settings → price book CSV import.
+
+## Next Steps
+1. Decide per-pack-unit vs per-kg for `Price per measurement` (Open Question 1). One
+   row is filled, so switching costs nothing right now and gets expensive later.
+2. Decide how the hoops row should join: add an `Ingredient` row to `pricebook.csv`,
+   or drop it if no recipe will ever use it.
+3. Unrelated but still the gating decision on this whole workstream:
+   `pricebook-audit.md` §3 price-unit question (208 families vs ~365 variants), which
+   blocks the Apify scrape.
+
+## Open Questions / Blockers
+1. **Is `Price per measurement` per pack unit or per kg?** Set to per pack unit here
+   with the reasoning above. Needs a yes/no; unblocks the remaining 93 rows.
+2. **Should the hoops row exist in `pricebook.csv` too?** Currently joins to nothing.
+   Not blocking anything today.
+
+## Environment & Config Notes
+Repo `saffronlm-cmyk/daily-shuffle`, branch `claude/alpro-greek-yoghurt-staples-liiqhy`
+restarted from `main` @ `ad26046` (the branch's previous PR #71 was already merged, so
+per CLAUDE.md's merged-PR rule it was recreated from main, not extended). No cache
+version bumped. No Supabase writes this session. No credentials touched.
+
+## Notes & Gotchas
+- **This row is the file's first quoted field containing commas.** Any reader doing
+  `line.split(',')` will now mis-parse it into 9 fields. If a script is ever written
+  against this file, use a real CSV parser.
+- **CLAUDE.md's row counts keep going stale** — "99" here while the file held 93, and
+  "~167" for `staple_products` while the table held 178 (see the 2026-08-13 entry).
+  Third instance of the same failure. Count, don't trust the doc.
+- The per-pack-unit choice was made by *this session*, not signed off by Saffron. It
+  is not in the same class as the locked `pricebook-audit.md` decisions — treat it as
+  provisional until she confirms.
+
 # Grocery List Was Multiplying Batch Recipes by Days Instead of Batches
 **Date:** 2026-08-23
 **Project:** Daily Shuffle — meal plan → grocery list (`index.html`)
