@@ -75,10 +75,10 @@ Single user (Saffron), no auth, deployed as static files.
       one ingredient. Row 2 is a pseudo-row with `Product = NOTE` holding a
       file-wide naming instruction (pluralise to match supermarket labelling) —
       **not a product**; skip it when reading this file as data.
-    - Two rows deliberately break the join-key rule and need `pricebook.csv` fixed
-      to match: `Grass-fed Collagen` (still `Gras-fed Collagen` at
-      `pricebook.csv:296`) and `M&S Only 5 Ingredients Multigrain Hoops` (a priced
-      SKU with **no `Ingredient` row at all**, 0 recipe occurrences).
+    - **93 of the 94 products join** to a `pricebook.csv` `Ingredient` as of
+      2026-08-24. The one that doesn't is `M&S Only 5 Ingredients Multigrain Hoops`
+      — a priced SKU with no `Ingredient` row at all (0 recipe occurrences), left
+      deliberately.
 - **Planning / handoff docs** — read before touching the related area:
   - `logs/daily-shuffle_log.md` — rolling session log, newest first. **Read the top entry
     at the start of every session** — it says exactly where things stand.
@@ -119,6 +119,16 @@ Single user (Saffron), no auth, deployed as static files.
     which contradicts the locked "variant = price unit, Product = grouping only" data
     model. That decision gates the scrape, because it sets whether it queries 208
     families or ~365 variants, and re-scraping burns the Apify quota twice.
+    - **Three naming normalisations were applied to `pricebook.csv` on 2026-08-24**
+      (audit §2/§6 work, done piecemeal rather than as the full pass): typo fix
+      `Gras-fed`→`Grass-fed Collagen`; `Argentine Red Shrimp` moved into the `Prawn`
+      family (it was the only shrimp variant not already there); `Crispy Fried
+      Shallot`→`Crispy Fried Onions` as its own family, with `Fried Shallot` moved
+      out of `Onion` to join it — a packaged fried topping must not share the `Onion`
+      family price (§3). **Convention set here: when renaming an `Ingredient`, keep
+      the old string in `Aliases`** so existing recipe text still resolves via
+      `lookupPriceBook()`. Recipe text in the `recipes` table was NOT rewritten —
+      the aliases make that unnecessary, and `ingredient_sections` is raw truth.
 - **`.github/workflows/supabase-keepalive.yml`** — daily ping so the free-tier Supabase
   project doesn't auto-pause. Schedule triggers only fire from `main`, so it must stay
   on `main`. The inlined anon key is already public in `index.html` — not a leak.

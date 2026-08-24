@@ -4,6 +4,145 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# Applied three `pricebook.csv` naming normalisations; worklist now joins 93/94; PR #75 merged
+**Date:** 2026-08-24
+**Project:** Daily Shuffle — price book (ingredient normalisation)
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete. PR #75 merged to `main`.
+
+---
+
+## Project Context
+Third and final entry of 2026-08-24, closing the thread of the two below. The middle
+entry merged Saffron's hand-priced worklist and **flagged three rows whose names no
+longer joined** to `pricebook.csv`. She said "fix 1-3 then merge to main" — so this
+entry applies them. Read the entry below for the worklist conventions; not repeated here.
+
+## Session Goal
+Apply the three flagged normalisations to `pricebook.csv`, then merge PR #75.
+
+## State Before This Session
+Branch at `20a3e45`, PR #75 open as a draft. `pricebook.csv` 987 rows, untouched since
+the 2026-08-06 audit. Three known naming defects flagged but not fixed.
+
+## What Was Done
+
+### 1. `Gras-fed` → `Grass-fed Collagen` (`pricebook.csv:296`)
+Typo fixed in **both** `Ingredient` and `Product` (the row was its own family), and
+**`gras-fed collagen` added to `Aliases`**. The alias is the important half: the 4
+recipe lines that produced this row still say "gras-fed", and `lookupPriceBook()`
+checks aliases before falling back to token containment, so the rename doesn't orphan
+them. Renaming without the alias would have silently un-priced 4 recipe lines.
+
+### 2. `Argentine Red Shrimp` → `Prawn` family (`:254`)
+The smallest of the three, and it needed no rename at all. Looking at the family, this
+row was **the only shrimp variant not already filed under Product `Prawn`** — `Shrimp`,
+`Wild Shrimp`, `And Deveined Shrimp`, `Jumbo Wild Caught Pink Shrimp` and
+`Prawn Shrimp` were all there already. So this was a one-cell fix bringing the holdout
+into line, not the ingredient merge her note implied. `Ingredient` left verbatim, which
+is both the data model (variant = recipe name, Product = grouping) and what keeps its
+own join intact. Family is now 9 rows / 32 occurrences.
+
+### 3. `Crispy Fried Shallot` → `Crispy Fried Onions` (`:209`), and `Fried Shallot` regrouped (`:292`)
+Renamed with `crispy fried shallot` retained as an alias, same reasoning as §1.
+
+The judgement call was **which family** it belongs to. `Fried Shallot` sat under
+Product `Onion` — and putting a packaged crispy-onion topping in the same family as
+raw onions is precisely `pricebook-audit.md` §3's defect: one price per family, so the
+topping would inherit brown-onion pricing (£12/kg vs ~£1/kg — an order of magnitude).
+So `Crispy Fried Onions` became **its own family**, and `Fried Shallot` moved out of
+`Onion` into it. That resolves the disagreement between the two rows in the direction
+that doesn't create a pricing error.
+
+Left alone: `Shallot` (16 occ) and `Banana Shallot` (10 occ) stay under `Onion` — those
+are genuine fresh shallots, correctly grouped.
+
+### 4. Kept the two files joined
+Renaming in `pricebook.csv` alone would have broken the *other* side of the join, so
+`pricebook-manual-batch.csv`'s `Crispy Fried Shallot` row was renamed to match, with
+the rename recorded in its `Notes`. Her `Grass-fed Collagen` row needed no change — it
+already carried the corrected spelling, which is what surfaced the mismatch originally.
+
+### 5. Verified the joins programmatically
+Wrote `scratchpad/verify_join.mjs` — parses both files properly, prints the four edited
+rows, confirms the old strings are gone from `Ingredient`/`Product` but *present* as
+aliases, lists both affected families, and cross-checks **every** worklist Product
+against `pricebook.csv`'s Ingredient set. Result: **93 of 94 join** (up from 91). The
+single orphan is the M&S hoops SKU, left deliberately.
+
+Also confirmed: 987 rows before and after, all 9 fields, and both renames keep their
+alphabetical position within their occurrence block (`Grass-fed` still sorts between
+`Glutinous Rice Flour` and `Green Bean`), so **no reordering** — the git diff is
+exactly 4 changed lines.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| pricebook.csv | 4 rows edited (2 renames + aliases, 2 Product regroupings). 987 rows unchanged | Modified | /home/user/daily-shuffle/ |
+| pricebook-manual-batch.csv | `Crispy Fried Shallot` → `Crispy Fried Onions` + rename note | Modified | /home/user/daily-shuffle/ |
+| CLAUDE.md | Recorded the three normalisations, the keep-old-name-as-alias convention, and 93/94 joining | Modified | /home/user/daily-shuffle/ |
+| logs/daily-shuffle_log.md | This entry | Modified | /home/user/daily-shuffle/logs/ |
+| verify_join.mjs | Cross-file join validator | Created (scratchpad, NOT committed) | scratchpad/ |
+
+**No app code touched** — no cache bump; JS parse check and smoke test don't apply.
+
+## Decisions & Reasoning
+- **Every rename keeps the old string as an alias.** New convention, now in CLAUDE.md.
+  `Ingredient` values are generated from recipe text, so a bare rename disconnects the
+  row from the recipes that created it. The alias path in `lookupPriceBook()` is the
+  mechanism that makes renames safe.
+- **`Crispy Fried Onions` as its own family, not under `Onion`** — audit §3 reasoning
+  above. Chose the option that can't produce a 10× pricing error.
+- **Did NOT rewrite recipe text in the `recipes` table**, which her original note asked
+  for ("all recipe mentions should be normalised"). The aliases make it unnecessary for
+  pricing, `ingredient_sections` is raw truth that the app treats as read-only outside
+  the editor, and the 2026-08-05 hollow-recipe damage came from a code path writing it.
+  A cosmetic rename is not worth touching that. Flagged rather than done.
+- **Did not add a `pricebook.csv` row for the hoops SKU** — not part of 1-3, 0 recipe
+  occurrences, and it would sit below the audit's `--min-occ 3`.
+- **Squash-merged** #75, matching the last several merges on `main`.
+
+## Current State (end of session)
+`main` includes: the hand-priced worklist (88 of 95 rows priced), the hoops row, the
+three normalisations, and the CLAUDE.md rewrite. `pricebook.csv` 987 rows with 2 new
+aliases and 2 regrouped Products. Nothing runs automatically — `csv_to_seed.py` still
+must not run against a partially-filled book (`pricebook-audit.md` §3).
+
+## Next Steps
+1. Confirm the four `ASSUMPTION:` rows in the worklist — `Milk Choice` (matched to
+   Coconut Milk), `Chicken` (thigh fillets), `Chipotle Powder` (chilli flakes),
+   `Green Cabbage` (Savoy). Still open from the previous entry.
+2. Consolidate the three salt-and-pepper rows into one (`Salt And Pepper`,
+   `Salt Pepper`, `Pinche Salt Pepper` — 10+ occurrences on the Pinche row alone).
+   Note `pricebook.csv:895` also has `Pinche Flaky Sea Salt And Black Pepper` (1 occ).
+3. Price `White Pepper` (the only genuinely unpriced worklist row).
+4. Still the gate on the whole workstream: `pricebook-audit.md` §3 — 208 families vs
+   ~365 variants — which blocks the Apify scrape.
+
+## Open Questions / Blockers
+- The four `ASSUMPTION:` matches (Next Step 1).
+- Whether the `NOTE` row's pluralising instruction should now be applied file-wide or
+  waits for the "final naming pass" it mentions. Not acted on.
+- Whether the hoops SKU should get a `pricebook.csv` row. Asked twice, not answered;
+  harmless either way.
+
+## Environment & Config Notes
+Repo `saffronlm-cmyk/daily-shuffle`. Branch `claude/alpro-greek-yoghurt-staples-liiqhy`
+→ PR **#75**, squash-merged to `main`. No Supabase writes. No cache bump. No
+credentials touched.
+
+## Notes & Gotchas
+- **`Argentine Red Shrimp` keeps its name.** Her note said "normalise to Prawns"; the
+  fix was a Product regrouping, because the `Ingredient` column is verbatim recipe text
+  and renaming it would break its join for no benefit. If she meant the recipe *text*
+  should say "prawns", that is Next-Steps work in the `recipes` table, not done here.
+- **`Fried Shallot` no longer sits under `Onion`.** If anything relied on the onion
+  family covering it, that changed today.
+- The audit's §2/§6 normalisation pass is now **partially applied** — three rows of it.
+  The produce-fold work (§2a, 49 rows into 10 base items, needs conversion factors) and
+  the plural-bug family splits (§4) are still untouched. Don't read this as "§2 done".
+
 # Saffron's hand-priced worklist merged in (87 of 93 rows priced) — supersedes the per-pack-unit convention I invented hours earlier
 **Date:** 2026-08-24
 **Project:** Daily Shuffle — price book (hand-pricing worklist)

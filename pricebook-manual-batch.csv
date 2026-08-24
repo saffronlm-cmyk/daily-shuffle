@@ -52,7 +52,7 @@ Almond,300g,per kg,£3.50,£11.67/kg,Whole Almonds
 Bone-in Skin-on Chicken Thigh,540g,per kg,£2.50,£4.63/kg,Skin on Thighs & Drumsticks pack (mixed cut)
 Chickpeas,400g (240g drained),per kg,£0.41,£1.71/kg,"In water, drained weight noted"
 Chile Lime Seasoning,142g,per kg,£3.50,£24.65/kg,Tajin Clasico Chilli & Lime Seasoning
-Crispy Fried Shallot,200g,per kg,£2.40,£12.00/kg,Naming discrepancy: no fried shallot product exists at Sainsbury's - matched to Fudco Crispy Fried Onions. All recipe mentions of this product should be normalised to 'Crispy Fried Onions'
+Crispy Fried Onions,200g,per kg,£2.40,£12.00/kg,Naming discrepancy: no fried shallot product exists at Sainsbury's - matched to Fudco Crispy Fried Onions. All recipe mentions of this product should be normalised to 'Crispy Fried Onions'. RENAMED 2026-08-24 from 'Crispy Fried Shallot' here and in pricebook.csv; old name kept as an alias there so existing recipe text still resolves. Recipe text itself is unchanged.
 Garlic Paste,75g,per kg,£1.75,£23.33/kg,
 Mirin,150ml,per litre,£1.90,£12.67/litre,
 Olive,340g (150g drained),per kg,£1.35,£3.97/kg,"Pitted Black Olives. Nectar price: £1.10 (£3.23/kg). Pitted Green Olives also available, same price"
