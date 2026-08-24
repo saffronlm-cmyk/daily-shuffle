@@ -53,13 +53,32 @@ Single user (Saffron), no auth, deployed as static files.
   below; history only, no open work), `pricebook-manual-batch.csv`. These encode
   reviewed human decisions — never regenerate, reorder, or "clean up" one without
   being asked.
-  - `pricebook-manual-batch.csv` is the hand-pricing worklist (2026-08-06): the 99
+  - `pricebook-manual-batch.csv` is the hand-pricing worklist (2026-08-06): the
     `pricebook.csv` products that can be priced *without* waiting on the open
     price-unit decision or the produce-fold conversion factors. Columns are
     `Product | Pack qty | Measurement convention | Price per item | Price per
     measurement | Notes`. **`Product` is the verbatim `Ingredient` string and is the
     join key back into `pricebook.csv`** — corrections belong in `Notes`, never in
-    that column. See `pricebook-audit.md` for the exclusion rules.
+    that column — with one deliberate exception, below. See `pricebook-audit.md` for
+    the exclusion rules. Count the rows rather than trusting a number here (this line
+    said 99 while the file held 93).
+    - **Saffron hand-priced 87 of the rows on 2026-08-24**, which set the value
+      conventions — follow them, don't re-derive: `Pack qty` carries its unit
+      inline (`340g`, `725ml`, `x2`, `loose`, `each`); `Measurement convention` is
+      **`per kg` / `per litre` / `per item`** (not per g/ml); prices carry the `£`
+      symbol; `Price per measurement` carries its unit suffix (`£3.06/kg`,
+      `£7.57/litre`, `65p each`). These are **shelf-label figures, not the app's
+      `packPrice / packSize`** — anything importing this file must divide per-kg by
+      1000 to reach the app's per-g `unitPrice`.
+    - Her `Notes` carry live worklist state: `ASSUMPTION:` = a product match she
+      wants confirmed, `FLAGGED FOR CONSOLIDATION` = duplicate rows to merge into
+      one ingredient. Row 2 is a pseudo-row with `Product = NOTE` holding a
+      file-wide naming instruction (pluralise to match supermarket labelling) —
+      **not a product**; skip it when reading this file as data.
+    - **93 of the 94 products join** to a `pricebook.csv` `Ingredient` as of
+      2026-08-24. The one that doesn't is `M&S Only 5 Ingredients Multigrain Hoops`
+      — a priced SKU with no `Ingredient` row at all (0 recipe occurrences), left
+      deliberately.
 - **Planning / handoff docs** — read before touching the related area:
   - `logs/daily-shuffle_log.md` — rolling session log, newest first. **Read the top entry
     at the start of every session** — it says exactly where things stand.
@@ -100,6 +119,16 @@ Single user (Saffron), no auth, deployed as static files.
     which contradicts the locked "variant = price unit, Product = grouping only" data
     model. That decision gates the scrape, because it sets whether it queries 208
     families or ~365 variants, and re-scraping burns the Apify quota twice.
+    - **Three naming normalisations were applied to `pricebook.csv` on 2026-08-24**
+      (audit §2/§6 work, done piecemeal rather than as the full pass): typo fix
+      `Gras-fed`→`Grass-fed Collagen`; `Argentine Red Shrimp` moved into the `Prawn`
+      family (it was the only shrimp variant not already there); `Crispy Fried
+      Shallot`→`Crispy Fried Onions` as its own family, with `Fried Shallot` moved
+      out of `Onion` to join it — a packaged fried topping must not share the `Onion`
+      family price (§3). **Convention set here: when renaming an `Ingredient`, keep
+      the old string in `Aliases`** so existing recipe text still resolves via
+      `lookupPriceBook()`. Recipe text in the `recipes` table was NOT rewritten —
+      the aliases make that unnecessary, and `ingredient_sections` is raw truth.
 - **`.github/workflows/supabase-keepalive.yml`** — daily ping so the free-tier Supabase
   project doesn't auto-pause. Schedule triggers only fire from `main`, so it must stay
   on `main`. The inlined anon key is already public in `index.html` — not a leak.

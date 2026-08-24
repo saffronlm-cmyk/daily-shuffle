@@ -206,7 +206,7 @@ Chilli Crunch Oil,Oil,Produce,,,,,,6
 Chinese Broccoli,Broccoli,Produce,,,,,stem chinese broccoli,6
 Cinnamon Stick,Cinnamon,Spices & Herbs,,,,,cinnamon quill,6
 Cold Water,Water,Beverages,,,,,,6
-Crispy Fried Shallot,Crispy Fried Shallot,Produce,,,,,,6
+Crispy Fried Onions,Crispy Fried Onions,Produce,,,,,crispy fried shallot,6
 Date,Date,Other,,,,,,6
 Garlic Paste,Garlic Paste,Produce,,,,,,6
 Juice Of 1 Large Lime,,Beverages,,,,,,6
@@ -251,7 +251,7 @@ Almond Extract,Almond Extract,Pantry / Dry Goods,,,,,,4
 Alpro High-protein Soya Milk,Milk,Dairy & Eggs / Alt,,,,,,4
 Apple Sauce,Apple Sauce,Condiments & Sauces,,,,,,4
 Applesauce,Applesauce,Condiments & Sauces,,,,,,4
-Argentine Red Shrimp,Argentine Red Shrimp,Meat & Seafood / Protein,,,,,,4
+Argentine Red Shrimp,Prawn,Meat & Seafood / Protein,,,,,,4
 Basil Pesto,Pesto,Condiments & Sauces,250,g,1.79,Lidl,green pesto;pesto,4
 Beetroot,Beetroot,Produce,,,,,,4
 Bell Pepper,Peppers,Produce,,,,,,4
@@ -289,11 +289,11 @@ Crusty Bread,Bread,Bakery,,,,,,4
 Dark Chocolate Chip Topping,Chocolate,Snacks & Confectionery,,,,,,4
 Dill Pickle,Pickles,Canned & Jarred,,,,,,4
 Extra Virgin Olive Oil,Oil,Condiments & Sauces,,,,,,4
-Fried Shallot,Onion,Produce,,,,,,4
+Fried Shallot,Crispy Fried Onions,Produce,,,,,,4
 Gluten-free Hoisin Sauce,Hoisin sauce,Condiments & Sauces,,,,,gluten free hoisin sauce;gluten hoisin sauce,4
 Gluten-free Oyster Sauce,Oyster sauce,Condiments & Sauces,,,,,gf oyster sauce,4
 Glutinous Rice Flour,Flour,Pantry / Dry Goods,,,,,,4
-Gras-fed Collagen,Gras-fed Collagen,Other,,,,,,4
+Grass-fed Collagen,Grass-fed Collagen,Other,,,,,gras-fed collagen,4
 Green Bean,Green Bean,Vegetables,,,,,,4
 Green Pepper,Peppers,Produce,,,,,,4
 Harissa,Harissa,Condiments & Sauces,,,,,,4
