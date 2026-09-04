@@ -252,9 +252,15 @@ wrong. Candidates are `Almond Milk` (14 uses already in the book) or `Soya Milk`
 and the cheapest at £0.85/L in the app seed). Whichever is chosen becomes a `CANON_TERMS`
 entry so future recipes normalise to it.
 
-**Splitting salt & pepper touches `ingredient_sections`**, which the `recipe-db` skill
-treats as the raw source of truth and read-only in practice. It needs a review CSV and an
-explicit go-ahead before any write — it is not a find-and-replace.
+**The salt & pepper split is DONE (2026-08-07).** 64 of 65 reviewed lines applied to
+`recipes.ingredient_sections` across 54 recipes — 64 combined lines became 138 separate
+ones (+74 net), verified against a pre-write backup. Conventions set: comma qualifiers
+(`Salt, to taste`), bare "pepper" ⇒ **Black Pepper**, "cracked"/"generous"/"flaky sea"
+dropped, sea salt = Salt. The scope grew from 56 to 65 lines mid-review: the first regex
+required the separator within 6 characters and only matched `and`/`&`/`,`/`/`, so it
+missed `+` separators and wordings like `salt and cracked pepper`. **One row was not
+applied** — Viral Chuck Roast `sidx 1, lidx 0` is a method step in the ingredients array
+and needs manual rescue. Backup: `recipes_backup_saltpepper_20260807` (all 341 rows).
 
 ## 6. Recommended order of work
 

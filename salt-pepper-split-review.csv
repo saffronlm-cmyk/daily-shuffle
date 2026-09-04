@@ -55,12 +55,12 @@ cc78c8db-64b2-45c8-b9ee-5790ee61b228|0|5,Tuna Melt Sandwich,Salt and pepper to t
 1f07d13d-0649-40fb-9e86-cb636a1c5cf5|0|1,Viral Chuck Roast,"Salt and pepper, to season generously","Salt, to season generously","Black Pepper, to season generously",,simple,,Y
 1f07d13d-0649-40fb-9e86-cb636a1c5cf5|1|0,Viral Chuck Roast,"Carrots and potatoes, tossed in olive oil, salt, and pepper - roast at 425F for 45 mins",,,,compound,NOT AN INGREDIENT LINE - this is a method step. Do not split; needs manual rescue.,Flag
 dfa89be8-b150-40ad-a50c-5d507466afbe|0|4,Zesty + Spicy Chicken Fusion Bowl,2 generous pinches salt & pepper,2 generous pinches Salt,2 generous pinches Black Pepper,,simple,,Y
-aa7618fb-d917-4a5a-867e-fc5e5b26c340|0|6,Chicken Caesar Salad Pita,Salt and black pepper,Salt,Black Pepper,,simple,,
-520918ae-a734-4ad1-9fed-c51e46ca82ca|2|10,Chicken Shawarma Sheet Pan Dinner,a couple pinches salt + pepper,a couple pinches Salt,a couple pinches Black Pepper,,simple,,
-19d09384-b9dd-43da-81c1-76e0235e72dd|1|5,Chili Honey Chicken Bowl,"Salt and black pepper, to taste","Salt, to taste","Black Pepper, to taste",,simple,,
-8356cba9-e0e8-43f1-becb-ac9771250799|0|2,Chipotle Chicken & Rice Skillet,salt and cracked pepper,Salt,Black Pepper,,simple,"'cracked' dropped — keep it? (e.g. 'Black Pepper, cracked')",
-c300c3ac-2cbe-49ea-8ff2-50d23cfa1830|0|2,Mediterranean Chicken & Rice Skillet,salt and cracked pepper,Salt,Black Pepper,,simple,"'cracked' dropped — keep it? (e.g. 'Black Pepper, cracked')",
-f2bd306c-beeb-49e8-95d6-a7f5b6b22476|1|11,Protein Packed Roasted Squash Pasta,Pinches of flaky sea salt and black pepper,Pinches of Sea Salt,Pinches of Black Pepper,,simple,"SEA SALT, not plain Salt — separate product, confirm",
-18997e47-12fe-47fe-b81b-322bb3f900c4|2|8,Sticky Miso Chicken Prep Boxes,generous salt + pepper,generous Salt,generous Black Pepper,,simple,,
-24e951f3-b6d6-434a-b481-2084b046590b|0|10,Sweet Potato Chicken Enchilada Skillet,salt and black pepper to taste,"Salt, to taste","Black Pepper, to taste",,simple,,
-9b44ebcc-2f1c-4b6a-a1d7-98c1598f5af3|0|9,Tuna Avocado Wrap,Salt & black pepper to taste,"Salt, to taste","Black Pepper, to taste",,simple,,
+aa7618fb-d917-4a5a-867e-fc5e5b26c340|0|6,Chicken Caesar Salad Pita,Salt and black pepper,Salt,Black Pepper,,simple,,Y
+520918ae-a734-4ad1-9fed-c51e46ca82ca|2|10,Chicken Shawarma Sheet Pan Dinner,a couple pinches salt + pepper,a couple pinches Salt,a couple pinches Black Pepper,,simple,,Y
+19d09384-b9dd-43da-81c1-76e0235e72dd|1|5,Chili Honey Chicken Bowl,"Salt and black pepper, to taste","Salt, to taste","Black Pepper, to taste",,simple,,Y
+8356cba9-e0e8-43f1-becb-ac9771250799|0|2,Chipotle Chicken & Rice Skillet,salt and cracked pepper,Salt,Black Pepper,,simple,'cracked' dropped per Saffron,Y
+c300c3ac-2cbe-49ea-8ff2-50d23cfa1830|0|2,Mediterranean Chicken & Rice Skillet,salt and cracked pepper,Salt,Black Pepper,,simple,'cracked' dropped per Saffron,Y
+f2bd306c-beeb-49e8-95d6-a7f5b6b22476|1|11,Protein Packed Roasted Squash Pasta,Pinches of flaky sea salt and black pepper,Pinches of Salt,Pinches of Black Pepper,,simple,sea salt treated as the same product as Salt (Saffron 2026-08-07),Y
+18997e47-12fe-47fe-b81b-322bb3f900c4|2|8,Sticky Miso Chicken Prep Boxes,generous salt + pepper,Salt,Black Pepper,,simple,'generous' dropped per Saffron,Y
+24e951f3-b6d6-434a-b481-2084b046590b|0|10,Sweet Potato Chicken Enchilada Skillet,salt and black pepper to taste,"Salt, to taste","Black Pepper, to taste",,simple,,Y
+9b44ebcc-2f1c-4b6a-a1d7-98c1598f5af3|0|9,Tuna Avocado Wrap,Salt & black pepper to taste,"Salt, to taste","Black Pepper, to taste",,simple,,Y
