@@ -48,10 +48,11 @@ Single user (Saffron), no auth, deployed as static files.
 - **Committed data CSVs (root)** — inputs/outputs of the data workstreams:
   `pricebook.csv`, `pricebook.variants.csv`, `ingredient-master.csv`,
   `recipe-ingredient-normalisation.csv` / `.final.csv`, `split-plan.csv`,
-  `unmatched-ingredients.csv`, `null-lines-reentry.csv` (superseded) /
-  `null-lines-reentry.v2.csv` (current), `pricebook-manual-batch.csv`,
-  `salt-pepper-split-review.csv`. These encode reviewed human decisions — never
-  regenerate, reorder, or "clean up" one without being asked.
+  `unmatched-ingredients.csv`, `null-lines-reentry.csv` /
+  `null-lines-reentry.v2.csv` (both **closed** — see the resolved hollow-recipe section
+  below; history only, no open work), `pricebook-manual-batch.csv`, `salt-pepper-split-review.csv`. These encode
+  reviewed human decisions — never regenerate, reorder, or "clean up" one without
+  being asked.
   - `salt-pepper-split-review.csv` is the **applied** record of the salt-and-pepper
     split (2026-08-07): 65 lines across 54 recipes, keyed by
     `row_key = recipeId|sectionIdx|lineIdx`, with Saffron's `approve?` marks.
@@ -64,13 +65,32 @@ Single user (Saffron), no auth, deployed as static files.
     sitting in the ingredients array (`Carrots and potatoes, tossed in olive oil…
     roast at 425°F`) and still needs manual rescue. Pre-write backup of all 341 rows
     is in the Supabase table `recipes_backup_saltpepper_20260807`.
-  - `pricebook-manual-batch.csv` is the hand-pricing worklist (2026-08-06): the 99
+  - `pricebook-manual-batch.csv` is the hand-pricing worklist (2026-08-06): the
     `pricebook.csv` products that can be priced *without* waiting on the open
     price-unit decision or the produce-fold conversion factors. Columns are
     `Product | Pack qty | Measurement convention | Price per item | Price per
     measurement | Notes`. **`Product` is the verbatim `Ingredient` string and is the
     join key back into `pricebook.csv`** — corrections belong in `Notes`, never in
-    that column. See `pricebook-audit.md` for the exclusion rules.
+    that column — with one deliberate exception, below. See `pricebook-audit.md` for
+    the exclusion rules. Count the rows rather than trusting a number here (this line
+    said 99 while the file held 93).
+    - **Saffron hand-priced 87 of the rows on 2026-08-24**, which set the value
+      conventions — follow them, don't re-derive: `Pack qty` carries its unit
+      inline (`340g`, `725ml`, `x2`, `loose`, `each`); `Measurement convention` is
+      **`per kg` / `per litre` / `per item`** (not per g/ml); prices carry the `£`
+      symbol; `Price per measurement` carries its unit suffix (`£3.06/kg`,
+      `£7.57/litre`, `65p each`). These are **shelf-label figures, not the app's
+      `packPrice / packSize`** — anything importing this file must divide per-kg by
+      1000 to reach the app's per-g `unitPrice`.
+    - Her `Notes` carry live worklist state: `ASSUMPTION:` = a product match she
+      wants confirmed, `FLAGGED FOR CONSOLIDATION` = duplicate rows to merge into
+      one ingredient. Row 2 is a pseudo-row with `Product = NOTE` holding a
+      file-wide naming instruction (pluralise to match supermarket labelling) —
+      **not a product**; skip it when reading this file as data.
+    - **93 of the 94 products join** to a `pricebook.csv` `Ingredient` as of
+      2026-08-24. The one that doesn't is `M&S Only 5 Ingredients Multigrain Hoops`
+      — a priced SKU with no `Ingredient` row at all (0 recipe occurrences), left
+      deliberately.
 - **Planning / handoff docs** — read before touching the related area:
   - `logs/daily-shuffle_log.md` — rolling session log, newest first. **Read the top entry
     at the start of every session** — it says exactly where things stand.
@@ -81,7 +101,12 @@ Single user (Saffron), no auth, deployed as static files.
     **250 ml** basis on 2026-08-05 (they previously used a US 240 ml cup, so displayed
     weights disagreed with the macro figures). These are still two separate tables at
     different granularity — the app keys on specific ingredient names, the script on
-    ~20 broad classes — so change one and check the other.
+    ~20 broad classes — so change one and check the other. The app's `parseQty()` was
+    likewise brought onto the script's parsing rules on 2026-08-23: it now reads
+    units glued to the number (`200g flour`, `15ml fish sauce` — the library's
+    dominant form, previously unparsed, so the whole line fell through as the
+    ingredient name) and collapses ranges (`3–4 tbsp`) to their **midpoint**, per the
+    plan's §3. Keep the two in step.
   - `MONETIZATION.md` — monetization + rollout roadmap (strategy, phases, tasks with
     acceptance criteria, decision gates, status tracker). Built to be executed one task
     at a time by any session — read its §0 operating rules before doing any
@@ -106,6 +131,16 @@ Single user (Saffron), no auth, deployed as static files.
     which contradicts the locked "variant = price unit, Product = grouping only" data
     model. That decision gates the scrape, because it sets whether it queries 208
     families or ~365 variants, and re-scraping burns the Apify quota twice.
+    - **Three naming normalisations were applied to `pricebook.csv` on 2026-08-24**
+      (audit §2/§6 work, done piecemeal rather than as the full pass): typo fix
+      `Gras-fed`→`Grass-fed Collagen`; `Argentine Red Shrimp` moved into the `Prawn`
+      family (it was the only shrimp variant not already there); `Crispy Fried
+      Shallot`→`Crispy Fried Onions` as its own family, with `Fried Shallot` moved
+      out of `Onion` to join it — a packaged fried topping must not share the `Onion`
+      family price (§3). **Convention set here: when renaming an `Ingredient`, keep
+      the old string in `Aliases`** so existing recipe text still resolves via
+      `lookupPriceBook()`. Recipe text in the `recipes` table was NOT rewritten —
+      the aliases make that unnecessary, and `ingredient_sections` is raw truth.
 - **`.github/workflows/supabase-keepalive.yml`** — daily ping so the free-tier Supabase
   project doesn't auto-pause. Schedule triggers only fire from `main`, so it must stay
   on `main`. The inlined anon key is already public in `index.html` — not a leak.
@@ -123,10 +158,20 @@ Single user (Saffron), no auth, deployed as static files.
   tracker). Check existing key names before adding new state.
 - **Bundled Supabase project** (`jsxcctrskkkxgdxfaduo`, hardcoded as
   `RECIPE_LIB_URL`/`RECIPE_LIB_KEY` in `index.html`): backs the recipe library **and** the
-  Tracker (`recipes`, `staple_products` (~167 rows after the USDA expansion), `food_log`,
+  Tracker (`recipes`, `staple_products` (~179 rows — 167 after the USDA expansion, plus
+  hand-added label-verified products), `food_log`,
   `day_meta`, `saved_meals`, all PK-keyed with open `anon ALL` RLS, upserted via
   `Prefer: resolution=merge-duplicates`). The Tracker's `TRK_SB_URL`/`TRK_SB_KEY` prefer
   this bundled project and fall back to personal creds.
+- **Plan → Tracker sync**: the Shuffle tab's "Send to Tracker" button
+  (`syncPlanToTracker()`) writes one `food_log` entry per planned slot, on that slot's
+  own date, as a normal eaten entry (it counts towards the rings immediately — the
+  `planned`/`status` columns exist and are written but nothing reads them). Every entry
+  it creates is tagged **`entry_type:'plan_sync'`**; a re-sync deletes only those for the
+  affected dates and rewrites them, so it never duplicates and never touches
+  hand-logged entries. **Don't reuse that `entry_type` for anything else** — the delete
+  is keyed on it. Macros come from the Supabase recipe row (per serving), falling back
+  to `RECIPE_FULL_DATA[id].nutrition` for local-only recipes.
 - **Personal Supabase creds** (`ds_supabase_url`/`ds_supabase_key`, Settings → Cloud
   Sync): optional, used only by the separate `user_library` cross-device sync path.
   Most sessions can assume they are NOT set.
@@ -155,16 +200,22 @@ Single user (Saffron), no auth, deployed as static files.
 3. **Bulk nutrition re-population** (blocked) — **must not run until step 2 is applied**,
    and must skip anything still flagged `empty_ingredients` or `serves_missing`.
 
-### Known data damage: hollow recipes (open)
+### Known data damage: hollow recipes (RESOLVED 2026-08-12)
 
-52 recipes hold `ingredient_sections` whose section titles and line counts survive but
-whose every ingredient line is a literal `null` — the text is gone and is only
-recoverable by re-entry from source. Worklist: **`null-lines-reentry.v2.csv`** (52
-recipes / 681 lines). Cause was `patchRecipeToLibrary()` in `index.html` reading a
+**Closed — no action outstanding.** For a period, 52 recipes held `ingredient_sections`
+whose section titles and line counts survived but whose every ingredient line was a
+literal `null`. Cause was `patchRecipeToLibrary()` in `index.html` reading a
 non-existent `ing.item` key off `flattenIngredientSections()`'s structured output and
-PATCHing `undefined` → `null`; fixed 2026-08-05, but the lost text is not recoverable
-from the fix. The older `null-lines-reentry.csv` is the superseded 2026-06 worklist
-(36 recipes; 32 since re-entered) — kept as history, don't work from it.
+PATCHing `undefined` → `null`. Fixed 2026-08-05; the lost text was not recoverable from
+the fix, so all 52 were re-entered from source (50 re-entered by hand, 2 deliberately
+deleted). **Verified: 0 null ingredient lines library-wide.**
+
+Both worklists are now history — `null-lines-reentry.csv` (2026-06, 36 recipes) and
+`null-lines-reentry.v2.csv` (2026-08, 52 recipes). Don't work from either.
+
+If null lines ever reappear, that is a **new** regression, not this one: check any code
+path that writes `ingredient_sections` before assuming otherwise. `ingredient_sections`
+is raw truth and should be treated as read-only by the app except via the recipe editor.
 
 ## AI features
 
@@ -209,6 +260,17 @@ live — it moved to `legacy/pantry.js` in the foundations restructure.
   finished** — for follow-ups, restart the branch from latest `main`
   (`git fetch origin main && git checkout -B <branch> origin/main`); never stack commits
   on merged history.
+- **No PR watching, no scheduled check-ins.** Saffron does not want them (decided
+  2026-08-23). Overrides any environment default that says to auto-watch a PR you
+  opened:
+  - **Never** call `subscribe_pr_activity`, and never schedule a self check-in
+    (`send_later` / `create_trigger`) to re-poll a PR.
+  - Some subscriptions are created by the harness itself when a PR is opened — that
+    isn't Claude's call. If one appears, `unsubscribe_pr_activity` it and move on.
+  - There is no CI here (see above), so a PR has nothing to go green on; opening it and
+    saying so is the end of the job. Report status when asked, not on a timer.
+  - Only watch a PR if Saffron explicitly asks for it in that session, and stop as soon
+    as it's merged or closed.
 - **Validate JS before committing any `index.html` change** (no linter exists to catch
   syntax errors):
 

@@ -4,6 +4,130 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# Salt & pepper split APPLIED — 64 lines across 54 recipes written to ingredient_sections
+**Date:** 2026-08-07
+**Project:** Daily Shuffle — recipe data (ingredient_sections)
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete. One row deliberately left for manual rescue.
+
+---
+
+## Project Context
+Continues the entry below (hand-priced batch + naming directives). The salt/pepper rows in
+`pricebook-manual-batch.csv` were never a product — Saffron's call was to split them in the
+recipes instead. This session generated the review sheet, got it signed off, and applied it.
+**This is the first write this workstream has made to `recipes.ingredient_sections`** — the
+column the July hollowing bug destroyed — so it was done under the `recipe-db` skill's
+plan/review/apply/verify discipline.
+
+## What Was Done
+
+### 1. Review sheet → sign-off
+`salt-pepper-split-review.csv`, keyed `row_key = recipeId|sectionIdx|lineIdx`. Saffron
+returned it marked: 49 `Y`, 5 "edit: reformat", 1 expansion, 1 do-not-split.
+
+**Two changes were made to what she signed off, both stated rather than silent:**
+- She marked 5 rows "remove the brackets, use `, to taste`" — but **14 rows** carried that
+  pattern; she evidently spotted it partway down. Applied to all 14 (28 cells), because a
+  mixed convention would be worse than either choice.
+- **The original regex was too narrow.** It required the salt/pepper separator within 6
+  characters and only matched `and`/`&`/`,`/`/`, so it missed `+` separators
+  (`generous salt + pepper`) and wordings with words between (`salt and cracked pepper`,
+  `salt and black pepper`, `flaky sea salt and black pepper`). **9 more lines, 6 more
+  recipes.** True scope 65/54, not 56/48. The write was **held** for a second sign-off
+  rather than applying 56 now and 9 later — two passes over this column is exactly the
+  risk not worth taking.
+
+Her calls on the 9: sea salt = **same product** as Salt; drop "generous"; don't keep
+"cracked". 6 of the 9 said "black pepper" explicitly, which confirmed the Black Pepper
+default assumed across the other 56.
+
+### 2. The apply
+- **Backup first**: `recipes_backup_saltpepper_20260807`, **all 341 rows**
+  (`id, name, ingredient_sections, backed_up_at`) — a table, not a transcription, so there
+  is no copy risk.
+- Verified **no two edits share a `(recipe, section)`**, so replacing one line with two
+  could never shift a later edit's index. This is why per-row statements were safe.
+- One statement per `row_key`, rebuilding that section's array with
+  `jsonb_agg(... order by o, s)` over `jsonb_array_elements ... with ordinality`, so line
+  order is preserved exactly. **Tested on one recipe and verified before running the other 63.**
+
+### 3. Verification
+- Line delta on pre-existing recipes: **+74**, exactly as predicted (138 lines replacing 64).
+- Raw table delta was +98 — the extra 24 are **two recipes Saffron added since the backup**
+  (Vietnamese Lemongrass Chicken, Butternut Protein Oat Flour Pancakes). Nothing this pass
+  touched. *Worth remembering: the table is live, so a raw before/after count will
+  over-report.*
+- Section counts unchanged on every touched recipe; **zero null lines** — no repeat of July.
+- Only one combined line remains: the deliberately skipped method step.
+- Spot-checked the two hardest read back: the Nando's 6-way blend and the Turkey Burgers
+  4-way `½ tsp each` both landed in position with order intact.
+
+## Conventions set (follow these; don't re-derive)
+Qualifiers use a **comma** (`Salt, to taste`, never `Salt (to taste)`). A bare "pepper"
+means **Black Pepper**. `cracked` / `generous` / `flaky sea` qualifiers are **dropped**.
+**Sea salt is the same product as Salt.**
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| salt-pepper-split-review.csv | Applied record, 65 rows, Saffron's approve marks | Modified | repo root |
+| pricebook-manual-batch.csv | Merged main's #75 version with this session's 9 decision notes | Modified | repo root |
+| pricebook-audit.md | §5b — split marked done | Modified | repo root |
+| CLAUDE.md | salt-pepper CSV now documented as applied, with the conventions | Modified | repo root |
+| sw.js | CACHE v45 → **v48** (main had reached v47) | Modified | repo root |
+| `recipes.ingredient_sections` | **64 lines → 138, across 54 recipes** | **WRITTEN** | Supabase |
+| recipes_backup_saltpepper_20260807 | Pre-write backup, 341 rows | Created | Supabase |
+
+## Decisions & Reasoning
+- **Held the write when the scope grew.** Applying the approved 56 immediately was
+  tempting; it would have meant a second pass over `ingredient_sections` and an
+  inconsistent intermediate state. One more review round was much cheaper than that risk.
+- **Applied the bracket reformat to all 14, not the 5 she marked.** A half-applied
+  formatting convention is worse than either convention.
+- **Backed up as a table, not a file.** No transcription step, therefore no transcription bug.
+- **Left the Viral Chuck Roast method step alone.** `sidx 1, lidx 0` is
+  `Carrots and potatoes, tossed in olive oil, salt, and pepper — roast at 425°F for 45 mins`
+  — cooking instructions sitting in the ingredients array. Splitting it would have
+  manufactured fake ingredients. **It also hints other method text may be misfiled the
+  same way — worth a sweep.**
+
+## Current State (end of session)
+Branch `claude/product-recipe-pricing-lw72m2`, merged with `main` (which had moved to
+**v47** and landed #70–#77, including the hollow-recipe close-out and PR #75's fuller
+hand-priced worklist). Cache resolved to **v48**. DB write is live and verified.
+
+## Next Steps
+1. **Rescue the Viral Chuck Roast method step**, and sweep for other method text sitting in
+   `ingredient_sections`.
+2. **Decide `Milk Choice`** — still the one open naming call (Almond vs Soya).
+3. Apply the 86 hand-priced rows into `pricebook.csv` (join on verbatim `Product`; her
+   figures are shelf-label `per kg`/`per litre`, so divide by 1000 for the app's per-g
+   `unitPrice`).
+4. The price-unit decision (audit §3) still gates the Apify scrape.
+5. Fix `canonicalise()`'s plural handling (audit §4) before adopting the pluralising
+   convention (§5a).
+
+## Open Questions / Blockers
+- `Milk Choice` target term — Saffron's call.
+- Whether other method steps are misfiled as ingredients — unknown scope, found by accident.
+
+## Environment & Config Notes
+Supabase `jsxcctrskkkxgdxfaduo`, table `recipes` (**written**), backup table
+`recipes_backup_saltpepper_20260807`. Cache v45 → v48. Branch merged with `origin/main`.
+
+## Notes & Gotchas
+- **The `recipes` table is live.** A raw before/after row or line count will include
+  recipes Saffron adds mid-session — scope any delta check to ids present in the backup.
+- **`recipes_backup_saltpepper_20260807` is the rollback path** and is worth keeping until
+  the split has been eyeballed in the app.
+- The index-shift hazard was avoided by luck as much as design — **no two edits shared a
+  section this time.** Any future per-line pass must re-check that, or process descending
+  by line index.
+
+---
+
 # Hand-priced batch landed; naming directives applied; pluralising convention blocked on canonicalise()
 **Date:** 2026-08-07
 **Project:** Daily Shuffle — product/recipe pricing
@@ -135,6 +259,1238 @@ from `main`), PR #69 draft. CACHE v44 → v45. No Supabase access. No credential
   them; she has been asked and has not yet answered.
 
 ---
+
+# Applied three `pricebook.csv` naming normalisations; worklist now joins 93/94; PR #75 merged
+**Date:** 2026-08-24
+**Project:** Daily Shuffle — price book (ingredient normalisation)
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete. PR #75 merged to `main`.
+
+---
+
+## Project Context
+Third and final entry of 2026-08-24, closing the thread of the two below. The middle
+entry merged Saffron's hand-priced worklist and **flagged three rows whose names no
+longer joined** to `pricebook.csv`. She said "fix 1-3 then merge to main" — so this
+entry applies them. Read the entry below for the worklist conventions; not repeated here.
+
+## Session Goal
+Apply the three flagged normalisations to `pricebook.csv`, then merge PR #75.
+
+## State Before This Session
+Branch at `20a3e45`, PR #75 open as a draft. `pricebook.csv` 987 rows, untouched since
+the 2026-08-06 audit. Three known naming defects flagged but not fixed.
+
+## What Was Done
+
+### 1. `Gras-fed` → `Grass-fed Collagen` (`pricebook.csv:296`)
+Typo fixed in **both** `Ingredient` and `Product` (the row was its own family), and
+**`gras-fed collagen` added to `Aliases`**. The alias is the important half: the 4
+recipe lines that produced this row still say "gras-fed", and `lookupPriceBook()`
+checks aliases before falling back to token containment, so the rename doesn't orphan
+them. Renaming without the alias would have silently un-priced 4 recipe lines.
+
+### 2. `Argentine Red Shrimp` → `Prawn` family (`:254`)
+The smallest of the three, and it needed no rename at all. Looking at the family, this
+row was **the only shrimp variant not already filed under Product `Prawn`** — `Shrimp`,
+`Wild Shrimp`, `And Deveined Shrimp`, `Jumbo Wild Caught Pink Shrimp` and
+`Prawn Shrimp` were all there already. So this was a one-cell fix bringing the holdout
+into line, not the ingredient merge her note implied. `Ingredient` left verbatim, which
+is both the data model (variant = recipe name, Product = grouping) and what keeps its
+own join intact. Family is now 9 rows / 32 occurrences.
+
+### 3. `Crispy Fried Shallot` → `Crispy Fried Onions` (`:209`), and `Fried Shallot` regrouped (`:292`)
+Renamed with `crispy fried shallot` retained as an alias, same reasoning as §1.
+
+The judgement call was **which family** it belongs to. `Fried Shallot` sat under
+Product `Onion` — and putting a packaged crispy-onion topping in the same family as
+raw onions is precisely `pricebook-audit.md` §3's defect: one price per family, so the
+topping would inherit brown-onion pricing (£12/kg vs ~£1/kg — an order of magnitude).
+So `Crispy Fried Onions` became **its own family**, and `Fried Shallot` moved out of
+`Onion` into it. That resolves the disagreement between the two rows in the direction
+that doesn't create a pricing error.
+
+Left alone: `Shallot` (16 occ) and `Banana Shallot` (10 occ) stay under `Onion` — those
+are genuine fresh shallots, correctly grouped.
+
+### 4. Kept the two files joined
+Renaming in `pricebook.csv` alone would have broken the *other* side of the join, so
+`pricebook-manual-batch.csv`'s `Crispy Fried Shallot` row was renamed to match, with
+the rename recorded in its `Notes`. Her `Grass-fed Collagen` row needed no change — it
+already carried the corrected spelling, which is what surfaced the mismatch originally.
+
+### 5. Verified the joins programmatically
+Wrote `scratchpad/verify_join.mjs` — parses both files properly, prints the four edited
+rows, confirms the old strings are gone from `Ingredient`/`Product` but *present* as
+aliases, lists both affected families, and cross-checks **every** worklist Product
+against `pricebook.csv`'s Ingredient set. Result: **93 of 94 join** (up from 91). The
+single orphan is the M&S hoops SKU, left deliberately.
+
+Also confirmed: 987 rows before and after, all 9 fields, and both renames keep their
+alphabetical position within their occurrence block (`Grass-fed` still sorts between
+`Glutinous Rice Flour` and `Green Bean`), so **no reordering** — the git diff is
+exactly 4 changed lines.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| pricebook.csv | 4 rows edited (2 renames + aliases, 2 Product regroupings). 987 rows unchanged | Modified | /home/user/daily-shuffle/ |
+| pricebook-manual-batch.csv | `Crispy Fried Shallot` → `Crispy Fried Onions` + rename note | Modified | /home/user/daily-shuffle/ |
+| CLAUDE.md | Recorded the three normalisations, the keep-old-name-as-alias convention, and 93/94 joining | Modified | /home/user/daily-shuffle/ |
+| logs/daily-shuffle_log.md | This entry | Modified | /home/user/daily-shuffle/logs/ |
+| verify_join.mjs | Cross-file join validator | Created (scratchpad, NOT committed) | scratchpad/ |
+
+**No app code touched** — no cache bump; JS parse check and smoke test don't apply.
+
+## Decisions & Reasoning
+- **Every rename keeps the old string as an alias.** New convention, now in CLAUDE.md.
+  `Ingredient` values are generated from recipe text, so a bare rename disconnects the
+  row from the recipes that created it. The alias path in `lookupPriceBook()` is the
+  mechanism that makes renames safe.
+- **`Crispy Fried Onions` as its own family, not under `Onion`** — audit §3 reasoning
+  above. Chose the option that can't produce a 10× pricing error.
+- **Did NOT rewrite recipe text in the `recipes` table**, which her original note asked
+  for ("all recipe mentions should be normalised"). The aliases make it unnecessary for
+  pricing, `ingredient_sections` is raw truth that the app treats as read-only outside
+  the editor, and the 2026-08-05 hollow-recipe damage came from a code path writing it.
+  A cosmetic rename is not worth touching that. Flagged rather than done.
+- **Did not add a `pricebook.csv` row for the hoops SKU** — not part of 1-3, 0 recipe
+  occurrences, and it would sit below the audit's `--min-occ 3`.
+- **Squash-merged** #75, matching the last several merges on `main`.
+
+## Current State (end of session)
+`main` includes: the hand-priced worklist (88 of 95 rows priced), the hoops row, the
+three normalisations, and the CLAUDE.md rewrite. `pricebook.csv` 987 rows with 2 new
+aliases and 2 regrouped Products. Nothing runs automatically — `csv_to_seed.py` still
+must not run against a partially-filled book (`pricebook-audit.md` §3).
+
+## Next Steps
+1. Confirm the four `ASSUMPTION:` rows in the worklist — `Milk Choice` (matched to
+   Coconut Milk), `Chicken` (thigh fillets), `Chipotle Powder` (chilli flakes),
+   `Green Cabbage` (Savoy). Still open from the previous entry.
+2. Consolidate the three salt-and-pepper rows into one (`Salt And Pepper`,
+   `Salt Pepper`, `Pinche Salt Pepper` — 10+ occurrences on the Pinche row alone).
+   Note `pricebook.csv:895` also has `Pinche Flaky Sea Salt And Black Pepper` (1 occ).
+3. Price `White Pepper` (the only genuinely unpriced worklist row).
+4. Still the gate on the whole workstream: `pricebook-audit.md` §3 — 208 families vs
+   ~365 variants — which blocks the Apify scrape.
+
+## Open Questions / Blockers
+- The four `ASSUMPTION:` matches (Next Step 1).
+- Whether the `NOTE` row's pluralising instruction should now be applied file-wide or
+  waits for the "final naming pass" it mentions. Not acted on.
+- Whether the hoops SKU should get a `pricebook.csv` row. Asked twice, not answered;
+  harmless either way.
+
+## Environment & Config Notes
+Repo `saffronlm-cmyk/daily-shuffle`. Branch `claude/alpro-greek-yoghurt-staples-liiqhy`
+→ PR **#75**, squash-merged to `main`. No Supabase writes. No cache bump. No
+credentials touched.
+
+## Notes & Gotchas
+- **`Argentine Red Shrimp` keeps its name.** Her note said "normalise to Prawns"; the
+  fix was a Product regrouping, because the `Ingredient` column is verbatim recipe text
+  and renaming it would break its join for no benefit. If she meant the recipe *text*
+  should say "prawns", that is Next-Steps work in the `recipes` table, not done here.
+- **`Fried Shallot` no longer sits under `Onion`.** If anything relied on the onion
+  family covering it, that changed today.
+- The audit's §2/§6 normalisation pass is now **partially applied** — three rows of it.
+  The produce-fold work (§2a, 49 rows into 10 base items, needs conversion factors) and
+  the plural-bug family splits (§4) are still untouched. Don't read this as "§2 done".
+
+# Saffron's hand-priced worklist merged in (87 of 93 rows priced) — supersedes the per-pack-unit convention I invented hours earlier
+**Date:** 2026-08-24
+**Project:** Daily Shuffle — price book (hand-pricing worklist)
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete. Rides in the still-open PR #75. Three follow-ups are hers to decide.
+
+---
+
+## Project Context
+Direct continuation of the entry below (same date, same PR branch). That entry added
+one row to `pricebook-manual-batch.csv` and **guessed at the `Price per measurement`
+convention because every row in the file was empty**. Saffron then supplied the
+hand-priced file, which answers that question — differently from my guess.
+
+## Session Goal
+She uploaded a filled-in `pricebook-manual-batch.csv` and asked two things: does it
+correlate with what's in the repo, and add the M&S hoops row to it.
+
+## State Before This Session
+Branch `claude/alpro-greek-yoghurt-staples-liiqhy` at `3b42a68`, PR #75 open as a
+draft (never merged). Repo file: 94 data rows, exactly one priced — mine, in
+per-pack-unit format. `main` at `ad26046`.
+
+## What Was Done
+
+### 1. Correlation check — it matches
+Parsed both files with a real RFC4180 parser rather than eyeballing (script:
+`scratchpad/compare.mjs`). Result: **identical headers, and 92 of the 93 product rows
+match by name AND in the same order.** Full set of differences:
+
+| Difference | Side | What it is |
+|---|---|---|
+| `NOTE` | uploaded only | A **pseudo-row**, not a product — `Product = NOTE`, Notes holds a file-wide instruction to pluralise names to match supermarket labelling on a final pass |
+| `Gras-fed Collagen` → `Grass-fed Collagen` | renamed | Deliberate spelling fix, documented in her Notes |
+| `M&S Only 5 Ingredients Multigrain Hoops` | repo only | My row from the previous entry — her copy predates it |
+
+So: her file is the repo file plus prices, one rename, one note row. No reordering, no
+dropped products, no field-count damage (all 95 rows exactly 6 fields).
+
+### 2. Her conventions overrule mine — mine was wrong
+The previous entry recorded, at length, a decision to use **per pack unit**
+(`0.00833` = £/g) with bare numbers. Her 87 priced rows use:
+- `Pack qty` with the unit inline — `340g`, `725ml`, `x2`, `loose`, `each`
+- `Measurement convention` = **`per kg` / `per litre` / `per item`** (69/12/5 rows)
+- `£` symbols on prices, unit suffixes on the measurement — `£3.06/kg`,
+  `£7.57/litre`, `65p each`
+
+i.e. **shelf-label figures, kept human-readable**, which in hindsight is obviously
+right for a file whose whole purpose is standing at a shelf with a phone. My
+reasoning (match the app's `packPrice / packSize`) optimised for a consumer that
+doesn't exist yet over the human actually filling the file in. Reformatted the hoops
+row to her convention: `300g | per kg | £2.50 | £8.33/kg`. **Same underlying price,
+same shelf label** — only the presentation changed.
+
+### 3. Took her file verbatim
+Copied her 95 lines byte-for-byte and appended only the hoops row; verified with
+`diff` that `head -n -1` of the result is **identical** to her upload. Deliberately
+did *not* normalise her `£`/`p` mixing (`65p each` vs `£1.25 each`), tidy her
+`ASSUMPTION:` prose, or reorder anything — CLAUDE.md forbids cleaning up these
+reviewed CSVs, and her formatting is self-consistent.
+
+### 4. Rewrote the CLAUDE.md bullet
+The previous commit had documented my per-pack-unit convention as fact. Replaced it
+with hers, plus the two things a future reader would otherwise trip on: the `NOTE`
+pseudo-row, and her `Notes` vocabulary (`ASSUMPTION:` = confirm this match,
+`FLAGGED FOR CONSOLIDATION` = merge these rows). Also recorded that anything importing
+this file **must divide per-kg by 1000** to reach the app's per-g `unitPrice` — the
+conversion my format would have avoided, now stated where an importer will read it.
+
+### 5. Checked the join keys of the rows she changed
+`grep`ped `pricebook.csv` for each:
+- `Gras-fed Collagen` **exists at `pricebook.csv:296`** (4 occurrences) with the
+  typo. Her rename to `Grass-fed Collagen` therefore **breaks that join** until
+  `pricebook.csv` is fixed too. Left her spelling — it's correct English and a
+  deliberate decision — and flagged it rather than "fixing" either file unasked.
+- `Argentine Red Shrimp` exists (`:254`, 4 occ) and `Prawn` exists separately
+  (`:114`, 14 occ) — so her "normalise to Prawns" note is a real merge, not a rename.
+- `Crispy Fried Shallot` exists (`:209`, 6 occ); her note says Sainsbury's has no such
+  product and it should become `Crispy Fried Onions`. `Fried Shallot` (`:292`) already
+  maps to Product `Onion`, so the two rows disagree with each other today.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| pricebook-manual-batch.csv | Replaced with her hand-priced version + the hoops row reformatted to her convention. 94 → 95 data rows, 1 priced → 88 priced | Modified | /home/user/daily-shuffle/ |
+| CLAUDE.md | Worklist bullet rewritten: her conventions, the `NOTE` pseudo-row, her Notes vocabulary, the ÷1000 warning, the two broken join keys | Modified | /home/user/daily-shuffle/ |
+| logs/daily-shuffle_log.md | This entry | Modified | /home/user/daily-shuffle/logs/ |
+| compare.mjs, merge.mjs, check_csv.mjs | RFC4180 comparison / merge / validation scripts | Created (scratchpad, NOT committed) | scratchpad/ |
+
+**No app code touched** — no cache bump, JS parse check and smoke test don't apply.
+
+## Decisions & Reasoning
+- **Adopted her conventions wholesale, did not argue for mine.** 87 rows of real data
+  beat one row of my inference, and her format is the one that works at a shelf.
+- **Did not touch `pricebook.csv`** despite two now-broken join keys. It's audited,
+  and the collagen typo fix + the shrimp/shallot merges are ingredient-normalisation
+  decisions with occurrence counts attached — her call, not a side effect of a CSV
+  merge.
+- **Kept her `NOTE` pseudo-row** rather than moving it to a comment or a doc. It is
+  how she left it, it's inside the file where the work happens, and CLAUDE.md's
+  no-cleanup rule covers exactly this. Documented it instead so no script trips on it.
+- **Kept the hoops row's join warning in `Notes`** — still true, still the only place
+  a reader of that row will see it.
+
+## Current State (end of session)
+`pricebook-manual-batch.csv`: 95 data rows — 88 priced, 6 deliberately blank
+(`White Pepper` genuinely unpriced; `Salt And Pepper` / `Salt Pepper` /
+`Pinche Salt Pepper` / `Argentine Red Shrimp` / `Grass-fed Collagen` awaiting her
+consolidation or price), plus the `NOTE` row. Nothing consumes the file automatically
+— `csv_to_seed.py` must still not run against a partially-filled book
+(`pricebook-audit.md` §3). Pushed to PR #75, still a draft.
+
+## Next Steps
+1. Confirm or correct the four `ASSUMPTION:` rows — `Milk Choice` (matched to Coconut
+   Milk), `Chicken` (matched to thigh fillets), `Chipotle Powder` (matched to chilli
+   flakes), `Green Cabbage` (matched to Savoy).
+2. Do the consolidations her notes flag: the three salt-and-pepper rows → one;
+   `Argentine Red Shrimp` → `Prawns`; `Crispy Fried Shallot` → `Crispy Fried Onions`.
+   These touch `pricebook.csv` and recipe ingredient text, so they're a real pass, not
+   a CSV edit.
+3. Fix `pricebook.csv:296` `Gras-fed` → `Grass-fed` so that row joins again.
+4. Price `White Pepper`, and decide whether the hoops SKU gets a `pricebook.csv` row.
+5. Still the gate on the whole workstream: `pricebook-audit.md` §3 (208 families vs
+   ~365 variants), which blocks the Apify scrape.
+
+## Open Questions / Blockers
+- The four `ASSUMPTION:` matches (Next Step 1) — hers to confirm.
+- Whether the pluralising instruction in the `NOTE` row applies to the whole file now
+  or at the "final naming pass" she mentions. Not acted on.
+- The hoops SKU still joins to nothing; unchanged from the previous entry.
+
+## Environment & Config Notes
+Repo `saffronlm-cmyk/daily-shuffle`, branch `claude/alpro-greek-yoghurt-staples-liiqhy`
+(off `main` @ `ad26046`), PR **#75** — open, draft, this commit extends it rather than
+opening a new one. No Supabase writes. No cache bump. No credentials touched.
+
+## Notes & Gotchas
+- **`Product = NOTE` on row 2 is not a product.** Any script reading this file as
+  products must skip it.
+- **Her figures are per-kg/litre shelf labels; the app's `unitPrice` is per g/ml.**
+  An importer that doesn't ÷1000 will price everything 1000× too high.
+- **`£` and `p` are mixed** in her values (`£3.06/kg`, `65p each`, `77p each`). Any
+  parser needs both.
+- **`Pack qty` is not always numeric** — `loose`, `each`, `x2`, `x2 pack`,
+  `4x145g (580g)`, `400g/400ml`, `340g (150g drained)`. Don't assume `parseFloat`.
+- Two rows are priced with an empty `Pack qty` (`Almond Butter`, `Chinese Five Spice`)
+  — her note says the pack size wasn't visible in the screenshot.
+- The previous entry (below, same date) states the per-pack-unit convention as a
+  decision. **It is superseded by this one** — kept as written, since prior entries
+  aren't edited.
+
+# First priced row in `pricebook-manual-batch.csv` — sets the per-pack-unit precedent; M&S Multigrain Hoops has no `pricebook.csv` join
+**Date:** 2026-08-24
+**Project:** Daily Shuffle — price book (hand-pricing worklist)
+**Status:** Complete. Two things need Saffron's eye — see Open Questions.
+**Mode:** Rolling Log + GitHub Push
+
+---
+
+## Project Context
+`pricebook-manual-batch.csv` was created 2026-08-06 as the subset of `pricebook.csv`
+products that can be hand-priced *now*, without waiting on the two open blockers in
+`pricebook-audit.md` (§3 price-unit decision, §2a produce-fold conversion factors).
+Until this session **every one of its rows was empty** — Product column filled in,
+all five value columns blank. See `pricebook-audit.md` for why the scrape is still
+gated; nothing in this session unblocks it.
+
+Earlier the same day, a separate task in this session added the Alpro Greek Style
+yoghurt to `staple_products` (PR #71, merged `5469d36`) — unrelated except that it
+raised the same "there is no price column on `staple_products`" point that made
+Saffron reach for this file.
+
+## Session Goal
+Add M&S Only 5 Ingredients Multigrain Hoops to `pricebook-manual-batch.csv` from a
+screenshot of the M&S shelf listing (300 g, £2.50, £8.33/kg).
+
+## State Before This Session
+`main` at `ad26046` (#74 — "Send to Tracker"). Note main moved four PRs (#71→#74)
+during this session from parallel work; the branch was restarted off `ad26046` per
+the merged-PR rule rather than stacked on the #71 branch.
+`pricebook-manual-batch.csv`: 93 data rows, **all value columns empty**.
+
+## What Was Done
+
+### 1. Added the row (the only filled row in the file)
+```
+M&S Only 5 Ingredients Multigrain Hoops,300,g,2.50,0.00833,"…"
+```
+Appended at the end rather than inserted — the file is ordered by descending
+occurrence count and CLAUDE.md forbids reordering these CSVs.
+
+### 2. Had to invent the "Price per measurement" convention
+**No row was filled in, so there was no precedent to copy — this row sets it.**
+The column could reasonably mean per-kg (what the shelf label quotes, £8.33) or per
+pack-unit (£0.00833/g). Chose **per pack unit**, because:
+- `pricebook.csv`'s own columns are `Pack size (qty)` / `Pack unit (g / ml / each)` /
+  `Pack price (£)`, and this file's whole purpose is joining back into it;
+- the app computes `unitPrice = packPrice / packSize` (`index.html`, `seedPriceBook()`
+  and `importPriceBookCsv()`), i.e. per pack unit — a per-kg column would need a
+  ×1000 that nothing downstream applies;
+- `pricebook-audit.md` §5 is already a list of rows broken by unit mismatch. Adding a
+  third unit basis to the same data invites exactly that.
+The shelf figure (£8.33/kg) is preserved verbatim in `Notes`, so nothing is lost if
+Saffron prefers per-kg — it is a one-column rewrite across a file with one filled row.
+
+### 3. Found the row does not join
+`Product` is documented as **the verbatim `Ingredient` string from `pricebook.csv`,
+and the join key**. Grepped `pricebook.csv` for `hoop|multigrain|cereal|m&s|marks`:
+the only hit is `Granola,Cereal,Pantry / Dry Goods,…,2`. **This SKU has no
+`Ingredient` row**, so as written the row joins to nothing. Added it anyway — Saffron
+asked for it by name and the price observation is worth capturing — with the
+mismatch recorded in `Notes` rather than silently left to be discovered later.
+
+### 4. Fixed a false number in CLAUDE.md
+CLAUDE.md said the worklist held "the 99 `pricebook.csv` products"; the file has held
+**93** for as long as git knows. Replaced the hard number with an instruction to count,
+and documented the per-pack-unit convention and the non-joining row.
+
+### 5. Validated
+Wrote a throwaway RFC4180 parser (`scratchpad/check_csv.mjs`) rather than eyeballing,
+because the new `Notes` value is the file's first quoted field containing commas — a
+naive `split(',')` reader would now see 9 fields on that row. Result: 94 data rows,
+**every row exactly 6 fields**, no duplicate Product values, and `2.50/300 = 0.00833`
+reproducing the label's £8.33/kg exactly. `node scripts/claude_md_drift.mjs` clean.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| pricebook-manual-batch.csv | +1 row, the file's first priced row (93 → 94 data rows) | Modified | /home/user/daily-shuffle/ |
+| CLAUDE.md | Worklist bullet: dropped the false "99", documented the per-pack-unit convention + the non-joining row | Modified | /home/user/daily-shuffle/ |
+| logs/daily-shuffle_log.md | This entry | Modified | /home/user/daily-shuffle/logs/ |
+| check_csv.mjs | Throwaway CSV field-count validator | Created (scratchpad, NOT committed) | scratchpad/ |
+
+**No app code touched** — `index.html`/`sw.js` untouched, so **no cache bump**, and the
+JS parse check / smoke test do not apply (data + docs only).
+
+## Decisions & Reasoning
+- **Per pack unit, not per kg** for `Price per measurement` — reasoning in §2 above.
+  Rejected per-kg despite it being what the shelf label shows, because three unit
+  bases in one dataset is how `pricebook-audit.md` §5 got its list of dead rows.
+- **Appended, did not insert** — file is occurrence-ordered and CLAUDE.md forbids
+  reordering these reviewed CSVs.
+- **Added the row despite the broken join, rather than stopping to ask** — she named
+  the product explicitly and supplied a complete price observation. Recording it with
+  the mismatch flagged in `Notes` loses nothing; refusing to write it would have lost
+  the observation. The fix (an `Ingredient` row, or a rename to an existing one) is
+  hers to choose.
+- **Did NOT add a matching row to `pricebook.csv`** — it is an audited file whose rows
+  derive from recipe ingredient usage, this SKU has 0 occurrences, and inserting a
+  0-occurrence branded row would fall below the `--min-occ 3` threshold the audit
+  recommends anyway. Not worth perturbing that file unasked.
+- **Kept the `&` unescaped** in `M&S` — plain CSV, no HTML/XML in the path; the app's
+  `importPriceBookCsv()` reads it as text.
+
+## Current State (end of session)
+`pricebook-manual-batch.csv` has 94 data rows, exactly one of them priced. The other
+93 remain the untouched worklist. Nothing consumes this file automatically yet — it is
+a hand-pricing worklist, so the row is inert until someone runs `csv_to_seed.py`
+(which the audit says must not run against a partially-filled book) or imports via
+Settings → price book CSV import.
+
+## Next Steps
+1. Decide per-pack-unit vs per-kg for `Price per measurement` (Open Question 1). One
+   row is filled, so switching costs nothing right now and gets expensive later.
+2. Decide how the hoops row should join: add an `Ingredient` row to `pricebook.csv`,
+   or drop it if no recipe will ever use it.
+3. Unrelated but still the gating decision on this whole workstream:
+   `pricebook-audit.md` §3 price-unit question (208 families vs ~365 variants), which
+   blocks the Apify scrape.
+
+## Open Questions / Blockers
+1. **Is `Price per measurement` per pack unit or per kg?** Set to per pack unit here
+   with the reasoning above. Needs a yes/no; unblocks the remaining 93 rows.
+2. **Should the hoops row exist in `pricebook.csv` too?** Currently joins to nothing.
+   Not blocking anything today.
+
+## Environment & Config Notes
+Repo `saffronlm-cmyk/daily-shuffle`, branch `claude/alpro-greek-yoghurt-staples-liiqhy`
+restarted from `main` @ `ad26046` (the branch's previous PR #71 was already merged, so
+per CLAUDE.md's merged-PR rule it was recreated from main, not extended). No cache
+version bumped. No Supabase writes this session. No credentials touched.
+
+## Notes & Gotchas
+- **This row is the file's first quoted field containing commas.** Any reader doing
+  `line.split(',')` will now mis-parse it into 9 fields. If a script is ever written
+  against this file, use a real CSV parser.
+- **CLAUDE.md's row counts keep going stale** — "99" here while the file held 93, and
+  "~167" for `staple_products` while the table held 178 (see the 2026-08-13 entry).
+  Third instance of the same failure. Count, don't trust the doc.
+- The per-pack-unit choice was made by *this session*, not signed off by Saffron. It
+  is not in the same class as the locked `pricebook-audit.md` decisions — treat it as
+  provisional until she confirms.
+
+# "Send to Tracker" — Plan → Tracker Sync Built and Shipped
+**Date:** 2026-08-23
+**Project:** Daily Shuffle — Shuffle ↔ Tracker integration (`index.html`)
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete. PR #74 merged (`ad26046`).
+
+---
+
+## Project Context
+Third and final piece of the 2026-08-23 session. The two entries below cover the earlier
+halves — the `parseQty` glued-unit fix (#72) and the grocery batch-scaling fix (#73).
+This one is a **new feature**, not a bug fix, and is independent of both.
+
+Nutrition workstream still untouched — step 2 (quantity normalisation) remains not
+applied, unchanged all session.
+
+## Session Goal
+Saffron asked for "a button or something" to push the Shuffle plan's meals through to
+the matching Tracker slots, so a planned week wouldn't have to be re-entered by hand.
+Scope it, take the design decisions, build it, ship it.
+
+## State Before This Session
+`main` at `0b2536e` (#73). `sw.js` at `daily-shuffle-v46`. No link of any kind between
+the Shuffle plan and the Tracker — every planned meal had to be re-added manually.
+
+## What Was Done
+
+### 1. Reconnaissance — the groundwork was mostly already there
+Four findings that made this much smaller than expected:
+- **`food_log` already has `planned` (boolean) and `status` columns**, and
+  `trkMakeEntry()` already writes both — but **nothing in the app reads either**. The
+  schema anticipated this feature and was never wired up.
+- **`trkAddRecipe()`** (`index.html:6431`) already builds a valid recipe entry with
+  macros and a `recipe_snapshot`. The sync is essentially that in a loop.
+- **The plan already persists what's needed** — `savePlan()` stores each day's
+  `dateISO` and slots (`_PLAN_DAY_SLOTS`).
+- **Recipe macros are stored PER SERVING.** Confirmed in `fetchMacroEstimate` (which
+  divides by servings before saving), not from the doc. So one planned slot = one entry
+  of one serving, **no scaling maths at all**.
+
+### 2. Two decisions put to Saffron (they changed the work materially)
+Asked rather than guessed; both answered:
+- **Ring maths → "count immediately as eaten."** I recommended the planned/confirm
+  model (it would have used the dormant `planned`/`status` columns and given honest
+  totals on days she deviates), but she chose immediate counting. **Consequence she was
+  told and accepted: syncing a week ahead shows every future day as fully eaten.**
+- **Button placement → Shuffle tab, by the plan** (push model), next to the lock bar.
+
+### 3. Built `syncPlanToTracker()`
+Placed in the tracker section after `trkAddRecipe` (it uses tracker internals; the
+`<script>` blocks share global scope so the Shuffle-tab button can call it).
+
+- Slot map `PLAN_SLOT_TO_MEAL`: breakfast/lunch/dinner straight across, **`snack` and
+  `snack2` both → `snack`** (the tracker has one snack slot).
+- Skips empty slots and **SHAKE (`id: 0`)** — it carries no macros.
+- Macros from the Supabase row via `trkFetchRecipes()`; **falls back to
+  `RECIPE_FULL_DATA[id].nutrition`** for local-only recipes (that fetch only returns
+  cloud rows). Neither available → still logged, with the count surfaced in the toast.
+- **`trkMakeEntry()` changed**: `date_key: o.date_key || trkDay`. That one-line change is
+  what lets the sync write future dates without navigating the tracker to each one.
+- New helper **`_trkPatchDayCache(dateKey, mutate)`** — read-modify-write on
+  `ds_trk_day_<key>` that **preserves each day's `meta`** (exercise, notes, tdee).
+  Necessary because `trkCacheDay()` only ever writes the day currently on screen.
+
+### 4. Idempotency (the part most worth understanding)
+Every entry is tagged **`entry_type:'plan_sync'`**. A sync first DELETEs only those rows
+for the affected `date_key`s, then rewrites. So repeat syncs never duplicate and
+hand-logged entries are never touched.
+
+**If the cloud delete fails the sync aborts** rather than writing entries that would
+duplicate once the device reconnects (`trkLoadDay` replaces `trkEntries` from cloud). If
+there's **no cloud configured at all** it proceeds locally — nothing to duplicate there.
+That asymmetry is deliberate.
+
+### 5. Verified at runtime, not by reading
+Sandbox can't reach Supabase, so **stubbed `window.fetch` and `window.confirm`** in the
+page and drove a real 2-day, 3-slot plan through `_groceryAggregate`'s sibling path:
+
+| Check | Result |
+|---|---|
+| Entries created | 6, correct dates |
+| Macros from cloud row | 400 / 600 kcal ✓ |
+| Local-only fallback | 333 kcal from `RECIPE_FULL_DATA` ✓ |
+| Pre-existing hand-logged entry | survived ✓ |
+| Day meta (exercise/notes/tdee) | preserved ✓ |
+| Second sync | 4 and 3 — unchanged, no duplication ✓ |
+| Delete scope | `?entry_type=eq.plan_sync&date_key=in.("2026-08-25","2026-08-26")` ✓ |
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| `index.html` | `syncPlanToTracker()`, `_trkPatchDayCache()`, `PLAN_SLOT_TO_MEAL`, `date_key` override in `trkMakeEntry()`, button in the lock bar | Modified | `/home/user/daily-shuffle/` |
+| `sw.js` | `CACHE` bumped `v46` → `v47` | Modified | `/home/user/daily-shuffle/` |
+| `CLAUDE.md` | New "Plan → Tracker sync" bullet in Data & sync | Modified | `/home/user/daily-shuffle/` |
+| `logs/daily-shuffle_log.md` | This entry | Modified | `/home/user/daily-shuffle/logs/` |
+
+No database writes this session. Supabase MCP used **read-only** (schema + serves
+distribution only).
+
+## Decisions & Reasoning
+- **Count as eaten immediately** — Saffron's call over my recommendation (see §2).
+  Reversible later: the `planned`/`status` columns are already written on every entry,
+  so a confirm-to-count model is a contained change, and `syncPlanToTracker` is where
+  those fields would be set.
+- **Tag + delete-by-tag for idempotency**, not upsert-by-id. IDs are random per call, so
+  upsert wouldn't dedupe; and delete-by-tag is the only approach that provably cannot
+  touch hand-logged rows.
+- **Abort on failed cloud delete, proceed when there's no cloud at all.** Duplication is
+  only possible when a cloud copy exists — so refusing offline entirely would be too
+  strict, and proceeding after a *failed* delete would be too loose.
+- **Fallback `servings || 1`, `date_key || trkDay`** — every new default reproduces the
+  prior behaviour exactly, so nothing existing changes.
+- **`snack2` → `snack`** rather than `dessert`. Both plan snack slots are snacks;
+  `dessert` is a separate tracker concept she uses deliberately.
+- **Left the AI-plan leftover-span bug alone** (see the #73 entry §1) — different
+  mechanism, would muddy this diff.
+
+## Current State (end of session)
+Working and shipped. `main` at **`ad26046`**. ship-check clean: 3/3 parse, smoke 5/5,
+cache `v47`, drift clean. All three of today's PRs (#72, #73, #74) merged.
+
+## Next Steps
+1. **Use it once for real**: Shuffle → generate/open a plan → "Send to Tracker" →
+   check the Tracker's slots on those dates. Hard-refresh if `v46` is still cached.
+2. **Expect future days to read as fully eaten** if a week is synced ahead. That's the
+   chosen behaviour, not a bug. If it grates, switch to the confirm-to-count model —
+   the columns are already there.
+3. **Optional — fix the AI Plan leftover span** (carried over from the #73 entry). The
+   clamp in `buildPlanFromAIDays` is the more robust of the two options; it doesn't
+   depend on the model obeying the prompt.
+4. Nutrition step 2 remains the open workstream, unchanged all session.
+
+## Open Questions / Blockers
+None blocking. Carried-over deferrals: the AI-plan leftover span; the two
+Tracker-target caveats (not cloud-synced, calorie field `|| default`) from the #72 entry.
+
+## Environment & Config Notes
+- Repo `saffronlm-cmyk/daily-shuffle`, branch `claude/manual-macro-targets-y9czdf`
+  (restarted from `origin/main` before each of today's three PRs), PR **#74** merged.
+- `sw.js` `CACHE` now **`daily-shuffle-v47`**. Read the live value from `sw.js`.
+- Supabase project `jsxcctrskkkxgdxfaduo`; tables `food_log`, `recipes` — read-only here.
+- No credentials beyond the already-public inlined anon key.
+
+## Notes & Gotchas
+- **`entry_type:'plan_sync'` is load-bearing.** The idempotent delete is keyed on it.
+  Never reuse that string for another feature, and never rename it without updating the
+  delete. Documented in CLAUDE.md for the same reason.
+- **`trkCacheDay()` only writes `trkDay`.** Anything touching another day's cache must go
+  through `_trkPatchDayCache` or it will silently wipe that day's `meta`.
+- **Recipe macros are per serving** (`fetchMacroEstimate` divides before saving). If that
+  ever changes, this sync starts logging whole batches per slot.
+- **`trkFetchRecipes()` memoises into `_trkRecipeCache`** and only returns cloud rows —
+  hence the `RECIPE_FULL_DATA` fallback. A recipe added locally this session won't be in
+  it until a reload.
+- **`trkNum()` coerces null → 0**, so an entry with unknown macros contributes nothing to
+  the rings rather than breaking the sum. That's why unmatched recipes are still logged.
+- **Runtime test pattern (reusable, and faster than driving the UI):** `addInitScript`
+  seeds `ds_recipe_cache` + `ds_recipe_cache_full`; then inside `page.evaluate` stub
+  `window.fetch` and `window.confirm` and call app internals directly. Used for both
+  today's grocery fix and this feature. Scratchpad only — not committed.
+- The branch name `claude/manual-macro-targets-y9czdf` describes none of today's three
+  changes; it came from the opening macro-targets question. Don't read meaning into it.
+
+---
+
+# Grocery List Was Multiplying Batch Recipes by Days Instead of Batches
+**Date:** 2026-08-23
+**Project:** Daily Shuffle — meal plan → grocery list (`index.html`)
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete. PR #73 merged.
+
+---
+
+## Project Context
+Second piece of work in the same session as the entry immediately below
+("parseQty Was Dropping Quantities…", 2026-08-23). **The two bugs are unrelated in
+cause but landed on the same screen**, which is very likely why the grocery list looked
+wrong in more than one way at once: `parseQty` was *losing* quantities, and
+`_groceryAggregate` was *over-counting* the ones that survived. Read both entries
+together before touching grocery-list maths.
+
+Nutrition workstream untouched again — step 2 still not applied.
+
+## Session Goal
+Saffron asked whether recipe serving sizes are factored into the leftover quantities on
+the calendar, then reported the real symptom: a **4-day plan whose breakfast and dinner
+each serve 4 had multiplied quantities in the grocery list**. Diagnose and fix.
+
+## State Before This Session
+`main` at `4225e50` (#72, the parseQty fix, merged earlier this session).
+`sw.js` at `daily-shuffle-v45`.
+
+## What Was Done
+
+### 1. Answered the servings/leftover question — two paths, only one correct
+There is **no Calendar tab**. The Calendar is a *section inside the Shuffle tab*
+(`tab-plan`), rendered by `renderPlanOutput()` (`index.html:4278`). Worth knowing
+before hunting for a tab that doesn't exist.
+
+- **Shuffle button — servings drives leftovers correctly.** `buildBatchSchedule()`
+  (`index.html:3916`) does `const n = Math.min(pick.servings || 1, rem)` — a recipe
+  occupies exactly `servings` consecutive days. `dinnerBatchDay`/`dinnerBatchTotal` are
+  measured off that span.
+- **AI Plan button — servings is never consulted.** `buildPlanFromAIDays()`
+  (`index.html:4149`) *measures* the span from whatever IDs the model repeated. The
+  model is never told servings: `formatR()` (`index.html:4051`) sends only
+  `id: name [kcal, protein] ★`, and the system prompt hardcodes *"group the SAME dinner
+  ID across 2–4 consecutive days"* (`index.html:4089`).
+  Against the live library that misfires both ways — of 54 dinner recipes, **5 serve 1**
+  (would be labelled "Leftover day 2/3" with no food left) and anything serving 5+ gets
+  truncated to 4. Only the 23 serves-2 and 7 serves-3 dinners fit the hardcoded range.
+
+**Not fixed** — see Next Steps. Flagged in PR #73's "Not included" section too.
+
+### 2. Found the actual reported bug — grocery scaling
+`_groceryAggregate()` (`index.html:4441`) had:
+
+```js
+const portionScale = (idCounts[idStr] || 1); // recipe used N times in plan
+```
+
+`idCounts` is the number of **plan slots** a recipe fills = **portions eaten**. But the
+recipe as written already yields `servings` portions, so what you shop for is
+**batches** = `ceil(portions / servings)`. Scaling by portions multiplied a 4-serve
+dinner over 4 days by 4.
+
+Note the app's own planner contradicts this: `buildBatchSchedule` deliberately spreads
+one cook across `servings` days and the calendar labels them "Leftover day 2/4". The
+grocery list was the only component treating those days as separate cooks.
+
+### 3. Reproduced at runtime before changing anything
+Wrote a throwaway Playwright script (same fixture-seeding trick as
+`scripts/smoke_test.mjs` — `ds_recipe_cache` + `ds_recipe_cache_full` in
+`addInitScript`), built a 4-day plan by hand, called the real `_groceryAggregate`:
+
+| Recipe line | Correct | Showed (before fix) |
+|---|---|---|
+| 400 g oats (serves 4) | 400 g | **1600 g** |
+| 800 g chicken thighs (serves 4) | 800 g | **3200 g** |
+
+### 4. Fixed and verified
+```js
+const serves = Math.max(1, (r && r.servings) || 1);
+const portionScale = Math.ceil((idCounts[idStr] || 1) / serves);
+```
+Re-ran the harness across 8 servings/days combinations (100 g per recipe, so grams
+should equal batches × 100): serves 1/3 days→300, 2/4→200, 3/4→200, 4/2→100, 4/4→100,
+6/4→100, 4/6→200, 4/9→300. **All correct.**
+
+### 5. Noticed a corroborating inconsistency
+`agg[].priceCost` uses the same `portionScale`, so the **per-aisle subtotals** were
+inflated by the same factor. The **plan cost summary** in `renderGroceryList` sums
+`cost.perPortion` across plan slots (4 days × total/4 = one batch) and was **already
+correct**. So the two figures on that screen disagreed before this change and agree
+after it — independent evidence that `portionScale` was the wrong term rather than the
+cost summary. Did not touch the cost summary.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| `index.html` | `_groceryAggregate()` — `portionScale` now batches, not portions | Modified | `/home/user/daily-shuffle/` |
+| `sw.js` | `CACHE` bumped `daily-shuffle-v45` → `v46` | Modified | `/home/user/daily-shuffle/` |
+| `logs/daily-shuffle_log.md` | This entry | Modified | `/home/user/daily-shuffle/logs/` |
+
+No database writes; Supabase MCP used read-only (serves distribution only).
+
+## Decisions & Reasoning
+- **Fixed `portionScale`, not the cost summary.** Both couldn't be right. The planner's
+  own batch model (`buildBatchSchedule` spreading one cook over `servings` days) and the
+  already-correct plan cost summary both point at portionScale as the outlier.
+- **`ceil(portions / servings)`, not `floor` or exact division.** You can't cook 0.5 of a
+  batch — shopping must round **up**. `ceil` also leaves serves-1 recipes at their old
+  value, so that whole class is provably unaffected.
+- **Fallback `servings || 1`, not `|| 2`.** `mapSupabaseToApp` defaults to 2, but here a
+  wrong-high default would *under*-buy. Falling back to 1 reproduces the old behaviour
+  exactly for any recipe whose servings we can't determine — fails safe.
+- **Left the AI-path leftover-span bug out of this PR.** Different mechanism (prompt +
+  catalog, not aggregation), and mixing them makes the diff harder to review.
+- **Kept the throwaway repro scripts in the scratchpad, not the repo.** They're one-off
+  diagnostics; `scripts/smoke_test.mjs` is the committed runtime check. If this needs
+  re-testing, the pattern is 20 lines — see §3.
+
+## Current State (end of session)
+Working. PR **#73** merged into `main`. ship-check clean: 3/3 parse, smoke 5/5, cache
+bumped to `v46`, drift clean.
+
+## Next Steps
+1. **Re-open the Shuffle tab and regenerate/re-check the current 4-day plan.** Quantities
+   should now show one batch per recipe. Hard-refresh once if `v45` is still cached.
+2. **Per-aisle price subtotals will drop** by the same factor the quantities did. Correct,
+   not a new bug.
+3. **Optional — fix the AI Plan leftover span** (§1). Two candidate changes: add `serves`
+   to `formatR`'s catalog line and replace the hardcoded "2–4 consecutive days" with a
+   per-recipe instruction; and/or clamp the returned span to the recipe's servings in
+   `buildPlanFromAIDays`. **The clamp is the more robust of the two** — it doesn't depend
+   on the model obeying the prompt.
+4. Nutrition step 2 remains the open workstream, unchanged.
+
+## Open Questions / Blockers
+None blocking. Deferred: the AI-path leftover span (above), plus the two Tracker-target
+caveats from the entry below.
+
+## Environment & Config Notes
+- Repo `saffronlm-cmyk/daily-shuffle`, branch `claude/manual-macro-targets-y9czdf`
+  (restarted from `origin/main` after #72 merged, per the merged-PR rule), PR **#73**.
+- `sw.js` `CACHE` now **`daily-shuffle-v46`**. Read the live value from `sw.js`.
+- No credentials in play.
+
+## Notes & Gotchas
+- **`idCounts` counts slot-occurrences, not days.** That's the right numerator — a recipe
+  in two slots on one day is two portions. Don't "fix" it to count distinct days.
+- **The grocery list and the plan cost summary compute cost by different routes** (aisle
+  subtotals via `agg[].priceCost` × portionScale; the header via `computeRecipeCost`'s
+  `perPortion` summed over slots). They agree now. If a future change touches one, check
+  the other — a disagreement between them is a reliable smell.
+- **The Calendar is a section of the Shuffle tab, not a tab.** `renderPlanOutput()`.
+- The serves distribution as of today: no NULLs, 342 recipes, dinners spread 5×serves-1,
+  23×serves-2, 7×serves-3, 17×serves-4, 2×serves-5. Will drift — re-measure, don't cite.
+- Runtime repro pattern worth reusing: `page.addInitScript` seeding `ds_recipe_cache` +
+  `ds_recipe_cache_full`, then `page.evaluate` calling app internals directly. Much
+  faster than driving the UI, and it works fully offline.
+
+---
+
+# parseQty Was Dropping Quantities on Glued Units and Ranges (650 lines, 225 recipes)
+**Date:** 2026-08-23
+**Project:** Daily Shuffle — recipe ingredient parsing (`index.html`)
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete. PR #72 merged.
+
+---
+
+## Project Context
+Sits underneath the nutrition-estimation workstream (steps in CLAUDE.md). Step 2
+(quantity normalisation) is approved and scripted but still **not applied** — see the
+2026-07-01 entry for the §6 decisions and the 2026-08-05 entry for the 250 ml cup
+unification. This session did not advance step 2; it fixed a **pre-existing app-side
+parser bug** that would have made step 2's output disagree with what the app displays.
+
+Not related to the hollow-recipe damage (closed 2026-08-12) — this bug never wrote
+anything to the database.
+
+## Session Goal
+Started as two questions from Saffron: (1) does the Tracker let her manually adjust
+macro targets, and (2) why do recipes she uploads to Supabase via **Claude chat** end
+up with the quantity sitting inside the ingredient-name box instead of the qty box.
+Question 2 turned into the session's real work: diagnose and fix.
+
+## State Before This Session
+`main` at `5469d36` (#71). Working branch `claude/manual-macro-targets-y9czdf` did not
+yet exist. `sw.js` at `daily-shuffle-v44`.
+
+## What Was Done
+
+### 1. Tracker macro targets — answered, no change made
+Already implemented, and has been since the tracker was integrated (commit `1ffe151`).
+Tracker tab → **"Targets"** button (`index.html:1317`) → `trkOpenTargets()` modal with
+five editable fields; `trkSaveTargets()` persists to `localStorage` under
+`ds_trk_targets`, merged over `TRK_TARGET_DEFAULTS` (1800/130/170/58/30) on load.
+
+Two caveats surfaced and reported, **neither fixed** (not asked to):
+- `ds_trk_targets` is **not** in the cloud-sync snapshot (`buildSyncPayload`, approx.
+  `index.html:5037-5053`). That list carries a *legacy* `ds_targets` key from the old
+  Track tab — a different thing. So targets do not follow her across devices.
+- `trkSaveTargets` does `|| TRK_TARGET_DEFAULTS.cal`, so a blank/zero **calorie** field
+  silently reverts to 1800. The other four macros accept 0 fine.
+
+### 2. Diagnosed the ingredient-field bug — it was NOT the chat uploads
+Saffron's framing was that Claude chat writes the rows wrong. It doesn't. The library
+stores each ingredient as **one plain string** (`"15ml fish sauce"`) — that is the
+convention across all 334 recipes including hand-entered ones — and the app splits it
+into qty/unit/name at **read time** via `parseQty()`.
+
+Root cause: the quantity regex in `_consumeQtyUnit()` required **whitespace** between
+the number and the unit:
+
+```js
+/^([\d½¼¾⅓⅔⅛][½¼¾⅓⅔⅛\d.\s]*?)\s+(?=[a-zA-Z(])/
+```
+
+So `2 tbsp soy sauce` parsed, `15ml fish sauce` did not. On a miss `parseQty` returns
+the **entire original string** as the name — hence a filled name box and an empty qty
+box. Verified by extracting the real function out of `index.html` into a node harness
+and running it, not by reading the regex.
+
+### 3. Measured the blast radius against live Supabase
+Reimplemented the parser's match conditions as SQL over all `ingredient_sections`:
+- **4,350** ingredient lines total; **650** lose their quantity; **225 of 334 recipes
+  (67%)** affected.
+- Breakdown: 536 glued-unit (`200ml milk of choice`), 97 numeric range
+  (`4–5 garlic cloves`), 17 other.
+
+Damage was **not** confined to the editor boxes: `computeRecipeCost()`
+(`index.html:3440`) passes the null qty to `_toBase()`, gets null back, and counts the
+line as **unpriced** — so recipe costs have been silently understated wherever a
+glued-unit line appears. Price-book lookups also missed, since
+`canonicalise("200g milk of choice")` keys on the digits too.
+
+### 4. Found the Python side was already correct
+`parse_leading_amount()` in `scripts/normalise_quantities.py:61` handles both shapes:
+`\d+(?:\.\d+)?` followed by `\s*` (so `200g` splits), and ranges → **midpoint**. So the
+app was the only component out of step. This meant **no script change was needed**, and
+it set the choice of range semantics (see Decisions).
+
+### 5. Fixed `_consumeQtyUnit()` and verified
+Two additions, both placed **after** the existing fraction and spaced parsers have
+already missed, so existing behaviour is untouched by construction.
+
+### 6. Verification (the part worth trusting)
+- 26 hand-picked shapes through old vs. new harness: 12 previously-broken now parse,
+  7 previously-working unchanged, 7 must-not-grab cases untouched.
+- All 16 distinct "other" residual shapes diffed old vs. new: 13 identical, **2
+  improved** (`1.5–2 lb …`, `1x 425g can tuna`), **0 regressed**.
+- **Regression proof, not a sample:** counted in SQL how many of the 2,887 lines the
+  old parser already handled could trigger either new branch. **Zero overlap on both.**
+  The change is therefore strictly additive on this corpus.
+- Post-fix: **635 of 650** broken lines parse (224 recipes). 15 remain — see Gotchas.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| `index.html` | `_consumeQtyUnit()` — added glued-unit branch + range-midpoint pre-pass | Modified | `/home/user/daily-shuffle/` |
+| `sw.js` | `CACHE` bumped `daily-shuffle-v44` → `v45` | Modified | `/home/user/daily-shuffle/` |
+| `CLAUDE.md` | Added the parseQty/midpoint rule to the quantity-normalisation bullet | Modified | `/home/user/daily-shuffle/` |
+| `logs/daily-shuffle_log.md` | This entry | Modified | `/home/user/daily-shuffle/logs/` |
+
+No database writes. `ingredient_sections` untouched — Supabase MCP used **read-only**.
+
+## Decisions & Reasoning
+- **Fixed the app parser rather than the uploaded data.** Options: (a) tell Claude chat
+  to write `200 g` with a space, (b) migrate the 650 lines, (c) fix `parseQty`. Chose
+  (c): the glued form is correct UK convention and already dominant in the library, so
+  (a) fights the house style forever and (b) is a destructive rewrite of reviewed data
+  that only fixes today's rows. (c) is read-time — **no migration, every existing
+  recipe corrects itself on next load**.
+- **Ranges → midpoint, not lower bound.** Lower bound is the conservative default I'd
+  otherwise pick, but `quantity-normalisation-plan.md` §3 locks **midpoint** and
+  `normalise_quantities.py` already implements it. App now agrees with the script.
+  Do not "simplify" this to the lower bound later — it would resplit the two.
+- **Reused `_UNIT_RE` for the glued branch instead of writing a second unit list.**
+  A duplicated list is a guaranteed future drift bug — CLAUDE.md already tracks five
+  copies of `canonicalise()` for exactly this reason.
+- **Guarded the glued branch with a lookahead + `_UNIT_RE` test** so it only eats digits
+  when a *real* unit follows. Keeps it off `200grams`, `7Up`, `2x400g`.
+- **Left `cm`, `4 × 100g` and vulgar-fraction ranges unfixed.** 15 lines total; `cm`
+  isn't a supported unit anywhere in the app, so "fixing" it means a new unit class —
+  scope creep on a parser fix.
+- **Did not fix the two Tracker-target caveats.** Real, but she asked a question, not
+  for a change; bundling them into a parser PR would muddy it.
+
+## Current State (end of session)
+Working. PR **#72** merged into `main`. ship-check clean: 3/3 script blocks parse,
+smoke test 5/5, cache bumped, drift script clean. Nutrition step 2 remains **not
+applied** — unchanged by this session.
+
+## Next Steps
+1. **Open the app and confirm on a real recipe** — the smoke test covers boot/tabs/
+   shuffle, it does **not** exercise the editor's qty boxes. Open any recipe with a
+   `200g`-style line, hit "✏️ Edit recipe", confirm qty/unit/name land in three boxes.
+   Hard-refresh once if the old `v44` cache is still serving.
+2. **Expect recipe costs to move.** Glued-unit lines were being dropped as unpriced, so
+   per-portion costs were understated. Post-fix figures are the correct ones — don't
+   read the change as a new bug.
+3. Nutrition step 2 (quantity normalisation) is still the open workstream — unchanged.
+   Its next action is still: dump `recipes` via Supabase MCP, run
+   `scripts/normalise_quantities.py`, review `quantity_review.csv` before any write.
+4. Optional, if she wants them: the two Tracker-target caveats in §1 above.
+
+## Open Questions / Blockers
+None blocking. Two deferred items, both logged above and neither started: Tracker
+targets not cloud-synced, and the calorie-field `|| default` quirk.
+
+## Environment & Config Notes
+- Repo `saffronlm-cmyk/daily-shuffle`, branch `claude/manual-macro-targets-y9czdf`,
+  PR **#72** (merged). Branch name is a leftover from the macro-targets question and
+  does not describe its contents — don't be confused by it later.
+- `sw.js` `CACHE` now **`daily-shuffle-v45`**. Read the live value from `sw.js`, never
+  from this entry.
+- Supabase project `jsxcctrskkkxgdxfaduo`, table `recipes`, read-only this session.
+- No credentials involved beyond the already-public inlined anon key.
+
+## Notes & Gotchas
+- **The 650/225 figures are as measured on 2026-08-23 and will drift** as recipes are
+  added. The SQL that produced them is reproducible from the classification in §3:
+  a line is "lost" if it starts with a digit or vulgar fraction but matches neither the
+  ASCII-fraction nor the spaced-qty pattern.
+- **`parseQty` returns the whole input string as `name` on a parse miss.** That silent
+  fallback is what made this bug invisible for so long — nothing errors, the line just
+  quietly carries its quantity in the wrong field. Worth remembering when debugging any
+  future ingredient-field weirdness.
+- **`_UNIT_RE` has no `g` flag**, so `.test()` is stateless — the new glued branch
+  relies on that. If anyone adds `/g` to it, the glued branch breaks intermittently via
+  `lastIndex`.
+- **The range pre-pass rewrites `t` before parsing** (`4–5 garlic` → `4.5 garlic`). It
+  is deliberately gated on a `(?=\s|[a-zA-Z])` lookahead so it can't fire on
+  `70-80% dark chocolate` or `5-spice powder`. Don't loosen that lookahead.
+- `"00 flour"` still yields qty null and name `"flour"` — the `00` is eaten and not
+  recovered. Pre-existing, unchanged by this fix, and not worth chasing.
+- Claude chat was **not** doing anything wrong. If this symptom is ever reported again,
+  check `parseQty` before blaming the writer.
+
+---
+
+# Added Alpro Greek Style plain yoghurt alternative to `staple_products` (178 → 179 rows)
+**Date:** 2026-08-13
+**Project:** Daily Shuffle — nutrition data (staple products)
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete.
+
+---
+
+## Project Context
+Nutrition-estimation step 1 (`staple_products`) is long done — see the 2026-07-01 entry
+"USDA Staple Lookup Built…" for how the 122 USDA rows were seeded. This session is
+ordinary upkeep on that table: Saffron pasted a product label and asked for it to be
+added. No connection to steps 2/3, which remain where the 2026-08-12 entry left them.
+
+## Session Goal
+Add Alpro Greek Style Plain Dairy Free Yoghurt Alternative to `staple_products` from a
+pasted label, following the table's existing naming/notes conventions.
+
+## State Before This Session
+`main` at `8257bbd` (#70). `staple_products` at **178 rows** — note CLAUDE.md and the
+`recipe-db` skill both still claimed "~167", the post-USDA figure; 11 rows had been
+hand-added since without either doc being updated.
+
+## What Was Done
+
+### 1. Checked conventions before writing
+Queried the live column list rather than trusting the skill doc, then pulled every
+yoghurt/Alpro/soya row to copy the house style. Findings that shaped the row:
+- **There is no price column** on `staple_products` (id, name, aliases, serving_qty,
+  serving_unit, calories, protein_g, carbs_g, fat_g, fibre_g, sugar_g, gi_estimate,
+  flags, notes, timestamps). Nor is there a sodium/salt column — existing rows put
+  salt and saturated fat in `notes` free text (e.g. the "Soya yoghurt, plain, no
+  sugars — Alpro" row: "Sat 0.4g, salt 0.24g").
+- **Naming pattern for branded rows is `<food>, <qualifiers> — <Brand>`** ("Almond milk,
+  barista — Alpro", "Soya yoghurt, plain, no sugars — Alpro", "Soy sauce, gluten free,
+  reduced sodium — Emma Basic").
+- **Flag vocabulary in use** is exactly: `usda_seed` (112), `high_sodium` (6),
+  `high_sugar` (5), `nutrition_estimated` (5), `high_fat` (4), `zero_macro` (3),
+  `high_sat_fat` (1). There is no `dairy_free`/`vegan` flag and the other Alpro rows
+  carry `flags = {}` — so this row does too. Nothing about it is "high" anything, and
+  it is label-verified, so `nutrition_estimated` would be wrong.
+
+### 2. Inserted the row
+`id e5ccadf0-5302-44c0-983a-422a5321a94e`, per 100 g:
+65 kcal · 5.6 P · 2.2 C · 3.3 F · 1.3 fibre · 2.2 sugar. `gi_estimate` null, `flags` `{}`.
+
+Macro cross-check before writing: 5.6×4 + 2.2×4 + 3.3×9 + 1.3×2 = 63.5 kcal vs the
+label's 65 — consistent, so the figures were taken as pasted.
+
+### 3. Verified no alias collision
+Alias matching in `index.html` is **exact** in `trkFindStapleId()` (line ~5904) and
+substring-`includes` in `trkMatchStaples()` (line ~6454), and every alias is also
+injected into the AI prompt context by `trkBuildStapleContext()`. So a careless alias
+can silently hijack a different product's logging. Ran an explicit collision query
+against every other row's name and aliases — **zero collisions**.
+
+### 4. Fixed the stale row count in two docs
+CLAUDE.md and `.claude/skills/recipe-db/SKILL.md` both said "~167 rows". Updated to
+~179 with a note that it is 167 from USDA plus hand-added label-verified products.
+Historical mentions of 167 in this log and in `quantity-normalisation-plan.md` were
+left alone — they were true when written.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| `staple_products` (Supabase) | +1 row, id `e5ccadf0-5302-44c0-983a-422a5321a94e` | Modified (insert) | project `jsxcctrskkkxgdxfaduo` |
+| CLAUDE.md | Data & sync section: staple row count ~167 → ~179 | Modified | /home/user/daily-shuffle/ |
+| .claude/skills/recipe-db/SKILL.md | Schema map: staple row count ~167 → ~179 | Modified | /home/user/daily-shuffle/.claude/skills/recipe-db/ |
+| logs/daily-shuffle_log.md | This entry | Modified | /home/user/daily-shuffle/logs/ |
+
+**No app code touched** — `index.html` and `sw.js` are untouched, so **no cache bump**
+and no ship-check run (data + docs only, per CLAUDE.md's bump rule).
+
+## Decisions & Reasoning
+- **Name `Greek style yoghurt, plain, dairy free — Alpro`**, not "Alpro Greek Yoghurt":
+  matches the existing `<food>, <qualifiers> — <Brand>` convention, and keeps it sorting
+  next to the other yoghurts rather than under A.
+- **Did NOT reuse the aliases `greek yoghurt` / `greek yogurt`**: those are exact-match
+  aliases on the *dairy* "Greek yoghurt" row (USDA FDC 2259794, 93.7 kcal). Claiming
+  them would make a bare "greek yoghurt" log resolve to whichever row matched first —
+  a silent 29-kcal-per-100g error. Used brand-qualified and dairy-free-qualified
+  aliases only (`alpro greek`, `alpro greek style`, `alpro greek yoghurt`,
+  `dairy free greek yoghurt`, `greek style yoghurt alternative`, `vegan greek yoghurt`).
+- **Price went into `notes`, not the price book**: there is no price column on
+  `staple_products`, and `pricebook.csv` is an *audited* file whose rows are derived
+  from recipe ingredient usage, currently gated on the open price-unit decision
+  (`pricebook-audit.md`). Hand-inserting a branded SKU into it would perturb a file
+  CLAUDE.md says not to touch unasked, and would not match any recipe ingredient
+  string. Recorded "400g pot £2.15 (£5.38/kg) on offer, normally £2.50 (2026-08-13)"
+  in `notes` instead and flagged the gap to Saffron.
+- **Recorded salt verbatim as `<0.5g`**: that is what the pasted label said. It is
+  almost certainly the packaging's "less than" rounding rather than a real 0.5 g
+  (comparable Alpro yoghurts are ~0.09–0.24 g), but inventing a tighter number would
+  breach the flag-don't-guess rule. There is no salt column so nothing computes on it.
+- **Skipped the pre-write review CSV** from the `recipe-db` skill: that rule is scoped
+  to bulk writes (>~10 rows). This is a single insert from a label Saffron supplied and
+  read back to her in full.
+
+## Current State (end of session)
+`staple_products` = **179 rows**, verified by count. The new row reads back correctly
+and collides with nothing. The Tracker and `fetchMacroEstimate` both read this table
+live and alias-aware, so the product is usable immediately with no app deploy.
+
+## Next Steps
+1. Nothing outstanding on this row.
+2. If Saffron wants the £5.38/kg figure to actually drive cost features, decide whether
+   branded SKUs belong in `pricebook.csv` at all — that is really a sub-question of the
+   open "variant = price unit vs Product = grouping" decision in `pricebook-audit.md`,
+   which still gates the Apify scrape.
+3. Unrelated and still the real next milestone: nutrition step 2 (apply
+   `scripts/normalise_quantities.py` against a live `recipes` dump) — see 2026-08-12.
+
+## Open Questions / Blockers
+- Should hand-added branded products get a price home at all? Deferred, see Next Steps 2.
+- The `<0.5g` salt figure is the label's rounded value, not a measured one. Harmless
+  today (no salt column, nothing computes on it); worth correcting if a sodium column
+  is ever added.
+
+## Environment & Config Notes
+Repo `saffronlm-cmyk/daily-shuffle`, branch `claude/alpro-greek-yoghurt-staples-liiqhy`
+off `main` @ `8257bbd`. Supabase project `jsxcctrskkkxgdxfaduo`, table
+`staple_products`, written via Supabase MCP `execute_sql` (no migration — no schema
+change). No cache version bumped. No credentials touched.
+
+## Notes & Gotchas
+- **The dairy "Greek yoghurt" row still exists and still owns the bare `greek yoghurt`
+  aliases.** Both rows are now in the AI prompt context simultaneously. If a bare
+  "greek yoghurt" tracker entry ever resolves to the dairy row when Saffron meant the
+  Alpro, the fix is to re-point those aliases — not to add them to both rows.
+- CLAUDE.md's row counts for this table have gone stale twice now (167 stated while the
+  live table was 178). Treat any row count in a doc as a hint and run
+  `select count(*)` — the same warning the workstream section already makes about the
+  "8 no-`serves`" figure.
+
+# Hollow-recipe damage CLOSED (all 52 resolved); cup basis unified on 250 ml; ingredient lines now weight-first
+**Date:** 2026-08-12
+**Project:** Daily Shuffle — data integrity closeout + ingredient display
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete. Nutrition step 2 is now unblocked apart from 4 `serves` values.
+
+---
+
+## Project Context
+Closes the thread opened by the two 2026-08-05 entries below (hollow-recipe damage found;
+fix merged). **Read those for the root-cause analysis** — this entry does not repeat it.
+Covers the cup-basis/display work (PR #66) and the verification + closeout after Saffron
+re-entered the lost ingredients.
+
+## Session Goal
+Two things: unify the app's cup conversion onto the ruleset's 250 ml basis and change the
+ingredient line to lead with weight/volume; then verify the re-entry and close the damage
+record out.
+
+## State Before This Session
+`main` at `829db47` (#66) then `02eed7b` (#65, price-book, from a parallel session). 52
+recipes hollow, CLAUDE.md carrying an open "Known data damage" section.
+
+## What Was Done
+
+### 1. Cup basis unified on UK 250 ml + weight-first ingredient lines (PR #66, merged `829db47`)
+The app converted cups on a **US 240 ml** basis while the normalisation ruleset uses the
+**UK 250 ml** cup from §6 decision 2 — plain flour 125 vs 133 g/cup. Two shipped tables,
+disagreeing, one feeding the screen and one feeding the macros.
+
+Because the tables are differently grained (app: ~60 ingredient names; script: ~20 broad
+classes) a blanket ×250/240 rescale would *not* have made them agree. Rule applied:
+- **Generic member of a script class → adopt that class's exact value** (flour 133,
+  sugar 213, syrup 350, paste 263, cocoa 103). Real agreement on the common ingredients.
+- **Finer variant the script doesn't distinguish → rescale ×250/240** (almond flour
+  96→100, icing sugar 130→135). Collapsing almond flour to a generic 133 would be worse.
+- **Empirically measured entries → untouched** (grains, nuts, seeds, cheese, berries).
+  Same distinction the plan drew in July. Cheese already agreed at 100.
+
+`_ingToText()` now renders `133g plain flour (1 cup)` — weight/volume, name, original
+measure in brackets. Counts stay counts; already-metric lines are left alone; a note
+merges into the same bracket (`80g rolled oats (1 cup, jumbo)`).
+
+**Three pre-existing bugs surfaced by that change**, all fixed in the same PR:
+- `convertIngredientText()` skipped any line containing `(...cup)`. The new format would
+  have **silently disabled the imperial toggle on every converted line**. Narrowed to
+  skip only genuine imperial equivalents `(...oz|lb)`.
+- `multiplyIngredientText()` matched `FRAC_OUT` on the entry *value* (a glyph) instead of
+  the key (a number), so the fraction branch never fired and `¾` rendered as `0.8`.
+- The same function swallowed the space before the unit → `2onion` when scaled.
+
+### 2. Verified the re-entry — 50 of 52, and two deliberate deletions
+Saffron re-entered the ingredients via a separate Supabase-MCP chat using the prompts in
+the previous entry. Verified against live data:
+- **0 null ingredient lines library-wide.** Damage cleared.
+- All restored lines are plain strings with source quantities intact and **no
+  hand-computed grams** — the addendum's central instruction was followed.
+- 50 of the 52 restored; **2 were deliberately deleted by Saffron** (hard-deleted, rows
+  gone, not `import_status='deleted'`): Maple Cinnamon Pumpkin Overnight Oats
+  (@manskis_wellness) and XL Gluten Free Rice Paper Dumplings (glutenfree.asian). Live
+  recipe count 332 → 330.
+- Checked for dangling references: **no table in the project has a `recipe_id` column**,
+  so nothing in `saved_meals` / `food_log` / `day_meta` points at deleted rows. Only a
+  client's `ds_recipe_cache` could hold stale copies until it refreshes.
+- Line-count reconciliation vs the worklist: 41 exact, 5 longer (extra detail — e.g.
+  Chicken Tikka Masala gained a "Cooking Chicken" section), 4 one line short (Green
+  Goddess Pasta Salad, No Bake Coconut Cookies, Pad See Ew with Beef, Snickers Overnight
+  Oats). **Saffron reviewed and accepted the short ones** — normal re-entry variance.
+- Two recipes have empty `ingredient_sections` (Apple & Cinnamon Protein Porridge, Whole
+  Roast Chicken) — both `import_status='custom'` from April/May, unrelated to this damage.
+
+### 3. Closed the damage record
+CLAUDE.md's "Known data damage" section rewritten from open to **RESOLVED**, with a note
+that any future null lines are a *new* regression rather than this one.
+`null-lines-reentry.v2.csv`'s `ingredients_recovered` column filled in (99 rows
+"re-entered 2026-08-12", 4 rows "recipe deleted 2026-08-12") so the file is
+self-describing history rather than an open worklist.
+
+### 4. Worked out the 4 missing `serves` values (proposed, NOT written)
+Three of the four already carry per-serve macros, so serves was **back-calculated** from
+stored per-serve figures ÷ estimated whole-recipe totals, cross-checked across kcal,
+protein, carbs and fat rather than guessed:
+
+| Recipe | Proposed | Basis |
+|---|---|---|
+| Cat Magic Macro Protein Brownie | **6** | ~990 kcal / 149 per serve ≈ 6.6; ~95 g protein / 15 ≈ 6.3 |
+| Pumpkin Pecan Pancakes | **7** | ~1030 kcal / 148 ≈ 7.0; carbs ≈ 7.2; fat ≈ 6.0 |
+| Vegan Blueberry Protein Pancakes | **6** | ~845 kcal / 142 ≈ 6.0; carbs ≈ 6.7; fat ≈ 5.0 |
+| Grilled Hot Honey Chicken w/ Peach Salsa | **4** (weak) | No quantities and no macros — conventional default only |
+
+**Written and verified** after Saffron confirmed: 4 rows updated (id-scoped, guarded by
+`serves is null`), 0 null `serves` remaining across 330 live recipes, none non-positive.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| index.html | Cup basis 240→250, `_ingToText()` weight-first, 3 display-path bug fixes | Modified (merged #66) | repo root |
+| sw.js | v42 → v43 (#66). Now v44 on main from #65. | Modified (merged #66) | repo root |
+| CLAUDE.md | Damage section open → RESOLVED; cup-basis note added in #66 | Modified | repo root |
+| null-lines-reentry.v2.csv | `ingredients_recovered` filled — closed out as history | Modified | repo root |
+| logs/daily-shuffle_log.md | This entry | Modified | logs/ |
+| Supabase `recipes` (4 rows) | `serves` filled: 6 / 7 / 6 / 4 | Modified | Supabase `jsxcctrskkkxgdxfaduo` |
+
+One database write this session: the 4 `serves` values above. Everything else read-only.
+
+## Decisions & Reasoning
+- **Rejected input-time gram conversion** (Saffron's suggestion) in favour of the display
+  change: it would have covered only 52 of 332 recipes, baked a *third* density table
+  into the raw text, and destroyed the source measure — grams are derived, text is truth.
+- **Class-value adoption over blanket rescale** for the density table: see §1. A ×250/240
+  rescale would have left flour at 130 vs the script's 133 — basis fixed, disagreement not.
+- **Left the 4 short-by-one recipes alone** — Saffron reviewed and accepted them.
+- **Kept `null-lines-reentry.v2.csv` rather than deleting it**, mirroring how v1 was
+  treated: the record of what was damaged has value even once the work is done.
+- **Did not write the `serves` values** — they're derived estimates, and serves is coupled
+  to the stored per-serve macros (see Gotchas). Saffron's call.
+
+## Current State (end of session)
+`main` has the fix, the guards, the 250 ml basis and the new ingredient rendering. The
+recipe library is clean: 330 live recipes, 0 null ingredient lines, 0 null `serves`.
+**Nutrition step 2 is fully unblocked** — nothing is gating it.
+
+## Next Steps
+1. **Run step 2**: dump `recipes` via Supabase MCP → `normalise_quantities.py` → review
+   CSV → `apply_migration` for the `ingredient_grams` jsonb column → batched writes.
+   The `empty_ingredients` / `serves_missing` guards will now catch anything unusable.
+2. **Step 3** (bulk nutrition re-population) once step 2 is applied.
+3. Unrelated and still open: the price-book Product-family decision from the 2026-08-06
+   entry below, which gates the Apify scrape.
+
+## Open Questions / Blockers
+- **`serves` for Grilled Hot Honey Chicken is a guess.** It has no quantities and no
+  macros, so nothing constrains it. Filling `serves` will *not* make it usable for step 3
+  — its real blocker is the `no_quantities` flag, which needs the source recipe.
+- **Does "serves" mean people or pancakes?** For the two pancake recipes the stored
+  per-serve macros imply serves = number of pancakes (7 and 6), not diners. Kept
+  consistent with the stored macros; changing that convention means recomputing them.
+
+## Environment & Config Notes
+Repo `saffronlm-cmyk/daily-shuffle`. PR #66 merged (`829db47`). Cache on `main` is **v44**
+(#65 bumped past #66's v43). Supabase `jsxcctrskkkxgdxfaduo`, read-only. Sandbox egress to
+`supabase.co` blocked — all DB access via Supabase MCP.
+
+## Notes & Gotchas
+- **`serves` and the stored per-serve macros are coupled.** Changing `serves` without
+  recomputing `calories`/`protein_g`/`carbs_g`/`fat_g` silently makes the per-serving
+  figures wrong. This is how the 4 values above were derived in the first place.
+- **`Snickers Overnight Oats` has a bare `"peanuts"` line** with no quantity — it will
+  come out `unresolved` in the step-2 review CSV. Expected, not a defect.
+- **Hard deletes bypass the `import_status='deleted'` convention.** Two rows were removed
+  outright this time. Nothing referenced them, but a hard delete leaves no tombstone, so
+  a recipe that vanishes from a worklist may simply be gone rather than damaged.
+- The display change is untested against the real recipe modal — the smoke test covers
+  boot/tabs/shuffle only. Open a recipe with cup measures and try the ×2 and imperial
+  toggles.
 
 # Price-book merge + audit — the pipeline shares one price across a whole Product family
 **Date:** 2026-08-06

@@ -3250,6 +3250,16 @@ const _DENSITY_G_PER_CUP = {
 // the remaining text. Used by parseQty so it can pick up compound forms like
 // "1/2 cup 1 tbsp butternut puree" and sum them into one quantity.
 function _consumeQtyUnit(t) {
+  // Ranges ("4-5 garlic cloves", "100-150g flour") collapse to their midpoint
+  // first, so the parsers below see a single number. Midpoint (not the lower
+  // bound) is the rule locked in quantity-normalisation-plan.md 3, and is what
+  // scripts/normalise_quantities.py already does. The lookahead keeps this off
+  // "70-80% dark chocolate" and "5-spice powder".
+  const range = t.match(/^(\d+(?:\.\d+)?)\s*[-–—]\s*(\d+(?:\.\d+)?)(?=\s|[a-zA-Z])/);
+  if (range) {
+    const mid = (parseFloat(range[1]) + parseFloat(range[2])) / 2;
+    t = mid + ' ' + t.slice(range[0].length).replace(/^\s+/, '');
+  }
   let qty = null, rest = t;
   // ASCII fractions (with optional whole-number prefix)
   const ascii = t.match(/^(\d+\s+)?(\d+)\s*\/\s*(\d+)(?=\s|$)/);
@@ -3265,6 +3275,17 @@ function _consumeQtyUnit(t) {
       for (const p of qm[1].trim().split(/\s+/)) val += (_FRAC_QTY[p] ?? (parseFloat(p) || 0));
       qty = val || null;
       rest = t.slice(qm[0].length);
+    } else {
+      // Unit glued to the number, with no space: "200g flour", "15ml fish
+      // sauce", "1.13kg chicken thighs". This is the dominant UK form and the
+      // one the library actually uses, so without it the whole line fell
+      // through as the ingredient name. Only consume the digits when a real
+      // unit follows, so "200grams", "7Up" and "2x400g" are left untouched.
+      const glued = t.match(/^(\d+(?:\.\d+)?)(?=[a-zA-Z])/);
+      if (glued && _UNIT_RE.test(t.slice(glued[0].length))) {
+        qty = parseFloat(glued[1]) || null;
+        rest = t.slice(glued[0].length);
+      }
     }
   }
   let unit = null;
@@ -4277,7 +4298,10 @@ function renderPlanOutput(plan) {
   // ── Lock bar ("set in stone") ────────────────────────────────────────────
   html += `<div class="plan-lock-bar${planLocked ? ' locked' : ''}">
       <span>${planLocked ? 'Plan locked — set in stone' : 'Plan unlocked — shuffle freely'}</span>
-      <button class="btn-lock-toggle" onclick="togglePlanLock()">${planLocked ? 'Unlock' : 'Lock plan'}</button>
+      <span style="display:flex;gap:8px">
+        <button class="btn-lock-toggle" onclick="syncPlanToTracker()" title="Log every planned meal into the Tracker on its own day">Send to Tracker</button>
+        <button class="btn-lock-toggle" onclick="togglePlanLock()">${planLocked ? 'Unlock' : 'Lock plan'}</button>
+      </span>
     </div>`;
 
   // ── Calendar ────────────────────────────────────────────────────────────
@@ -4450,7 +4474,14 @@ function _groceryAggregate(plan) {
     const fd = RECIPE_FULL_DATA[id];
     const r = recipes.find(x => x.id === id || x.id === idStr);
     if (!fd || !fd.ingredients || !fd.ingredients.length) continue;
-    const portionScale = (idCounts[idStr] || 1); // recipe used N times in plan
+    // idCounts is how many plan slots the recipe fills — i.e. portions eaten.
+    // The recipe as written already yields `servings` portions, so what you
+    // actually shop for is the number of BATCHES: ceil(portions / servings).
+    // Scaling by portions alone (the old behaviour) multiplied a 4-serve
+    // dinner spread over 4 days by 4, when one batch cook covers the week.
+    // servings unknown -> treat as 1 serving, i.e. one batch per portion.
+    const serves = Math.max(1, (r && r.servings) || 1);
+    const portionScale = Math.ceil((idCounts[idStr] || 1) / serves);
     for (const ing of fd.ingredients) {
       let qty, unit, name;
       if (ing.item != null) {
@@ -5786,7 +5817,9 @@ function trkMakeEntry(o){
   const now = new Date().toISOString();
   return {
     id: o.id || ('e_'+Date.now()+'_'+Math.round(Math.random()*1e5)),
-    date_key: trkDay,
+    // Defaults to the day being viewed. Plan sync overrides it so it can write
+    // entries onto future dates without navigating the tracker to each one.
+    date_key: o.date_key || trkDay,
     meal_id: o.meal_id,
     entry_type: o.entry_type || 'manual_food',
     source_id: o.source_id || null,
@@ -6425,6 +6458,116 @@ async function trkAddRecipe(r){
   });
   trkCloseModal();
   await trkAddEntry(entry);
+}
+
+// ── plan → tracker sync ─────────────────────────────────────────────────────
+// Pushes the current Shuffle plan into the tracker's meal slots, one entry per
+// planned slot on that slot's own date. Entries are written as normal eaten
+// entries, so they count towards the rings straight away.
+//
+// Every entry it creates is tagged entry_type:'plan_sync'. Re-syncing clears
+// only those and rewrites them, so a repeat sync never duplicates and never
+// touches anything logged by hand.
+
+const PLAN_SLOT_TO_MEAL = { breakfast:'breakfast', lunch:'lunch', dinner:'dinner', snack:'snack', snack2:'snack' };
+
+// Read-modify-write one day's localStorage cache, preserving its meta (exercise,
+// notes, tdee) — trkCacheDay() only ever writes the day currently being viewed.
+function _trkPatchDayCache(dateKey, mutate){
+  const k = 'ds_trk_day_'+dateKey;
+  let o = { entries: [], meta: { exercise:[], omegaLogged:false, notes:'', tdee:null } };
+  try { const s = localStorage.getItem(k); if(s) o = JSON.parse(s); } catch(e){}
+  o.entries = mutate(o.entries || []);
+  try { localStorage.setItem(k, JSON.stringify(o)); } catch(e){}
+}
+
+async function syncPlanToTracker(){
+  if(!currentPlan || !currentPlan.length){ showToast('No plan yet — shuffle one first.'); return; }
+
+  // Macros live on the Supabase recipe rows (per serving). Custom/local recipes
+  // won't be in that fetch, so fall back to the app's own nutrition cache.
+  const lib = await trkFetchRecipes();
+  const byId = new Map((lib||[]).map(r => [String(r.id), r]));
+
+  const entries = [], dayKeys = [];
+  let noMacros = 0;
+  for(const day of currentPlan){
+    const dt = day.date instanceof Date ? day.date : new Date(day.date);
+    const dateKey = trkTodayKey(dt);
+    if(!dayKeys.includes(dateKey)) dayKeys.push(dateKey);
+    for(const slot of _PLAN_DAY_SLOTS){
+      if(!day.activeSlots || !day.activeSlots[slot]) continue;
+      const r = day[slot];
+      if(!r || r.id === 0) continue; // empty slot, or the ad-hoc shake (no macros to log)
+      const lr  = byId.get(String(r.id));
+      const nut = (RECIPE_FULL_DATA[r.id] || {}).nutrition;
+      if(!lr && !nut) noMacros++;
+      entries.push(trkMakeEntry({
+        date_key: dateKey, meal_id: PLAN_SLOT_TO_MEAL[slot],
+        entry_type: 'plan_sync', title: r.name,
+        source_id: String(r.id), source_label: r.name,
+        serving_qty: 1, serving_unit: 'serving',
+        calories: lr ? lr.calories : (nut ? nut.kcal    : null),
+        protein_g: lr ? lr.protein_g : (nut ? nut.protein : null),
+        carbs_g:  lr ? lr.carbs_g  : (nut ? nut.carbs   : null),
+        fat_g:    lr ? lr.fat_g    : (nut ? nut.fat     : null),
+        fibre_g:  lr ? lr.fibre_g  : null,
+        gi_estimate: lr ? (lr.gi_estimate || null) : null,
+        nutrition_source: 'database',
+        recipe_snapshot: { recipeId:r.id, name:r.name, serves:(lr ? lr.serves : r.servings) || null, fromPlan:true },
+      }));
+    }
+  }
+
+  if(!entries.length){ showToast('Nothing in the plan to send.'); return; }
+  if(!confirm(
+    `Send ${entries.length} planned meal${entries.length>1?'s':''} to the tracker across ${dayKeys.length} day${dayKeys.length>1?'s':''}?` +
+    `\n\nThey'll count towards your totals on each day.` +
+    `\n\nAnything sent by a previous sync is replaced. Meals you logged yourself are left alone.`
+  )) return;
+
+  // Clear previously synced entries for these days — cloud first, then local.
+  if(trkHasCloud()){
+    try {
+      const inList = dayKeys.map(k => `"${k}"`).join(',');
+      const res = await fetch(
+        `${TRK_SB_URL}/rest/v1/food_log?entry_type=eq.plan_sync&date_key=in.(${inList})`,
+        { method:'DELETE', headers: trkSbHeaders() });
+      if(!res.ok) throw new Error('HTTP '+res.status);
+    } catch(e){
+      showToast('⚠ Could not clear the last sync — stopped to avoid duplicates ('+e.message+')');
+      return;
+    }
+  }
+  for(const k of dayKeys) _trkPatchDayCache(k, list => list.filter(e => e.entry_type !== 'plan_sync'));
+
+  // Write the new entries locally, then push the batch to the cloud.
+  for(const k of dayKeys){
+    const mine = entries.filter(e => e.date_key === k);
+    _trkPatchDayCache(k, list => list.concat(mine));
+  }
+  let cloudOk = true;
+  if(trkHasCloud()){
+    try {
+      const res = await fetch(`${TRK_SB_URL}/rest/v1/food_log`,
+        { method:'POST', headers: trkSbHeaders(true), body: JSON.stringify(entries) });
+      if(!res.ok) throw new Error('HTTP '+res.status);
+    } catch(e){
+      cloudOk = false;
+      showToast('⚠ Sent to this device only — cloud sync failed ('+e.message+')');
+    }
+  } else {
+    cloudOk = false;
+    showToast('⚠ No cloud — sent to this device only');
+  }
+
+  // If the tracker is sitting on one of these days, refresh what it shows.
+  if(dayKeys.includes(trkDay)){ trkLoadCacheDay(); renderTracker(); }
+
+  if(cloudOk){
+    showToast(`Sent ${entries.length} meal${entries.length>1?'s':''} to the tracker ✓` +
+      (noMacros ? ` · ${noMacros} had no macro data` : ''));
+  }
 }
 
 // ── exercise ────────────────────────────────────────────────────────────────

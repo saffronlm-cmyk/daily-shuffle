@@ -5,17 +5,17 @@ Baking Powder,160g,per kg,£0.65,£4.06/kg,
 Black Pepper,100g,per kg,£2.80,£28.00/kg,Whole Black Peppercorns. Grinder version also available: 50g £2.85 (£57.00/kg)
 Baking Soda,180g,per kg,£0.65,£3.61/kg,Sainsbury's Bicarbonate of Soda
 Chia Seed,150g,per kg,£1.80,£12.00/kg,
-Milk Choice,,,,,"STILL UNDECIDED 2026-08-07 — needs a target term. Context: 28 recipes, almost all sweet breakfast/baking (overnight oats, baked oats, pancakes, chia puddings, smoothies, cakes). 3 name almond milk as the default ('almond milk, or milk of choice'); 2 say dairy-free/non-dairy. NOT coconut milk — the earlier match was wrong. Candidates: Almond Milk (14 uses in book) or Soya Milk (8 uses, cheapest at £0.85/L in the app seed)."
+Milk Choice,,,,,"STILL UNDECIDED 2026-08-07 — needs a target term. Context: 28 recipes, almost all sweet breakfast/baking. 3 name almond milk as the default; 2 say dairy-free/non-dairy. NOT coconut milk. Candidates: Almond Milk (14 uses) or Soya Milk (8 uses, cheapest at £0.85/L)."
 Fish Sauce,725ml,per litre,£5.49,£7.57/litre,Squid Brand (Amazon)
 Chicken Breast,1kg,per kg,£6.69,£6.69/kg,640g pack also available: £4.62 (£7.22/kg)
 Medjool Date,500g,per kg,£5.00,£10.00/kg,Tesco Finest Medjool Dates (non-pitted)
-Salt And Pepper,,,,,DECISION 2026-08-07: not a product — SPLIT INTO SALT + PEPPER IN THE RECIPES. Scope: 56 ingredient lines across 48 recipes (6 of them carrying 'pinche'). Do not price this row.
+Salt And Pepper,,,,,"RESOLVED 2026-08-07: not a product — SPLIT INTO SALT + PEPPER IN THE RECIPES, applied to recipes.ingredient_sections (64 lines / 54 recipes). Do not price this row."
 Tahini,300g,per kg,£3.00,£10.00/kg,
 Oregano,18g,per kg,£0.98,£54.44/kg,"Stamford Street Co. (dried, jar)"
 White Pepper,,,,,
 Almond Butter,,,£12.81,£12.81/kg,Pack size not visible in screenshot; was £13.41
 Turmeric Powder,48g,per kg,£1.15,£23.96/kg,Sainsbury's Ground Turmeric
-Chicken,1kg,per kg,£6.95,£6.95/kg,"CONTEXT CHECKED 2026-08-07 against the library: the bare 'Chicken' lines are overwhelmingly COOKED — shredded/leftover/rotisserie (12 of ~20 lines), plus one 1.8kg whole chicken. NOT thigh fillets; the earlier match was wrong. Price as a whole/rotisserie chicken. Several of the 19 uses are not ingredients at all ('oil to brush over the chicken', 'water to cover the chicken') and should drop out on a cleanup pass."
+Chicken,1kg,per kg,£6.95,£6.95/kg,"CONTEXT CHECKED 2026-08-07 against the library: the bare 'Chicken' lines are overwhelmingly COOKED — shredded/leftover/rotisserie (12 of ~20 lines), plus one 1.8kg whole chicken. NOT thigh fillets. Price as a whole/rotisserie chicken."
 Cornstarch,500g,per kg,£2.65,£5.30/kg,Sainsbury's Cornflour (UK equivalent of cornstarch)
 Pumpkin Pie Spice,38g,per kg,£1.15,£30.26/kg,Same price/pack size as Ground Cinnamon (per user note)
 Coconut Aminos,250ml,per litre,£6.99,£27.96/litre,Cocofina Organic (Amazon)
@@ -23,7 +23,7 @@ Nutritional Yeast,100g,per kg,£4.00,£40.00/kg,Marigold Engevita B12 flakes
 Onion Powder,58g,per kg,£1.15,£19.83/kg,Sainsbury's Onion Granules
 Rice Paper,340g,per kg,£3.45,£10.15/kg,Bamboo Tree (Amazon)
 Dill,20g,per kg,£0.60,£30.00/kg,Sainsbury's Bunched Dill
-Salt Pepper,,,,,DECISION 2026-08-07: split in the recipes — see 'Salt And Pepper' row.
+Salt Pepper,,,,,RESOLVED 2026-08-07: split in the recipes — see 'Salt And Pepper'.
 Vanilla Bean Paste,60ml,per litre,£5.75,£95.83/litre,Nielsen-Massey. 118ml also available: £10.00 (£84.75/litre). CONFIRMED 2026-08-07 distinct from Vanilla Essence.
 Tuna,4x145g (580g),per kg,£2.49,£6.10/kg,Tuna Chunks in Spring Water
 Chipotle Powder,,,,,DECISION 2026-08-07: Sainsbury's stocks no chipotle powder — left unpriced rather than substituting Chipotle Chilli Flakes. Do not fill with the flakes price.
@@ -37,7 +37,7 @@ Bean Sprout,300g,per kg,£0.85,£2.83/kg,Sainsbury's Beansprouts
 Ginger Paste,75g,per kg,£1.75,£23.33/kg,
 Gochujang Paste,500g,per kg,£3.10,£6.20/kg,Chung Jung One (Amazon)
 Miso Paste,300g,per kg,£3.30,£11.00/kg,Yutaka Organic Miso Paste
-Pinche Salt Pepper,,,,,"DECISION 2026-08-07: split in the recipes — see 'Salt And Pepper' row. 'Pinche' is a mangled 'pinch of', a quantity, not part of the name."
+Pinche Salt Pepper,,,,,RESOLVED 2026-08-07: split in the recipes — see 'Salt And Pepper'. 'Pinche' is a mangled 'pinch of'.
 Coconut Cream,250ml,per litre,£2.10,£8.40/litre,
 Desiccated Coconut,250g,per kg,£2.70,£10.80/kg,
 Star Anise,15g,per kg,£1.15,£76.67/kg,
@@ -52,7 +52,7 @@ Almond,300g,per kg,£3.50,£11.67/kg,Whole Almonds
 Bone-in Skin-on Chicken Thigh,540g,per kg,£2.50,£4.63/kg,Skin on Thighs & Drumsticks pack (mixed cut)
 Chickpeas,400g (240g drained),per kg,£0.41,£1.71/kg,"In water, drained weight noted"
 Chile Lime Seasoning,142g,per kg,£3.50,£24.65/kg,Tajin Clasico Chilli & Lime Seasoning
-Crispy Fried Shallot,200g,per kg,£2.40,£12.00/kg,Naming discrepancy: no fried shallot product exists at Sainsbury's - matched to Fudco Crispy Fried Onions. All recipe mentions of this product should be normalised to 'Crispy Fried Onions'
+Crispy Fried Onions,200g,per kg,£2.40,£12.00/kg,Naming discrepancy: no fried shallot product exists at Sainsbury's - matched to Fudco Crispy Fried Onions. All recipe mentions of this product should be normalised to 'Crispy Fried Onions'. RENAMED 2026-08-24 from 'Crispy Fried Shallot' here and in pricebook.csv; old name kept as an alias there so existing recipe text still resolves. Recipe text itself is unchanged.
 Garlic Paste,75g,per kg,£1.75,£23.33/kg,
 Mirin,150ml,per litre,£1.90,£12.67/litre,
 Olive,340g (150g drained),per kg,£1.35,£3.97/kg,"Pitted Black Olives. Nectar price: £1.10 (£3.23/kg). Pitted Green Olives also available, same price"
@@ -93,3 +93,4 @@ Tofu,450g,per kg,£3.50,£7.78/kg,The Tofoo Co. Naked Organic Tofu
 Cashew,200g,per kg,£3.20,£16.00/kg,Oven Baked Unsalted
 Green Cabbage,each,per item,£0.77,77p each,CONFIRMED 2026-08-07 = Savoy Cabbage. (White and Red also stocked at 89p — not this row.)
 Lean Turkey,500g,per kg,£4.95,£9.90/kg,2% Fat Turkey Breast Mince (leaner option). 7% Fat Turkey Mince also available: £4.25 (£8.50/kg)
+M&S Only 5 Ingredients Multigrain Hoops,300g,per kg,£2.50,£8.33/kg,"M&S Only 5 Ingredients range. No matching Ingredient row in pricebook.csv — new SKU, not used by any recipe, so this row does not join yet"
