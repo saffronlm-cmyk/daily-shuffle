@@ -190,6 +190,78 @@ weight-based recipe line:
   during the merge because their prices differ from the 2026-04 seed, so they are a
   separate observation, not a lossy transcription. Need a confirmed pack size.
 
+## 5a. Naming convention: pluralise — but it depends on the §4 fix
+
+Saffron's call from the 2026-08-07 hand-pricing pass: **product names should follow the
+pluralising convention supermarkets use** (hazelnuts, cashews, almonds), applied on a
+final naming pass.
+
+This is right for readability, and for most names it is free — but it **collides with
+the `canonicalise()` plural bug in §4**, and the collision is systematic:
+
+| singular ends in | plural | canonical key | verdict |
+|---|---|---|---|
+| a consonant | hazelnuts, cashews, almonds, carrots, dates, olives, courgettes, raisins, shallots | collapses to the singular | **safe** |
+| **a vowel** | bananas, avocados, peas, tortillas, sultanas, chickpeas | stays plural — a *second* key | **splits** |
+| **-oes** | tomatoes, potatoes, mangoes | → `tomatoe`, `potatoe`, `mangoe` | **splits** |
+
+`canonicalise()`'s singularising rule is `([^aeiou])s\b → $1`, so it requires a
+**consonant** before the `s`. Every countable ingredient whose singular ends in a vowel
+therefore ends up with two price-book keys once pluralised — the recipe says `avocado`,
+the book says `avocados`, and `lookupPriceBook()` misses. This is the same mechanism
+that already split `Potato`/`Potatoes`, `Carrot`/`Carrots` and `Banana`/`Bananas` (§2).
+
+**So the plural convention must not be applied before `canonicalise()` is fixed**, or it
+converts a handful of existing splits into a systematic one. The fix is a rule for
+vowel-plurals and `-oes`, applied across all five copies (§4).
+
+Two things partly cover the gap in the meantime:
+- `CANON_TERMS` in `index.html` bridges any pair explicitly listed in it — that is
+  precisely why `'bananas': 'Banana'` works today when `canonicalise()` cannot collapse
+  it. It only covers terms someone has added by hand.
+- **`CANON_TERMS` currently normalises *toward the singular*** (`bananas → Banana`),
+  which is the opposite of the convention above. Once §4 is fixed, flip those entries to
+  the plural form so the map and the convention agree. Until then they disagree
+  deliberately, because the singular is the form `canonicalise()` can actually key on.
+
+## 5b. Open items resolved from the hand-pricing pass (2026-08-07)
+
+| item | decision |
+|---|---|
+| `Green Cabbage` | **= Savoy Cabbage.** Confirmed. |
+| `Vanilla Essence` / `Vanilla Bean Paste` | **Distinct products.** Price separately. |
+| `Chipotle Powder` | **Leave unpriced.** Sainsbury's stocks no chipotle powder; do *not* substitute Chipotle Chilli Flakes. |
+| `Salt And Pepper` / `Salt Pepper` / `Pinche Salt Pepper` | **Not a product — split into Salt + Pepper in the recipes.** Scope: **56 ingredient lines across 48 recipes**, 6 carrying `pinche`. |
+| `Chicken` | **Cooked whole/rotisserie chicken, not thigh fillets** — see below. |
+| `Milk Choice` | **Still open** — needs a target term. Evidence below. |
+
+**`Chicken` — the earlier match was wrong.** Checked against the live library: the bare
+`Chicken` lines are overwhelmingly *cooked* — `shredded chicken`, `cooked shredded
+chicken`, `rotisserie chicken`, `leftover shredded chicken`, `pre-cooked chicken` (12 of
+~20 lines) — plus one `1.8 kg whole chicken`. It should be priced as a whole or
+rotisserie bird, which is also what the app's 2026-04 seed implies (`chicken`, 1000 g,
+£5.15). Several of its 19 "uses" are not ingredients at all (`Olive oil, to brush over
+the chicken`, `Enough water to cover the chicken`, `1/2 tbsp oil (to cook chicken)`) and
+should drop out on a cleanup pass.
+
+**`Milk Choice` — context for the decision.** 28 recipes, almost all sweet
+breakfast/baking: overnight oats, baked oats, pancakes, chia puddings, smoothies, cakes,
+muffins. Three name almond milk as the default (`1 cup almond milk, or milk of choice`),
+two say dairy-free/non-dairy explicitly. It is **not** coconut milk — that match was
+wrong. Candidates are `Almond Milk` (14 uses already in the book) or `Soya Milk` (8 uses,
+and the cheapest at £0.85/L in the app seed). Whichever is chosen becomes a `CANON_TERMS`
+entry so future recipes normalise to it.
+
+**The salt & pepper split is DONE (2026-08-07).** 64 of 65 reviewed lines applied to
+`recipes.ingredient_sections` across 54 recipes — 64 combined lines became 138 separate
+ones (+74 net), verified against a pre-write backup. Conventions set: comma qualifiers
+(`Salt, to taste`), bare "pepper" ⇒ **Black Pepper**, "cracked"/"generous"/"flaky sea"
+dropped, sea salt = Salt. The scope grew from 56 to 65 lines mid-review: the first regex
+required the separator within 6 characters and only matched `and`/`&`/`,`/`/`, so it
+missed `+` separators and wordings like `salt and cracked pepper`. **One row was not
+applied** — Viral Chuck Roast `sidx 1, lidx 0` is a method step in the ingredients array
+and needs manual rescue. Backup: `recipes_backup_saltpepper_20260807` (all 341 rows).
+
 ## 6. Recommended order of work
 
 1. **Decide the price-unit question in §3** — this gates the scrape, because it

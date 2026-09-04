@@ -50,9 +50,21 @@ Single user (Saffron), no auth, deployed as static files.
   `recipe-ingredient-normalisation.csv` / `.final.csv`, `split-plan.csv`,
   `unmatched-ingredients.csv`, `null-lines-reentry.csv` /
   `null-lines-reentry.v2.csv` (both **closed** — see the resolved hollow-recipe section
-  below; history only, no open work), `pricebook-manual-batch.csv`. These encode
+  below; history only, no open work), `pricebook-manual-batch.csv`, `salt-pepper-split-review.csv`. These encode
   reviewed human decisions — never regenerate, reorder, or "clean up" one without
   being asked.
+  - `salt-pepper-split-review.csv` is the **applied** record of the salt-and-pepper
+    split (2026-08-07): 65 lines across 54 recipes, keyed by
+    `row_key = recipeId|sectionIdx|lineIdx`, with Saffron's `approve?` marks.
+    **64 were applied to `recipes.ingredient_sections` on 2026-08-07**, replacing 64
+    combined lines with 138 separate ones (+74 net). Conventions set here and worth
+    following: qualifiers use a comma (`Salt, to taste`, not `Salt (to taste)`), a
+    bare "pepper" means **Black Pepper**, "cracked"/"generous"/"flaky sea" qualifiers
+    were dropped, and sea salt is treated as the same product as Salt. **One row was
+    deliberately not applied** — Viral Chuck Roast `sidx 1, lidx 0` is a method step
+    sitting in the ingredients array (`Carrots and potatoes, tossed in olive oil…
+    roast at 425°F`) and still needs manual rescue. Pre-write backup of all 341 rows
+    is in the Supabase table `recipes_backup_saltpepper_20260807`.
   - `pricebook-manual-batch.csv` is the hand-pricing worklist (2026-08-06): the
     `pricebook.csv` products that can be priced *without* waiting on the open
     price-unit decision or the produce-fold conversion factors. Columns are
