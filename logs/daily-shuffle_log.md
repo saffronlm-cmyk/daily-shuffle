@@ -4,6 +4,212 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# `ingredient-master.csv` sense-checked and normalised; conventions locked; 29 residual rows closed
+**Date:** 2026-09-05
+**Project:** Daily Shuffle — ingredient normalisation (price-book / grocery-list naming)
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete for this file. One structural gap identified and NOT closed (see Open Questions).
+
+---
+
+## Project Context
+Continues the ingredient-normalisation stream whose last entry is 2026-08-24 (three
+`pricebook.csv` naming normalisations, PR #75 merged). That entry covered `pricebook.csv`
+and `pricebook-manual-batch.csv`; this one covers **`ingredient-master.csv`**, which no
+prior entry documents at all — CLAUDE.md named it in the committed-data-CSV list and said
+nothing else about it. Read the 2026-08-24 entry for the price-book conventions
+(rename-keeps-old-string-as-alias, variant = price unit); not repeated here.
+
+## Session Goal
+Saffron asked whether she had a lengthy ingredient/product CSV needing alias and name
+normalisation, then asked for a **sense check before any changes** on four points:
+(1) are the proposed `product change` values sound, (2) same for `variant change`,
+(3) is it necessary to work through the ~436 rows with no proposed change, and
+(4) have the `pricebook.variants.csv` aliases been parsed through the master.
+
+## State Before This Session
+Branch `claude/csv-ingredient-normalization-sx0kza` freshly cut from `main` at `7841817`,
+zero commits, no PR. `ingredient-master.csv` at 1,057 lines, untouched since it was
+committed. No documentation of its structure or conventions anywhere in the repo.
+
+## What Was Done
+
+### 1. Established what the file actually is
+The important discovery, and it reframed everything downstream: **the `variant` column is
+`canonicalise()` output, not raw recipe text.** Evidence:
+- 1,012 of 1,041 data rows (97%) hold a `variant` byte-identical to its own
+  `canonicalise()` result;
+- **zero** rows contain a stop-adjective (`fresh`, `chopped`, `diced`…), which raw recipe
+  text is saturated with;
+- the column carries canonicalise's own scars: `Watercres`, `Bird Eye Chilly`,
+  `Bay Leave`, `Glas Vermicelli Noodles`, `Pumpkin Pur E`.
+
+So the file is a **key → display-name map**: `product`/`variant` are join keys, and the
+two `* change` columns are the human-readable names. That distinction decided the plural
+question below and it is now written into CLAUDE.md.
+
+Also corrected a count I had given her earlier in the session: the file is **1,041 data
+rows**, not 1,060 — 15 rows are category headers (first column carries the category name).
+And "546 product-change cells filled" overstated it: 12 merely restate the existing value.
+Real changes were **534 product** and **321 variant**.
+
+### 2. Sense check — the four questions
+**(1) and (2): both columns were near-clean.** Across 534 product changes: one product
+mapped to two targets (`Plain Yoghurt` → `Yoghurt` and → `Cream`), which is **correct** —
+the `Cream` one is the `Yoghurt Sour Cream` row, a deliberate re-file. Plus two chains.
+Across 321 variant changes: **zero** conflicts, one chain. Her read ("I've been through
+those, they should be ok") held up.
+
+**(3) No, the 434 no-change rows did not need working through.** They decompose as:
+69 blank **because they are the destination** other rows point at; 31 already covered by
+`split-plan.csv`; 3 duplicate pairs; ~297 already-clean grocery nouns (`Egg` 57 occ,
+`Soy Sauce` 56, `Garlic` 37). **True residual needing a decision: 29 rows**, of which only
+`Milk Choice` (21 occ) and `Thai Red Curry Paste` (6) carry weight.
+
+**(4) Aliases were already 293/297 through.** Only one disagreement in 293 — the
+`crispy fried shallot` row, which had not caught up to the 2026-08-24 pricebook rename.
+The 22 aliases with no master variant were mostly the `yogurt`/`yoghurt` spelling split;
+the 12 genuinely absent were checked against `recipe-ingredient-normalisation.final.csv`
+and have **zero live recipe occurrences** — dead strings, nothing to add.
+
+### 3. The plural reversal — a decision made on my wrong premise, then corrected
+I originally offered her "strip plurals for consistency with the keys". That framing was
+**wrong** and she initially agreed to it on that basis. Once §1 established that the keys
+live in a different column and are computed at runtime, pre-singularising the display
+column bought nothing and cost a lot. Run against the 31 distinct plural targets it would
+have: broken 5 words outright (`Chillies`→`Chilly`, `Watercress`→`Watercres`,
+`Lemongrass`→`Lemongras`, `Bay Leaves`→`Bay Leave`, `Kaffir Lime Leaves`→`Kaffir Lime
+Leave`) and wrong-registered 19 mass nouns (`Oats`→`Oat`, `Noodles`→`Noodle`,
+`Pickles`→`Pickle`). It also contradicted the pluralise-to-match-supermarket-labelling
+instruction already in CLAUDE.md from her hand-pricing pass. Flagged before writing;
+she ruled **"plural = display only"**. Nothing was stripped.
+
+### 4. Applied
+887 change cells now carry the agreed conventions. Cell counts by class:
+Title Case 152 · Cornflour 6 · yoghurt 2 · espresso chain 1 · shallot 1 · kaffir 1 ·
+29-proposals 22 · split-flagged 4 · non-product note 1 · backslash 1 · Date Puree 1 ·
+chain resolution 14.
+
+Chain resolution deserves a note: title-casing **unmasked two chains that case
+differences had been hiding** (`Desiccated Coconut` → `Coconut`, and the
+`Sundried`/`Sun-dried Tomatoes` split). Both were resolved onto `pricebook.csv`'s dominant
+form, as was `Pickled Jalapeno` → `Pickled Jalapeño`. The file is now verified chain-free.
+
+Two of the six compounds already carried Saffron's own notes saying the same thing, so the
+script correctly skipped them (its guard only writes into an empty `Notes`). Her wording
+was better than mine; it stands.
+
+### 5. Verified
+- Row count 1,057 → 1,057; field counts identical; category-header rows identical.
+- `product`, `variant`, `occurrences`, `in_pricebook` columns: **0 cells changed**.
+- `git diff --numstat` = `158 158` — one-for-one rewrites, **no reordering**.
+- Post-change re-run: 0 product chains, 0 variant chains, 0 variant conflicts, 0 `yogurt`,
+  0 `Cornstarch` left. Only remaining multi-target is the known-correct `Plain Yoghurt`.
+- `node scripts/claude_md_drift.mjs` → no drift.
+
+No app code touched, so no cache bump, no JS parse check, no smoke test (per CLAUDE.md's
+doc/data-only carve-out).
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| ingredient-master.csv | 158 rows rewritten across the two `* change` columns + `Notes`. Keys untouched | Modified | /home/user/daily-shuffle/ |
+| split-plan.csv | 6 SPLIT rows appended with recipe + example_line context, CRLF and ` \| ` separator matching the file | Modified | /home/user/daily-shuffle/ |
+| CLAUDE.md | New sub-bullets documenting `ingredient-master.csv`'s structure/conventions and `pricebook.variants.csv`'s staleness | Modified | /home/user/daily-shuffle/ |
+| logs/daily-shuffle_log.md | This entry | Modified | /home/user/daily-shuffle/logs/ |
+| canon.py, apply.py, transform.py, before.csv | Analysis + apply scripts, pre-change snapshot | Created (scratchpad, NOT committed) | scratchpad/ |
+
+## Decisions & Reasoning
+- **Plurals are display-only, never stripped.** Options: mirror `canonicalise()`'s
+  singularisation vs leave intact. Chose leave. The keys are computed at runtime from
+  recipe text and never read this file, so stripping bought nothing; the rule breaks 5
+  words and mass-nouns 19 more; and the shelf says "oats". Saffron's call after I
+  retracted my own framing.
+- **Title Case, word-initial only** (`Gluten-free Soy Sauce`, not `Gluten-Free`). Matches
+  both `pricebook.csv`'s `Ingredient`/`Product` convention and the app's `_displayName()`,
+  which does exactly `w[0].toUpperCase() + w.slice(1)`. Rejected: sentence case (102 of
+  her targets used it, but 137 used Title Case and the price book breaks the tie).
+- **`Cornflour`, not `Cornstarch`.** UK shelf name, and the list's stated purpose is to
+  mimic a normal grocery store. Note this now **disagrees with `pricebook.csv`**, whose
+  `Cornstarch` row holds 18 occurrences — see Open Questions.
+- **British spelling throughout** (`Yoghurt`). `pricebook.csv` already runs the fold this
+  way: `Greek Yoghurt` is the `Ingredient` and `greek yogurt` is an alias.
+- **Left the mangled keys mangled.** `Watercres`, `Bay Leave`, `Pumpkin Pur E` are what
+  the app will compute at runtime, so "fixing" them would break the join. Recorded in
+  CLAUDE.md as a trap.
+- **`Milk Choice` → `Milk`.** Read as "milk of your choice". Conflicts with the hand-
+  pricing pass, which matched it to Coconut Milk — see Open Questions.
+- **Did not touch `pricebook.csv`.** Three consolidations surfaced (below) but they are
+  price-book decisions, and CLAUDE.md is explicit that these CSVs encode reviewed human
+  decisions not to be cleaned up unasked.
+- **Did not repair `split-plan.csv` row 48**, which is malformed (3 fields, not 7, and
+  uses `|` without spaces). Hand-entered by Saffron; flagged rather than reformatted.
+
+## Current State (end of session)
+`ingredient-master.csv` is internally consistent, chain-free, Title Case, British-spelled,
+and aligned to `pricebook.csv` on every alias that joins. Commit `f32d906` on
+`claude/csv-ingredient-normalization-sx0kza`, pushed. The file is **finished as a file**;
+what it is not yet is wired into anything (see below).
+
+## Next Steps
+1. **Decide the four price-book consolidations** listed in Open Questions — the
+   `Cornstarch`/`Cornflour` one is now a live disagreement created by this session's
+   change and should go first.
+2. Confirm `Milk Choice` → `Milk` against the `ASSUMPTION: Coconut Milk` row still open in
+   `pricebook-manual-batch.csv` (21 occurrences ride on it).
+3. Work the 6 newly-appended `split-plan.csv` rows through whatever applies that file.
+4. Decide whether to wire the master into the app at all — the structural gap below.
+
+## Open Questions / Blockers
+**The structural gap: these names have no route onto the grocery list.**
+`_displayName()` (`index.html:3336`) builds the list label from the raw recipe text —
+`_stripPrep()` → `canonicalise()` → title-case. The price-book entry is consulted **only**
+for `product` (aisle clustering) and `unitPrice`; the name is never read from it. So
+`ingredient-master.csv` currently terminates in a file. Closing it needs either
+`_displayName()` preferring a matched price-book `Ingredient`, or a new canonical-name map
+in the app. Rewriting recipe text is the third option and should stay rejected —
+`ingredient_sections` is where the 2026-08-05 hollow-recipe damage came from.
+
+**Four `pricebook.csv` consolidations found, none actioned:**
+- `Cornstarch` (18 occ, aliases `corn flour;cornflour`) vs a separate `Cornflour` row
+  (1 occ). Now disagrees with the master. Per the 2026-08-24 convention the fix is rename
+  `Cornstarch` → `Cornflour` keeping `cornstarch` as an alias, and merge the two rows.
+- Six orphan `Yogurt`-spelled `Ingredient` rows (18 occ total) duplicating existing
+  `Yoghurt` rows — `Plain Greek Yogurt` (8) against `Greek Yoghurt` (72), plus
+  `Vanilla Greek Yogurt`, `0% Fat Greek Yogurt`, `0% Greek Yogurt`,
+  `0% Plain Greek Yogurt`, `Kefir Yogurt`. None is currently an alias of anything.
+- Two sun-dried tomato families: `Sun-dried Tomatoes` (Product `Sun-dried Tomatoes`) and
+  `Sundried tomatoes` (lowercase t, 3 rows). One price per family, so this splits pricing.
+- `split-plan.csv` row 48 is malformed (3 fields).
+
+Still the gate on the whole workstream, unchanged from 2026-08-24: `pricebook-audit.md` §3,
+208 families vs ~365 variants, which decides what the Apify scrape queries.
+
+## Environment & Config Notes
+Repo `saffronlm-cmyk/daily-shuffle`, branch `claude/csv-ingredient-normalization-sx0kza`,
+cut from `main` at `7841817`. Data commit `f32d906`. No credentials, no Supabase access, no
+network calls — the whole session was local CSV analysis. No cache bump (no app code).
+
+## Notes & Gotchas
+- **Never "fix" the mangled `variant` values.** `Watercres`, `Bay Leave`, `Chilly`,
+  `Pumpkin Pur E` are canonicalise() output; the app recomputes the same string at runtime,
+  so the mangling is load-bearing. Verify with
+  `canonicalise('Watercress') === 'watercres'`.
+- **`pricebook.variants.csv` is stale** — 781 rows against `pricebook.csv`'s 987, still
+  holding pre-2026-08-24 spellings, aliases drifted both ways (33 only there, 46 only in
+  `pricebook.csv`). Read aliases from `pricebook.csv`.
+- The `Notes` column carries live human worklist state. The apply script only ever wrote
+  into an **empty** `Notes` cell; keep that guard if you re-run anything like it.
+- `split-plan.csv` is CRLF and mostly uses ` | ` (spaced) as its separator. Match it.
+- `canonicalise()` has real defects that are simply lived with: `Chillies`→`chilly`,
+  `Watercress`→`watercres`, `Purée`→`pure`. Consistent, so joins work — but don't be
+  surprised by them.
+- 34 of the 434 no-change rows have `occurrences = 0`; they are dead weight, not pending
+  decisions.
+
+---
+
 # Applied three `pricebook.csv` naming normalisations; worklist now joins 93/94; PR #75 merged
 **Date:** 2026-08-24
 **Project:** Daily Shuffle — price book (ingredient normalisation)
