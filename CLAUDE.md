@@ -53,6 +53,30 @@ Single user (Saffron), no auth, deployed as static files.
   below; history only, no open work), `pricebook-manual-batch.csv`. These encode
   reviewed human decisions — never regenerate, reorder, or "clean up" one without
   being asked.
+  - `ingredient-master.csv` is a **key → display-name map**, 1,041 data rows under 15
+    category header rows (rows whose first column is the category name — skip them when
+    reading it as data). Columns are `category | product | product change | variant |
+    variant change | occurrences | in_pricebook | Notes`.
+    - **The `variant` column is `canonicalise()` output, not raw recipe text** — 97% of
+      values are byte-identical to their own canonicalise() result and none contains a
+      stop-adjective. It therefore carries canonicalise's own scars (`Watercres`,
+      `Bird Eye Chilly`, `Bay Leave`, `Pumpkin Pur E`). **Never "fix" those** — the app
+      computes the same mangled key at runtime, so the damage is what makes the join
+      work. `product`/`variant` are the keys; the two `* change` columns are the
+      human-readable names.
+    - Conventions set 2026-09-05, applied across all 887 change cells: **Title Case**
+      (word-initial only, so `Gluten-free Soy Sauce` — matches `pricebook.csv` and the
+      app's `_displayName()`); **plurals are display-only and are never stripped** (the
+      shelf says oats, noodles, pickles; singularising also mangles `Chillies`→`Chilly`
+      and `Watercress`→`Watercres`); **British spelling** (`Yoghurt`, `Cornflour`).
+      No `* change` target may point at a value that is itself renamed elsewhere — the
+      file is checked chain-free.
+    - Compound lines ("soy sauce + rice vinegar") do **not** get a name here; they go to
+      `split-plan.csv` and are marked `SPLIT: a | b` in `Notes`.
+  - `pricebook.variants.csv` is a **stale sibling** of `pricebook.csv` — 781 rows against
+    987, still carrying the pre-2026-08-24 `Gras-fed Collagen` and `Crispy Fried Shallot`
+    spellings, with aliases drifted both ways (33 only in variants, 46 only in
+    `pricebook.csv`). **Read aliases from `pricebook.csv`**, which is the live file.
   - `pricebook-manual-batch.csv` is the hand-pricing worklist (2026-08-06): the
     `pricebook.csv` products that can be priced *without* waiting on the open
     price-unit decision or the produce-fold conversion factors. Columns are
