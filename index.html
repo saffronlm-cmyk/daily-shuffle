@@ -1457,6 +1457,23 @@ const RECIPE_LIB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmF
 const RECIPE_LIB_HEADERS = { 'apikey': RECIPE_LIB_KEY, 'Authorization': `Bearer ${RECIPE_LIB_KEY}`, 'Content-Type': 'application/json' };
 const cloudRecipeIds = new Set(); // populated on load
 
+// Whether `id` has a Supabase row to write to. Prefer this over a bare
+// `cloudRecipeIds.has(id)` at any call site that decides whether to attempt
+// a cloud write: the Set is client-side bookkeeping that can fall behind
+// reality (a recipe created in one session, then edited in a later one where
+// the Set was never re-populated with it — see the 2026-09-10 log entries),
+// and a stale Set previously made patchRecipeToLibrary()/
+// patchNutritionToLibrary() silently no-op forever on an affected recipe,
+// with no error shown. A real Supabase id is always a uuid; a genuine
+// local-only recipe's fallback id is a Date.now() integer, which fails this
+// test and (if it ever reached a PATCH anyway) would also be rejected by
+// Postgres's uuid cast — so this check is both more reliable and a superset
+// of the Set-based one, never a subset.
+const _UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+function isCloudRecipeId(id) {
+  return cloudRecipeIds.has(id) || _UUID_RE.test(String(id));
+}
+
 function mapSupabaseToApp(row) {
   // Cloud schema may include `meal_types text[]` (new) or only `meal_type text`
   // (old). Tolerate both indefinitely.
@@ -2894,7 +2911,7 @@ function saveRecipeEdits(id) {
 // ─── PATCH RECIPE TO SUPABASE LIBRARY ───────────────────────────────────────
 async function patchRecipeToLibrary(id) {
   const r = getRecipeById(id);
-  if (!r || !cloudRecipeIds.has(id)) return; // only patch cloud recipes
+  if (!r || !isCloudRecipeId(id)) return; // only patch cloud recipes
   const fd = RECIPE_FULL_DATA[id] || {};
 
   // Convert flat [{group,qty,unit,name,note}] back to [{section_title, ingredients[]}].
@@ -2951,7 +2968,13 @@ async function patchRecipeToLibrary(id) {
     if (!res.ok) {
       console.warn('[Daily Shuffle] Recipe patch rejected:', res.status);
       showToast('⚠ Couldn’t sync this recipe to the library');
+      return;
     }
+    // A successful write is positive proof this id has a cloud row — heal the
+    // bookkeeping Set so every other cloudRecipeIds.has() check downstream
+    // (saveCustom()'s custom/cloud split, deleteRecipe()'s soft-delete path,
+    // etc.) stops treating this recipe as local-only too.
+    cloudRecipeIds.add(id);
   } catch (err) {
     console.warn('[Daily Shuffle] Failed to patch recipe to library:', err.message);
     showToast('⚠ Couldn’t sync this recipe to the library');
@@ -2968,7 +2991,7 @@ async function patchRecipeToLibrary(id) {
 // recipes have a row to patch — local-only recipes fall back to
 // RECIPE_FULL_DATA in the Tracker reads already, so this is a no-op for them.
 async function patchNutritionToLibrary(id, nutrition) {
-  if (!cloudRecipeIds.has(id)) return;
+  if (!isCloudRecipeId(id)) return;
   const payload = {
     calories: nutrition.kcal ?? null,
     protein_g: nutrition.protein ?? null,
@@ -2986,6 +3009,7 @@ async function patchNutritionToLibrary(id, nutrition) {
       showToast('⚠ Re-estimate saved here, but couldn’t sync to the library — the Tracker may still show old macros');
       return;
     }
+    cloudRecipeIds.add(id); // see patchRecipeToLibrary()'s matching comment
     // The Tracker caches its own recipe list in memory for the rest of this
     // session (_trkRecipeCache) — patch it in place so a Tracker screen
     // already open doesn't keep showing the pre-estimate figures until reload.
@@ -3109,7 +3133,7 @@ async function importRecipeIngredientsCsv(evt) {
   }
   saveOverrides();                       // persist locally + sync to your personal cloud
   for (const id of known) {              // patch the shared recipe library
-    if (cloudRecipeIds.has(id)) { try { await patchRecipeToLibrary(id); cloudOK++; } catch(e){} }
+    if (isCloudRecipeId(id)) { try { await patchRecipeToLibrary(id); cloudOK++; } catch(e){} }
   }
   renderRecipes();
   showToast(`Imported ${known.length} recipe(s) · ${cloudOK} patched to library ✓`);
