@@ -4,6 +4,192 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# Merged PR #81, shipped a manual "sync all edits to library" sweep — PR #82
+**Date:** 2026-09-10
+**Project:** Daily Shuffle — cloud sync (continued, fourth act)
+**Mode:** Rolling Log + GitHub Push
+**Status:** In Progress. PR #81 merged. PR #82 open as a draft, not merged, and needs
+Saffron to actually run its new button once — see Next Steps.
+
+---
+
+## Project Context
+Direct continuation of the entry below (same session, same day). That entry fixed the
+`cloudRecipeIds` write-gating bug for good (PR #81) and hand-corrected the one known
+victim (the muffin recipe). Saffron then asked to merge #81 **and** "make sure all
+recipes are synced between supabase and the app."
+
+## Session Goal
+1. Merge PR #81.
+2. Actually verify — or make it possible to verify — that every recipe's local state
+   matches its Supabase row, not just the one recipe found by chance.
+
+## State Before This Session
+PR #81 open as a draft. No mechanism existed to check or force-fix sync state across
+the whole library, only the one recipe already fixed by hand.
+
+## What Was Done
+
+### 1. Merged PR #81
+Had to un-draft it first this time (`mcp__github__merge_pull_request` returned a 405
+"still a draft" — earlier PRs in this session were un-drafted before the merge call
+too, but worth noting explicitly since it's a real failure mode, not a flake). Squash-
+merged. Merge commit `bdb1838`. `main` → `daily-shuffle-v50`.
+
+### 2. Established what "make sure all recipes are synced" can and can't mean from here
+This session has Supabase MCP access (the cloud side), but **not** access to Saffron's
+browser's `localStorage` — and `ds_overrides` (where every local edit actually lives)
+is client-side only, never mirrored anywhere this session can read. So there is no way
+to audit "is recipe X's local state == its Supabase row" for the whole library from
+inside this session. The only two things actually achievable:
+  (a) spot-check individual recipes she names, the way the previous entry did for the
+      muffin recipe;
+  (b) ship a tool she runs *from her own browser* that re-sends everything it can see
+      is locally overridden, unconditionally, so it self-heals without needing an
+      audit step at all.
+Went with (b) — it directly answers the request without requiring per-recipe back-
+and-forth, and it doesn't depend on correctly diagnosing which recipes are affected
+(which, per the previous entry, isn't reliably possible from Supabase data alone —
+no `updated_at` trigger, remember).
+
+### 3. Built `syncAllOverridesToLibrary()`
+New button: Settings → Recipe Library → **"Sync all edits to library"**. On click:
+1. `await syncLocalRecipes()` — promotes any recipe that never got a cloud row at all
+   (failed initial POST, still on a `Date.now()` id).
+2. Reads `ds_overrides`, filters to ids that are `isCloudRecipeId()` and still resolve
+   via `getRecipeById()` (skips overrides left behind for deleted recipes).
+3. For each: `patchRecipeToLibrary(id, {silent:true})`, then — if
+   `RECIPE_FULL_DATA[id].nutrition` exists — `patchNutritionToLibrary(id, nut,
+   {silent:true})`.
+4. Reports a synced/failed count in the Settings panel and a toast.
+
+Deliberately **unconditional** — it doesn't try to first check whether a recipe is
+already in sync (no cheap way to do that without fetching every row and diffing, which
+is both slower and re-introduces a "trust some check" dependency). PATCH is idempotent,
+so re-sending an already-correct recipe costs an API call and nothing else.
+
+### 4. Supporting changes needed to make the sweep report accurately
+`patchRecipeToLibrary()` and `patchNutritionToLibrary()` previously returned nothing —
+fine for their original fire-and-forget callers, useless for a loop that needs to count
+successes. Both now return `true`/`false`. Both gained an optional `{silent:true}` so a
+loop over many recipes doesn't fire one toast per failure (the sweep reports one
+summary toast instead).
+
+While touching the only *other* existing loop over `patchRecipeToLibrary()`
+(`importRecipeIngredientsCsv()`'s bulk-patch step) for the `silent` option, noticed it
+had **always** counted every attempt towards its "N patched" total, not just confirmed
+successes — since `patchRecipeToLibrary()` never threw on an HTTP failure, `cloudOK++`
+ran unconditionally. Pre-existing bug, unrelated to today's root cause, fixed as a
+drive-by since the new return value made it a one-line fix
+(`if (isCloudRecipeId(id) && await patchRecipeToLibrary(id, {silent:true})) cloudOK++;`).
+
+### 5. Verified manually — the smoke test doesn't reach Settings
+`scripts/smoke_test.mjs` boots the app and checks tabs/shuffle only; nothing exercises
+the Settings overlay. Wrote a throwaway Playwright script (not committed — same
+pattern as `smoke_test.mjs`'s own `require('playwright')` fallback), booted the app
+headless, opened Settings, clicked the new button. Result: button found and clickable,
+no JS error, correctly reported "Nothing to sync — no local edits found on this
+device" against the test's empty `localStorage`. Two `console.error` lines appeared
+(`ERR_CONNECTION_RESET` / `ERR_TUNNEL_CONNECTION_FAILED`) — expected: `syncLocalRecipes()`
+tries to reach Supabase, sandbox egress blocks it, same as every other Supabase-touching
+check in this repo; caught gracefully, not a crash.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| index.html | New sync-all button + supporting return-value changes | Modified | /home/user/daily-shuffle/ |
+| sw.js | Service worker | Modified (cache bump only) | /home/user/daily-shuffle/ |
+| logs/daily-shuffle_log.md | This entry | Modified | /home/user/daily-shuffle/logs/ |
+
+## Decisions & Reasoning
+- **Unconditional re-send over a diff-then-patch approach.** A "check first" version
+  would need to fetch every candidate row from Supabase and compare field-by-field
+  against local state — more code, more API calls (a GET plus a PATCH per recipe
+  instead of just a PATCH), and a new place for a bug like today's to hide. Since PATCH
+  already leaves untouched columns alone and this is a rarely-run manual sweep (not a
+  hot path), simplicity won over efficiency.
+  Uses `patchRecipeToLibrary()`. Kept as
+  two separate PATCH calls (matching how `estimateNutritionWithAI()` already does it)
+  rather than merging into one combined payload — smaller diff, and the two functions
+  already have independent failure/retry semantics worth keeping separate.
+- **Scoped to `ds_overrides` keys, not every recipe in `recipes`.** A recipe with no
+  override entry has never been locally edited — its `RECIPE_FULL_DATA` is whatever
+  the last cloud fetch returned, so there's nothing local to re-send and no possible
+  drift to fix. Scoping this way keeps the sweep fast (proportional to what's actually
+  been edited, not the ~327-row library) and avoids spamming Supabase with no-op writes.
+- **Put it in Settings next to the existing library import/export controls**, not as a
+  toast/banner or automatic background task. This is a manual, occasional "just in
+  case" action, not something that should run silently — Saffron should be able to see
+  it happened and how many recipes it touched.
+
+## Current State (end of session)
+PR #81: merged (`bdb1838`), `main` on `daily-shuffle-v50`. PR #82: pushed to
+`claude/verify-recipe-sync`, open as a draft, not merged. JS parse check,
+`scripts/smoke_test.mjs` (5/5), `scripts/claude_md_drift.mjs`, and a manual
+Settings-button check all clean. `sw.js` `CACHE` now `daily-shuffle-v51` on that
+branch.
+
+**Important: "make sure all recipes are synced" is not actually complete yet** — the
+tool that can do it now exists, but only running it (from Saffron's own browser, where
+the real `ds_overrides` data lives) does the actual syncing. Nothing has been swept
+yet beyond the one recipe hand-corrected in the previous entry.
+
+## Next Steps
+1. Saffron reviews and merges PR #82.
+2. **Saffron runs Settings → Recipe Library → "Sync all edits to library" once**, on
+   her actual device. This is the step that actually fulfils "make sure all recipes
+   are synced" — nothing this session can do substitutes for it. Report back what the
+   synced/failed count says; a nonzero "failed" count means something worth
+   investigating further (likely a specific recipe worth naming, per this session's
+   pattern).
+3. If the sweep reports failures, spot-check the specific recipe(s) the same way this
+   session did for the muffin: compare what the app shows locally against a direct
+   Supabase query, then decide whether to re-run the sweep, hand-correct, or dig
+   further into why the PATCH itself is failing (RLS, payload shape, etc. — none of
+   which have been ruled out for a genuine repeated failure, only for the
+   `cloudRecipeIds`-gate case already fixed).
+4. Carried over, still not actioned: `trkAddRecipe()`'s missing local-nutrition
+   fallback (from two entries ago).
+
+## Open Questions / Blockers
+- Still open from the previous entry: why `cloudRecipeIds` went stale for the muffin
+  recipe specifically, across two days and multiple app opens. `isCloudRecipeId()`
+  (PR #81) makes this moot for the three write-gating call sites, but if the same
+  underlying cause affects the bookkeeping-only call sites (custom/cloud
+  classification), it's still there, just no longer destructive to writes.
+- Whether any *other* recipe besides the muffin has ever had this problem is now
+  answerable — via #82's sweep, once run — where before this session it wasn't
+  answerable at all.
+
+## Environment & Config Notes
+Repo `saffronlm-cmyk/daily-shuffle`. PR #81 merged to `main` (squash, `bdb1838`). PR
+**#82** open as a draft against `main`, branch `claude/verify-recipe-sync`. Cache:
+`main` at v50, #82's branch at v51. No Supabase MCP writes this session (read-only
+Supabase access not even needed this time — no diagnosis required, just new app code).
+No PR watching set up for #82 — harness auto-subscribed on creation as with #79/#80/#81;
+unsubscribed the same turn, per CLAUDE.md.
+
+## Notes & Gotchas
+- **`mcp__github__merge_pull_request` fails with a 405 if the PR is still marked
+  draft.** Every PR this session opened defaults to draft (per the environment's PR
+  rules) and needs `update_pull_request({draft: false})` immediately before the merge
+  call. Not a new discovery, just worth having written down plainly since this session
+  hit the actual error message for the first time.
+- **The new sweep button's failure count can't distinguish "recipe patched but
+  nutrition patch failed" from "recipe patch itself failed"** — `ok` only increments
+  when *both* succeed (or nutrition wasn't applicable). If Saffron reports a nonzero
+  failed count, check the browser console (`[Daily Shuffle] Recipe patch rejected`
+  vs. `Nutrition patch rejected`) for which one actually failed, since the UI summary
+  collapses both into one number.
+- **This sweep does not touch recipes that were never locally edited on this
+  specific device.** If Saffron uses more than one browser/device, `ds_overrides` is
+  per-device — a recipe edited only on her phone wouldn't be in the desktop browser's
+  `ds_overrides`, and running the sweep from the desktop wouldn't catch it. Worth
+  knowing if a "still wrong after running the sweep" report comes back.
+
+---
+
 # Merged PR #80, diagnosed #80 didn't actually fix Saffron's recipe, hand-corrected the row, hardened the write gate — PR #81
 **Date:** 2026-09-10
 **Project:** Daily Shuffle — nutrition estimate / Tracker sync (continued)
