@@ -951,6 +951,11 @@
           <button class="btn-library" onclick="document.getElementById('importIngCsvInput').click()">⬆ Import ingredient CSV</button>
           <input type="file" id="importIngCsvInput" accept=".csv" style="display:none" onchange="importRecipeIngredientsCsv(event)">
         </div>
+        <p style="font-size:12px;color:var(--text2);margin:12px 0 8px;line-height:1.5">Re-sends every edit and nutrition estimate saved on <em>this device</em> to the cloud library. Run this once if a recipe you edited doesn't look right elsewhere — a past bug let some edits save locally without ever reaching the cloud.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <button class="btn-library" id="btnSyncAllRecipes" onclick="syncAllOverridesToLibrary()">↻ Sync all edits to library</button>
+          <span id="syncAllNotice" style="font-size:12px;color:var(--green);display:none"></span>
+        </div>
       </div>
       <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
         <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:6px">Deleted Recipes</div>
@@ -2909,9 +2914,14 @@ function saveRecipeEdits(id) {
 }
 
 // ─── PATCH RECIPE TO SUPABASE LIBRARY ───────────────────────────────────────
-async function patchRecipeToLibrary(id) {
+// Returns true if the PATCH is confirmed to have reached Supabase, false
+// otherwise (not a cloud recipe, HTTP rejection, or network error). Pass
+// `silent: true` when calling this from a loop over many recipes (see
+// syncAllOverridesToLibrary()) so one failure doesn't spam a toast per recipe
+// — the caller reports one summary toast instead.
+async function patchRecipeToLibrary(id, { silent = false } = {}) {
   const r = getRecipeById(id);
-  if (!r || !isCloudRecipeId(id)) return; // only patch cloud recipes
+  if (!r || !isCloudRecipeId(id)) return false; // only patch cloud recipes
   const fd = RECIPE_FULL_DATA[id] || {};
 
   // Convert flat [{group,qty,unit,name,note}] back to [{section_title, ingredients[]}].
@@ -2967,17 +2977,19 @@ async function patchRecipeToLibrary(id) {
     });
     if (!res.ok) {
       console.warn('[Daily Shuffle] Recipe patch rejected:', res.status);
-      showToast('⚠ Couldn’t sync this recipe to the library');
-      return;
+      if (!silent) showToast('⚠ Couldn’t sync this recipe to the library');
+      return false;
     }
     // A successful write is positive proof this id has a cloud row — heal the
     // bookkeeping Set so every other cloudRecipeIds.has() check downstream
     // (saveCustom()'s custom/cloud split, deleteRecipe()'s soft-delete path,
     // etc.) stops treating this recipe as local-only too.
     cloudRecipeIds.add(id);
+    return true;
   } catch (err) {
     console.warn('[Daily Shuffle] Failed to patch recipe to library:', err.message);
-    showToast('⚠ Couldn’t sync this recipe to the library');
+    if (!silent) showToast('⚠ Couldn’t sync this recipe to the library');
+    return false;
   }
 }
 
@@ -2990,8 +3002,11 @@ async function patchRecipeToLibrary(id) {
 // reached the Tracker and the old macros kept showing there. Only cloud
 // recipes have a row to patch — local-only recipes fall back to
 // RECIPE_FULL_DATA in the Tracker reads already, so this is a no-op for them.
-async function patchNutritionToLibrary(id, nutrition) {
-  if (!isCloudRecipeId(id)) return;
+// Returns true if the PATCH is confirmed to have reached Supabase, false
+// otherwise. `silent: true` suppresses the per-call toast for bulk callers
+// (see syncAllOverridesToLibrary()) — same convention as patchRecipeToLibrary().
+async function patchNutritionToLibrary(id, nutrition, { silent = false } = {}) {
+  if (!isCloudRecipeId(id)) return false;
   const payload = {
     calories: nutrition.kcal ?? null,
     protein_g: nutrition.protein ?? null,
@@ -3006,8 +3021,8 @@ async function patchNutritionToLibrary(id, nutrition) {
     });
     if (!res.ok) {
       console.warn('[Daily Shuffle] Nutrition patch rejected:', res.status);
-      showToast('⚠ Re-estimate saved here, but couldn’t sync to the library — the Tracker may still show old macros');
-      return;
+      if (!silent) showToast('⚠ Re-estimate saved here, but couldn’t sync to the library — the Tracker may still show old macros');
+      return false;
     }
     cloudRecipeIds.add(id); // see patchRecipeToLibrary()'s matching comment
     // The Tracker caches its own recipe list in memory for the rest of this
@@ -3017,10 +3032,58 @@ async function patchNutritionToLibrary(id, nutrition) {
       const row = _trkRecipeCache.find(r => String(r.id) === String(id));
       if (row) Object.assign(row, payload);
     }
+    return true;
   } catch (err) {
     console.warn('[Daily Shuffle] Failed to patch nutrition to library:', err.message);
-    showToast('⚠ Re-estimate saved here, but couldn’t sync to the library — the Tracker may still show old macros');
+    if (!silent) showToast('⚠ Re-estimate saved here, but couldn’t sync to the library — the Tracker may still show old macros');
+    return false;
   }
+}
+
+// One-time "make sure everything I've edited on this device actually reached
+// the cloud" sweep (Settings → Recipe Library → "Sync all edits to library").
+// Walks every recipe id with a saved local override — the only recipes that
+// could hold a local edit the cloud doesn't know about — and re-PATCHes both
+// its fields and its nutrition, regardless of whether cloudRecipeIds /
+// isCloudRecipeId() already believes it's in sync. Exists because the
+// cloudRecipeIds bookkeeping has twice now let a real edit silently never
+// reach Supabase (see the 2026-09-10 log entries: PR #79's addRecipe() gap,
+// then a recipe whose id stayed missing from the Set for reasons that were
+// never pinned down). Rather than trust that bookkeeping, this just re-sends
+// the current local truth for anything that was ever edited — a blunt but
+// reliable backstop, safe to run repeatedly (PATCH is idempotent).
+async function syncAllOverridesToLibrary() {
+  const btn = document.getElementById('btnSyncAllRecipes');
+  const notice = document.getElementById('syncAllNotice');
+  if (btn) { btn.disabled = true; btn.textContent = 'Syncing…'; }
+  if (notice) notice.style.display = 'none';
+
+  // First, promote any recipe that never even reached the cloud at all (a
+  // failed initial Add Recipe POST, still sitting on a local Date.now() id).
+  await syncLocalRecipes();
+
+  let overrides = {};
+  try { overrides = JSON.parse(localStorage.getItem('ds_overrides') || '{}'); } catch(e) {}
+
+  const ids = Object.keys(overrides).filter(id => isCloudRecipeId(id) && getRecipeById(id));
+  let ok = 0, failed = 0;
+  for (const id of ids) {
+    const patchedRecipe = await patchRecipeToLibrary(id, { silent: true });
+    const nut = RECIPE_FULL_DATA[id] && RECIPE_FULL_DATA[id].nutrition;
+    const patchedNutrition = nut ? await patchNutritionToLibrary(id, nut, { silent: true }) : true;
+    if (patchedRecipe && patchedNutrition) ok++; else failed++;
+  }
+
+  if (btn) { btn.disabled = false; btn.textContent = '↻ Sync all edits to library'; }
+  const summary = ids.length
+    ? `Synced ${ok}/${ids.length} edited recipe${ids.length===1?'':'s'} to the cloud${failed ? ` · ${failed} failed` : ''}`
+    : 'Nothing to sync — no local edits found on this device';
+  if (notice) {
+    notice.textContent = '✓ ' + summary;
+    notice.style.color = failed ? 'var(--accent)' : 'var(--green)';
+    notice.style.display = 'inline';
+  }
+  showToast(summary + (failed ? ' — check your connection and try again' : ' ✓'));
 }
 
 // ─── AI NUTRITION + COST ESTIMATION ─────────────────────────────────────────
@@ -3133,7 +3196,9 @@ async function importRecipeIngredientsCsv(evt) {
   }
   saveOverrides();                       // persist locally + sync to your personal cloud
   for (const id of known) {              // patch the shared recipe library
-    if (isCloudRecipeId(id)) { try { await patchRecipeToLibrary(id); cloudOK++; } catch(e){} }
+    // patchRecipeToLibrary() reports failure via its return value, not a
+    // throw — count only confirmed successes, not every attempt.
+    if (isCloudRecipeId(id) && await patchRecipeToLibrary(id, { silent: true })) cloudOK++;
   }
   renderRecipes();
   showToast(`Imported ${known.length} recipe(s) · ${cloudOK} patched to library ✓`);
