@@ -1598,25 +1598,17 @@ function loadCachedRecipes() {
 }
 
 // ─── APP STATE ────────────────────────────────────────────────────────────────
-// Load from localStorage cache immediately (offline-first), refresh in background
-const _cachedCloudRecipes = loadCachedRecipes();
-for (const r of _cachedCloudRecipes) cloudRecipeIds.add(r.id);
-let recipes = [..._cachedCloudRecipes];
-try {
-  const saved = localStorage.getItem('ds_custom_recipes');
-  if (saved) {
-    const customRecipes = JSON.parse(saved);
-    // Merge custom recipes, skipping any IDs already in cloudRecipeIds
-    recipes = [..._cachedCloudRecipes, ...customRecipes.filter(r => !cloudRecipeIds.has(r.id))];
-  }
-} catch(e) {}
-
-// Apply saved overrides to all recipes (metadata + full data)
-try {
-  const ov = localStorage.getItem('ds_overrides');
-  if (ov) {
+// Apply saved overrides (metadata + full data) to a list of recipe objects.
+// Called at boot AND after the background cloud refresh replaces `recipes` —
+// a locally-saved edit must always win over whatever Supabase just returned,
+// otherwise a cloud row that never received a PATCH (see patchRecipeToLibrary's
+// cloudRecipeIds gate) silently reverts the edit on the next stale-cache reload.
+function applyOverrides(list) {
+  try {
+    const ov = localStorage.getItem('ds_overrides');
+    if (!ov) return;
     const overrides = JSON.parse(ov);
-    for (const r of recipes) {
+    for (const r of list) {
       const o = overrides[r.id];
       if (!o) continue;
       if (o.name) r.name = o.name;
@@ -1643,8 +1635,23 @@ try {
         if (o.storage !== undefined) RECIPE_FULL_DATA[r.id].storage = o.storage;
       }
     }
+  } catch(e) {}
+}
+
+// Load from localStorage cache immediately (offline-first), refresh in background
+const _cachedCloudRecipes = loadCachedRecipes();
+for (const r of _cachedCloudRecipes) cloudRecipeIds.add(r.id);
+let recipes = [..._cachedCloudRecipes];
+try {
+  const saved = localStorage.getItem('ds_custom_recipes');
+  if (saved) {
+    const customRecipes = JSON.parse(saved);
+    // Merge custom recipes, skipping any IDs already in cloudRecipeIds
+    recipes = [..._cachedCloudRecipes, ...customRecipes.filter(r => !cloudRecipeIds.has(r.id))];
   }
 } catch(e) {}
+
+applyOverrides(recipes);
 
 // ─── SCHEMA MIGRATION ────────────────────────────────────────────────────────
 // Idempotent: brings cached/loaded recipes onto the new shape on every boot.
@@ -4784,6 +4791,11 @@ async function addRecipe() {
     if (res.ok) {
       const [created] = await res.json();
       newId = created?.id || null;
+      // Register it as a cloud recipe now, not just on the next background
+      // refresh — otherwise patchRecipeToLibrary() (gated on cloudRecipeIds)
+      // silently skips every edit made before that refresh runs, and the
+      // stale Supabase row then overwrites the local edit on the next reload.
+      if (newId) cloudRecipeIds.add(newId);
     } else {
       // Never swallow a write failure — surface why (e.g. RLS/permission).
       const body = await res.text().catch(() => '');
@@ -5256,6 +5268,11 @@ async function syncLocalRecipes() {
       // Rebuild recipes: fresh cloud + any existing custom recipes
       const custom = recipes.filter(r => !cloudRecipeIds.has(r.id));
       recipes = [...fresh, ...custom];
+      // fetchCloudRecipes() just repopulated RECIPE_FULL_DATA straight from the
+      // Supabase rows, which clobbers any local edit that never reached the
+      // cloud (e.g. patchRecipeToLibrary skipped it — see cloudRecipeIds gate
+      // above). Reapply saved overrides so a local edit still wins.
+      applyOverrides(recipes);
       renderRecipes();
       showToast(`Library updated — ${fresh.length} recipes loaded ✓`);
     } else if (recipes.length === 0) {

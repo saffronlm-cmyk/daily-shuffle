@@ -4,6 +4,154 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# Fixed self-added recipe edits silently reverting after a cache refresh — PR #79
+**Date:** 2026-09-10
+**Project:** Daily Shuffle — recipe editor / cloud sync
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete. PR #79 open as a draft (no PR watching per CLAUDE.md — see below).
+
+---
+
+## Project Context
+Bug report from Saffron: editing a recipe she'd added herself (Add Recipe), adjusting
+ingredients/anything, and saving — the edit doesn't stick. First entry to touch the
+recipe-editor / cloud-sync code path; not a continuation of the price-book or
+nutrition-estimation workstreams above.
+
+## Session Goal
+Find why edits to self-added recipes don't persist, and fix it.
+
+## State Before This Session
+Not investigated before. `saveRecipeEdits()` / `patchRecipeToLibrary()` /
+`applyOverrides` logic (the last didn't exist as a named function yet) hadn't been
+touched recently per git history.
+
+## What Was Done
+Traced the save path end-to-end: `saveRecipeEdits()` → `saveOverrides()` +
+`saveCustom()` (local) → `patchRecipeToLibrary()` (cloud, fire-and-forget). Local save
+looked unconditionally correct, so the fault had to be either (a) the save not actually
+running, or (b) something later overwriting the saved state. Ruled out (a): confirmed
+`getRecipeById()` already does a `String()`-loose id lookup (see its own comment,
+2026-context) so the classic numeric-vs-string onclick-id mismatch is not it.
+
+Found two compounding bugs on the (b) side, both real and both needed for the reported
+symptom:
+
+1. **`addRecipe()` never added a newly-synced recipe's id to `cloudRecipeIds`.** When
+   the Add Recipe POST to Supabase succeeds, the recipe gets back a real UUID — but
+   that id was only ever registered in `cloudRecipeIds` later, via the background
+   refresh IIFE (fires when the recipe cache is >30 min stale) or `promoteLocalRecipe()`
+   (a completely different path, for recipes whose *initial* POST failed and are
+   retried by `syncLocalRecipes()`). In between — i.e. for the rest of the session the
+   recipe was created in — `patchRecipeToLibrary(id)` is gated on
+   `cloudRecipeIds.has(id)` and silently returned early on every edit. The edit updated
+   local state fine (`saveOverrides()`/`saveCustom()` don't check this flag), so the
+   "✓ Saved!" notice fired and the modal showed the new data — but Supabase's copy of
+   the recipe never moved.
+2. **The background cloud refresh didn't reapply local overrides after replacing
+   `recipes`.** That refresh (the `CLOUD RECIPE BACKGROUND REFRESH` IIFE, fires once
+   the cache is >30 min stale — i.e. essentially guaranteed by the next time the app is
+   opened) calls `fetchCloudRecipes()`, which unconditionally repopulates
+   `RECIPE_FULL_DATA[id].ingredients`/`.method` straight from whatever Supabase
+   returns via `populateFullDataFromRow()`. Because of bug 1, Supabase's copy was still
+   the pre-edit version. The refresh handler then did
+   `recipes = [...fresh, ...custom]` and re-rendered — but never re-ran the
+   override-reapplication logic that boot does (`ds_overrides` → `RECIPE_FULL_DATA`).
+   So the stale cloud copy silently won, and the edit vanished from the UI on the next
+   load — even though it was still sitting untouched in `ds_overrides` in
+   `localStorage`. This is what made bug 1 visible to Saffron rather than a purely
+   internal inconsistency: within the same session the edit looked saved; on the next
+   session it was gone.
+
+Bug 2 alone would be latent/harmless if bug 1 didn't exist (Supabase would already
+have the correct data, so re-fetching it wouldn't lose anything) — but it's a real gap
+for *any* case where `patchRecipeToLibrary` fails for other reasons (the existing
+`catch` there already surfaces a ⚠ toast on failure per the CLAUDE.md convention, but
+nothing previously stopped that failure from becoming permanent data loss on the next
+reload).
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| index.html | Recipe editor / cloud sync | Modified | /home/user/daily-shuffle/ |
+| sw.js | Service worker | Modified (cache bump only) | /home/user/daily-shuffle/ |
+| logs/daily-shuffle_log.md | This entry | Modified | /home/user/daily-shuffle/logs/ |
+
+### index.html changes, precisely
+- `addRecipe()`: added `if (newId) cloudRecipeIds.add(newId);` right after the
+  successful-POST branch sets `newId`.
+- Extracted the boot-time override-reapplication `try {...}` block (previously inline,
+  right after the `ds_custom_recipes` merge) into a standalone `applyOverrides(list)`
+  function, same logic, no behavioural change at that call site — still called once at
+  boot on `recipes`.
+- Added a second call, `applyOverrides(recipes)`, inside the background refresh IIFE
+  right after `recipes = [...fresh, ...custom];` and before `renderRecipes()`.
+
+## Decisions & Reasoning
+- **Fixed both bugs, not just bug 1.** Bug 1 alone (registering the cloud id
+  immediately) is enough to resolve Saffron's specific report, since it stops the
+  divergence between local and cloud state from happening in the first place. But bug 2
+  is a separate, independently-triggerable failure mode (any transient
+  `patchRecipeToLibrary` failure — network blip, RLS hiccup — has the exact same
+  "looks saved, silently reverts next session" symptom), and the fix is cheap
+  (reapplying the same logic that already runs at boot). Left it in as defence in
+  depth rather than opening a second PR for what's really the same class of bug.
+- **Extracted `applyOverrides()` rather than duplicating the ~30-line loop.** The two
+  call sites (boot, post-refresh) need byte-identical logic — duplicating it risks the
+  two drifting apart on some future edit to one but not the other.
+- **Did not touch `patchRecipeToLibrary()` itself.** Its `cloudRecipeIds` gate is
+  correct in principle (don't PATCH a recipe id that was never a real cloud row) — the
+  bug was that `addRecipe()` wasn't updating that set promptly, not that the gate
+  exists.
+- **Did not add a synchronous `await` on `patchRecipeToLibrary()` in `saveRecipeEdits()`
+  or block the "✓ Saved!" notice on it.** Out of scope — it's already
+  fire-and-forget by design elsewhere in the app (see the function's own comment) and
+  changing that would be a separate UX decision, not part of this bugfix.
+
+## Current State (end of session)
+Fix committed and pushed to `claude/recipe-edits-not-saving-wfkzbo`
+(`c986319`), PR #79 open as a draft against `main`. Not merged. JS parse check,
+`scripts/smoke_test.mjs` (5/5), and `scripts/claude_md_drift.mjs` all clean. `sw.js`
+`CACHE` bumped `daily-shuffle-v47` → `v48`.
+
+## Next Steps
+1. Saffron reviews and merges PR #79 when ready — nothing else is blocking it.
+2. No dedicated regression test exists for this path (no CI/test suite in this repo —
+   see CLAUDE.md Dev workflow). If this class of bug recurs, the fastest repro is:
+   add a recipe, note whether Supabase actually got the POST (check the `recipes`
+   table via the `recipe-db` skill / Supabase MCP), edit it in the same session, save,
+   then manually clear `ds_recipe_cache_at` from localStorage (or wait >30 min) and
+   reload to force the background refresh — confirm the edit survives.
+3. Nothing else queued from this session.
+
+## Open Questions / Blockers
+None. Fix is self-contained and doesn't touch any of the open price-book/nutrition
+workstream items above.
+
+## Environment & Config Notes
+Repo `saffronlm-cmyk/daily-shuffle`. Branch `claude/recipe-edits-not-saving-wfkzbo` →
+PR **#79** (draft, not merged). Cache bumped: `daily-shuffle-v47` → `v48`. No Supabase
+writes made by this session (read-only investigation of the sync logic; no
+Supabase MCP calls used). Per CLAUDE.md's explicit "No PR watching, no scheduled
+check-ins" instruction (decided 2026-08-23), `subscribe_pr_activity` was **not**
+called for PR #79 and no check-in was scheduled.
+
+## Notes & Gotchas
+- **The three places a recipe's id can enter `cloudRecipeIds`** are now: (1) boot, from
+  the cached cloud fetch; (2) `addRecipe()`, immediately on a successful POST (new,
+  this session); (3) `promoteLocalRecipe()`, when `syncLocalRecipes()` retries a recipe
+  whose *original* POST had failed. If a fourth cloud-write path is ever added for
+  recipes, it needs the same `cloudRecipeIds.add(id)` treatment or this exact bug class
+  reappears.
+- **`applyOverrides()` must stay in sync with whatever `saveOverrides()` writes.** They
+  are the write/read pair for `ds_overrides`; if a field is added to one, add it to the
+  other, in both the metadata block and the `RECIPE_FULL_DATA` block.
+- **This does not touch the `user_library` cross-device sync path** (personal Supabase
+  creds, Settings → Cloud Sync) — that's a separate mechanism from the bundled-project
+  recipe library this bug lives in. Most sessions can assume personal creds aren't set
+  anyway (per CLAUDE.md).
+
 # Applied three `pricebook.csv` naming normalisations; worklist now joins 93/94; PR #75 merged
 **Date:** 2026-08-24
 **Project:** Daily Shuffle — price book (ingredient normalisation)
