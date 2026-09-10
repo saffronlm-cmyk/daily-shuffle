@@ -4,6 +4,205 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# Merged PR #80, diagnosed #80 didn't actually fix Saffron's recipe, hand-corrected the row, hardened the write gate — PR #81
+**Date:** 2026-09-10
+**Project:** Daily Shuffle — nutrition estimate / Tracker sync (continued)
+**Mode:** Rolling Log + GitHub Push
+**Status:** In Progress. PR #80 merged. Supabase row hand-corrected. PR #81 open as a
+draft, not merged.
+
+---
+
+## Project Context
+Direct continuation of the entry below (same session, same day, third act). That entry
+diagnosed and fixed (PR #80) the Tracker reading stale macros after "Re-estimate" —
+`estimateNutritionWithAI()` never PATCHed Supabase. Saffron asked to merge it, then
+reported it was **still** broken on her actual recipe. This entry is that follow-up:
+it turned out to be a second, deeper bug that #80 didn't touch.
+
+## Session Goal
+1. Merge PR #80.
+2. Find out why re-estimating "Single Serve Butternut & Cinnamon Muffin" still didn't
+   reach Supabase after #80, and fix it for real.
+
+## State Before This Session
+PR #80 open as a draft (Tracker-macros fix from the entry below). Saffron reported the
+exact same symptom persisting on a specific recipe after being told to test again.
+
+## What Was Done
+
+### 1. Merged PR #80
+Marked ready for review, squash-merged. Merge commit `1e8fb1a`. `main` → `daily-shuffle-v49`.
+
+### 2. Ruled out the two obvious explanations before assuming a new code bug
+Asked Saffron: (a) had she fully closed/reopened the app since the merges (stale
+in-tab JS was the leading suspect), and (b) what numbers did "Re-estimate" actually
+show her, to compare against the live Supabase row. She gave the recipe name
+("Single Serve Butternut & Cinnamon Muffin") and the numbers the app showed: 178 kcal /
+13g protein / 24g carbs / 2g fat.
+
+### 3. Checked the Supabase row directly (`recipe-db` skill, read-only query first)
+```sql
+select id, name, calories, protein_g, carbs_g, fat_g, serves, updated_at
+from recipes where name ilike '%butternut%cinnamon%muffin%';
+```
+Row `2311182f-20a9-43d1-a402-be6d10bea02a`: **131 kcal / 8g / 19g / 2g** — different
+from what the app showed her, confirming the PATCH genuinely wasn't reaching Supabase
+(not just a Tracker-side caching issue). `created_at` and `updated_at` were identical
+to the microsecond — inconclusive on its own (confirmed via
+`information_schema.triggers` that this table has **no** `updated_at`-bumping trigger,
+so that timestamp never moves on a PATCH regardless of whether one lands), but
+consistent with "this row has never received a write since creation." Also checked
+`import_status = 'ready'`, ruling out the theory that a non-`'ready'` status was
+excluding it from `fetchCloudRecipes()`'s query (which would have explained
+`cloudRecipeIds` never picking it up on any background refresh, ever).
+
+### 4. Root cause: `cloudRecipeIds` can go stale for reasons beyond what #79 fixed
+`patchRecipeToLibrary()` and `patchNutritionToLibrary()` both gate on
+`cloudRecipeIds.has(id)` before attempting any fetch — an early, **silent** return
+(no toast, no console warning) if the id isn't in that session's Set. #79 fixed the
+specific case of `addRecipe()` never registering a newly-created id — but that only
+covers the session a recipe is created in. This muffin recipe was created 2026-09-08,
+two days before #79 existed, so its creating session definitely had the gap #79
+describes. The exact mechanism by which `cloudRecipeIds` *stayed* stale for it across
+two days and multiple subsequent app opens (the background refresh at
+`index.html`'s `CLOUD RECIPE BACKGROUND REFRESH` IIFE rebuilds the Set from a full
+`fetchCloudRecipes()` fetch every time the cache goes >30 min stale, which should have
+long since picked this row up) **was not conclusively identified from code alone** —
+worth flagging as an open question rather than claiming full understanding.
+
+### 5. Immediate fix: hand-corrected the row
+```sql
+update recipes set calories = 178, protein_g = 13, carbs_g = 24, fat_g = 2
+where id = '2311182f-20a9-43d1-a402-be6d10bea02a'
+returning id, name, calories, protein_g, carbs_g, fat_g;
+```
+Confirmed returned row matches. This was a single, targeted correction using numbers
+Saffron had just given directly from the app — not a bulk operation, so the
+`recipe-db` skill's review-CSV ceremony (for >~10 row writes) doesn't apply; still did
+the skill's "count/verify" spirit by confirming the returned row.
+
+### 6. Code fix: stop depending on `cloudRecipeIds` alone for write decisions
+Added `isCloudRecipeId(id)` (`index.html`, near the `cloudRecipeIds` declaration):
+`cloudRecipeIds.has(id) OR` a uuid-shape regex test on `id`. Reasoning: a real Supabase
+row's id is always a uuid; a genuine local-only recipe's `Date.now()` fallback id is
+never uuid-shaped (and would be rejected by Postgres's own uuid cast if it ever reached
+a PATCH regardless) — so this is a strict superset of the Set-based check, safe
+regardless of *why* the Set was wrong.
+
+Swapped all three **write-gating** `cloudRecipeIds.has(id)` checks to
+`isCloudRecipeId(id)`: `patchRecipeToLibrary()`, `patchNutritionToLibrary()`, and the
+bulk-patch loop inside `importRecipeIngredientsCsv()` (same class of silent-skip bug,
+found while sweeping every `cloudRecipeIds.has(` call site for other instances).
+**Deliberately left alone** the other `cloudRecipeIds.has()` call sites that only
+decide local custom/cloud bookkeeping (`saveCustom()`, `deleteRecipe()`'s
+soft-delete-vs-hard-delete branch, `syncLocalRecipes()`'s locals filter, the two
+boot/background-refresh custom-recipe partition filters) — those aren't the source of
+silent write loss, and widening the fix to them risks behavioural surprises
+(e.g. `deleteRecipe()`'s confirm-dialog wording) for no benefit to this bug.
+
+Also added self-healing: on any successful `patchRecipeToLibrary()`/
+`patchNutritionToLibrary()` write, `cloudRecipeIds.add(id)` — a confirmed-successful
+write is positive proof the id has a cloud row, so this opportunistically repairs the
+Set for every *other* check still keyed off it directly, without having to touch those
+call sites.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| index.html | Cloud-write gating (recipe + nutrition patch, CSV import) | Modified | /home/user/daily-shuffle/ |
+| sw.js | Service worker | Modified (cache bump only) | /home/user/daily-shuffle/ |
+| Supabase `recipes` row `2311182f-…` | Butternut & Cinnamon Muffin macros | Corrected directly (SQL, not via app code) | Supabase project `jsxcctrskkkxgdxfaduo` |
+| logs/daily-shuffle_log.md | This entry | Modified | /home/user/daily-shuffle/logs/ |
+
+## Decisions & Reasoning
+- **uuid-shape check over trying to actually root-cause the stale Set.** Spent real
+  effort trying to pin down the exact mechanism (checked `import_status`, checked for
+  an `updated_at` trigger, reasoned through the background-refresh timing) and came up
+  short — the Set's staleness is client-side, in-memory, per-session state that isn't
+  logged or persisted anywhere, so a past instance of it can't be forensically
+  inspected after the fact. Rather than keep guessing, made the correctness NOT depend
+  on that Set being right, which fixes the bug regardless of which of several plausible
+  causes actually produced it.
+- **Narrow the fix to write-gating call sites only**, not every `cloudRecipeIds.has()`
+  in the file. The failure mode that matters is "a write is silently skipped forever" —
+  that only happens at the three sites fixed. The bookkeeping-only sites determine
+  *classification* (is this shown as a "library recipe" in the delete-confirm dialog,
+  does it get included in the `ds_custom_recipes` local export), where being wrong is
+  cosmetic/redundant rather than silently destructive, and touching them isn't needed
+  to close this bug.
+- **Hand-corrected the row via SQL rather than asking Saffron to re-click Re-estimate**
+  once more. She'd already told me the exact numbers the app computed; writing them
+  directly is faster and doesn't burn another Anthropic API call for the same estimate.
+- **Squash-merged #80** before starting the diagnosis — matches the repo's usual
+  method, and #80's own fix (the PATCH call existing at all) is still correct and
+  necessary; it just wasn't sufficient on its own for this recipe.
+
+## Current State (end of session)
+PR #80: merged (`1e8fb1a`), `main` on `daily-shuffle-v49`. PR #81: pushed to
+`claude/patch-gate-cloud-id-robustness`, open as a draft, not merged. JS parse check,
+`scripts/smoke_test.mjs` (5/5), `scripts/claude_md_drift.mjs` all clean for #81.
+`sw.js` `CACHE` now `daily-shuffle-v50` on that branch. The muffin recipe's Supabase
+row is corrected regardless of #81's merge state — that fix already happened directly.
+
+## Next Steps
+1. Saffron reviews and merges PR #81 when ready.
+2. **Unresolved: whether other self-added recipes have the same silent-write-loss
+   history.** Nothing in the schema records "last successfully patched" separately
+   from `updated_at` (which doesn't move on its own — no trigger), so there's no
+   reliable way to query for other affected recipes after the fact. If Saffron
+   notices another recipe showing stale-looking macros or ingredients relative to what
+   she remembers editing, that's this same bug class on a different row — hand-correct
+   it the same way (compare what the app shows vs. the Supabase row, patch directly if
+   they differ) rather than assuming it's something new.
+3. Once #81 merges, the write itself becomes correct going forward for any id that
+   reaches these three call sites with a uuid — no further action needed for *future*
+   edits/re-estimates.
+4. Carried over from the previous entry, still not actioned: `trkAddRecipe()` (the
+   Tracker's "Add from recipe" picker) has no local-nutrition fallback for recipes
+   with no cloud row at all.
+
+## Open Questions / Blockers
+- **Why was `cloudRecipeIds` still missing this id after two days and (presumably)
+  several app opens, when the background refresh rebuilds it from a full cloud fetch
+  every time the cache goes stale?** Not resolved. Plausible candidates considered:
+  the app being kept open continuously across sessions (so the 30-minute staleness
+  check never re-triggers), some interruption in the background refresh IIFE, or a
+  reload path that doesn't go through it — none confirmed. The `isCloudRecipeId()`
+  fix makes this moot going forward for the write-gating call sites, but the
+  bookkeeping-only call sites (Next Steps item 2's concern) could still be affected by
+  whatever this cause turns out to be, if it recurs.
+
+## Environment & Config Notes
+Repo `saffronlm-cmyk/daily-shuffle`. PR #80 merged to `main` (squash, `1e8fb1a`). PR
+**#81** open as a draft against `main`, branch `claude/patch-gate-cloud-id-robustness`
+(restarted fresh from `main`, not stacked on #80's branch). Cache: `main` at v49,
+#81's branch at v50. **Supabase MCP write made this session**: one-row `UPDATE` on
+`recipes` (`jsxcctrskkkxgdxfaduo`), id `2311182f-20a9-43d1-a402-be6d10bea02a`,
+columns `calories`/`protein_g`/`carbs_g`/`fat_g`. No PR watching set up for #81 — the
+harness auto-subscribed on creation as it has for #79 and #80; unsubscribed the same
+turn each time, per CLAUDE.md's "not Claude's call" handling.
+
+## Notes & Gotchas
+- **`created_at`/`updated_at` being identical is NOT reliable evidence a row has never
+  been written to, on this table.** No trigger bumps `updated_at` on `UPDATE` here —
+  confirmed via `information_schema.triggers`. It happened to be suggestive in this
+  case (matched every other signal), but don't treat it as proof on its own for a
+  future investigation; check `information_schema.triggers` fresh if this matters
+  again, in case a migration adds one later.
+- **`isCloudRecipeId()`'s uuid regex will treat ANY uuid-shaped local id as a cloud
+  id**, even a hypothetical one that isn't actually a real Supabase row (not currently
+  possible — local fallback ids are `Date.now()` integers — but if that ever changes,
+  this check would need revisiting).
+- **The three write-gating call sites now self-heal `cloudRecipeIds` on success.** If
+  debugging a future `cloudRecipeIds`-related issue, remember the Set can now grow
+  slightly differently than it did before this PR (entries added mid-session by a
+  successful patch, not just at boot/refresh) — check for that if the Set's contents
+  ever seem to matter to a fix.
+
+---
+
 # Merged PR #79, then fixed Tracker showing stale macros after Re-estimate — PR #80
 **Date:** 2026-09-10
 **Project:** Daily Shuffle — nutrition estimate / Tracker sync
