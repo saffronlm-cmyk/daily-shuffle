@@ -4,6 +4,151 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# Merged PR #79, then fixed Tracker showing stale macros after Re-estimate — PR #80
+**Date:** 2026-09-10
+**Project:** Daily Shuffle — nutrition estimate / Tracker sync
+**Mode:** Rolling Log + GitHub Push
+**Status:** In Progress. PR #79 merged to `main`. PR #80 open as a draft, not merged.
+
+---
+
+## Project Context
+Direct continuation of the entry below (same session, same day). That entry fixed
+self-added recipe edits reverting; Saffron asked to merge it, then reported a second,
+related-shaped bug: after using "Re-estimate" on a recipe's nutrition, the Tracker
+still shows the old macros when that recipe is sent there. Read the entry below first —
+this one assumes its `cloudRecipeIds` / `applyOverrides` context.
+
+## Session Goal
+1. Merge PR #79.
+2. Diagnose and fix: Tracker shows stale macros after re-estimating a recipe's
+   nutrition.
+
+## State Before This Session
+PR #79 open as a draft (recipe-edit fix from earlier today). Nutrition re-estimate and
+Tracker sync code untouched.
+
+## What Was Done
+
+### 1. Merged PR #79
+Marked ready for review (`draft: false`) then squash-merged — matches the repo's usual
+merge method (see the 2026-08-24 entries). Merge commit `6264c3f`. `main` is now on
+`daily-shuffle-v48`.
+
+### 2. Traced the stale-macros report
+`estimateNutritionWithAI(id)` (the "Re-estimate" button, `index.html`) only ever wrote
+the new figures to `RECIPE_FULL_DATA[id].nutrition`, then called `saveNutrition()` —
+which is `localStorage.setItem('ds_nutrition', ...)`, local-only, no Supabase call
+anywhere in it. `patchRecipeToLibrary()` — the function that *does* PATCH a recipe's
+cloud row after an edit — never included nutrition columns in its payload at all; it
+was never wired to run after a re-estimate regardless.
+
+Both places the Tracker gets a recipe's macros from read the cloud row directly and
+prefer it over local state:
+- `trkFetchRecipes()` — `SELECT ... calories,protein_g,carbs_g,fat_g ...` from the
+  bundled Supabase project's `recipes` table (same project `patchRecipeToLibrary` and
+  `addRecipe` write to — confirmed `TRK_SB_URL` resolves to `RECIPE_LIB_URL` at
+  `index.html:5842`).
+- `syncPlanToTracker()` — `calories: lr ? lr.calories : (nut ? nut.kcal : null)`; `lr`
+  (the Supabase row) wins whenever the recipe has one, `nut`
+  (`RECIPE_FULL_DATA[id].nutrition`, the fresh local estimate) is only used as a
+  fallback for recipes with no cloud row at all.
+- `trkAddRecipe()` (the "Add from recipe" picker) reads only `r.calories` etc. from
+  the same `trkFetchRecipes()` list — no local fallback at all on this path.
+
+So: re-estimating updated the number shown in the recipe modal (which reads
+`RECIPE_FULL_DATA` directly), but had nowhere on the Supabase side to land, and both
+Tracker paths kept reading the old cloud figures indefinitely. Same *shape* of bug as
+PR #79 (a local write that a cloud-preferring reader never sees), different code path —
+here the payload never included nutrition fields at all, rather than a
+`cloudRecipeIds` registration gap.
+
+### 3. Fix
+Added `patchNutritionToLibrary(id, nutrition)` next to `patchRecipeToLibrary()` in
+`index.html`:
+- PATCHes `calories`/`protein_g`/`carbs_g`/`fat_g` to the Supabase `recipes` row.
+- Gated on `cloudRecipeIds.has(id)` — local-only recipes have no row to patch, and are
+  already correctly served by the `nut` fallback in `syncPlanToTracker()` (though
+  still silently wrong in `trkAddRecipe()` — see Notes & Gotchas).
+- Same `res.ok` check + `showToast('⚠ ...')` on failure as every other write helper
+  (CLAUDE.md convention).
+- Also patches `_trkRecipeCache` (the Tracker's in-memory, session-lifetime recipe
+  cache) in place when already populated, so a Tracker screen already open in the same
+  session reflects the new macros immediately rather than needing a reload.
+
+Wired into `estimateNutritionWithAI()`: one line, `patchNutritionToLibrary(id,
+RECIPE_FULL_DATA[id].nutrition)`, called fire-and-forget right after `saveNutrition()`
+— matches how `patchRecipeToLibrary()` is called fire-and-forget from
+`saveRecipeEdits()`.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| index.html | Nutrition estimate / Tracker sync | Modified | /home/user/daily-shuffle/ |
+| sw.js | Service worker | Modified (cache bump only) | /home/user/daily-shuffle/ |
+| logs/daily-shuffle_log.md | This entry | Modified | /home/user/daily-shuffle/logs/ |
+
+## Decisions & Reasoning
+- **New function rather than folding into `patchRecipeToLibrary()`.** The two run on
+  different triggers (edit-save vs. re-estimate) and `patchRecipeToLibrary()` already
+  has a documented reason its payload omits absent-field columns
+  (`ingredient_sections`/`method_steps`) to avoid blanking stored content on an empty
+  local copy — mixing nutrition into that payload would couple two independent save
+  actions for no benefit. A second small PATCH costs nothing extra over Supabase's
+  `Prefer: return=minimal`.
+- **Patched `_trkRecipeCache` in place instead of clearing it.** Clearing would force a
+  full Tracker recipe-list refetch on next open; patching the one changed row is
+  cheaper and doesn't risk racing a concurrent `trkFetchRecipes()` call.
+- **Did not touch `trkAddRecipe()`'s missing local-fallback gap** (see Notes & Gotchas)
+  — out of scope for the reported symptom, which was specifically about
+  `syncPlanToTracker()`("Send to Tracker"). Flagged, not fixed.
+
+## Current State (end of session)
+PR #79: merged (`6264c3f`), `main` on `daily-shuffle-v48`. PR #80: pushed to
+`claude/tracker-stale-macros-after-reestimate`, open as a draft, not merged. JS parse
+check, `scripts/smoke_test.mjs` (5/5), `scripts/claude_md_drift.mjs` all clean for #80.
+`sw.js` `CACHE` now `daily-shuffle-v49` on that branch.
+
+## Next Steps
+1. Saffron reviews and merges PR #80 when ready.
+2. Optional follow-up, not part of #80: `trkAddRecipe()` (the Tracker's "Add from
+   recipe" picker) has no local-nutrition fallback at all — a recipe that's local-only
+   (never synced to the cloud, e.g. a failed Add Recipe POST) shows `0kcal`/blank macros
+   there rather than falling back to `RECIPE_FULL_DATA[id].nutrition` the way
+   `syncPlanToTracker()` does. Only matters for recipes that never made it to Supabase;
+   flagged, not actioned.
+3. Nothing else queued.
+
+## Open Questions / Blockers
+None for #80 itself. Next Steps item 2 is an open, unprioritised gap.
+
+## Environment & Config Notes
+Repo `saffronlm-cmyk/daily-shuffle`. PR #79 merged to `main` (squash, `6264c3f`). PR
+**#80** open as a draft against `main`, branch `claude/tracker-stale-macros-after-reestimate`
+(restarted fresh from `main` per the merged-PR rule — not stacked on #79's branch).
+Cache: `main` at v48, #80's branch at v49. No Supabase MCP writes made — the PATCH added
+is an app-code path (`RECIPE_LIB_URL`/`RECIPE_LIB_KEY`, the bundled project's anon key,
+already public in `index.html`), not a session-side write. No PR watching set up for
+#80, per CLAUDE.md's standing instruction — the harness auto-subscribed to #79 when it
+was opened earlier today; that was unsubscribed the same session per the documented
+"not Claude's call" handling.
+
+## Notes & Gotchas
+- **`patchNutritionToLibrary()` and `patchRecipeToLibrary()` are now two separate PATCH
+  calls to the same row** on a re-estimate-after-edit sequence — not a problem
+  (`Prefer: return=minimal`, no conflict), just worth knowing if debugging why a
+  recipe's Supabase row got two PATCH requests close together in the network log.
+- **`_trkRecipeCache` is in-memory only, cleared on reload** — the in-place patch here
+  only helps a Tracker tab already open in the *same* session. A fresh load always
+  re-fetches from Supabase, so once #80 is merged this is moot for new sessions
+  regardless.
+- **The `trkAddRecipe()` local-fallback gap (Next Steps item 2) predates this session**
+  — not introduced by this fix, just newly visible while tracing the macro-read paths.
+  Don't conflate it with what #80 actually fixes.
+
+---
+
 # Fixed self-added recipe edits silently reverting after a cache refresh — PR #79
 **Date:** 2026-09-10
 **Project:** Daily Shuffle — recipe editor / cloud sync
