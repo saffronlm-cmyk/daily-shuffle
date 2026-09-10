@@ -2958,6 +2958,47 @@ async function patchRecipeToLibrary(id) {
   }
 }
 
+// Patch a re-estimated nutrition figure to the Supabase recipe row. Without
+// this, "Re-estimate" only ever updated RECIPE_FULL_DATA[id].nutrition
+// (local-only, via saveNutrition()) — the Tracker's "Add from recipe" picker
+// and "Send to Tracker" plan sync both read calories/protein_g/carbs_g/fat_g
+// straight off the cloud row (see trkFetchRecipes()) and prefer it over the
+// local nutrition cache whenever the recipe has one, so a re-estimate never
+// reached the Tracker and the old macros kept showing there. Only cloud
+// recipes have a row to patch — local-only recipes fall back to
+// RECIPE_FULL_DATA in the Tracker reads already, so this is a no-op for them.
+async function patchNutritionToLibrary(id, nutrition) {
+  if (!cloudRecipeIds.has(id)) return;
+  const payload = {
+    calories: nutrition.kcal ?? null,
+    protein_g: nutrition.protein ?? null,
+    carbs_g: nutrition.carbs ?? null,
+    fat_g: nutrition.fat ?? null,
+  };
+  try {
+    const res = await fetch(`${RECIPE_LIB_URL}/rest/v1/recipes?id=eq.${id}`, {
+      method: 'PATCH',
+      headers: { ...RECIPE_LIB_HEADERS, 'Prefer': 'return=minimal' },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+      console.warn('[Daily Shuffle] Nutrition patch rejected:', res.status);
+      showToast('⚠ Re-estimate saved here, but couldn’t sync to the library — the Tracker may still show old macros');
+      return;
+    }
+    // The Tracker caches its own recipe list in memory for the rest of this
+    // session (_trkRecipeCache) — patch it in place so a Tracker screen
+    // already open doesn't keep showing the pre-estimate figures until reload.
+    if (typeof _trkRecipeCache !== 'undefined' && _trkRecipeCache) {
+      const row = _trkRecipeCache.find(r => String(r.id) === String(id));
+      if (row) Object.assign(row, payload);
+    }
+  } catch (err) {
+    console.warn('[Daily Shuffle] Failed to patch nutrition to library:', err.message);
+    showToast('⚠ Re-estimate saved here, but couldn’t sync to the library — the Tracker may still show old macros');
+  }
+}
+
 // ─── AI NUTRITION + COST ESTIMATION ─────────────────────────────────────────
 function saveNutrition() {
   try {
@@ -3792,6 +3833,7 @@ async function estimateNutritionWithAI(id) {
     // costPerPortion is hardcoded per-store — do not overwrite with AI estimate
 
     saveNutrition();
+    patchNutritionToLibrary(id, RECIPE_FULL_DATA[id].nutrition); // fire-and-forget, cloud recipes only
 
     // Re-render the nutrition section in place
     const nut = RECIPE_FULL_DATA[id].nutrition;
