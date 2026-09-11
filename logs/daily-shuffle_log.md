@@ -4,6 +4,114 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# Merged PR #84 — step count logger live on main at v52
+**Date:** 2026-09-11
+**Project:** Daily Shuffle — Tracker
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete. PR #84 squash-merged. Nothing outstanding in code.
+
+---
+
+## Project Context
+Direct continuation of the entry below (same session, same day), which built the step
+count logger. That entry's Status and Next Steps are now superseded: it was written
+while #84 was still an open draft.
+
+## Session Goal
+Answer whether TDEE actually persists to Supabase (Saffron: "Does tdee save to
+supabase? If yes, I'd like step count to"), then merge.
+
+## State Before This Session
+PR #84 open as a draft. The step-count write path was verified by code-read and by the
+applied migration, but never against live data.
+
+## What Was Done
+
+### 1. Confirmed the TDEE persistence question with live data
+Queried `day_meta` directly: TDEE is and always has been a Supabase column, with real
+history in it - 2,848 on 2026-08-13, 2,550 on 08-03, 2,500 on 07-20, back through July.
+The `steps` column added by #84 sits on the same row and reads null for every
+historical row, as expected. Steps needed no further work: `trkSaveMeta()` already
+sends `tdee` and `steps` in one upsert body, so they persist on the same round-trip.
+
+### 2. Closed the schema-cache risk the previous entry left open
+The real hazard with a freshly added column is PostgREST serving a stale schema cache
+and rejecting `steps` with a 400 until it reloads. Tried the honest test first - a
+`curl` POST/GET/DELETE against `/rest/v1/day_meta` on a throwaway `date_key` of
+`1999-01-01` - and it failed at the egress proxy (`connect_rejected`, http 000, four
+attempts). **`supabase.co` is blocked from the agent sandbox, same as Apify and USDA.**
+No row was created, so nothing needed cleaning up. Settled it from SQL instead:
+`pg_event_trigger` shows `pgrst_ddl_watch` (on `ddl_command_end`) and `pgrst_drop_watch`
+both enabled, so the `ALTER TABLE` itself fired the schema reload. PostgREST knows
+about `steps`.
+
+### 3. Merged
+Un-drafted #84 first (a draft merge returns 405 - this is the third session in a row to
+hit it), then squash-merged. Merge commit `c4cf9bf`; `main` now carries
+`daily-shuffle-v52`. Branch restarted from `origin/main` for this log entry, per the
+merged-PR-is-finished rule.
+
+### 4. Harness auto-subscribed the PR; unsubscribed it
+On opening #84 the harness created a PR-activity subscription on its own. CLAUDE.md's
+2026-08-23 decision says to unsubscribe and move on, so I did, and scheduled no
+check-in. Expect this on every PR - it is the harness default, not a choice made in
+session.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| logs/daily-shuffle_log.md | This entry | Modified | `/daily-shuffle/logs/` |
+
+No code changed in this act. The code artifacts are listed in the entry below.
+
+## Decisions & Reasoning
+- **Nothing was built in response to "I'd like step count to".** The condition was
+  already satisfied - steps shares TDEE's upsert - so the answer was evidence, not a
+  patch. Building a second write path would have been duplicate machinery.
+- **Verified the schema cache from SQL rather than declaring it fine.** The event
+  trigger is checkable; "PostgREST usually reloads" is not a verification. Worth the
+  one query, because a stale cache would have failed silently in the browser as a ⚠
+  toast and looked like a step-logger bug.
+- **Restarted the branch from `main` rather than reopening #84.** Repo rule: a merged
+  PR is finished, never stack on merged history.
+
+## Current State (end of session)
+Shipped. `main` at `c4cf9bf`, service worker cache `daily-shuffle-v52`, `day_meta.steps`
+live and exposed through PostgREST. The app on `main` reads and writes it.
+
+## Next Steps
+1. Reopen the PWA once so the service worker picks up `v52` (network-first for the HTML
+   document, so one open should do it).
+2. Log a step count on the Tracker, refresh, and confirm it survives - then check it on
+   a second device. That is the one thing no agent session can verify, because
+   `supabase.co` is unreachable from the sandbox.
+3. Set the daily steps goal in Tracker → Daily targets if 10,000 isn't the right figure.
+
+## Open Questions / Blockers
+None. The deferred question from the entry below still stands unanswered by choice:
+whether steps should ever drive anything (a streak, a nudge when the deficit is large
+and the count is low). Nothing built towards it.
+
+## Environment & Config Notes
+- Repo `saffronlm-cmyk/daily-shuffle`. PR #84 merged as `c4cf9bf`. Branch
+  `claude/step-count-logger-nakj7q` restarted from `origin/main` for this entry.
+- Supabase project `jsxcctrskkkxgdxfaduo`, `day_meta.steps` (integer, nullable),
+  migration `add_steps_to_day_meta`.
+- Service worker cache `daily-shuffle-v52` on `main`.
+
+## Notes & Gotchas
+- **`supabase.co` is blocked from the agent sandbox.** CLAUDE.md names Apify and USDA
+  as the blocked hosts; add this one to the mental list. No agent session can test a
+  live tracker write end-to-end - only read via the Supabase MCP, which goes
+  server-side and does work.
+- **The 405-on-draft-merge trap is now three-for-three.** Always un-draft before
+  calling merge.
+- **PostgREST schema cache**: if a future migration adds a column and the app 400s on
+  it, check `pg_event_trigger` for `pgrst_ddl_watch` before debugging the app code.
+
+---
+
 # Step count logger added to the Tracker, alongside TDEE — PR #84
 **Date:** 2026-09-11
 **Project:** Daily Shuffle — Tracker
