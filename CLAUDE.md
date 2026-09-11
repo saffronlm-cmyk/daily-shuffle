@@ -151,6 +151,32 @@ Single user (Saffron), no auth, deployed as static files.
   `day_meta`, `saved_meals`, all PK-keyed with open `anon ALL` RLS, upserted via
   `Prefer: resolution=merge-duplicates`). The Tracker's `TRK_SB_URL`/`TRK_SB_KEY` prefer
   this bundled project and fall back to personal creds.
+- **Two recipe editors, split by what they own** (2026-09-11). Tags and recipe content
+  are edited and saved separately:
+  - **Quick tag editor** (`openTagPop()` → `saveRecipeTags()`) — a popover reached from
+    the 🏷 button on a recipe card *and* the modal's "🏷 Tags" button. Owns meal types,
+    protein/cuisine/carb type and cravings, and nothing else.
+  - **Recipe editor** (`openRecipeEditor()` → `saveRecipeEdits()`, the modal's "Edit
+    recipe" panel) — owns name, description, servings, prep time, cost tier,
+    ingredients, method, tips/storage/notes, source URL. It carries **no** tag controls;
+    it links to the tag popover instead.
+  - `patchRecipeToLibrary(id, { scope })` enforces the split at the wire:
+    `'tags'` sends only the tag columns, `'content'` only the content columns (including
+    `ingredient_sections`), `'all'` both (the default, used by the Settings sync sweep).
+    A PATCH leaves absent columns untouched, so **re-tagging can never write
+    `ingredient_sections`** — keep it that way. Both editors still write the full local
+    state via `saveOverrides()`/`saveCustom()`.
+- **Every recipe belongs in the cloud library** (2026-09-11). A local-only recipe is a
+  *failed upload*, never a category of its own: `addRecipe()` POSTs to Supabase and only
+  falls back to a `Date.now()` id (with a ⚠ toast) when that write fails.
+  `localOnlyRecipes()` is the single definition of "stranded" — anything in `recipes`
+  failing `isCloudRecipeId()`, which is deliberately wider than an `id` type test so a
+  string-typed local id can't hide from it. `syncLocalRecipes()` back-fills them by POST
+  and `promoteLocalRecipe()` re-keys everything held by id; it runs on app load, on the
+  `online` event, from the Settings sync sweep, and from the **☁️ Upload local-only
+  recipes** button. It reports `{ synced, failed, names }` and toasts failures — don't
+  regress that to a silent `continue`, and keep `renderLocalOnlyStatus()` (Settings →
+  Library) telling the truth about the count.
 - **Plan → Tracker sync**: the Shuffle tab's "Send to Tracker" button
   (`syncPlanToTracker()`) writes one `food_log` entry per planned slot, on that slot's
   own date, as a normal eaten entry (it counts towards the rings immediately — the

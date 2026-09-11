@@ -4,6 +4,190 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# Split tag editing from recipe/ingredient editing — PR #83
+**Date:** 2026-09-11
+**Project:** Daily Shuffle — recipe editing UI / cloud write safety
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete. PR #83 open as a draft, not merged. Nothing outstanding in code;
+Saffron just needs to review, merge, and try the new 🏷 button on a real recipe.
+
+---
+
+## Project Context
+Separate from the cloud-sync thread that ran through PRs #80–#82 (see 2026-09-10
+entries), though it lands on the same fault line: `patchRecipeToLibrary()` and the
+`ingredient_sections` column. That column is the one the 2026-08 hollow-recipe damage
+went through (52 recipes, every ingredient line written as literal `null` — see the
+RESOLVED section in CLAUDE.md and the 2026-08-12 entry).
+
+## Session Goal
+Saffron asked, as a question: "I'd like to separate the in-app editing of tags from the
+actual recipe quantities and ingredients. Is that possible?" She then picked, from three
+offered approaches, the largest one: pull tags out into their own lightweight control on
+the recipe card, leaving "Edit recipe" for ingredients/method/notes.
+
+## State Before This Session
+One editor for everything. The modal's "Edit recipe" button called `openTagEditor(id)`,
+which rendered a single panel — Basic Info, Meal types, Categories (protein/cuisine/carb),
+Cravings, Ingredients, Method, Notes — behind one **Save changes** button
+(`saveRecipeEdits`). That function read every field and called
+`patchRecipeToLibrary(id)`, whose payload always carried **both** the tag columns and
+`ingredient_sections` + `method_steps`. So toggling one craving re-sent the recipe's
+whole ingredient list. Function and div were still named for "tags" (`openTagEditor`,
+`#modal-tag-editor`) — a holdover from when that panel really was tags-only.
+
+## What Was Done
+
+### 1. Established the actual coupling before proposing anything
+Read the editor end to end. The important finding wasn't UI-level, it was the shared
+PATCH payload: tag edits and ingredient edits were the same write. That reframed the
+request from "tidy the form" to "stop tag edits touching the column that hollowed out
+52 recipes", which is what the implementation optimises for.
+
+### 2. Found and fixed a live bug on the way past
+`openTagEditor()` did `editorEl.previousElementSibling.textContent = '▲ Close editor'`.
+`previousElementSibling` is the **button row div**, not a button — so opening the editor
+replaced the Edit and Delete buttons with a text node. Both toggles now target their
+button by id (`#btnRecipeEditorToggle`). Not asked for, but it was in the lines being
+moved and it broke the panel being split.
+
+### 3. Quick tag editor (new)
+`openTagPop(event, id)` → `saveRecipeTags()`. A popover built on the existing
+`.picker-overlay` / `.picker-panel` classes (z-index 1100, so it sits over the recipe
+modal at 1000). Reached two ways:
+  - a new 🏷 button on each library card, next to the ♥ (`.rl-tagbtn`, mirrors `.rl-fav`
+    styling; `event.stopPropagation()` or the card's own onclick opens the modal too);
+  - the modal's new **🏷 Tags** button.
+Owns meal types, protein source, cuisine, carb type, cravings. Cravings render grouped
+by `CRAVING_TAXONOMY` (as the Shuffle tab does) **plus a trailing "Other" group** built
+from `ALL_CRAVINGS` minus the taxonomy — that catches the legacy `chicken`/`beef`/`tofu`
+values, which would otherwise be invisible but still saved, i.e. impossible to remove.
+
+### 4. Recipe editor (renamed, narrowed)
+`openTagEditor` → `openRecipeEditor`; `#modal-tag-editor` → `#modal-recipe-editor`.
+Meal types / Categories / Cravings sections deleted from its markup, replaced by a line
+of text and a "🏷 Edit tags" button into the popover. `saveRecipeEdits()` no longer reads
+or writes `mealTypes`, `proteinSource`, `cuisine`, `carbType`, `cravings`. Removed the
+now-dead `_editorMealTypes`, `_editorCravings`, `renderEditorMealTypes`,
+`renderEditorCravings`, `toggleEditorMealType`, `toggleEditorCraving`.
+
+### 5. Enforced the split at the wire, not just in the UI
+`patchRecipeToLibrary(id, { silent, scope })` — new `scope`:
+  - `'tags'` → `meal_type`, `meal_types`, `protein_source`, `cuisine`, `carb_type`,
+    `craving_tags`
+  - `'content'` → `name`, `subtitle`, `serves`, `prep_cook_time`, `notes`,
+    `ingredient_sections`, `method_steps`
+  - `'all'` (default) → both; keeps `syncAllOverridesToLibrary()` and the other existing
+    callers behaving exactly as before.
+The `sectionMap` loop is skipped entirely unless `wantContent`. A PATCH leaves absent
+columns untouched, so a tag save now cannot write `ingredient_sections` even in
+principle. Both editors still persist full local state via `saveOverrides()`/`saveCustom()` —
+the scoping is about the cloud write only.
+
+### 6. Modal header staleness
+A tag save refreshes the modal's kicker (`.modal-type`, meal types + cuisine) **in place**
+rather than calling `openModal(id)` again. Re-rendering would have discarded any unsaved
+edits sitting in an open recipe editor below. Added `modalContent.dataset.recipeId` in
+`openModal()` so the popover knows whether the modal behind it is even showing this
+recipe, and extracted `recipeKicker(r)` so both paths compute the string one way.
+
+### 7. Verification
+- JS parse check: 3/3 script blocks OK.
+- `node scripts/smoke_test.mjs`: 5/5.
+- `node scripts/claude_md_drift.mjs`: no drift.
+- Wrote a throwaway Playwright script in the scratchpad (**not committed** — it is
+  scenario-specific; the repo smoke test stays the general one) driving the real UI in
+  headless Chromium. 12/12: card 🏷 opens the popover and does *not* open the modal;
+  existing cravings render active; 7 meal-type + 39 craving chips; a tag save writes
+  tags, persists to `ds_overrides`, closes the popover, leaves name/servings alone; the
+  modal Tags button opens the popover over the open modal; Edit recipe opens the panel
+  **and the button row survives** (the §2 regression); a recipe save renames without
+  dropping tags.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| index.html | Tag popover + markup/CSS/`ic-tag` sprite; recipe editor narrowed and renamed; `patchRecipeToLibrary` scoping; `recipeKicker()`; toggle-button fix | Modified | /home/user/daily-shuffle/ |
+| sw.js | `CACHE` bumped v51 → v52 | Modified | /home/user/daily-shuffle/ |
+| CLAUDE.md | New "Two recipe editors, split by what they own" bullet under Data & sync | Modified | /home/user/daily-shuffle/ |
+| tagpop_test.mjs | Ad-hoc Playwright check of the split (12 assertions) | Created, not committed | scratchpad only |
+
+## Decisions & Reasoning
+- **Popover on the card, not split Save buttons in the same panel**: Saffron picked this
+  from three options (the other two were splitting the save buttons inside the existing
+  panel, and explanation-only). It costs more code but gives her re-tagging without
+  opening a recipe at all — which is the bulk-tidying motion she actually has ahead.
+- **Scoped PATCH rather than UI separation alone**: separating the forms would have left
+  the two saves sharing one payload, so a tag save would still have re-sent
+  `ingredient_sections`. The structural guarantee is the point of the change; the UI is
+  how she reaches it.
+- **`'all'` stays the default**: `syncAllOverridesToLibrary()` (PR #82) and the
+  local-recipe promotion path must keep sending everything. Making `'all'` the default
+  meant not touching any existing call site except `saveRecipeEdits`.
+- **Cravings grouped + an "Other" bucket**: the flat `ALL_CRAVINGS` list the old editor
+  rendered is ~39 chips of undifferentiated scroll. Grouping by taxonomy matches the
+  Shuffle tab; the "Other" group exists solely so the three legacy protein cravings stay
+  removable rather than silently preserved.
+- **Reused `.picker-overlay`/`.picker-panel`**: already styled, already above the modal,
+  already has the scroll-body/flex-column shape. Three new CSS rules instead of a new
+  component.
+- **Kicker updated in place, modal not re-rendered**: protects unsaved ingredient edits.
+- **Kept the protein/cuisine `<option>` lists verbatim** rather than folding them onto
+  `PLAN_PROTEINS`/`PROTEIN_LABELS`: the labels differ slightly ("Tofu / Plant" vs
+  "Tofu"), and quietly changing dropdown labels isn't part of this change. Note the
+  Add Recipe form hardcodes its own copies of both lists too — three copies now exist.
+
+## Current State (end of session)
+Working and pushed. Branch `claude/dreamy-shannon-6mbhnd`, commit on top of `c78171a`.
+Draft PR: https://github.com/saffronlm-cmyk/daily-shuffle/pull/83 — not merged.
+
+## Next Steps
+1. Saffron: open PR #83, merge it (un-draft first — `merge_pull_request` 405s on drafts,
+   per the 2026-09-10 entry).
+2. Hard-open the app once after deploy (cache v52) and try the 🏷 button on a library
+   card: toggle a craving, Save tags, then open the recipe and confirm its ingredients
+   are untouched.
+3. If the card grid feels crowded with two buttons, the 🏷 could move to a long-press or
+   into the modal only — the popover itself is entry-point agnostic, both callers are
+   one line.
+
+## Open Questions / Blockers
+None blocking. One deferred judgement: whether the Add Recipe form's tag section should
+also point at this popover instead of carrying its own `f-mealTypes`/`f-cravings` chips.
+Left alone — that form builds a recipe that doesn't exist yet, so there's no row to
+PATCH and no coupling to break.
+
+## Environment & Config Notes
+Repo `saffronlm-cmyk/daily-shuffle`, branch `claude/dreamy-shannon-6mbhnd`, draft PR #83.
+Service worker `CACHE` = `daily-shuffle-v52`. Supabase table `recipes` (bundled project),
+columns touched by the scoping: `meal_type`, `meal_types`, `protein_source`, `cuisine`,
+`carb_type`, `craving_tags` (tags scope) and `name`, `subtitle`, `serves`,
+`prep_cook_time`, `notes`, `ingredient_sections`, `method_steps` (content scope). No
+credentials involved beyond the already-public inlined anon key.
+
+## Notes & Gotchas
+- **`scope` is a safety mechanism, not a formatting nicety.** If a future editor adds a
+  tag control that saves through `'content'`, or adds ingredient handling to
+  `saveRecipeTags()`, the guarantee is gone. CLAUDE.md states it; keep it true.
+- The old names are gone: `openTagEditor` and `#modal-tag-editor` no longer exist. Any
+  doc, note or muscle-memory referring to them means `openRecipeEditor` /
+  `#modal-recipe-editor`.
+- `openTagPop(event, id)` takes `event` **first** — it needs `stopPropagation()` when
+  called from the card, whose parent div opens the modal. Callers with no event pass
+  `null`… except there are none right now; both call sites are inline `onclick`s.
+- `saveRecipeTags()` reads `_tagPopId`, not an argument. Closing the popover nulls it, so
+  don't call it after `closeTagPop()`.
+- The ad-hoc Playwright script is in the scratchpad and dies with this session. If the
+  split needs re-testing, rewrite it from the recipe of `scripts/smoke_test.mjs` — the
+  fixture-seeding preamble is the reusable part.
+- Fixture recipe ids (`smoke-*`) aren't UUIDs, so `isCloudRecipeId()` is false and
+  `patchRecipeToLibrary` returns early — the browser test never hits the network. That is
+  why it passes offline, and also why it does **not** exercise the payload scoping. The
+  scoping is verified by reading, not by test.
+
+---
+
 # Merged PR #81, shipped a manual "sync all edits to library" sweep — PR #82
 **Date:** 2026-09-10
 **Project:** Daily Shuffle — cloud sync (continued, fourth act)
