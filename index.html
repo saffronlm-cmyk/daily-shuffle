@@ -971,6 +971,11 @@
           <button class="btn-library" id="btnSyncAllRecipes" onclick="syncAllOverridesToLibrary()">↻ Sync all edits to library</button>
           <span id="syncAllNotice" style="font-size:12px;color:var(--green);display:none"></span>
         </div>
+        <p style="font-size:12px;color:var(--text2);margin:12px 0 8px;line-height:1.5">Every recipe belongs in the cloud library. One stays on this device only when its upload failed — offline, or a rejected write. They retry automatically on reconnect and on every app load; use this to force it now.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <button class="btn-library" id="btnUploadLocalRecipes" onclick="uploadLocalRecipes()">☁️ Upload local-only recipes</button>
+          <span id="localOnlyNotice" style="font-size:12px;display:none"></span>
+        </div>
       </div>
       <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
         <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:6px">Deleted Recipes</div>
@@ -3184,7 +3189,9 @@ async function syncAllOverridesToLibrary() {
 
   // First, promote any recipe that never even reached the cloud at all (a
   // failed initial Add Recipe POST, still sitting on a local Date.now() id).
-  await syncLocalRecipes();
+  // Silent: its own toast would be overwritten by this function's summary, so
+  // fold the counts into that instead.
+  const local = await syncLocalRecipes({ silent: true });
 
   let overrides = {};
   try { overrides = JSON.parse(localStorage.getItem('ds_overrides') || '{}'); } catch(e) {}
@@ -3199,15 +3206,19 @@ async function syncAllOverridesToLibrary() {
   }
 
   if (btn) { btn.disabled = false; btn.textContent = '↻ Sync all edits to library'; }
-  const summary = ids.length
+  const uploaded = local.synced ? ` · uploaded ${local.synced} local-only recipe${local.synced===1?'':'s'}` : '';
+  const stranded = local.failed ? ` · ${local.failed} still local-only` : '';
+  const summary = (ids.length
     ? `Synced ${ok}/${ids.length} edited recipe${ids.length===1?'':'s'} to the cloud${failed ? ` · ${failed} failed` : ''}`
-    : 'Nothing to sync — no local edits found on this device';
+    : 'Nothing to sync — no local edits found on this device') + uploaded + stranded;
+  const anyFailed = failed || local.failed;
   if (notice) {
-    notice.textContent = '✓ ' + summary;
-    notice.style.color = failed ? 'var(--accent)' : 'var(--green)';
+    notice.textContent = (anyFailed ? '⚠ ' : '✓ ') + summary;
+    notice.style.color = anyFailed ? 'var(--accent)' : 'var(--green)';
     notice.style.display = 'inline';
   }
-  showToast(summary + (failed ? ' — check your connection and try again' : ' ✓'));
+  renderLocalOnlyStatus();
+  showToast(summary + (anyFailed ? ' — check your connection and try again' : ' ✓'));
 }
 
 // ─── AI NUTRITION + COST ESTIMATION ─────────────────────────────────────────
@@ -5476,14 +5487,27 @@ function promoteLocalRecipe(r, newId) {
   cloudRecipeIds.add(newId);
 }
 
+// Every recipe belongs in the cloud library; a local-only one is a failed
+// upload, never a category of its own. Anything without a cloud row to write
+// to is one, deliberately wider than the old `typeof r.id === 'number'` test
+// — a local id that came back from a JSON round-trip as a string was invisible
+// to that check and would have stayed stranded forever.
+function localOnlyRecipes() {
+  return recipes.filter(r => r && r.id != null && r.id !== 0 && !isCloudRecipeId(r.id));
+}
+
 let _syncingLocal = false;
-async function syncLocalRecipes() {
-  if (_syncingLocal) return;
-  // Local-only = numeric id (Date.now fallback) not yet known to the cloud.
-  const locals = recipes.filter(r => r && typeof r.id === 'number' && r.id !== 0 && !cloudRecipeIds.has(r.id));
-  if (!locals.length) return;
+// Returns { synced, failed, names } — callers report it. A silent failure here
+// used to leave a recipe in localStorage with no signal anywhere in the UI,
+// which is exactly how a recipe goes missing when a device is lost.
+async function syncLocalRecipes({ silent = false } = {}) {
+  const idle = { synced: 0, failed: 0, names: [] };
+  if (_syncingLocal) return idle;
+  const locals = localOnlyRecipes();
+  if (!locals.length) return idle;
   _syncingLocal = true;
   let synced = 0;
+  const failedNames = [];
   for (const r of locals) {
     try {
       const res = await fetch(`${RECIPE_LIB_URL}/rest/v1/recipes`, {
@@ -5491,21 +5515,70 @@ async function syncLocalRecipes() {
         headers: { ...RECIPE_LIB_HEADERS, 'Prefer': 'return=representation' },
         body: JSON.stringify(buildRecipeRow(r))
       });
-      if (!res.ok) continue;
+      if (!res.ok) {
+        const body = await res.text().catch(() => '');
+        console.warn('[Daily Shuffle] Local recipe POST rejected:', r.name, res.status, body.slice(0, 200));
+        failedNames.push(r.name); continue;
+      }
       const [created] = await res.json();
-      if (!created || !created.id) continue;
+      if (!created || !created.id) { failedNames.push(r.name); continue; }
       promoteLocalRecipe(r, created.id);
       synced++;
-    } catch(e) { /* leave it local — try again next load */ }
+    } catch(e) {
+      console.warn('[Daily Shuffle] Failed to upload local recipe:', r.name, e.message);
+      failedNames.push(r.name); // leave it local — retried on reconnect and next load
+    }
   }
   _syncingLocal = false;
   if (synced) {
     saveCustom(); saveNutrition(); saveFavourites(); saveOverrides();
     if (typeof currentPlan !== 'undefined' && currentPlan) savePlan();
     renderRecipes();
-    showToast(`☁️ Synced ${synced} recipe${synced > 1 ? 's' : ''} to your library`);
   }
+  // One toast, not two — showToast() replaces the live message, so a second
+  // call would swallow the first.
+  if (!silent && (synced || failedNames.length)) {
+    const parts = [];
+    if (synced) parts.push(`☁️ Synced ${synced} recipe${synced > 1 ? 's' : ''} to your library`);
+    if (failedNames.length) parts.push(`⚠ ${failedNames.length} still on this device only`);
+    showToast(parts.join(' · '));
+  }
+  renderLocalOnlyStatus();
+  return { synced, failed: failedNames.length, names: failedNames };
 }
+
+// Settings surface for the same fact: how many recipes exist only here, and
+// which. Without it a failed upload is invisible until the device is gone.
+function renderLocalOnlyStatus() {
+  const el  = document.getElementById('localOnlyNotice');
+  const btn = document.getElementById('btnUploadLocalRecipes');
+  if (!el) return; // Settings not open / not rendered yet
+  const locals = localOnlyRecipes();
+  el.style.display = 'inline';
+  if (!locals.length) {
+    el.textContent = '✓ All recipes are in your cloud library';
+    el.style.color = 'var(--green)';
+    if (btn) btn.disabled = true;
+    return;
+  }
+  const shown = locals.slice(0, 3).map(r => r.name).join(', ');
+  el.textContent = `⚠ ${locals.length} on this device only: ${shown}${locals.length > 3 ? `, +${locals.length - 3} more` : ''}`;
+  el.style.color = 'var(--accent)';
+  if (btn) btn.disabled = false;
+}
+
+async function uploadLocalRecipes() {
+  const btn = document.getElementById('btnUploadLocalRecipes');
+  const label = btn ? btn.textContent : '';
+  if (btn) { btn.disabled = true; btn.textContent = 'Uploading…'; }
+  const res = await syncLocalRecipes();
+  if (btn) { btn.textContent = label || '☁️ Upload local-only recipes'; }
+  renderLocalOnlyStatus();
+  if (!res.synced && !res.failed) showToast('Nothing to upload — every recipe is already in your library ✓');
+}
+
+// A recipe added offline would otherwise sit local until the next full reload.
+window.addEventListener('online', () => { syncLocalRecipes(); });
 
 // ─── CLOUD RECIPE BACKGROUND REFRESH ────────────────────────────────────────
 // Runs silently after app load; refreshes recipe list if cache is stale (>30 min)
@@ -5692,7 +5765,8 @@ function openSettings() {
   const lastSync = localStorage.getItem('ds_last_sync');
   const syncEl = document.getElementById('syncStatus');
   if (syncEl && lastSync) syncEl.textContent = '☁ Last synced ' + new Date(lastSync).toLocaleString();
-  // Price book + receipt
+  // Cloud-library completeness + price book + receipt
+  renderLocalOnlyStatus();
   renderPriceBook();
   renderReceiptHistory();
   if (!_rcRows.length) { _rcRows = [{ name:'', packSize:'', packUnit:'each', packs:1, packPrice:'' }]; }
