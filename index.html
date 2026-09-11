@@ -762,6 +762,8 @@
   .nd-logrow .nd-lbtn { background: none; border: none; color: var(--fn-text-muted); cursor: pointer; font-size: 14px; line-height: 1; padding: 2px 3px; }
   .nd-logrow .nd-lbtn:hover { color: var(--ed-oxblood-deep); }
   .nd-empty { font-family: var(--font-ui); font-size: 13px; color: var(--fn-text-muted); padding: 8px 0; border-top: 1px solid var(--fn-border); }
+  .nd-steps-bar { height: 8px; border-radius: var(--radius-pill); background: var(--fn-border); overflow: hidden; margin: 4px 0 2px; }
+  .nd-steps-fill { height: 100%; border-radius: var(--radius-pill); background: var(--fn-accent); transition: width .3s ease; }
   .nd-add { margin-top: 10px; font-family: var(--font-ui); font-size: 13px; font-weight: 500; color: var(--fn-text-muted);
             background: transparent; border: 1px solid var(--fn-border); border-radius: var(--radius-pill); padding: 7px 14px;
             cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
@@ -5907,11 +5909,11 @@ function prefillForm(r) {
    and showToast(). */
 
 const TRK_MEALS = ['breakfast','snack','lunch','dinner','dessert','drinks'];
-const TRK_TARGET_DEFAULTS = { cal:1800, prot:130, carb:170, fat:58, fib:30 };
+const TRK_TARGET_DEFAULTS = { cal:1800, prot:130, carb:170, fat:58, fib:30, steps:10000 };
 
 let trkDay = trkTodayKey();
 let trkEntries = [];
-let trkMeta = { exercise:[], omegaLogged:false, notes:'', tdee:null };
+let trkMeta = { exercise:[], omegaLogged:false, notes:'', tdee:null, steps:null };
 let trkStaples = [];
 let trkStaplesLoaded = false;
 let trkSavedMeals = [];
@@ -5979,8 +5981,8 @@ function trkCacheDay(){
   try { localStorage.setItem('ds_trk_day_'+trkDay, JSON.stringify({ entries:trkEntries, meta:trkMeta })); } catch(e){}
 }
 function trkLoadCacheDay(){
-  try { const s = localStorage.getItem('ds_trk_day_'+trkDay); if(s){ const o=JSON.parse(s); trkEntries=o.entries||[]; trkMeta=Object.assign({exercise:[],omegaLogged:false,notes:'',tdee:null},o.meta||{}); return true; } } catch(e){}
-  trkEntries = []; trkMeta = { exercise:[], omegaLogged:false, notes:'', tdee:null };
+  try { const s = localStorage.getItem('ds_trk_day_'+trkDay); if(s){ const o=JSON.parse(s); trkEntries=o.entries||[]; trkMeta=Object.assign({exercise:[],omegaLogged:false,notes:'',tdee:null,steps:null},o.meta||{}); return true; } } catch(e){}
+  trkEntries = []; trkMeta = { exercise:[], omegaLogged:false, notes:'', tdee:null, steps:null };
   return false;
 }
 async function trkLoadDay(){
@@ -5992,7 +5994,7 @@ async function trkLoadDay(){
       fetch(`${TRK_SB_URL}/rest/v1/day_meta?date_key=eq.${trkDay}&select=*`, { headers: trkSbHeaders() })
     ]);
     if(eRes.ok){ trkEntries = await eRes.json(); }
-    if(mRes.ok){ const rows = await mRes.json(); if(rows.length){ trkMeta = { exercise: rows[0].exercise||[], omegaLogged: !!rows[0].omega_logged, notes: rows[0].notes||'', tdee: rows[0].tdee!=null ? trkNum(rows[0].tdee) : null }; } else { trkMeta = { exercise:[], omegaLogged:false, notes:'', tdee:null }; } }
+    if(mRes.ok){ const rows = await mRes.json(); if(rows.length){ trkMeta = { exercise: rows[0].exercise||[], omegaLogged: !!rows[0].omega_logged, notes: rows[0].notes||'', tdee: rows[0].tdee!=null ? trkNum(rows[0].tdee) : null, steps: rows[0].steps!=null ? Math.round(trkNum(rows[0].steps)) : null }; } else { trkMeta = { exercise:[], omegaLogged:false, notes:'', tdee:null, steps:null }; } }
     trkCacheDay();
   } catch(e){ /* keep cached */ }
 }
@@ -6014,7 +6016,7 @@ async function trkSaveMeta(){
   trkCacheDay();
   if(!trkHasCloud()) return;
   try {
-    const res = await fetch(`${TRK_SB_URL}/rest/v1/day_meta`, { method:'POST', headers: trkSbHeaders(true), body: JSON.stringify({ date_key:trkDay, exercise:trkMeta.exercise, omega_logged:trkMeta.omegaLogged, notes:trkMeta.notes, tdee: (trkMeta.tdee!=null && trkMeta.tdee!=='') ? trkNum(trkMeta.tdee) : null, updated_at:new Date().toISOString() }) });
+    const res = await fetch(`${TRK_SB_URL}/rest/v1/day_meta`, { method:'POST', headers: trkSbHeaders(true), body: JSON.stringify({ date_key:trkDay, exercise:trkMeta.exercise, omega_logged:trkMeta.omegaLogged, notes:trkMeta.notes, tdee: (trkMeta.tdee!=null && trkMeta.tdee!=='') ? trkNum(trkMeta.tdee) : null, steps: (trkMeta.steps!=null && trkMeta.steps!=='') ? Math.round(trkNum(trkMeta.steps)) : null, updated_at:new Date().toISOString() }) });
     if(!res.ok) throw new Error('HTTP '+res.status);
   } catch(e){ showToast('⚠ Exercise/notes saved here only — cloud sync failed'); }
 }
@@ -6336,6 +6338,32 @@ function renderTracker(){
     ${tdee!=null ? `<div class="trk-sub" style="margin-top:6px;opacity:.7">Deficit is measured against TDEE. Exercise above is already included, so it isn't added separately.</div>` : `<div class="trk-sub" style="margin-top:6px;opacity:.7">Enter your end-of-day total burn to see today's true deficit (TDEE − food).</div>`}
   </div>`;
 
+  // ── Steps card ──
+  // Steps are logged, not burned: the day's TDEE already accounts for them, so
+  // this never feeds the Burned / Deficit maths (same no-double-count rule the
+  // exercise list follows).
+  const steps = (trkMeta.steps!=null && trkMeta.steps!=='') ? Math.round(trkNum(trkMeta.steps)) : null;
+  const stepTgt = Math.round(trkNum(trkTargets.steps));
+  const stepPct = (steps!=null && stepTgt>0) ? Math.round(steps/stepTgt*100) : 0;
+  const stepsSum = steps!=null
+    ? `${steps.toLocaleString()} steps${stepTgt>0 ? ' · '+stepPct+'% of goal' : ''}`
+    : 'not logged';
+  let stepsNote = 'Log your end-of-day step count. Steps aren’t added to Burned — your TDEE already covers them.';
+  if(steps!=null && stepTgt>0){
+    stepsNote = steps >= stepTgt
+      ? `Goal met — ${(steps-stepTgt).toLocaleString()} over ${stepTgt.toLocaleString()}.`
+      : `${(stepTgt-steps).toLocaleString()} to go to hit ${stepTgt.toLocaleString()}.`;
+  }
+  const stepsHtml = `<div class="nd-meal">
+    <div class="nd-meal-head"><span class="nd-meal-name">Steps</span><span class="nd-meal-sum">${stepsSum}</span></div>
+    ${(steps!=null && stepTgt>0) ? `<div class="nd-steps-bar"><div class="nd-steps-fill" style="width:${Math.max(0,Math.min(100,stepPct))}%"></div></div>` : ''}
+    <div class="trk-field" style="margin-top:12px">
+      <label>Steps today</label>
+      <input id="trkStepsInput" type="number" step="1" min="0" value="${steps!=null?steps:''}" placeholder="e.g. 8000" onchange="trkSetSteps(this.value)">
+    </div>
+    <div class="trk-sub" style="margin-top:6px;opacity:.7">${stepsNote}</div>
+  </div>`;
+
   body.innerHTML = `
     ${stripHtml}
     ${calCardHtml}
@@ -6343,6 +6371,7 @@ function renderTracker(){
     <p class="nd-loglabel">Today's log</p>
     ${mealsHtml}
     ${exerciseHtml}
+    ${stepsHtml}
     ${!trkHasCloud() ? `<div class="nd-empty" style="text-align:center;border:none">No Supabase credentials — logging to this browser only. Add them in Settings to sync.</div>` : ''}
   `;
 }
@@ -6603,10 +6632,10 @@ async function trkAddRecipe(r){
 const PLAN_SLOT_TO_MEAL = { breakfast:'breakfast', lunch:'lunch', dinner:'dinner', snack:'snack', snack2:'snack' };
 
 // Read-modify-write one day's localStorage cache, preserving its meta (exercise,
-// notes, tdee) — trkCacheDay() only ever writes the day currently being viewed.
+// notes, tdee, steps) — trkCacheDay() only ever writes the day currently viewed.
 function _trkPatchDayCache(dateKey, mutate){
   const k = 'ds_trk_day_'+dateKey;
-  let o = { entries: [], meta: { exercise:[], omegaLogged:false, notes:'', tdee:null } };
+  let o = { entries: [], meta: { exercise:[], omegaLogged:false, notes:'', tdee:null, steps:null } };
   try { const s = localStorage.getItem(k); if(s) o = JSON.parse(s); } catch(e){}
   o.entries = mutate(o.entries || []);
   try { localStorage.setItem(k, JSON.stringify(o)); } catch(e){}
@@ -6722,16 +6751,22 @@ async function trkSetTdee(v){
   trkMeta.tdee = (v==='' || v==null || !(n>0)) ? null : n;
   renderTracker(); await trkSaveMeta();
 }
+async function trkSetSteps(v){
+  const n = Math.round(trkNum(v));
+  trkMeta.steps = (v==='' || v==null || !(n>0)) ? null : n;
+  renderTracker(); await trkSaveMeta();
+}
 
 // ── targets ─────────────────────────────────────────────────────────────────
 function trkOpenTargets(){
   trkModal(`<h3>Daily targets</h3><div class="trk-sub">Used for the rings and remaining-calorie math.</div>
     <div class="trk-row"><div class="trk-field"><label>Calories</label><input id="trkTgCal" type="number" value="${trkTargets.cal}"></div><div class="trk-field"><label>Protein</label><input id="trkTgProt" type="number" value="${trkTargets.prot}"></div></div>
     <div class="trk-row"><div class="trk-field"><label>Carbs</label><input id="trkTgCarb" type="number" value="${trkTargets.carb}"></div><div class="trk-field"><label>Fat</label><input id="trkTgFat" type="number" value="${trkTargets.fat}"></div><div class="trk-field"><label>Fibre</label><input id="trkTgFib" type="number" value="${trkTargets.fib}"></div></div>
+    <div class="trk-field"><label>Daily steps</label><input id="trkTgSteps" type="number" step="1" min="0" value="${trkTargets.steps}"></div>
     <button class="trk-btn" onclick="trkSaveTargets()">Save</button>`);
 }
 function trkSaveTargets(){
-  trkTargets = { cal:trkNum(document.getElementById('trkTgCal').value)||TRK_TARGET_DEFAULTS.cal, prot:trkNum(document.getElementById('trkTgProt').value), carb:trkNum(document.getElementById('trkTgCarb').value), fat:trkNum(document.getElementById('trkTgFat').value), fib:trkNum(document.getElementById('trkTgFib').value) };
+  trkTargets = { cal:trkNum(document.getElementById('trkTgCal').value)||TRK_TARGET_DEFAULTS.cal, prot:trkNum(document.getElementById('trkTgProt').value), carb:trkNum(document.getElementById('trkTgCarb').value), fat:trkNum(document.getElementById('trkTgFat').value), fib:trkNum(document.getElementById('trkTgFib').value), steps:Math.round(trkNum(document.getElementById('trkTgSteps').value)) };
   try { localStorage.setItem('ds_trk_targets', JSON.stringify(trkTargets)); } catch(e){}
   trkCloseModal(); renderTracker();
 }
