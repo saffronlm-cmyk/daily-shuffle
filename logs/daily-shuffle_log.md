@@ -4,6 +4,160 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# Step count logger added to the Tracker, alongside TDEE — PR #84
+**Date:** 2026-09-11
+**Project:** Daily Shuffle — Tracker
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete. PR #84 open as a draft, not merged.
+
+---
+
+## Project Context
+Unrelated to the cloud-sync run of 2026-09-09/10 (PRs #80–#82) - that stream is
+finished as far as this session is concerned and nothing here touches it. The relevant
+prior context is the 2026-06-25 entry, which built the Tracker's TDEE field and the
+deficit maths it drives. This session extends the same `day_meta` row with a second
+per-day figure.
+
+## Session Goal
+Saffron: "Alongside TDEE, I'd like to add a step count logger." Build a per-day step
+count into the Tracker, persisted and synced the way TDEE already is.
+
+## State Before This Session
+The Tracker's Exercise card carried a single TDEE input writing `day_meta.tdee`. There
+was no step count anywhere in the app, in the schema, or in the local mirror. Branch
+`claude/step-count-logger-nakj7q` existed at `origin/main` with no commits of its own.
+
+## What Was Done
+
+### 1. Schema
+Migration `add_steps_to_day_meta` on `jsxcctrskkkxgdxfaduo`:
+`alter table public.day_meta add column if not exists steps integer;` - nullable,
+additive, existing rows read null. Integer rather than numeric because a step count is
+a whole number; TDEE's `numeric` is the odd one out, not the precedent.
+
+### 2. `trkMeta` gains `steps`
+`trkMeta`'s default shape is written out **five** times in `index.html` and every one
+had to gain `steps:null`, or a day that round-trips through the missing site silently
+drops the field:
+- `let trkMeta = {...}` (initial, ~L5914)
+- `trkLoadCacheDay()`'s `Object.assign` defaults **and** its cache-miss reset (~L5982-3)
+- `trkLoadDay()`'s cloud-load branch **and** its no-row else branch (~L5995)
+- `_trkPatchDayCache()`'s default `o` (~L6609), the plan-sync path
+Plus the `day_meta` upsert body in `trkSaveMeta()` (~L6017), which now sends
+`steps: ... ? Math.round(trkNum(trkMeta.steps)) : null` on the same null-or-number
+pattern TDEE uses.
+
+### 3. The Steps card
+New card rendered after `exerciseHtml` at the foot of the Tracker. Header shows
+`7,500 steps · 75% of goal` (or `not logged`), then a slim progress bar, a number
+input, and a sub-line that counts down to the goal or reports the overshoot. Two new
+CSS rules, `.nd-steps-bar` / `.nd-steps-fill`, using the existing `--fn-border` /
+`--fn-accent` tokens - no new colours introduced.
+
+`trkSetSteps(v)` mirrors `trkSetTdee(v)` exactly, including treating blank, null and
+non-positive input as a clear back to `null` (so 0 steps is not loggable - same
+behaviour as TDEE, and the honest reading is that 0 means "not logged").
+
+### 4. Steps goal
+Added `steps:10000` to `TRK_TARGET_DEFAULTS` and a "Daily steps" field to the Daily
+targets modal. `trkTargets` is loaded with `Object.assign({}, TRK_TARGET_DEFAULTS,
+JSON.parse(saved))`, so anyone with an existing `ds_trk_targets` blob picks up the new
+key from defaults without losing their macros. `trkSaveTargets()` was extended to carry
+`steps` through - it rebuilds the object field-by-field, so omitting it would have
+dropped the goal on the first save.
+
+### 5. Verification
+Beyond ship-check, wrote a throwaway Playwright check (scratchpad only, not committed)
+that drives the real card: it confirms the card renders on a plain tracker open in the
+`not logged` state, that `trkSetSteps('7500')` sets `trkMeta.steps`, writes the
+`ds_trk_day_*` mirror, renders a 75%-wide bar and the "2,500 to go" copy, that clearing
+the input returns it to `null` and removes the bar, that `trkMeta.tdee` is untouched
+throughout, and that no page errors fire. The repo's own smoke test does not reach the
+Tracker's internals, so this was worth doing by hand.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| index.html | Steps card, `trkSetSteps()`, `steps` through every `trkMeta` default and the `day_meta` upsert, steps goal in targets, 2 CSS rules | Modified | `/daily-shuffle/index.html` |
+| sw.js | Cache bumped `daily-shuffle-v51` → `v52` | Modified | `/daily-shuffle/sw.js` |
+| Supabase: `day_meta.steps` | Nullable integer column | Created (migration `add_steps_to_day_meta`) | project `jsxcctrskkkxgdxfaduo` |
+| logs/daily-shuffle_log.md | This entry | Modified | `/daily-shuffle/logs/` |
+
+## Decisions & Reasoning
+- **Steps stay out of the Burned / Deficit maths.** Options: fold a step-derived burn
+  into Burned, or log steps as a bare figure. Chose the bare figure. The 2026-06-25
+  entry locked the invariant that Apple Watch EOD TDEE already includes all movement,
+  which is why logged exercise isn't added on top; steps are the same category of
+  double-count. A code comment on the card says so, so a future refactor doesn't
+  "helpfully" wire it into the strip.
+- **Its own card, not another field in the Exercise card.** The Exercise card is about
+  burn; a step count is not a burn figure, and burying it under the TDEE input would
+  have implied it feeds the same maths. A separate card also gives the goal bar room.
+- **A daily steps goal in `trkTargets`, not a bare number.** A logged step count with
+  nothing to measure against is just a number in a box. The targets modal already owns
+  every other daily goal, so it belongs there. Default 10,000 - the conventional
+  figure, and editable.
+- **`integer`, not `numeric`.** Half a step does not exist. `Math.round()` guards both
+  the write and the render, so a pasted decimal can't reach the column.
+- **No CLAUDE.md change.** Checked: CLAUDE.md names the tracker tables but does not
+  enumerate `day_meta`'s columns, nor does the `recipe-db` skill's schema map, so no
+  stated fact went stale. `claude_md_drift.mjs` agrees (clean).
+
+## Current State (end of session)
+Working. PR #84 open as a draft against `main`, one commit plus this log commit. The
+migration is **already applied to the live project** - it is additive and nullable, so
+`main` is unaffected until the PR merges, and the app on `main` simply never sends or
+reads the column.
+
+ship-check results:
+- JS parse: 3/3 script blocks OK
+- Smoke test: 5/5 checks passed
+- Cache: bumped `daily-shuffle-v51` → `v52` (app-code change)
+- canonicalise: not touched
+- Writes: no new fetch - `trkSaveMeta()` already checks `res.ok` and toasts
+- localStorage: no new keys (steps rides inside `ds_trk_day_*` and `ds_trk_targets`)
+- CLAUDE.md: drift clean, no stated facts changed
+
+## Next Steps
+1. Saffron to merge PR #84 (un-draft first - a draft merge returns 405, see the
+   2026-09-10 entry).
+2. Reopen the PWA once after the merge to pick up `v52`, then log a step count on the
+   Tracker and confirm it survives a refresh and appears on another device. That is the
+   one thing this session could not verify: Supabase is unreachable from the sandbox,
+   so the cloud round-trip is verified by code-read and by the applied migration, not by
+   a live write.
+3. Optional, if it proves useful: a rolling 7-day step average, or steps on the stat
+   strip. The strip is deliberately three cells wide for mobile, so a fourth cell would
+   need a layout decision first.
+
+## Open Questions / Blockers
+None blocking. One open question deferred rather than decided: whether steps should
+ever drive anything (a target-met streak, a nudge when the deficit is large and the
+step count is low). Nothing was built towards it.
+
+## Environment & Config Notes
+- Repo `saffronlm-cmyk/daily-shuffle`, branch `claude/step-count-logger-nakj7q`, PR #84
+  (draft).
+- Supabase project `jsxcctrskkkxgdxfaduo`, table `day_meta`, new column `steps`,
+  migration name `add_steps_to_day_meta`.
+- Service worker cache `daily-shuffle-v52`.
+- No credentials touched; the tracker keeps using the bundled `RECIPE_LIB_*` creds.
+
+## Notes & Gotchas
+- **Five default shapes.** If any future field is added to `trkMeta`, it must be added
+  at all five sites listed in §2 plus the upsert body, or it will be silently dropped
+  on whichever path missed it. `_trkPatchDayCache()` is the easiest one to forget - it
+  is in the plan-sync section, hundreds of lines away from the others.
+- **Clearing the input is how you unset.** Blank, or any value ≤ 0, writes `null`. There
+  is no delete affordance, deliberately - it matches TDEE.
+- **The progress bar only renders when both a count and a goal exist.** Zeroing the
+  steps goal in the targets modal hides the bar and the "% of goal" suffix; the count
+  still logs. That is intended, not a bug.
+
+---
+
 # Merged PR #81, shipped a manual "sync all edits to library" sweep — PR #82
 **Date:** 2026-09-10
 **Project:** Daily Shuffle — cloud sync (continued, fourth act)
