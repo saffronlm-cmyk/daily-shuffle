@@ -4,6 +4,194 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# Screenshot recipe parse died on truncated JSON — max_tokens raised, salvage parser added — PR #86
+**Date:** 2026-09-13
+**Project:** Daily Shuffle — Add Recipe / AI features
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete. PR #86 open as a draft, not merged. Not verified end-to-end against the live API.
+
+---
+
+## Project Context
+Unrelated to the step-count work of 2026-09-11 (PR #84) and the cloud-sync run of
+2026-09-09/10 (PRs #80–#82); nothing here touches either. This sits in the AI-features
+area described in CLAUDE.md's "AI features" section — the five in-browser call sites
+that hit `api.anthropic.com` direct with Saffron's own key.
+
+## Session Goal
+Saffron reported one bug, verbatim: "Add a recipe: quick add with AI screenshot error:
+JSON Parse error: Unterminated string." Diagnose and fix it.
+
+## State Before This Session
+`parseWithAI()` (Add Recipe → Quick add with AI → Screenshot tab) sent
+`max_tokens: 2048` and parsed the reply with a bare `JSON.parse` after a markdown-fence
+strip. No truncation handling, no `stop_reason` check, no loose-parse fallback. Branch
+`claude/quick-add-screenshot-json-error-fqiuep` existed at `origin/main` with no commits
+of its own.
+
+## What Was Done
+
+### 1. Diagnosis
+"JSON Parse error: Unterminated string" is **WebKit's** exact wording for JSON that stops
+mid-string (Chrome says "Unexpected end of JSON input"). That points at a truncated
+response, not a malformed one — and the cause was in the request, not the screenshot.
+
+`parseWithAI` asked for `max_tokens: 2048`. Its schema wants name, mealTypes, cuisine,
+proteinSource, carbType, servings, prepTime, costTier, description, an `ingredients`
+array of **five-key objects**, a `method` array, tips, storage, cravings, notes,
+instagramUrl and a nutrition object. A real recipe overruns 2048 easily — the reply came
+back cut mid-string, `JSON.parse` threw, and everything the model had read off the
+screenshot was discarded. The raw parser message went straight to the status line.
+
+Confirmed the call site: the Tracker's own "Quick add with AI" modal (`trkRunQuickAdd`)
+has **no image path at all**, so "quick add with AI screenshot" can only be the Add
+Recipe panel, whose header is also "Quick add with AI" (index.html ~L1166).
+
+### 2. Removed the cause
+`max_tokens: 2048` → **8192**. Haiku 4.5 allows far more and the request bills only what
+it emits, so this costs nothing in the common case.
+
+### 3. Added a salvage path anyway
+Raising the cap makes truncation rare, not impossible — a longer recipe, or several
+screenshots at once, can still hit it. New shared helpers in the **first** script block,
+directly after `claudeText()`:
+
+- `stripJsonNoise(s)` — block comments, line comments, trailing commas. This is the body
+  the tracker's `trkParseJsonLoose` used to carry, moved out verbatim.
+- `closeTruncatedJson(s)` — one forward scan tracking `inStr`/`esc` and a bracket stack.
+  Records a cut point at every comma and every closing bracket (with a snapshot of the
+  stack at that moment), then rewinds to the last one and appends the reversed snapshot
+  as closers. Returns `{ text, truncated }`, or null if the cut landed before any
+  complete value. `truncated` is `cutStack.length > 0`, which distinguishes a genuinely
+  cut-off reply from a complete-then-chatty one where the rewind only trimmed trailing
+  prose.
+- `parseJsonLoose(raw)` — the entry point. Strips fences, drops leading prose (slices
+  from the first `{`/`[`), then tries four candidates in order (raw, body, noise-stripped
+  raw, noise-stripped body) before the truncation salvage. Returns `{ value, truncated }`
+  and re-throws the original `SyntaxError` if nothing parses.
+
+### 4. Wired it in
+- `parseWithAI` destructures `{ value: parsed, truncated }`, guards that `parsed` is a
+  plain object, and computes `cutShort = truncated || data.stop_reason === 'max_tokens'`.
+  The `stop_reason` half matters because the model can hit the cap on a boundary that
+  still parses cleanly — truncated-but-valid JSON.
+- New `.ai-parse-status.warn` CSS state using the existing `--yellow` token (no new
+  colour). When `cutShort`, the status line warns instead of showing the ✓ success
+  message. An incomplete result must never look like a clean one.
+- The `catch` now replaces a `SyntaxError` with actionable wording rather than passing
+  WebKit's message through.
+- `trkParseJsonLoose(raw)` became `return parseJsonLoose(raw).value;` — kept as a named
+  function because both tracker call sites read better for it. Script blocks share global
+  scope and block 1 defines the helper, so block 2 resolves it fine at call time.
+
+### 5. Downstream fix the salvage exposed
+The parser's rule is "every still-open container keeps its complete members", applied at
+every depth. So a reply cut inside an ingredient object salvages as `{"qty":"2"}` with no
+`item`. `prefillForm`'s legacy fallback then did
+`String(ing.item != null ? ing.item : ing)` → **`"[object Object]"`** in the ingredients
+textarea. Now skips any object ingredient with no usable `item`. This was a latent bug
+for any malformed ingredient, not only truncated ones.
+
+### 6. What I considered and rejected
+- **Making the parser drop the trailing partial object entirely.** Tempting, but there is
+  no consistent recursive rule: in the mid-string case the partial member is a scalar and
+  the comma-rewind drops it naturally, while the `method` array *containing* it is itself
+  a partial member we clearly want to keep. Dropping partial containers recursively would
+  delete the method array too. Kept "keep complete members at every depth" and hardened
+  `prefillForm` instead.
+- **Raising `max_tokens` on the other four call sites.** Out of scope for the reported
+  bug, and they all now have the salvage. Left at 256 / 512 / 1024 / 4096 and documented
+  in CLAUDE.md so the next session can raise one deliberately.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| `index.html` | `max_tokens` 2048→8192; three new JSON helpers after `claudeText()`; `parseWithAI` parse/status/catch rewritten; `.ai-parse-status.warn` CSS; `trkParseJsonLoose` delegates; `prefillForm` skips nameless ingredients | Modified | `/home/user/daily-shuffle/` |
+| `sw.js` | `CACHE` bumped `daily-shuffle-v52` → `v53` | Modified | `/home/user/daily-shuffle/` |
+| `CLAUDE.md` | AI-features section documents both shared reply-reading helpers, the `{ value, truncated }` contract and the warn obligation, plus the remaining `max_tokens` caps | Modified | `/home/user/daily-shuffle/` |
+| `t.mjs` / `helpers.mjs` | 10-case throwaway test suite over the extracted helpers | Created (scratchpad, **not committed**) | session scratchpad |
+
+## Decisions & Reasoning
+- **Raised `max_tokens` AND added a salvage parser, not one or the other.** The cap alone
+  leaves the app fragile to a longer recipe; the salvage alone leaves every long recipe
+  silently partial. Together the common case is clean and the tail case is survivable.
+- **8192, not the model's maximum.** Haiku 4.5 permits far more, but a recipe that needs
+  more than 8192 output tokens is a signal something is wrong (wrong screenshot, a whole
+  article), and an enormous cap just makes a runaway reply slower and dearer. Output is
+  billed on what is emitted, so the headroom is free.
+- **Returned `{ value, truncated }` rather than just the value.** A silently-partial
+  recipe is worse than a visible error — she would save it believing it complete. The
+  flag forces every caller to decide, and the contract is documented in CLAUDE.md.
+- **Treated `stop_reason === 'max_tokens'` as incomplete even when the JSON parses.** The
+  cut can land on a comma or closing brace; parsing cleanly is not evidence of
+  completeness.
+- **Put the helpers in script block 1, not block 2.** Block 2 already depends on block 1
+  and not the reverse; reversing that would be the fragile direction.
+- **Kept `stripJsonNoise`'s comment-stripping regex exactly as the tracker had it**,
+  including its known crudeness (it can touch a `//` inside a string). It only runs after
+  a clean parse has already failed, and changing established behaviour was not this bug.
+- **Warn state uses `--yellow` (`#9a7040`)**, an existing token. BRAND.md governs colour;
+  inventing one for a status line would not survive review.
+
+## Current State (end of session)
+Working and pushed. Branch `claude/quick-add-screenshot-json-error-fqiuep`, draft PR #86.
+Per CLAUDE.md's no-PR-watching rule, no subscription and no check-in were created.
+
+Verified: JS parse check on all three script blocks (all OK), `node scripts/smoke_test.mjs`
+5/5, `node scripts/claude_md_drift.mjs` no drift, and a 10-case suite over the helpers
+extracted from `index.html` — truncation mid-string, mid-object and mid-array; escaped
+quotes and backslashes inside strings; braces inside strings; fenced and prose-wrapped
+replies; comments and trailing commas; clean JSON untouched; unsalvageable cut still
+throwing `SyntaxError`. All pass.
+
+**Not verified against the live API** — that needs her key and a real screenshot.
+
+## Next Steps
+1. Saffron merges PR #86, opens the app (network-first HTML means the new version appears
+   on next open), and retries the screenshot that failed.
+2. If it now parses clean with no ⚠, done — the cap was the whole story.
+3. If the ⚠ "reply was cut short" warning appears, the salvage is doing its job but 8192
+   is still short for that recipe: raise `max_tokens` at `index.html` `parseWithAI`
+   (search `max_tokens: 8192`) rather than touching the parser.
+4. If it still errors, get the console output — `console.error(err)` in `parseWithAI`'s
+   catch logs the real object, and the response shape (not the token cap) would then be
+   the suspect.
+
+## Open Questions / Blockers
+None blocking. One thing worth a decision later: `trkRunQuickAdd` is on `max_tokens: 1024`
+and `generatePlanWithAI` on 512. Both now salvage rather than throw, but a long meal list
+or a big plan could still come back quietly partial. Not raised here because neither was
+reported broken — raise deliberately if she sees a ⚠ or a short result.
+
+## Environment & Config Notes
+Repo `saffronlm-cmyk/daily-shuffle`, branch `claude/quick-add-screenshot-json-error-fqiuep`,
+draft PR #86. `sw.js` `CACHE` now `daily-shuffle-v53`. Credential in play: `ds_api_key`
+in `localStorage` (name only) — the Anthropic key the browser sends direct. No Supabase
+work this session; no migrations, no table writes.
+
+## Notes & Gotchas
+- **`closeTruncatedJson` snapshots the stack with `.slice()` at each cut point and then
+  `.reverse()`s it when closing.** The snapshot matters: the stack at end-of-string is
+  not the stack at the cut point. The reverse matters: closers apply innermost-first.
+  Don't "simplify" either away.
+- **The parser keeps complete members at every depth**, so a partial trailing object
+  survives with whatever keys it got. Anything consuming `parseJsonLoose` output must
+  tolerate an element with missing keys — that is exactly what bit `prefillForm`. The
+  tracker's two call sites are safe because both render a human review step before
+  writing.
+- `parseJsonLoose` slices from the first `{`/`[` but deliberately does **not** slice to
+  the last closer. On a truncated reply the last `}` is an *inner* one, and slicing there
+  would throw away the rest. The tracker's own `[`/`]` slice before calling
+  `trkParseJsonLoose` is harmless (a truncated array of objects has no closing `]`, so
+  the slice no-ops) but is now redundant.
+- `--yellow` is `#9a7040`, a muted brown-gold, not a bright warning yellow. It reads as a
+  caution next to the `#c96060` error red, which is the intent.
+- CLAUDE.md's AI-features section now states the `{ value, truncated }` contract and the
+  obligation to warn. If a sixth call site is added, it inherits that obligation.
+
+---
+
 # Step count logger added to the Tracker, alongside TDEE — PR #84
 **Date:** 2026-09-11
 **Project:** Daily Shuffle — Tracker
