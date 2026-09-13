@@ -428,6 +428,7 @@
   .ai-parse-status { font-size: 13px; color: var(--text3); }
   .ai-parse-status.error { color: #c96060; }
   .ai-parse-status.success { color: var(--green); }
+  .ai-parse-status.warn { color: var(--yellow); }
   .ai-no-key-notice { font-size: 13px; color: var(--text3); background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; margin-bottom: 14px; }
   .ai-no-key-notice a { color: var(--accent); cursor: pointer; text-decoration: underline; }
 
@@ -3817,6 +3818,82 @@ function claudeText(data) {
   return blocks.find(b => b && b.type === 'text')?.text || '';
 }
 
+// ── Loose JSON parsing for model replies ────────────────────────────────────
+// Strip the two kinds of noise a model sometimes leaves in otherwise-valid
+// JSON: JS-style comments (it echoes the `// field` annotations from our own
+// prompts) and trailing commas.
+function stripJsonNoise(s) {
+  return s
+    .replace(/\/\*[\s\S]*?\*\//g, '')        // /* block comments */
+    .replace(/(^|[^:"'])\/\/[^\n\r]*/g, '$1')  // // line comments (skip http://)
+    .replace(/,(\s*[}\]])/g, '$1');            // trailing commas
+}
+
+// Close a JSON document that stops mid-way because the model ran out of output
+// tokens. Walks the text tracking string/escape state and the bracket stack,
+// rewinds to the last point the document was structurally whole (a comma or a
+// closing bracket), then closes whatever containers are still open. Returns
+// null when there is nothing salvageable — i.e. the cut landed before the
+// first complete value.
+//
+// `truncated` distinguishes a genuinely cut-off reply from one that was merely
+// complete-then-chatty, where the rewind just trims trailing prose.
+function closeTruncatedJson(s) {
+  let inStr = false, esc = false;
+  const stack = [];
+  let cut = -1, cutStack = null;
+  for (let i = 0; i < s.length; i++) {
+    const c = s[i];
+    if (inStr) {
+      if (esc) esc = false;
+      else if (c === '\\') esc = true;
+      else if (c === '"') inStr = false;
+      continue;
+    }
+    if (c === '"') { inStr = true; continue; }
+    if (c === '{' || c === '[') { stack.push(c === '{' ? '}' : ']'); continue; }
+    if (c === '}' || c === ']') { stack.pop(); cut = i + 1; cutStack = stack.slice(); continue; }
+    if (c === ',' && stack.length) { cut = i; cutStack = stack.slice(); }
+  }
+  if (cut < 0 || !cutStack) return null;
+  return { text: s.slice(0, cut) + cutStack.reverse().join(''), truncated: cutStack.length > 0 };
+}
+
+// Parse JSON a model may have lightly malformed, trying the cheapest repair
+// first: the text as sent, then with any wrapping prose dropped, then with
+// comments and trailing commas stripped, and finally — if the reply was cut
+// off mid-value — with its dangling containers closed so a partial result is
+// still usable. That last case is what surfaces as "JSON Parse error:
+// Unterminated string" on WebKit/iOS and "Unexpected end of JSON input" on
+// Chrome; before the salvage path it lost the whole parse.
+//
+// Returns { value, truncated }; throws the original SyntaxError if nothing
+// parses. Callers that only want the value can ignore the flag, but anything
+// showing the result to Saffron should warn her when `truncated` is true.
+function parseJsonLoose(raw) {
+  const text = String(raw == null ? '' : raw)
+    .replace(/^```(?:json)?\s*/i, '')
+    .replace(/\s*```$/i, '')
+    .trim();
+
+  const oi = text.indexOf('{'), ai = text.indexOf('[');
+  const start = oi < 0 ? ai : (ai < 0 ? oi : Math.min(oi, ai));
+  const body = start > 0 ? text.slice(start) : text;
+
+  for (const cand of [text, body, stripJsonNoise(text), stripJsonNoise(body)]) {
+    if (!cand) continue;
+    try { return { value: JSON.parse(cand), truncated: false }; } catch (_) {}
+  }
+
+  const closed = closeTruncatedJson(stripJsonNoise(body));
+  if (closed) {
+    // Rewinding to a comma can leave a trailing one behind — strip again.
+    try { return { value: JSON.parse(stripJsonNoise(closed.text)), truncated: closed.truncated }; } catch (_) {}
+  }
+
+  return { value: JSON.parse(text), truncated: false };  // throws the real error
+}
+
 // Estimate per-serving macros from an ingredient list via Claude. Returns
 // {kcal,protein,carbs,fat} or null on any failure (no key, network, bad JSON).
 // Shared by the in-modal "Re-estimate" button and the Add-Recipe submit flow.
@@ -5767,7 +5844,11 @@ Rules:
       },
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
-        max_tokens: 2048,
+        // A full recipe — description, a dozen five-key ingredient objects, a
+        // long method, tips and storage — overruns 2048 tokens, and the reply
+        // came back cut mid-string. Haiku 4.5 allows far more; we only pay for
+        // what it actually emits.
+        max_tokens: 8192,
         system: systemPrompt,
         messages: [{ role: 'user', content: userContent }]
       })
@@ -5781,9 +5862,13 @@ Rules:
     const data = await res.json();
     const raw = claudeText(data);
 
-    // Strip any accidental markdown fences
-    const cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
-    const parsed = JSON.parse(cleaned);
+    // Salvage a reply that was cut short rather than losing the whole parse —
+    // a half-filled form she can finish beats a raw SyntaxError.
+    const { value: parsed, truncated } = parseJsonLoose(raw);
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+      throw new Error('The AI returned something that isn’t a recipe. Try again.');
+    }
+    const cutShort = truncated || data.stop_reason === 'max_tokens';
 
     // Standardise ingredient wording before the form is filled, so it lands as a
     // visible suggestion she can still edit rather than a silent rewrite on save.
@@ -5794,16 +5879,22 @@ Rules:
     }
 
     prefillForm(parsed);
-    statusEl.textContent = '✓ Form pre-filled — review and save!'
+    statusEl.textContent = (cutShort
+        ? '⚠ The AI reply was cut short — some fields may be missing or incomplete. Check each one, and try fewer screenshots at a time.'
+        : '✓ Form pre-filled — review and save!')
       + (renamed.length ? `  Standardised: ${renamed.join(', ')}.` : '');
-    statusEl.className = 'ai-parse-status success';
+    statusEl.className = 'ai-parse-status ' + (cutShort ? 'warn' : 'success');
 
     // Scroll down to the form
     document.querySelector('.form-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
 
   } catch (err) {
     console.error(err);
-    statusEl.textContent = '⚠ ' + (err.message || 'Something went wrong. Check your API key and try again.');
+    // A SyntaxError here means even the salvage path failed, so the raw
+    // "Unterminated string" is noise to her — say what to do instead.
+    statusEl.textContent = '⚠ ' + (err instanceof SyntaxError
+      ? 'Couldn’t read the recipe from the AI reply — it came back malformed or badly cut off. Try again, or split the screenshots into smaller batches.'
+      : (err.message || 'Something went wrong. Check your API key and try again.'));
     statusEl.className = 'ai-parse-status error';
   } finally {
     btn.disabled = false;
@@ -5858,6 +5949,11 @@ function prefillForm(r) {
     const lines = [];
     let lastGroup = null;
     for (const ing of r.ingredients) {
+      if (ing == null) continue;
+      // A reply cut off mid-object leaves a nameless ingredient ({"qty":"2"}
+      // and nothing else). It has no line to contribute, and the old fallback
+      // stringified it into the textarea as "[object Object]" — drop it.
+      if (typeof ing === 'object' && !String(ing.item ?? '').trim()) continue;
       // Tolerate both the new structured shape and any legacy {group,item} blobs.
       const grp = ing.group || null;
       if (grp && grp !== lastGroup) {
@@ -6918,17 +7014,12 @@ async function trkCommitBulkStaples(){
 }
 
 // ── AI quick add ────────────────────────────────────────────────────────────
-// Parse JSON that an LLM may have lightly malformed: strip JS-style comments
-// (the model sometimes echoes the `// field` annotations from our prompt) and
-// trailing commas before commas/closing brackets. Both are the usual cause of
-// "Property name must be a string literal" from JSON.parse on WebKit/iOS.
+// Thin wrapper on the shared parseJsonLoose() (defined in the first script
+// block, above) — it handles the comments and trailing commas this used to
+// handle itself, plus a reply cut off by max_tokens. Kept as a named function
+// because both tracker call sites read better for it.
 function trkParseJsonLoose(raw){
-  try { return JSON.parse(raw); } catch(_){}
-  const cleaned = raw
-    .replace(/\/\*[\s\S]*?\*\//g, '')      // /* block comments */
-    .replace(/(^|[^:"'])\/\/[^\n\r]*/g, '$1') // // line comments (skip http://)
-    .replace(/,(\s*[}\]])/g, '$1');        // trailing commas
-  return JSON.parse(cleaned);
+  return parseJsonLoose(raw).value;
 }
 function trkOpenQuickAdd(){
   const meal = trkChooserMeal();

@@ -220,6 +220,23 @@ sharing the `claudeText()` response-parsing helper:
 | `trkRunQuickAdd` | Tracker | Free-text "what I ate" → structured entries |
 | `trkRunBulkStaples` | Tracker | Bulk staple paste import |
 
+**Reading a reply** goes through two shared helpers, both in the first script block:
+`claudeText()` finds the text block (never index `content[0]` — a `thinking` block can
+lead), and **`parseJsonLoose()`** turns that text into a value. The latter tries, in
+order: the raw text; the text with wrapping prose dropped; comments and trailing commas
+stripped (`stripJsonNoise()`); and finally `closeTruncatedJson()`, which closes the
+dangling containers of a reply the model cut off mid-value. It returns
+`{ value, truncated }` — **`truncated` means the result is incomplete, so any caller
+showing it to Saffron must warn her** (`parseWithAI` does, via the `.ai-parse-status.warn`
+state). The tracker's `trkParseJsonLoose()` is now a thin wrapper on it.
+
+Truncation is a real failure mode, not a theoretical one: `parseWithAI`'s screenshot path
+ran on `max_tokens: 2048`, which a full recipe overruns, and the cut-off reply surfaced as
+a raw `JSON Parse error: Unterminated string`. It now asks for **8192** and salvages what
+arrives. If a call site starts reporting truncation often, raise its `max_tokens` rather
+than leaning on the salvage — the remaining caps are 256 (`fetchMacroEstimate`), 512
+(`generatePlanWithAI`), 1024 (`trkRunQuickAdd`) and 4096 (`trkRunBulkStaples`).
+
 `parseWithAI` runs its parsed ingredient names through **`CANON_TERMS`** (a synonym →
 preferred-term map next to `_STOP_ADJ` in `index.html`) before filling the Add Recipe
 form, so new recipes land on one vocabulary instead of drifting into near-duplicate
