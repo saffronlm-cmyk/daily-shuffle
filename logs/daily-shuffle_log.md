@@ -4,6 +4,79 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# Root README.md added
+**Date:** 2026-10-01
+**Project:** Daily Shuffle — Docs
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete. Draft PR open on `claude/add-readme`, not merged.
+
+---
+
+## Project Context
+Docs-only session, unrelated to any open workstream. The prior entry (2026-09-11, step
+count logger, PR #84) is still the latest app-code change; nothing here touches it.
+
+## Session Goal
+Saffron: "I need to add a README". Add a human-facing `README.md` at the repo root.
+
+## State Before This Session
+The repo had no root README. `CLAUDE.md` served as the only overview, but it's written
+for agent sessions and is far too deep for a human landing on the repo. `scripts/README.md`
+and `legacy/README.md` already existed and covered their own folders.
+
+## What Was Done
+- Wrote `README.md`: one-paragraph pitch, a table of the five live tabs, how to run it
+  locally (`python3 -m http.server`, since service workers won't register from
+  `file://`), how to deploy (static host, five files needed), optional Settings setup
+  (Anthropic key, personal Supabase creds), a short architecture section, the two
+  pre-commit checks (JS parse + smoke test) plus the two always-on conventions (cache
+  bump, `res.ok` + toast), and an index of the planning docs.
+- Added a `README.md` bullet to CLAUDE.md's Architecture list. Required, not cosmetic:
+  `scripts/claude_md_drift.mjs` check 3 fails on any tracked root `.md` not mentioned in
+  CLAUDE.md.
+- Ran the drift check: no drift.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| README.md | Human-facing repo overview | Created | /home/user/daily-shuffle/ |
+| CLAUDE.md | Added README.md bullet under Architecture | Modified | /home/user/daily-shuffle/ |
+| logs/daily-shuffle_log.md | This entry | Modified | /home/user/daily-shuffle/logs/ |
+
+## Decisions & Reasoning
+- **README deliberately shallow; CLAUDE.md stays the reference.** Duplicating CLAUDE.md's
+  detail would create a third copy of facts to keep in sync (after CLAUDE.md and
+  `project-instructions.md`). The README links out instead.
+- **No volatile numbers in the README** (no cache version, no row counts, no recipe
+  counts). CLAUDE.md repeatedly warns those rot; the README avoids stating them at all.
+- **Audience assumed to be a human developer / future Saffron**, not end users or
+  customers. If it's wanted as a public-facing pitch (MONETIZATION.md rollout), it would
+  need screenshots and a different tone.
+- **No `sw.js` cache bump**: doc-only change, per CLAUDE.md.
+
+## Current State (end of session)
+README.md and the CLAUDE.md mention are committed on `claude/add-readme` with a draft PR.
+Drift check passes. No app code changed.
+
+## Next Steps
+1. Saffron to review and merge the draft PR.
+2. Optional: add screenshots to the README if it's ever meant for a public audience.
+
+## Open Questions / Blockers
+N/A
+
+## Environment & Config Notes
+Repo `saffronlm-cmyk/daily-shuffle`, branch `claude/add-readme`. No cache bump (still
+`daily-shuffle-v52`). No PR watching, per CLAUDE.md.
+
+## Notes & Gotchas
+- The README restates a few CLAUDE.md facts (tab list, sw.js strategy, the parse-check
+  snippet, cache-bump and `res.ok` rules). The new CLAUDE.md bullet says to update the
+  README if any of those change. The drift script does NOT check README content.
+
+---
+
 # Step count logger added to the Tracker, alongside TDEE — PR #84
 **Date:** 2026-09-11
 **Project:** Daily Shuffle — Tracker

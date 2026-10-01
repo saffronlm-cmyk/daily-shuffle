@@ -79,6 +79,9 @@ Single user (Saffron), no auth, deployed as static files.
       2026-08-24. The one that doesn't is `M&S Only 5 Ingredients Multigrain Hoops`
       — a priced SKU with no `Ingredient` row at all (0 recipe occurrences), left
       deliberately.
+- **`README.md`** — human-facing overview (what the app is, how to run/deploy it, the
+  two pre-commit checks, a doc index). Deliberately shallow; this file stays the full
+  reference. If you change a fact it states (tabs, run steps, conventions), update it too.
 - **Planning / handoff docs** — read before touching the related area:
   - `logs/daily-shuffle_log.md` — rolling session log, newest first. **Read the top entry
     at the start of every session** — it says exactly where things stand.
