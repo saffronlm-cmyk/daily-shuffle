@@ -4,6 +4,72 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# README gains "How the AI features work" section
+**Date:** 2026-10-02
+**Project:** Daily Shuffle — Docs
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete. Draft PR open on `claude/add-readme`, not merged.
+
+---
+
+## Project Context
+Follow-up to the 2026-10-01 entry (root README.md added). That PR, #87, was merged to
+`main` as squash commit `19d2cea` at Saffron's request, so the 2026-10-01 entry's
+"not merged" status line is stale. It was left unedited, per the prepend-only rule.
+
+## Session Goal
+Saffron supplied a ready-written "How the AI features work" section and asked for it to
+be added to the README alongside "What it does".
+
+## State Before This Session
+README.md live on `main` with sections: What it does, Running it, How it's built,
+Development, Further reading. No AI section.
+
+## What Was Done
+- Restarted `claude/add-readme` from `origin/main` (PR #87 was merged, so no stacking).
+- Inserted Saffron's section verbatim as its own `##` section directly after "What it
+  does" and before "Running it".
+- Checked the two references in her text before committing: the server-side proxy is
+  task 2B.4 in `MONETIZATION.md`, and `logs/macro-audit.md` exists.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| README.md | New "How the AI features work" section | Modified | /home/user/daily-shuffle/ |
+| logs/daily-shuffle_log.md | This entry | Modified | /home/user/daily-shuffle/logs/ |
+
+## Decisions & Reasoning
+- **Text used verbatim.** It was Saffron's own copy and every fact checked out against
+  CLAUDE.md's AI features section (five call sites, shared `claudeText()` helper,
+  whole-recipe totals divided in JS, staple injection, `CANON_TERMS`).
+- **Placed as a sibling section, not nested under "What it does".** Her text came with
+  its own `##` heading, and the section's design-choices and known-limits material
+  goes beyond "what the app does".
+- **No CLAUDE.md change.** CLAUDE.md doesn't describe the README's sections, and the
+  drift check passes. No cache bump: docs only.
+
+## Current State (end of session)
+Committed and pushed on `claude/add-readme`, draft PR open. No app code changed.
+
+## Next Steps
+1. Saffron to review and merge the draft PR.
+
+## Open Questions / Blockers
+N/A
+
+## Environment & Config Notes
+Repo `saffronlm-cmyk/daily-shuffle`, branch `claude/add-readme` (rebuilt from `main` at
+`19d2cea`). No PR watching, per CLAUDE.md.
+
+## Notes & Gotchas
+- The README now restates CLAUDE.md's AI facts (model name, five features, design
+  choices). If an AI call site is added, removed or changes model, update both files.
+- The section switches voice: "she checks" in one bullet, "the user's own staple
+  products" in another. Kept as written; harmonise if the README is ever made public.
+
+---
+
 # Root README.md added
 **Date:** 2026-10-01
 **Project:** Daily Shuffle — Docs

@@ -16,6 +16,27 @@ It's a Progressive Web App that ships as plain static files: no build step, no b
 
 Tabs retired during the foundations restructure (Pantry, Discover, Wellness, Macro Calculator, the old Food Log) are kept in [`legacy/`](legacy/README.md). They're not loaded by the live app.
 
+## How the AI features work
+
+Five features call Claude (Haiku 4.5) from the browser, sharing one response-parsing helper.
+
+| Feature | Takes | Returns |
+|---|---|---|
+| Recipe parsing | Pasted text or screenshots | Structured recipe JSON that pre-fills the Add Recipe form |
+| Macro estimate | A recipe's ingredient list | Whole-recipe nutrition totals |
+| AI meal plan | The recipe library | A generated plan |
+| Tracker quick-add | Free text ("what I ate") | Structured log entries |
+| Bulk staples | A pasted product list | Staple product rows |
+
+Design choices:
+
+- **Output is reviewed, not trusted.** Parsed recipes fill a form she checks before saving; nothing reaches the library unseen.
+- **Arithmetic stays in code.** The model returns whole-recipe totals and the app divides by servings, rather than asking the model to do both.
+- **Grounded in real data.** Macro estimates and quick-add receive the user's own staple products with exact label values, so the model only falls back to generic estimates for ingredients not on that list.
+- **One vocabulary.** Parsed ingredient names are mapped to preferred terms (courgette, not zucchini) and the rename is shown, never silent.
+
+Known limits: the API key lives in the browser, so the app is single-user by design; a server-side proxy is scoped in `MONETIZATION.md`. There are no automated evals. Stored macros have been audited and corrected by hand (`logs/macro-audit.md`).
+
 ## Running it
 
 There's nothing to install. Serve the folder over HTTP, since service workers won't register from `file://`:
