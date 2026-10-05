@@ -4,6 +4,162 @@ Rolling log of Claude sessions on the Daily Shuffle project. Newest entry at the
 
 ---
 
+# Recipe detail rebuilt on the Claude Design prototype
+**Date:** 2026-10-05
+**Project:** Daily Shuffle — Visual design / Recipe detail
+**Mode:** Rolling Log + GitHub Push
+**Status:** Complete. Committed and pushed on `claude/eloquent-wright-dqomga`, draft PR open, not merged.
+
+---
+
+## Project Context
+First session of a visual-design pass. Saffron feels the app looks "rudimentary / AI
+slop" and has been designing replacement screens in **Claude Design** (claude.ai/design).
+This session ported the first of those designs into `index.html`. The README work in the
+2026-10-02 entry is unrelated.
+
+## Session Goal
+Diagnose why the app looks generic, then port Saffron's Claude Design prototype
+"Daily Shuffle – Recipe Detail + Nutrition" into the live app.
+
+## State Before This Session
+- `BRAND.md` tokens (cream / oxblood / Fraunces + Inter / `No. 001` numbering) were
+  already partly applied in `index.html` (`--fn-*` / `--ed-*` vars, editorial headers,
+  the `.nd-*` Tracker dashboard).
+- The recipe detail popup was a 680px centred card: text "♡ Save" button, × close,
+  Units / Multiply / Custom / Edit / Delete rows stacked above the ingredients, and the
+  cost line in green inside the nutrition block.
+- No recipe has a photo (no image field anywhere). Cards and hero use gradients.
+
+## What Was Done
+1. **Diagnosis.** Screenshotted all five tabs at 390px in headless Chromium. Findings
+   given to Saffron: no photography (the biggest tell); the same pill + hairline border
+   on every element; the identical "KICKER / Serif title." header on every tab; a
+   stray blue "AI plan" button (off-palette); the Shuffle tab being a form dump with the
+   plan last; bare grey empty/loading states. Note: the sandbox is offline, so Google
+   Fonts don't load in screenshots — the serif you see there is a fallback, not Fraunces.
+2. **Getting the design.** Claude Code can't read `claude.ai/design/...` share links:
+   the Artifact reader takes only `claude.ai/artifact/...`, and `DesignSync` is reserved
+   for the user-started `/design-sync` skill. Saffron uploaded the exported
+   `.html` instead. It's a **self-unpacking bundle** (fonts + React inlined, ~640 KB);
+   to read it, render it in headless Chromium, wait ~5s, dump `page.content()`, and
+   strip the `data:` URIs. The bundle holds two 390×844 phone mocks: **Recipe Detail**
+   and **Nutrition Dashboard**.
+3. **Comparison.** The Nutrition Dashboard mock is already in the app almost verbatim
+   (`renderTracker()`, `.nd-strip`, `.nd-cal-card`, `.nd-macros`, `.nd-meal` — same
+   values, same structure), so no work was needed there. The recipe detail was the gap.
+4. **Port.** Rewrote `openModal()` in `index.html` around the prototype:
+   - `.rd-hero`: the design's radial oxblood-brown gradient, `min(326px, 40vh)` tall, a
+     faint `#ic-utensils` mark (the design's "RECIPE PHOTO" label dropped), and
+     44px glass buttons — back (closes), heart (`.rd-fav`, bright-oxblood fill when
+     active), more (`.rd-menu`).
+   - `.rd-body` sheet overlapping the hero by 24px: kicker + `No. ###`, Fraunces
+     title, meta row (Serves with the existing override input restyled as a dashed
+     underline, time, ££), description *after* the meta row (design order), a "Batch"
+     ×1–×4 + Custom row, numbered ingredients (`.rd-ing-no`, Fraunces 01/02…),
+     method, tips/storage, nutrition with a split header
+     (`nutritionHeadHtml()` → "Nutrition" / "per serving · AI estimate").
+   - `.rd-foot` sticky footer (only when `computeRecipeCost()` has a total > 0):
+     "Total · N servings · k unpriced" + total on the left, per-serving price in
+     Fraunces 24px on the right. Built by `recipeFooterHtml()`; total and servings
+     rescale on batch change.
+   - More menu: Edit recipe (opens the inline tag editor and scrolls to it), View
+     source on Instagram, a Units Metric/Imperial toggle, Delete recipe.
+   - Phones (≤767px): `.modal-overlay` padding 0 and `.modal` full-screen with no radius.
+     Desktop: 480px card, 88vh max.
+5. **Bugs fixed along the way** (all verified in headless Chromium):
+   - `setModalMultiplier()` replaced `#modal-ingredients-section` via `outerHTML` with
+     markup that had no id, so the **second** multiplier tap silently did nothing. Now
+     uses `innerHTML`.
+   - `setModalMultiplier()` looked the recipe up with `x.id === recipeId` (strict), so
+     it no-opped on locally saved numeric-id recipes. Now `getRecipeById()`.
+   - Recipe-card `No. ###` came from the index in the **filtered** list, so numbers
+     shifted with every filter, which breaks BRAND.md §6 "stable per recipe". New
+     `archiveNo(r)` (index in `recipes`) is used by both card and detail.
+6. `estimateNutritionWithAI()`'s in-place re-render now uses `nutritionHeadHtml()` and
+   the `.rd-status` class instead of the green inline-styled "✓ Saved!".
+7. Removed dead `.modal-fav-btn` CSS (both the base and editorial overrides). Added
+   `#ic-arrow-left` and `#ic-more-vertical` to the SVG sprite.
+
+## Artifacts Produced / Modified
+
+| File | What it is | Status | Location |
+|------|------------|--------|----------|
+| index.html | `openModal()` rewrite; new `archiveNo`, `nutritionHeadHtml`, `recipeFooterHtml`, `toggleRecipeMenu`, `closeRecipeMenu`; `buildIngredientsHtml` numbering; `setModalMultiplier` fixes; `.rd-*` CSS block after `.modal-close` editorial override; 2 new sprite icons | Modified | /home/user/daily-shuffle/ |
+| sw.js | `CACHE` `daily-shuffle-v52` → `v53` | Modified | /home/user/daily-shuffle/ |
+| logs/daily-shuffle_log.md | This entry | Modified | /home/user/daily-shuffle/logs/ |
+
+The design export itself was **not** committed (scratchpad only).
+
+## Decisions & Reasoning
+- **"Add to plan" footer button left out** (Saffron chose this over "pick a day" and
+  "log to Tracker"). No add-to-plan feature exists — plans are built by shuffling, with
+  per-slot swap via `openPicker()`. It's a separate feature to design properly.
+- **Footer right side is the per-serving price**, replacing the absent CTA, so the
+  footer still has a focal point; cost is central to the app's purpose.
+- **Units toggle, Edit, Delete and Source moved into the More menu.** The design shows
+  none of them in the body; they're set-and-forget or rare actions. Delete is muted
+  (`--fn-text-muted`), not oxblood — BRAND.md reserves oxblood for heart and streak.
+- **Kept "Custom" multiplier and the Serves override input** even though the mock
+  doesn't show them: they're existing features, so they were restyled, not dropped.
+- **Hero kept at the design's height (capped at 40vh)** even without photos, on the
+  basis that it's her design call. The cap stops the title being pushed below the fold
+  on short screens.
+- **`--cta` / tab bar stay `#3D0F13` (deep oxblood).** Earlier in the session I told
+  Saffron to switch them to near-black per BRAND.md §1a (`--cta #1C1815`). That was
+  wrong: both her prototype and the app's own `:root` comment use `#3D0F13`
+  deliberately. **BRAND.md's `--cta` row is stale** relative to her current design;
+  it was not edited this session (flagged to her instead).
+
+## Current State (end of session)
+Recipe detail matches the prototype on phone and desktop. Verified in headless
+Chromium with a fixture recipe: hero buttons, heart toggle, More menu, units toggle,
+batch ×2 then ×3 rescaling ingredients and footer, no page errors. Smoke test 5/5,
+JS parse 3/3, drift check clean. Not yet seen on a real phone or with real fonts.
+
+## Next Steps
+1. Saffron to open the draft PR's preview / merge, then check the recipe detail on her
+   phone (real fonts, safe-area insets in standalone PWA mode).
+2. Decide whether BRAND.md §1a `--cta` should change to `#3D0F13` to match the app and
+   the prototype; if yes, update the table and §4 "near-black pill" wording.
+3. Port the next Claude Design screen. The likeliest high-value ones are the Shuffle
+   tab (filters → bottom sheet per BRAND.md §4.9, plan first) and the recipe library.
+   Ask her to export each as `.html` and upload it; unpack as described in Notes.
+4. Photography: add an `image_url` column to `recipes` and render it in `.rd-hero` and
+   `.rl-card-grad` (swap the gradient for `background-image`). Proposed source:
+   crop from the screenshot `parseWithAI` already receives.
+5. Design an add-to-plan flow, then add the footer CTA from the prototype
+   (`Add to plan`, `--cta` pill, right side of `.rd-foot`).
+
+## Open Questions / Blockers
+- BRAND.md `--cta` colour (see Next Steps 2). Saffron's call.
+- Add-to-plan behaviour (which day/slot; behaviour when the plan is locked).
+
+## Environment & Config Notes
+Repo `saffronlm-cmyk/daily-shuffle`, branch `claude/eloquent-wright-dqomga` (cut from
+`main` at `82ecf8d`). Cache now `daily-shuffle-v53`. No credentials used. The headless
+check seeded `ds_recipe_cache`, `ds_recipe_cache_full` and a dummy `ds_api_key`
+(value irrelevant, never sent).
+
+## Notes & Gotchas
+- **Claude Design exports are self-unpacking bundles.** Don't grep the raw file. Render
+  it in Playwright (file:// works), wait for `#__bundler_loading` to go, dump
+  `page.content()`, then regex out `data:` URIs (fonts) to get readable markup (~60 KB).
+  The mock's live logic sits in a `<script type="text/x-dc">` `DCLogic` class at the
+  bottom.
+- Claude Code cannot open `claude.ai/design/p/...` links; ask for the export.
+- `#modal-ingredients-section` must keep its id — always re-render with `innerHTML`.
+- `.mult-btn` is now also used for the Units buttons inside `.rd-menu`;
+  `setModalMultiplier` scopes its active-state update to `.rd-batch .mult-btn` so it
+  doesn't clear the Units state. `setUnitPref` still matches by button text.
+- `.modal` / `#modalContent` is used **only** by the recipe detail, which is why its
+  base styles could be restructured (padding 0, flex column). `.modal-close` is still
+  used by Settings — its CSS was left alone.
+- The "5 unpriced" in test screenshots is because the fixture had an empty price book,
+  not a bug.
+
+---
+
 # README gains "How the AI features work" section
 **Date:** 2026-10-02
 **Project:** Daily Shuffle — Docs
