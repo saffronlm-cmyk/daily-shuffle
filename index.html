@@ -163,9 +163,6 @@
   .fav-btn:hover { color: var(--accent); transform: scale(1.2); }
   .fav-btn.active { color: var(--accent); }
   .recipe-card { position: relative; }
-  .modal-fav-btn { background: none; border: 1px solid var(--border); color: var(--text3); padding: 6px 12px; border-radius: 7px; font-size: 13px; transition: all .15s; }
-  .modal-fav-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .modal-fav-btn.active { background: var(--accent-tint); border-color: var(--accent); color: var(--accent); }
 
   /* Servings override */
   .servings-override { display: inline-flex; align-items: center; gap: 6px; }
@@ -796,9 +793,91 @@
                     display: flex; align-items: baseline; justify-content: center; gap: 4px; white-space: nowrap; }
   .nc-val { font-size: 12px; font-weight: 400; color: var(--fn-text); }
   .nc-lbl { font-size: 11px; color: var(--fn-text); text-transform: none; letter-spacing: .01em; margin-top: 0; }
-  .modal-fav-btn { border-radius: var(--radius-pill); border-color: var(--fn-border); color: var(--fn-text-muted); }
-  .modal-fav-btn.active { background: transparent; border-color: var(--ed-oxblood-bright); color: var(--ed-oxblood-bright); }
   .modal-close { background: var(--fn-bg); border-color: var(--fn-border); color: var(--fn-text-muted); }
+
+  /* ── Recipe detail — Claude Design prototype "Recipe Detail & Nutrition" ──
+     Hero with glass icon buttons → content sheet overlapping it → sticky cost
+     footer. Full-screen on phones, a centred card from 768px up. The hero is a
+     gradient until recipes carry photos. */
+  .modal { padding: 0; border: none; overflow: hidden; display: flex; flex-direction: column;
+           max-width: 480px; box-shadow: var(--shadow-card); }
+  .rd-scroll { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+  .rd-hero { position: relative; height: min(326px, 40vh); flex-shrink: 0;
+             background: radial-gradient(130% 100% at 30% 15%, #7A3D2E 0%, #5C2A24 45%, #3B1C1A 100%); }
+  .rd-hero::before { content: ''; position: absolute; inset: 0;
+                     background: linear-gradient(rgba(0,0,0,.28) 0%, rgba(0,0,0,0) 34%, rgba(0,0,0,0) 60%, rgba(59,46,40,.35) 100%); }
+  .rd-hero-mark { position: absolute; left: 50%; top: 46%; transform: translate(-50%,-50%);
+                  width: 46px; height: 46px; color: rgba(243,236,216,.4); }
+  .rd-hero-btns { position: absolute; top: calc(16px + env(safe-area-inset-top)); left: 16px; right: 16px;
+                  display: flex; justify-content: space-between; z-index: 2; }
+  .rd-hero-right { display: flex; gap: 8px; }
+  .rd-glass { width: 44px; height: 44px; border-radius: 50%; border: none; padding: 0; cursor: pointer;
+              display: flex; align-items: center; justify-content: center; color: var(--fn-text);
+              background: var(--glass-tint-fn); backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur)); }
+  .rd-glass .ic { width: 20px; height: 20px; }
+  .rd-fav .ic { width: 21px; height: 21px; fill: none; stroke: var(--fn-text); }
+  .rd-fav.active .ic { fill: var(--ed-oxblood-bright); stroke: var(--ed-oxblood-bright); }
+  .rd-more-wrap { position: relative; }
+  .rd-menu { display: none; position: absolute; top: 52px; right: 0; min-width: 220px; padding: 6px;
+             background: var(--fn-surface); border-radius: var(--radius-sm); box-shadow: var(--shadow-card); }
+  .rd-menu.open { display: block; }
+  .rd-menu > button, .rd-menu > a { display: block; width: 100%; text-align: left; background: none; border: none;
+             font-family: var(--font-ui); font-size: 14px; font-weight: 500; color: var(--fn-text);
+             padding: 10px 12px; border-radius: 8px; cursor: pointer; }
+  .rd-menu > button:hover, .rd-menu > a:hover { background: var(--fn-bg); color: var(--fn-text); }
+  .rd-menu-units { display: flex; align-items: center; gap: 6px; padding: 8px 12px;
+                   border-top: var(--border-hairline); border-bottom: var(--border-hairline); margin: 4px 0; }
+  .rd-menu-units span { font-family: var(--font-ui); font-size: 12px; color: var(--fn-text-muted); margin-right: auto; }
+  .rd-menu-units .mult-btn { padding: 5px 11px; font-size: 12px; }
+  .rd-menu > .rd-menu-danger { color: var(--fn-text-muted); }
+  .rd-body { position: relative; background: var(--fn-surface); border-radius: 24px 24px 0 0; margin-top: -24px;
+             padding: 24px 24px 28px; box-shadow: var(--shadow-card); }
+  .rd-body .modal-header-row { padding-right: 0; margin-bottom: 8px; }
+  .rd-body .modal-title { margin-bottom: 0; }
+  .rd-body .modal-meta { gap: 18px; margin: 14px 0 0; }
+  .rd-body .modal-desc { margin: 16px 0 0; }
+  .rd-body .servings-input { width: 2.6em; padding: 1px 2px; background: transparent; border: none;
+                             border-bottom: 1px dashed var(--fn-accent); border-radius: 0; color: var(--fn-text-muted);
+                             font-family: var(--font-ui); font-size: 13px; text-align: center; }
+  .rd-batch { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 20px; }
+  .rd-batch-lbl { font-family: var(--font-ui); font-size: 11px; font-weight: 600; letter-spacing: .08em;
+                  text-transform: uppercase; color: var(--fn-text-muted); margin-right: 2px; }
+  .rd-batch .mult-btn { font-size: 13px; }
+  .rd-batch-note { font-family: var(--font-ui); font-size: 12px; color: var(--fn-text-muted); }
+  .rd-body .modal-divider { margin: 24px 0; }
+  .rd-body .modal-section h4 { font-size: 12px; font-weight: 600; margin-bottom: 14px; }
+  .rd-body .recipe-ingredients { gap: 0; }
+  .rd-body .recipe-ingredient-item { display: flex; align-items: baseline; gap: 12px; line-height: 1.4; }
+  .rd-ing-no { font-family: var(--font-display); font-size: 13px; color: var(--fn-accent); min-width: 20px; flex-shrink: 0; }
+  .rd-body .recipe-ingredient-group { font-family: var(--font-ui); font-size: 11px; font-weight: 600; letter-spacing: .08em;
+                                      margin: 18px 0 2px; }
+  .rd-body .recipe-ingredient-group:first-child { margin-top: 0; }
+  .rd-body .recipe-method-steps { gap: 16px; }
+  .rd-body .recipe-method-step { padding-left: 40px; }
+  .rd-body .recipe-method-step::before { top: 0; }
+  .rd-sec-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+  .rd-body .rd-sec-head h4 { margin-bottom: 0; }
+  .rd-sec-head span { font-family: var(--font-ui); font-size: 11px; color: var(--fn-text-muted); text-align: right; }
+  .rd-body .computed-cost, .rd-body .computed-cost strong { color: var(--fn-text); }
+  .rd-body .btn-estimate { background: transparent; color: var(--fn-text-muted); border: 1px solid var(--fn-border);
+                           border-radius: var(--radius-pill); font-family: var(--font-ui); font-weight: 500; font-size: 13px; }
+  .rd-body .btn-estimate:hover:not(:disabled) { background: transparent; border-color: var(--fn-accent); color: var(--fn-text); }
+  .rd-status { font-family: var(--font-ui); font-size: 12px; color: var(--fn-text-muted); margin-left: 10px; }
+  .rd-empty-note { font-family: var(--font-ui); font-size: 13px; color: var(--fn-text-muted); margin-bottom: 10px; }
+  .rd-body .recipe-tips { background: var(--fn-bg); border: none; border-radius: var(--radius-sm); color: var(--fn-text-muted);
+                          font-size: 14px; }
+  .rd-foot { flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; gap: 16px;
+             background: var(--fn-surface); border-top: var(--border-hairline);
+             padding: 14px 24px calc(14px + env(safe-area-inset-bottom)); box-shadow: 0 -6px 20px rgba(59,46,40,.08); }
+  .rd-foot p { margin: 0; }
+  .rd-foot-lbl { font-family: var(--font-ui); font-size: 12px; color: var(--fn-text-muted); }
+  .rd-foot-total { font-family: var(--font-ui); font-size: 13px; color: var(--fn-text); margin-top: 4px; }
+  .rd-foot-pp { display: flex; flex-direction: column; align-items: flex-end; }
+  .rd-foot-pp-val { font-family: var(--font-display); font-weight: 500; font-size: 24px; line-height: 1.1; color: var(--fn-text); }
+  @media (max-width: 767px) {
+    .modal-overlay { padding: 0; }
+    .modal { max-width: none; width: 100%; height: 100%; max-height: none; border-radius: 0; }
+  }
 
   /* ── Shuffle day cards — editorial register ── */
   .cal-day, .plan-day-row { border-radius: var(--radius-card); box-shadow: var(--shadow-oxblood-sm); border-color: transparent; }
@@ -895,6 +974,12 @@
   </symbol>
   <symbol id="ic-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <path d="M18 21a8 8 0 0 0-16 0"/><circle cx="10" cy="8" r="5"/><path d="M22 20c0-3.37-2-6.5-4-8a5 5 0 0 0-.45-8.3"/>
+  </symbol>
+  <symbol id="ic-arrow-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>
+  </symbol>
+  <symbol id="ic-more-vertical" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>
   </symbol>
   <symbol id="ic-heart" viewBox="0 0 24 24" stroke-width="1.75">
     <path d="M12 21s-7.5-4.6-10-9.3C.4 8.3 2 4.8 5.4 4.1c2-.4 4 .5 5.1 2.2C11.6 4.6 13.6 3.7 15.6 4.1c3.4.7 5 4.2 3.4 7.6C19.5 16.4 12 21 12 21z"/>
@@ -2340,7 +2425,7 @@ function renderRecipes() {
   ];
   grid.innerHTML = filtered.map((r, i) => {
     const fav = favourites.has(r.id);
-    const num = 'No. ' + String(i + 1).padStart(3, '0');   // archival numbering motif
+    const num = archiveNo(r);                               // archival numbering motif — stable per recipe
     const grad = RL_GRADS[i % RL_GRADS.length];
     const heroCls = i === 0 ? ' rl-card--hero' : '';        // first card = full-width hero
     return `
@@ -2391,6 +2476,33 @@ function getRecipeById(id) {
   return recipes.find(x => String(x.id) === String(id)) || null;
 }
 
+// Archive number (BRAND.md §6): stable per recipe, so it's taken from the
+// library order, never from the position in a filtered view.
+function archiveNo(r) {
+  const i = recipes.findIndex(x => String(x.id) === String(r.id));
+  return i >= 0 ? 'No. ' + String(i + 1).padStart(3, '0') : '';
+}
+
+function nutritionHeadHtml(srvLabel) {
+  return `<div class="rd-sec-head"><h4>Nutrition</h4><span>per serving · AI estimate${srvLabel || ''}</span></div>`;
+}
+
+// Sticky footer cost line — total scales with the batch multiplier, the
+// per-serving figure with the servings override.
+function recipeFooterHtml(r, cost, displayServings, srvScale, mult) {
+  const servings = displayServings * mult;
+  const unpriced = cost.unpriced > 0
+    ? ` · <span title="${cost.missing.join(', ')}">${cost.unpriced} unpriced</span>` : '';
+  return `<div>
+      <p class="rd-foot-lbl">Total · ${servings} serving${servings !== 1 ? 's' : ''}${unpriced}</p>
+      <p class="rd-foot-total">£${(cost.total * mult).toFixed(2)}</p>
+    </div>
+    <div class="rd-foot-pp">
+      <span class="rd-foot-pp-val">£${(cost.perPortion * srvScale).toFixed(2)}</span>
+      <span class="rd-foot-lbl">per serving</span>
+    </div>`;
+}
+
 function openModal(id) {
   const r = getRecipeById(id); if(!r) return;
   const fd = RECIPE_FULL_DATA[r.id] || null;
@@ -2425,100 +2537,121 @@ function openModal(id) {
   // ── Batch multiplier HTML ─────────────────────────────────────────────────
   const hasIngredients = fd && fd.ingredients && fd.ingredients.length;
   const multiplierHtml = hasIngredients ? `
-    <div class="modal-section" style="padding-bottom:0">
-      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-        <span style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px">Multiply</span>
-        ${[1,2,3,4].map(n=>`<button class="mult-btn${n===1?' active':''}" data-mult="${n}" onclick="setModalMultiplier(${n},'${id}')">×${n}</button>`).join('')}
-        <button class="mult-btn" data-mult="custom" onclick="promptCustomMultiplier('${id}')">Custom</button>
-        <span style="font-size:11px;color:var(--text3)" id="modal-servings-scaled"></span>
-      </div>
+    <div class="rd-batch">
+      <span class="rd-batch-lbl">Batch</span>
+      ${[1,2,3,4].map(n=>`<button class="mult-btn${n===1?' active':''}" data-mult="${n}" onclick="setModalMultiplier(${n},'${id}')">×${n}</button>`).join('')}
+      <button class="mult-btn" data-mult="custom" onclick="promptCustomMultiplier('${id}')">Custom</button>
+      <span class="rd-batch-note" id="modal-servings-scaled"></span>
     </div>` : '';
 
-  // ── Unit toggle HTML ──────────────────────────────────────────────────────
-  const unitToggleHtml = hasIngredients ? `
-    <div style="display:inline-flex;align-items:center;gap:6px;margin-left:auto">
-      <span style="font-size:11px;color:var(--text3)">Units</span>
-      <button class="mult-btn${unitPref==='metric'?' active':''}" onclick="setUnitPref('metric','${id}')">Metric</button>
-      <button class="mult-btn${unitPref==='imperial'?' active':''}" onclick="setUnitPref('imperial','${id}')">Imperial</button>
-    </div>` : '';
+  // ── Cost: a computed price goes in the sticky footer; anything else (the
+  //    "add prices" nudge, or a hardcoded per-store fallback) stays inline ──
+  const cost = computeRecipeCost(r.id);
+  const hasFooterCost = !!(cost && cost.total > 0);
+  const inlineCostHtml = hasFooterCost ? '' : renderComputedCostHtml(r.id, srvScale);
 
-  // ── Nutrition + Cost HTML ──────────────────────────────────────────────────
+  // ── Nutrition HTML ────────────────────────────────────────────────────────
   const hasApiKey = !!localStorage.getItem('ds_api_key');
   const nut = fd?.nutrition;
-  const cost = fd?.costPerPortion;
   let nutritionHtml = '';
   const srvLabel = srvScale !== 1 ? ` · scaled to ${displayServings} portion${displayServings!=1?'s':''}` : '';
   if(nut && (nut.kcal || nut.protein || nut.carbs || nut.fat)) {
     const scl = n => n != null ? Math.round(n * srvScale) : null;
-    const sclF = n => n != null ? (n * srvScale).toFixed(1) : null;
     nutritionHtml = `<div class="modal-divider"></div>
       <div class="modal-section" id="modal-nutrition-section">
-        <h4>Nutrition <span style="font-size:10px;color:var(--text3);font-weight:400;text-transform:none;letter-spacing:0">(per serving · AI estimate${srvLabel})</span></h4>
+        ${nutritionHeadHtml(srvLabel)}
         <div class="nutrition-grid">
           <div class="nutrition-cell"><div class="nc-val">${scl(nut.kcal)??'—'}</div><div class="nc-lbl">kcal</div></div>
           <div class="nutrition-cell"><div class="nc-val">${scl(nut.protein)!=null?scl(nut.protein)+'g':'—'}</div><div class="nc-lbl">protein</div></div>
           <div class="nutrition-cell"><div class="nc-val">${scl(nut.carbs)!=null?scl(nut.carbs)+'g':'—'}</div><div class="nc-lbl">carbs</div></div>
           <div class="nutrition-cell"><div class="nc-val">${scl(nut.fat)!=null?scl(nut.fat)+'g':'—'}</div><div class="nc-lbl">fat</div></div>
         </div>
-        ${renderComputedCostHtml(r.id, srvScale)}
-        ${hasApiKey?`<div style="margin-top:10px"><button class="btn-estimate" id="btnEstimateNutrition" onclick="estimateNutritionWithAI('${r.id}')">Re-estimate</button><span id="estimateStatus" style="font-size:12px;color:var(--text3);margin-left:10px"></span></div>`:''}
+        ${inlineCostHtml}
+        ${hasApiKey?`<div style="margin-top:12px"><button class="btn-estimate" id="btnEstimateNutrition" onclick="estimateNutritionWithAI('${r.id}')">Re-estimate</button><span id="estimateStatus" class="rd-status"></span></div>`:''}
       </div>`;
-  } else {
-    const computedCostHtml = renderComputedCostHtml(r.id, srvScale);
-    if(hasApiKey || computedCostHtml) {
-      nutritionHtml = `<div class="modal-divider"></div>
-        <div class="modal-section" id="modal-nutrition-section">
-          <h4>Nutrition &amp; Cost</h4>
-          ${computedCostHtml}
-          ${hasApiKey?`<p style="color:var(--text3);font-size:13px;margin-bottom:10px;margin-top:${computedCostHtml?'10':'0'}px">No nutrition data yet — estimate with AI from the ingredient list.</p>
-          <button class="btn-estimate" id="btnEstimateNutrition" onclick="estimateNutritionWithAI('${r.id}')">Estimate with AI</button>
-          <span id="estimateStatus" style="font-size:12px;color:var(--text3);margin-left:10px"></span>`:''}
-        </div>`;
-    }
+  } else if(hasApiKey || inlineCostHtml) {
+    nutritionHtml = `<div class="modal-divider"></div>
+      <div class="modal-section" id="modal-nutrition-section">
+        <h4>${inlineCostHtml ? 'Nutrition &amp; Cost' : 'Nutrition'}</h4>
+        ${inlineCostHtml}
+        ${hasApiKey?`<p class="rd-empty-note" style="margin-top:${inlineCostHtml?'10':'0'}px">No nutrition data yet — estimate with AI from the ingredient list.</p>
+        <button class="btn-estimate" id="btnEstimateNutrition" onclick="estimateNutritionWithAI('${r.id}')">Estimate with AI</button>
+        <span id="estimateStatus" class="rd-status"></span>`:''}
+      </div>`;
   }
 
   const isFav = favourites.has(r.id);
 
   const types = r.mealTypes || [];
-  const primaryType = types[0] || '';
   const typeLabel = types.map(t => TYPE_LABELS[t] || t).join(' · ');
   const cuisineName = r.cuisine ? r.cuisine.charAt(0).toUpperCase()+r.cuisine.slice(1) : '';
   const kicker = [typeLabel, cuisineName].filter(Boolean).join(' · ');
-  const rIdx = recipes.findIndex(x => String(x.id) === String(r.id));
-  const archiveNum = rIdx >= 0 ? 'No. ' + String(rIdx + 1).padStart(3, '0') : '';
+  const archiveNum = archiveNo(r);
+  const costTier = '£'.repeat(Number(r.costTier) || 0);
 
-  document.getElementById('modalContent').innerHTML = `
-    <button class="modal-close" onclick="closeModal()">×</button>
-    <button class="modal-fav-btn${isFav?' active':''}" style="position:absolute;top:16px;right:56px" onclick="toggleFav(null,'${r.id}')" title="${isFav?'Remove from favourites':'Add to favourites'}">${isFav?'♥ Saved':'♡ Save'}</button>
-    <div class="modal-header-row">
-      <div class="modal-type ${TYPE_CLASSES[primaryType]||''}">${kicker}</div>
-      ${archiveNum?`<span class="modal-archive">${archiveNum}</span>`:''}
+  const modal = document.getElementById('modalContent');
+  modal.innerHTML = `
+    <div class="rd-scroll">
+      <div class="rd-hero">
+        <svg class="ic rd-hero-mark" aria-hidden="true"><use href="#ic-utensils"/></svg>
+        <div class="rd-hero-btns">
+          <button class="rd-glass" onclick="closeModal()" aria-label="Close"><svg class="ic"><use href="#ic-arrow-left"/></svg></button>
+          <div class="rd-hero-right">
+            <button class="rd-glass rd-fav${isFav?' active':''}" onclick="toggleFav(null,'${r.id}')" aria-label="${isFav?'Remove from favourites':'Add to favourites'}"><svg class="ic"><use href="#ic-heart"/></svg></button>
+            <div class="rd-more-wrap">
+              <button class="rd-glass" data-rd-more onclick="toggleRecipeMenu(event)" aria-label="More" aria-haspopup="menu"><svg class="ic"><use href="#ic-more-vertical"/></svg></button>
+              <div class="rd-menu" role="menu">
+                <button role="menuitem" onclick="closeRecipeMenu();openTagEditor('${r.id}');document.getElementById('modal-tag-editor').scrollIntoView({behavior:'smooth',block:'start'})">Edit recipe</button>
+                ${r.instagramUrl?`<a role="menuitem" href="${r.instagramUrl}" target="_blank" rel="noopener" onclick="closeRecipeMenu()">View source on Instagram</a>`:''}
+                ${hasIngredients?`<div class="rd-menu-units">
+                  <span>Units</span>
+                  <button class="mult-btn${unitPref==='metric'?' active':''}" onclick="setUnitPref('metric','${id}')">Metric</button>
+                  <button class="mult-btn${unitPref==='imperial'?' active':''}" onclick="setUnitPref('imperial','${id}')">Imperial</button>
+                </div>`:''}
+                <button role="menuitem" class="rd-menu-danger" onclick="closeRecipeMenu();deleteRecipe('${r.id}')">Delete recipe</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="rd-body">
+        <div class="modal-header-row">
+          <div class="modal-type">${kicker}</div>
+          ${archiveNum?`<span class="modal-archive">${archiveNum}</span>`:''}
+        </div>
+        <h2 class="modal-title">${r.name}</h2>
+        <div class="modal-meta">
+          ${r.servings?`<div class="modal-meta-item"><svg class="ic"><use href="#ic-users"/></svg> <span class="servings-override">Serves <input class="servings-input" type="number" min="1" value="${displayServings}" onchange="updateServingOverride('${r.id}',this.value)" title="Change serving count to rescale nutrition" aria-label="Servings"></span></div>`:''}
+          ${r.prepTime?`<div class="modal-meta-item"><svg class="ic"><use href="#ic-clock"/></svg> ${r.prepTime}</div>`:''}
+          ${costTier?`<div class="modal-meta-item"><strong>${costTier}</strong> per portion</div>`:''}
+        </div>
+        ${r.description?`<p class="modal-desc">${r.description}</p>`:''}
+        ${multiplierHtml}
+        <div id="modal-tag-editor" style="display:none"></div>
+        ${r.notes?`<div class="modal-divider"></div><div class="modal-section"><h4>Batch cook notes</h4><p>${r.notes}</p></div>`:''}
+        <div class="modal-divider"></div>
+        <div id="modal-ingredients-section">${ingredientsHtml}</div>
+        ${methodHtml}
+        ${tipsHtml}
+        ${nutritionHtml}
+      </div>
     </div>
-    <div class="modal-title">${r.name}</div>
-    ${r.description?`<div class="modal-desc">${r.description}</div>`:''}
-    <div class="modal-meta">
-      ${r.servings?`<div class="modal-meta-item"><svg class="ic"><use href="#ic-users"/></svg> <span class="servings-override">Serves <input class="servings-input" type="number" min="1" value="${displayServings}" onchange="updateServingOverride('${r.id}',this.value)" title="Change serving count to rescale nutrition"></span></div>`:''}
-      ${r.prepTime?`<div class="modal-meta-item"><svg class="ic"><use href="#ic-clock"/></svg> <strong>${r.prepTime}</strong></div>`:''}
-      ${'£'.repeat(r.costTier)?`<div class="modal-meta-item"><strong>${'£'.repeat(r.costTier)}</strong> per portion</div>`:''}
-      ${unitToggleHtml}
-    </div>
-    ${multiplierHtml}
-    <div style="display:flex;gap:8px;align-items:center;margin:4px 0 8px">
-      <button class="btn-edit-open" onclick="openTagEditor('${r.id}')">Edit recipe</button>
-      <button class="btn-edit-open" style="color:var(--accent);opacity:.7" onclick="deleteRecipe('${r.id}')">Delete</button>
-    </div>
-    <div id="modal-tag-editor" style="display:none"></div>
-    ${r.notes?`<div class="modal-section"><h4>Batch cook notes</h4><p>${r.notes}</p></div>`:''}
-    <div class="modal-divider"></div>
-    <div id="modal-ingredients-section">${ingredientsHtml}</div>
-    ${methodHtml}
-    ${tipsHtml}
-    ${nutritionHtml}
-    ${r.instagramUrl?`<div class="modal-divider"></div><div class="modal-section"><h4>Source</h4><a href="${r.instagramUrl}" target="_blank" class="modal-instagram-link">View on Instagram</a></div>`:''}
+    ${hasFooterCost?`<div class="rd-foot" id="rdFoot">${recipeFooterHtml(r, cost, displayServings, srvScale, 1)}</div>`:''}
   `;
   document.getElementById('modalOverlay').classList.add('open');
 }
-function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+
+function toggleRecipeMenu(e) {
+  e.stopPropagation();
+  const menu = e.currentTarget.parentElement.querySelector('.rd-menu');
+  if (menu) menu.classList.toggle('open');
+}
+function closeRecipeMenu() {
+  document.querySelectorAll('.rd-menu.open').forEach(m => m.classList.remove('open'));
+}
+document.addEventListener('click', e => { if (!e.target.closest('.rd-more-wrap')) closeRecipeMenu(); });
+
+function closeModal() { closeRecipeMenu(); document.getElementById('modalOverlay').classList.remove('open'); }
 function closeModalOnOverlay(e) { if(e.target===document.getElementById('modalOverlay')) closeModal(); }
 
 function toggleFav(event, id) {
@@ -2535,11 +2668,10 @@ function toggleFav(event, id) {
     }
   });
   // Update modal button if open
-  const modalBtn = document.querySelector('.modal-fav-btn');
+  const modalBtn = document.querySelector('.rd-fav');
   if(modalBtn) {
     modalBtn.classList.toggle('active', favourites.has(id));
-    modalBtn.textContent = favourites.has(id) ? '♥ Saved' : '♡ Save';
-    modalBtn.title = favourites.has(id) ? 'Remove from favourites' : 'Add to favourites';
+    modalBtn.setAttribute('aria-label', favourites.has(id) ? 'Remove from favourites' : 'Add to favourites');
   }
   // If favourites filter is active and we unfavourited, re-render
   if(filters.favourites && !favourites.has(id)) renderRecipes();
@@ -3932,7 +4064,7 @@ async function estimateNutritionWithAI(id) {
     const section = document.getElementById('modal-nutrition-section');
     if(section) {
       section.innerHTML = `
-        <h4>Nutrition <span style="font-size:10px;color:var(--text3);font-weight:400;text-transform:none;letter-spacing:0">(per serving · AI estimate)</span></h4>
+        ${nutritionHeadHtml()}
         <div class="nutrition-grid">
           <div class="nutrition-cell"><div class="nc-val">${nut.kcal??'—'}</div><div class="nc-lbl">kcal</div></div>
           <div class="nutrition-cell"><div class="nc-val">${nut.protein!=null?nut.protein+'g':'—'}</div><div class="nc-lbl">protein</div></div>
@@ -3942,7 +4074,7 @@ async function estimateNutritionWithAI(id) {
         ${renderCostHtml(cost)}
         <div style="margin-top:10px">
           <button class="btn-estimate" id="btnEstimateNutrition" onclick="estimateNutritionWithAI('${id}')">Re-estimate</button>
-          <span id="estimateStatus" style="font-size:12px;color:var(--green);margin-left:10px">✓ Saved!</span>
+          <span id="estimateStatus" class="rd-status">✓ Saved</span>
         </div>`;
     }
   } catch(err) {
@@ -5142,6 +5274,7 @@ function buildIngredientsHtml(fd, multiplier, toImperial) {
   if (!fd || !fd.ingredients || !fd.ingredients.length) return '';
   let lastGroup = null;
   let items = '';
+  let n = 0;
   for (const ing of fd.ingredients) {
     if (ing.group && ing.group !== lastGroup) {
       items += `<li class="recipe-ingredient-group">${ing.group}</li>`;
@@ -5150,7 +5283,7 @@ function buildIngredientsHtml(fd, multiplier, toImperial) {
     let item = _ingToText(ing);
     if (multiplier !== 1) item = multiplyIngredientText(item, multiplier);
     if (toImperial) item = convertIngredientText(item, true);
-    items += `<li class="recipe-ingredient-item">${item}</li>`;
+    items += `<li class="recipe-ingredient-item"><span class="rd-ing-no">${String(++n).padStart(2, '0')}</span><span>${item}</span></li>`;
   }
   return `<div class="modal-section"><h4>Ingredients</h4><ul class="recipe-ingredients">${items}</ul></div><div class="modal-divider"></div>`;
 }
@@ -5158,17 +5291,24 @@ function buildIngredientsHtml(fd, multiplier, toImperial) {
 function setModalMultiplier(factor, recipeId) {
   modalMultiplier = factor;
   const fd = RECIPE_FULL_DATA[recipeId] || null;
-  const r = recipes.find(x => x.id === recipeId); if (!r) return;
+  const r = getRecipeById(recipeId); if (!r) return;
   // Update multiplier buttons
-  document.querySelectorAll('.mult-btn').forEach(b => b.classList.toggle('active', Number(b.dataset.mult) === factor));
-  // Re-render ingredients
+  document.querySelectorAll('.rd-batch .mult-btn').forEach(b => b.classList.toggle('active', Number(b.dataset.mult) === factor));
+  // Re-render ingredients (innerHTML, so the section keeps its id for the next change)
   const ingSection = document.getElementById('modal-ingredients-section');
-  if (ingSection) ingSection.outerHTML = buildIngredientsHtml(fd, modalMultiplier, unitPref === 'imperial');
+  if (ingSection) ingSection.innerHTML = buildIngredientsHtml(fd, modalMultiplier, unitPref === 'imperial');
   // Update servings display
+  const displayServings = servingOverrides[r.id] || r.servings || 1;
   const srvDisplay = document.getElementById('modal-servings-scaled');
   if (srvDisplay && r.servings) {
-    const total = r.servings * factor;
-    srvDisplay.textContent = factor > 1 ? ` → ${total} total` : '';
+    srvDisplay.textContent = factor !== 1 ? `${+(displayServings * factor).toFixed(2)} servings` : '';
+  }
+  // Footer total scales with the batch
+  const foot = document.getElementById('rdFoot');
+  const cost = computeRecipeCost(r.id);
+  if (foot && cost && cost.total > 0) {
+    const srvScale = r.servings ? (r.servings / displayServings) : 1;
+    foot.innerHTML = recipeFooterHtml(r, cost, displayServings, srvScale, factor);
   }
 }
 
